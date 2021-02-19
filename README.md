@@ -164,14 +164,14 @@ Project Link: [https://github.com/MechResato/DeflectionAnalyzer](https://github.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/MechResato/repo.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/MechResato/DeflectionAnalyzer.svg?style=for-the-badge
 [contributors-url]: https://github.com/MechResato/DeflectionAnalyzer/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/MechResato/repo.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/MechResato/DeflectionAnalyzer.svg?style=for-the-badge
 [forks-url]: https://github.com/MechResato/DeflectionAnalyzer/network/members
-[stars-shield]: https://img.shields.io/github/stars/MechResato/repo.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/MechResato/DeflectionAnalyzer.svg?style=for-the-badge
 [stars-url]: https://github.com/MechResato/DeflectionAnalyzer/stargazers
-[issues-shield]: https://img.shields.io/github/issues/MechResato/repo.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/MechResato/DeflectionAnalyzer.svg?style=for-the-badge
 [issues-url]: https://github.com/MechResato/DeflectionAnalyzer/issues
-[license-shield]: https://img.shields.io/github/license/MechResato/repo.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/MechResato/DeflectionAnalyzer.svg?style=for-the-badge
 [license-url]: https://github.com/MechResato/DeflectionAnalyzer/blob/master/LICENSE.txt
 [product-screenshot]: images/overview.jpg
