@@ -32,7 +32,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/MechResato/DeflectionAnalyzer">
-    <img src="images/logo.png" alt="Logo" width="410" height="165">
+    <img src="images/logo1.png" alt="Logo" width="410" height="165">
   </a>
 
   <h3 align="center"></h3>
