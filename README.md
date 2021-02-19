@@ -38,7 +38,7 @@
   <h3 align="center"></h3>
 
   <p align="center">
-    project_description
+    A XMC microcontroller based platform for analysis and interpretation of sensors focused on motorcycle suspensions
     <br />
     <a href="https://github.com/MechResato/DeflectionAnalyzer"><strong>Explore the docs »</strong></a>
     <br />
@@ -60,7 +60,8 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#motivation">Motivation</a></li>
+		<li><a href="#hardware">Hardware</a></li>
       </ul>
     </li>
     <li>
@@ -75,7 +76,7 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
+    <li><a href="#acknowledgements-and-resources">Acknowledgements and Resources</a></li>
   </ol>
 </details>
 
@@ -86,30 +87,31 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://github.com/MechResato/DeflectionAnalyzer/images)
 
-### Built With
+### Motivation
 
 * []()
 * []()
 * []()
 
+### Hardware
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-<!-- To get a local copy up and running follow these simple steps.
+<!-- To get a local copy up and running follow these simple steps.-->
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
+<!-- This is an example of how to list things you need to use the software and how to install them.
 * npm
   ```sh
-  npm install npm@latest -g
+  npm install npm@latest -g-->
   ```
 
 ### Installation
 
-1. Clone the repo
+<!-- 1. Clone the repo
    ```sh
    git clone https://github.com/MechResato/DeflectionAnalyzer.git
    ```
@@ -165,11 +167,11 @@ Project Link: [https://github.com/MechResato/DeflectionAnalyzer](https://github.
 
 
 
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
+<!-- ACKNOWLEDGEMENTS & RESOURCES -->
+## Acknowledgements and Resources
 
-* []()
-* []()
+* [othneildrew - Best-README-Template](https://github.com/othneildrew/Best-README-Template)
+* [RudolphRiedel - FT800-FT813](https://github.com/RudolphRiedel/FT800-FT813)
 * []()
 
 
