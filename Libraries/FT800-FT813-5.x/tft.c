@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <globals.h>
 #include "EVE.h"
 #include "tft_data.h"
 
@@ -84,9 +85,9 @@ uint32_t num_dl_static; // amount of bytes in the static part of our display-lis
 
 /////////// General Variables
 uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
-volatile uint8_t frameover = 0; // Debug value - is set to one if the sensor buffer gets full the first time (used to only run debugcode when actual data is there...)
+//volatile uint8_t frameover = 0; // Debug value - is set to one if the sensor buffer gets full the first time (used to only run debugcode when actual data is there...)
 // Input signal type used in main for measurement and here for swithcen on touch
-volatile uint8_t InputType = 3; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+//volatile uint8_t InputType = 3; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
 
 
 /////////// Button states
@@ -111,14 +112,14 @@ void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint
 	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
 	///  width	... width of the actual graph data area in full Pixels
 	///  height	... height of the actual graph data area in full Pixels
-	///  padding	...	clearance from the outer corners (x,y) to the axes
+	///  padding ... clearance from the outer corners (x,y) to the axes
 	///  amp_max ... maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% horizontal line
-	///  t_max 	... maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
+	///  t_max 	 ... maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
 	///  h_grid_lines ... number of horizontal grid lines
 	///  v_grid_lines ... number of vertical grid lines
 	///  Note: The predefined GRAPH_AXISCOLOR and GRAPH_GRIDCOLOR are used directly!
 
-	// Define a array of function pointers for every used "EVE_cmd_dl..." function. First on is normal, second on is to be used with burst mode
+	// Define a array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used with burst mode
 	void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
 	void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
 	void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};

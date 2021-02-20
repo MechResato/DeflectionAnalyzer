@@ -95,6 +95,15 @@
 							<tool id="com.ifx.xmc4000.printsize.1969046066" name="ARM-GCC Print Size" superClass="com.ifx.xmc4000.printsize"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.ifx.xmc4000.appRelease.1369295884.1464585266" name="globals.c" rcbsApplicability="disable" resourcePath="globals.c" toolsToInvoke="com.ifx.xmc4000.appRelease.compiler.1399137610.1614485936">
+						<tool id="com.ifx.xmc4000.appRelease.compiler.1399137610.1614485936" name="ARM-GCC C Compiler" superClass="com.ifx.xmc4000.appRelease.compiler.1399137610"/>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.286212429" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.370010754" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1225052354" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
 					<sourceEntries>
 						<entry excluding="main_test.c|Dave/Model" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
@@ -196,6 +205,9 @@
 							<tool id="com.ifx.xmc4000.printsize.2004772897" name="ARM-GCC Print Size" superClass="com.ifx.xmc4000.printsize"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.ifx.xmc4000.appDebug.2017222501.1756532105" name="globals.c" rcbsApplicability="disable" resourcePath="globals.c" toolsToInvoke="com.ifx.xmc4000.appDebug.compiler.964839220.850214636">
+						<tool id="com.ifx.xmc4000.appDebug.compiler.964839220.850214636" name="ARM-GCC C Compiler" superClass="com.ifx.xmc4000.appDebug.compiler.964839220"/>
+					</fileInfo>
 					<sourceEntries>
 						<entry excluding="main_test.c|Dave/Model" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
@@ -241,4 +253,5 @@
 			<resource resourceType="PROJECT" workspacePath="/DataAcquisitionAnalyzerPlatform_XMC4700"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

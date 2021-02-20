@@ -2807,60 +2807,25 @@
  250 001c 80BD     	 pop {r7,pc}
  251              	 .cfi_endproc
  252              	.LFE306:
- 254              	 .comm InputType,1,1
- 255              	 .comm frameover,1,1
- 256              	 .global InputBuffer1_idx
- 257 001e 00BF     	 .section .bss.InputBuffer1_idx,"aw",%nobits
- 258              	 .align 1
- 261              	InputBuffer1_idx:
- 262 0000 0000     	 .space 2
- 263              	 .global InputBuffer1
- 264              	 .section .bss.InputBuffer1,"aw",%nobits
- 265              	 .align 2
- 268              	InputBuffer1:
- 269 0000 00000000 	 .space 880
- 269      00000000 
- 269      00000000 
- 269      00000000 
- 269      00000000 
- 270              	 .comm result,2,2
- 271              	 .global tft_tick
- 272              	 .section .bss.tft_tick,"aw",%nobits
- 275              	tft_tick:
- 276 0000 00       	 .space 1
- 277              	 .global _msCounter
- 278              	 .section .bss._msCounter,"aw",%nobits
- 279              	 .align 2
- 282              	_msCounter:
- 283 0000 00000000 	 .space 4
- 284              	 .global MeasurementCounter
- 285              	 .section .bss.MeasurementCounter,"aw",%nobits
- 286              	 .align 2
- 289              	MeasurementCounter:
- 290 0000 00000000 	 .space 4
- 291              	 .global lastval
- 292              	 .section .bss.lastval,"aw",%nobits
- 293              	 .align 2
- 296              	lastval:
- 297 0000 00000000 	 .space 4
- 298              	 .global __aeabi_ui2d
- 299              	 .global __aeabi_ddiv
- 300              	 .global __aeabi_dmul
- 301              	 .global __aeabi_dadd
- 302              	 .global __aeabi_d2uiz
- 303              	 .section .text.VADC0_C0_2_IRQHandler,"ax",%progbits
- 304              	 .align 2
- 305              	 .global VADC0_C0_2_IRQHandler
- 306              	 .thumb
- 307              	 .thumb_func
- 309              	VADC0_C0_2_IRQHandler:
- 310              	.LFB437:
- 311              	 .file 4 "../main.c"
+ 254              	 .comm _msCounter,4,4
+ 255              	 .comm tft_tick,1,1
+ 256              	 .comm MeasurementCounter,4,4
+ 257              	 .comm InputBuffer1_idx,2,2
+ 258              	 .comm InputType,1,1
+ 259              	 .comm frameover,1,1
+ 260 001e 00BF     	 .section .text.main,"ax",%progbits
+ 261              	 .align 2
+ 262              	 .global main
+ 263              	 .thumb
+ 264              	 .thumb_func
+ 266              	main:
+ 267              	.LFB437:
+ 268              	 .file 4 "../main.c"
    1:../main.c     **** /*
    2:../main.c     ****  * main.c
    3:../main.c     ****  *  Created on: 2021 Feb 19 20:41:21
    4:../main.c     ****  *  Author: Rene Santeler @ MCI 2020/21
-   5:../main.c     ****  *  Version: V0.1 (Abgabeversion Projekt)
+   5:../main.c     ****  *  Version: V0.1
    6:../main.c     ****  *  Comment:
    7:../main.c     ****  *  Parts are taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done with Stefan 
    8:../main.c     ****  */
@@ -2869,623 +2834,200 @@
   11:../main.c     **** #include <stdio.h>
   12:../main.c     **** #include <stdint.h>
   13:../main.c     **** #include <math.h>
-  14:../main.c     **** #include <FT800-FT813-5.x/tft.h> // Implementation of display communication using the EVE Library o
-  15:../main.c     **** 
-  16:../main.c     **** 
-  17:../main.c     **** //// Debug
-  18:../main.c     **** //#define DEBUG_ENABLE // self implemented Debug flag
-  19:../main.c     **** #if defined (DEBUG_ENABLE)
-  20:../main.c     **** 	extern void initialise_monitor_handles(void);
-  21:../main.c     **** #else
-  22:../main.c     **** 	#define printf(...) { ; }
-  23:../main.c     **** #endif
+  14:../main.c     **** #include <globals.h>
+  15:../main.c     **** #include <FT800-FT813-5.x/tft.h> // Implementation of display communication using the EVE Library o
+  16:../main.c     **** #include <measure.h>
+  17:../main.c     **** 
+  18:../main.c     **** 
+  19:../main.c     **** 
+  20:../main.c     **** 
+  21:../main.c     **** 
+  22:../main.c     **** 
+  23:../main.c     **** 
   24:../main.c     **** 
-  25:../main.c     **** //// Input Buffer
-  26:../main.c     **** #define InputBuffer1_size (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage      
-  27:../main.c     **** uint16_t InputBuffer1_idx = 0;
-  28:../main.c     **** XMC_VADC_RESULT_SIZE_t InputBuffer1[InputBuffer1_size] = { 0 }; // all elements 0
-  29:../main.c     **** 
-  30:../main.c     **** //// System, counter and debug variables
-  31:../main.c     **** volatile XMC_VADC_RESULT_SIZE_t result;
-  32:../main.c     **** volatile uint8_t tft_tick = 0;
-  33:../main.c     **** volatile uint32_t _msCounter = 0;
-  34:../main.c     **** volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
-  35:../main.c     **** 
-  36:../main.c     **** //// Adc_Measurement_Handler
-  37:../main.c     **** extern volatile uint8_t InputType; // defined in tft.c, used to select signal reorded by  Adc_Measu
-  38:../main.c     **** uint32_t lastval = 0; // just for TestTriangle signal
-  39:../main.c     **** 
+  25:../main.c     **** int main(void)
+  26:../main.c     **** {
+ 269              	 .loc 4 26 0
+ 270              	 .cfi_startproc
+ 271              	 
+ 272              	 
+ 273 0000 80B5     	 push {r7,lr}
+ 274              	.LCFI22:
+ 275              	 .cfi_def_cfa_offset 8
+ 276              	 .cfi_offset 7,-8
+ 277              	 .cfi_offset 14,-4
+ 278 0002 82B0     	 sub sp,sp,#8
+ 279              	.LCFI23:
+ 280              	 .cfi_def_cfa_offset 16
+ 281 0004 00AF     	 add r7,sp,#0
+ 282              	.LCFI24:
+ 283              	 .cfi_def_cfa_register 7
+  27:../main.c     **** 	#if defined (DEBUG_ENABLE)
+  28:../main.c     **** 	initialise_monitor_handles();
+  29:../main.c     **** 	#endif
+  30:../main.c     **** 
+  31:../main.c     **** 	DAVE_STATUS_t status;
+  32:../main.c     **** 	status = DAVE_Init();           /* Initialization of DAVE APPs  */
+ 284              	 .loc 4 32 0
+ 285 0006 FFF7FEFF 	 bl DAVE_Init
+ 286 000a 0346     	 mov r3,r0
+ 287 000c BB71     	 strb r3,[r7,#6]
+  33:../main.c     **** 	if(status != DAVE_STATUS_SUCCESS) {
+ 288              	 .loc 4 33 0
+ 289 000e BB79     	 ldrb r3,[r7,#6]
+ 290 0010 002B     	 cmp r3,#0
+ 291 0012 00D0     	 beq .L14
+ 292              	.L15:
+  34:../main.c     **** 		/* Placeholder for error handler code. The while loop below can be replaced with an user error ha
+  35:../main.c     **** 		printf("DAVE APPs initialization failed\n");
+  36:../main.c     **** 
+  37:../main.c     **** 		while(1U){ }
+ 293              	 .loc 4 37 0 discriminator 1
+ 294 0014 FEE7     	 b .L15
+ 295              	.L14:
+  38:../main.c     **** 	}
+  39:../main.c     **** 	else{ printf("DAVE APPs initialization successful\n"); }
   40:../main.c     **** 
-  41:../main.c     **** 
-  42:../main.c     **** 
+  41:../main.c     **** 	// Arm-M internal interrupt init
+  42:../main.c     **** 	SysTick_Config(SystemCoreClock / 144);
+ 296              	 .loc 4 42 0
+ 297 0016 1D4B     	 ldr r3,.L20
+ 298 0018 1B68     	 ldr r3,[r3]
+ 299 001a 1D4A     	 ldr r2,.L20+4
+ 300 001c A2FB0323 	 umull r2,r3,r2,r3
+ 301 0020 5B09     	 lsrs r3,r3,#5
+ 302 0022 1846     	 mov r0,r3
+ 303 0024 FFF7FEFF 	 bl SysTick_Config
   43:../main.c     **** 
-  44:../main.c     **** void Adc_Measurement_Handler(void){
- 312              	 .loc 4 44 0
- 313              	 .cfi_startproc
- 314              	 
- 315              	 
- 316 0000 98B5     	 push {r3,r4,r7,lr}
- 317              	.LCFI22:
- 318              	 .cfi_def_cfa_offset 16
- 319              	 .cfi_offset 3,-16
- 320              	 .cfi_offset 4,-12
- 321              	 .cfi_offset 7,-8
- 322              	 .cfi_offset 14,-4
- 323 0002 00AF     	 add r7,sp,#0
- 324              	.LCFI23:
- 325              	 .cfi_def_cfa_register 7
-  45:../main.c     **** 	/// Do measurements and store result in buffer. Allows to 'measure' self produced test signal base
-  46:../main.c     **** 	/// uses global/extern variables: InputType, InputBuffer1_idx, InputBuffer1_size, InputBuffer1, tf
-  47:../main.c     **** 
-  48:../main.c     **** 	// Increment current Buffer index and set back to 0 if greater than size of array
-  49:../main.c     **** 	InputBuffer1_idx++;
- 326              	 .loc 4 49 0
- 327 0004 664B     	 ldr r3,.L25+24
- 328 0006 1B88     	 ldrh r3,[r3]
- 329 0008 0133     	 adds r3,r3,#1
- 330 000a 9AB2     	 uxth r2,r3
- 331 000c 644B     	 ldr r3,.L25+24
- 332 000e 1A80     	 strh r2,[r3]
-  50:../main.c     **** 	if(InputBuffer1_idx >= InputBuffer1_size){
- 333              	 .loc 4 50 0
- 334 0010 634B     	 ldr r3,.L25+24
- 335 0012 1B88     	 ldrh r3,[r3]
- 336 0014 B3F5DC7F 	 cmp r3,#440
- 337 0018 05D3     	 bcc .L14
-  51:../main.c     **** 		//printf("fo\n");
-  52:../main.c     **** 		frameover = 1;
- 338              	 .loc 4 52 0
- 339 001a 624B     	 ldr r3,.L25+28
- 340 001c 0122     	 movs r2,#1
- 341 001e 1A70     	 strb r2,[r3]
-  53:../main.c     **** 		InputBuffer1_idx = 0;
- 342              	 .loc 4 53 0
- 343 0020 5F4B     	 ldr r3,.L25+24
- 344 0022 0022     	 movs r2,#0
- 345 0024 1A80     	 strh r2,[r3]
- 346              	.L14:
-  54:../main.c     **** 	}
-  55:../main.c     **** 
-  56:../main.c     **** 	/// Read next value from sensor
-  57:../main.c     **** 	 switch (InputType){
- 347              	 .loc 4 57 0
- 348 0026 604B     	 ldr r3,.L25+32
- 349 0028 1B78     	 ldrb r3,[r3]
- 350 002a DBB2     	 uxtb r3,r3
- 351 002c 032B     	 cmp r3,#3
- 352 002e 00F29F80 	 bhi .L15
- 353 0032 01A2     	 adr r2,.L17
- 354 0034 52F823F0 	 ldr pc,[r2,r3,lsl#2]
- 355              	 .p2align 2
- 356              	.L17:
- 357 0038 49000000 	 .word .L16+1
- 358 003c 61000000 	 .word .L18+1
- 359 0040 9D000000 	 .word .L19+1
- 360 0044 E3000000 	 .word .L20+1
- 361              	 .p2align 1
- 362              	.L16:
-  58:../main.c     **** 		// 0 ADC Sensor 5
-  59:../main.c     **** 		case 0:
-  60:../main.c     **** 			InputBuffer1[InputBuffer1_idx] = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A); //result
- 363              	 .loc 4 60 0
- 364 0048 554B     	 ldr r3,.L25+24
- 365 004a 1B88     	 ldrh r3,[r3]
- 366 004c 1C46     	 mov r4,r3
- 367 004e 5748     	 ldr r0,.L25+36
- 368 0050 FFF7FEFF 	 bl ADC_MEASUREMENT_GetResult
- 369 0054 0346     	 mov r3,r0
- 370 0056 1A46     	 mov r2,r3
- 371 0058 554B     	 ldr r3,.L25+40
- 372 005a 23F81420 	 strh r2,[r3,r4,lsl#1]
-  61:../main.c     **** 			break;
- 373              	 .loc 4 61 0
- 374 005e 87E0     	 b .L15
- 375              	.L18:
-  62:../main.c     **** 		// 1 TestImpulse
-  63:../main.c     **** 		case 1:
-  64:../main.c     **** 			if(InputBuffer1_idx % (InputBuffer1_size/5)) InputBuffer1[InputBuffer1_idx] = 0;
- 376              	 .loc 4 64 0
- 377 0060 4F4B     	 ldr r3,.L25+24
- 378 0062 1B88     	 ldrh r3,[r3]
- 379 0064 534A     	 ldr r2,.L25+44
- 380 0066 A2FB0312 	 umull r1,r2,r2,r3
- 381 006a 9209     	 lsrs r2,r2,#6
- 382 006c 5821     	 movs r1,#88
- 383 006e 01FB02F2 	 mul r2,r1,r2
- 384 0072 9B1A     	 subs r3,r3,r2
- 385 0074 9BB2     	 uxth r3,r3
- 386 0076 002B     	 cmp r3,#0
- 387 0078 07D0     	 beq .L21
- 388              	 .loc 4 64 0 is_stmt 0 discriminator 1
- 389 007a 494B     	 ldr r3,.L25+24
- 390 007c 1B88     	 ldrh r3,[r3]
- 391 007e 1A46     	 mov r2,r3
- 392 0080 4B4B     	 ldr r3,.L25+40
- 393 0082 0021     	 movs r1,#0
- 394 0084 23F81210 	 strh r1,[r3,r2,lsl#1]
-  65:../main.c     **** 			else InputBuffer1[InputBuffer1_idx] = 4095;
-  66:../main.c     **** 			break;
- 395              	 .loc 4 66 0 is_stmt 1 discriminator 1
- 396 0088 72E0     	 b .L15
- 397              	.L21:
-  65:../main.c     **** 			else InputBuffer1[InputBuffer1_idx] = 4095;
- 398              	 .loc 4 65 0
- 399 008a 454B     	 ldr r3,.L25+24
- 400 008c 1B88     	 ldrh r3,[r3]
- 401 008e 1A46     	 mov r2,r3
- 402 0090 474B     	 ldr r3,.L25+40
- 403 0092 40F6FF71 	 movw r1,#4095
- 404 0096 23F81210 	 strh r1,[r3,r2,lsl#1]
- 405              	 .loc 4 66 0
- 406 009a 69E0     	 b .L15
- 407              	.L19:
-  67:../main.c     **** 		// 2 TestSawtooth
-  68:../main.c     **** 		case 2:
-  69:../main.c     **** 			if(lastval < 4095) InputBuffer1[InputBuffer1_idx] = lastval+14;
- 408              	 .loc 4 69 0
- 409 009c 464B     	 ldr r3,.L25+48
- 410 009e 1B68     	 ldr r3,[r3]
- 411 00a0 40F6FE72 	 movw r2,#4094
- 412 00a4 9342     	 cmp r3,r2
- 413 00a6 0BD8     	 bhi .L23
- 414              	 .loc 4 69 0 is_stmt 0 discriminator 1
- 415 00a8 3D4B     	 ldr r3,.L25+24
- 416 00aa 1B88     	 ldrh r3,[r3]
- 417 00ac 1A46     	 mov r2,r3
- 418 00ae 424B     	 ldr r3,.L25+48
- 419 00b0 1B68     	 ldr r3,[r3]
- 420 00b2 9BB2     	 uxth r3,r3
- 421 00b4 0E33     	 adds r3,r3,#14
- 422 00b6 99B2     	 uxth r1,r3
- 423 00b8 3D4B     	 ldr r3,.L25+40
- 424 00ba 23F81210 	 strh r1,[r3,r2,lsl#1]
- 425 00be 06E0     	 b .L24
- 426              	.L23:
-  70:../main.c     **** 			else InputBuffer1[InputBuffer1_idx] = 0;
- 427              	 .loc 4 70 0 is_stmt 1
- 428 00c0 374B     	 ldr r3,.L25+24
- 429 00c2 1B88     	 ldrh r3,[r3]
- 430 00c4 1A46     	 mov r2,r3
- 431 00c6 3A4B     	 ldr r3,.L25+40
- 432 00c8 0021     	 movs r1,#0
- 433 00ca 23F81210 	 strh r1,[r3,r2,lsl#1]
- 434              	.L24:
-  71:../main.c     **** 			lastval = InputBuffer1[InputBuffer1_idx];
- 435              	 .loc 4 71 0
- 436 00ce 344B     	 ldr r3,.L25+24
- 437 00d0 1B88     	 ldrh r3,[r3]
- 438 00d2 1A46     	 mov r2,r3
- 439 00d4 364B     	 ldr r3,.L25+40
- 440 00d6 33F81230 	 ldrh r3,[r3,r2,lsl#1]
- 441 00da 1A46     	 mov r2,r3
- 442 00dc 364B     	 ldr r3,.L25+48
- 443 00de 1A60     	 str r2,[r3]
-  72:../main.c     **** 			break;
- 444              	 .loc 4 72 0
- 445 00e0 46E0     	 b .L15
- 446              	.L20:
-  73:../main.c     **** 		// 3 TestSine (Note: The used time variable is not perfect for this purpose)
-  74:../main.c     **** 		case 3:
-  75:../main.c     **** 			InputBuffer1[InputBuffer1_idx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)Measure
- 447              	 .loc 4 75 0
- 448 00e2 2F4B     	 ldr r3,.L25+24
- 449 00e4 1B88     	 ldrh r3,[r3]
- 450 00e6 1C46     	 mov r4,r3
- 451 00e8 344B     	 ldr r3,.L25+52
- 452 00ea 1B68     	 ldr r3,[r3]
- 453 00ec 1846     	 mov r0,r3
- 454 00ee FFF7FEFF 	 bl __aeabi_ui2d
- 455 00f2 0246     	 mov r2,r0
- 456 00f4 0B46     	 mov r3,r1
- 457 00f6 1046     	 mov r0,r2
- 458 00f8 1946     	 mov r1,r3
- 459 00fa 23A3     	 adr r3,.L25
- 460 00fc D3E90023 	 ldrd r2,[r3]
- 461 0100 FFF7FEFF 	 bl __aeabi_ddiv
- 462 0104 0246     	 mov r2,r0
- 463 0106 0B46     	 mov r3,r1
- 464 0108 1046     	 mov r0,r2
- 465 010a 1946     	 mov r1,r3
- 466 010c 20A3     	 adr r3,.L25+8
- 467 010e D3E90023 	 ldrd r2,[r3]
- 468 0112 FFF7FEFF 	 bl __aeabi_dmul
- 469 0116 0246     	 mov r2,r0
- 470 0118 0B46     	 mov r3,r1
- 471 011a 1046     	 mov r0,r2
- 472 011c 1946     	 mov r1,r3
- 473 011e FFF7FEFF 	 bl sin
- 474 0122 0246     	 mov r2,r0
- 475 0124 0B46     	 mov r3,r1
- 476 0126 1046     	 mov r0,r2
- 477 0128 1946     	 mov r1,r3
- 478 012a 4FF00002 	 mov r2,#0
- 479 012e 244B     	 ldr r3,.L25+56
- 480 0130 FFF7FEFF 	 bl __aeabi_dadd
- 481 0134 0246     	 mov r2,r0
- 482 0136 0B46     	 mov r3,r1
- 483 0138 1046     	 mov r0,r2
- 484 013a 1946     	 mov r1,r3
- 485 013c 4FF00002 	 mov r2,#0
- 486 0140 204B     	 ldr r3,.L25+60
- 487 0142 FFF7FEFF 	 bl __aeabi_dmul
- 488 0146 0246     	 mov r2,r0
- 489 0148 0B46     	 mov r3,r1
- 490 014a 1046     	 mov r0,r2
- 491 014c 1946     	 mov r1,r3
- 492 014e 12A3     	 adr r3,.L25+16
- 493 0150 D3E90023 	 ldrd r2,[r3]
- 494 0154 FFF7FEFF 	 bl __aeabi_dmul
- 495 0158 0246     	 mov r2,r0
- 496 015a 0B46     	 mov r3,r1
- 497 015c 1046     	 mov r0,r2
- 498 015e 1946     	 mov r1,r3
- 499 0160 FFF7FEFF 	 bl __aeabi_d2uiz
- 500 0164 0346     	 mov r3,r0
- 501 0166 9AB2     	 uxth r2,r3
- 502 0168 114B     	 ldr r3,.L25+40
- 503 016a 23F81420 	 strh r2,[r3,r4,lsl#1]
-  76:../main.c     **** 			break;
- 504              	 .loc 4 76 0
- 505 016e 00BF     	 nop
- 506              	.L15:
-  77:../main.c     **** 	 }
-  78:../main.c     **** 
-  79:../main.c     **** 	// Trigger next main loop (with his it is running in synch with the measurement -> change if neede
-  80:../main.c     **** 	tft_tick = 42;
- 507              	 .loc 4 80 0
- 508 0170 154B     	 ldr r3,.L25+64
- 509 0172 2A22     	 movs r2,#42
- 510 0174 1A70     	 strb r2,[r3]
-  81:../main.c     **** 
-  82:../main.c     **** 	// Increase count of executed measurements
-  83:../main.c     **** 	MeasurementCounter++;
- 511              	 .loc 4 83 0
- 512 0176 114B     	 ldr r3,.L25+52
- 513 0178 1B68     	 ldr r3,[r3]
- 514 017a 0133     	 adds r3,r3,#1
- 515 017c 0F4A     	 ldr r2,.L25+52
- 516 017e 1360     	 str r3,[r2]
-  84:../main.c     **** }
- 517              	 .loc 4 84 0
- 518 0180 98BD     	 pop {r3,r4,r7,pc}
- 519              	.L26:
- 520 0182 00BFAFF3 	 .align 3
- 520      0080
- 521              	.L25:
- 522 0188 00000000 	 .word 0
- 523 018c 0070A740 	 .word 1084715008
- 524 0190 A5C226FA 	 .word -98123099
- 525 0194 E66A5240 	 .word 1079143142
- 526 0198 00000000 	 .word 0
- 527 019c 00FEAF40 	 .word 1085275648
- 528 01a0 00000000 	 .word InputBuffer1_idx
- 529 01a4 00000000 	 .word frameover
- 530 01a8 00000000 	 .word InputType
- 531 01ac 00000000 	 .word ADC_MEASUREMENT_Channel_A_handle
- 532 01b0 00000000 	 .word InputBuffer1
- 533 01b4 A38B2EBA 	 .word -1171354717
- 534 01b8 00000000 	 .word lastval
- 535 01bc 00000000 	 .word MeasurementCounter
- 536 01c0 0000F03F 	 .word 1072693248
- 537 01c4 0000E03F 	 .word 1071644672
- 538 01c8 00000000 	 .word tft_tick
- 539              	 .cfi_endproc
- 540              	.LFE437:
- 542 01cc AFF30080 	 .section .text.SysTick_Handler,"ax",%progbits
- 543              	 .align 2
- 544              	 .global SysTick_Handler
- 545              	 .thumb
- 546              	 .thumb_func
- 548              	SysTick_Handler:
- 549              	.LFB438:
-  85:../main.c     **** 
-  86:../main.c     **** 
-  87:../main.c     **** 
-  88:../main.c     **** void SysTick_Handler(){
- 550              	 .loc 4 88 0
- 551              	 .cfi_startproc
- 552              	 
- 553              	 
- 554              	 
- 555 0000 80B4     	 push {r7}
- 556              	.LCFI24:
- 557              	 .cfi_def_cfa_offset 4
- 558              	 .cfi_offset 7,-4
- 559 0002 00AF     	 add r7,sp,#0
- 560              	.LCFI25:
- 561              	 .cfi_def_cfa_register 7
-  89:../main.c     **** 	// Interrupt Routine - used for delay_ms
-  90:../main.c     **** 	_msCounter++;
- 562              	 .loc 4 90 0
- 563 0004 044B     	 ldr r3,.L28
- 564 0006 1B68     	 ldr r3,[r3]
- 565 0008 0133     	 adds r3,r3,#1
- 566 000a 034A     	 ldr r2,.L28
- 567 000c 1360     	 str r3,[r2]
-  91:../main.c     **** }
- 568              	 .loc 4 91 0
- 569 000e BD46     	 mov sp,r7
- 570              	.LCFI26:
- 571              	 .cfi_def_cfa_register 13
- 572              	 
- 573 0010 5DF8047B 	 ldr r7,[sp],#4
- 574              	.LCFI27:
- 575              	 .cfi_restore 7
- 576              	 .cfi_def_cfa_offset 0
- 577 0014 7047     	 bx lr
- 578              	.L29:
- 579 0016 00BF     	 .align 2
- 580              	.L28:
- 581 0018 00000000 	 .word _msCounter
- 582              	 .cfi_endproc
- 583              	.LFE438:
- 585              	 .section .text.delay_ms,"ax",%progbits
- 586              	 .align 2
- 587              	 .global delay_ms
- 588              	 .thumb
- 589              	 .thumb_func
- 591              	delay_ms:
- 592              	.LFB439:
-  92:../main.c     **** 
-  93:../main.c     **** // F
-  94:../main.c     **** void delay_ms(uint32_t ms){
- 593              	 .loc 4 94 0
- 594              	 .cfi_startproc
- 595              	 
- 596              	 
- 597              	 
- 598 0000 80B4     	 push {r7}
- 599              	.LCFI28:
- 600              	 .cfi_def_cfa_offset 4
- 601              	 .cfi_offset 7,-4
- 602 0002 85B0     	 sub sp,sp,#20
- 603              	.LCFI29:
- 604              	 .cfi_def_cfa_offset 24
- 605 0004 00AF     	 add r7,sp,#0
- 606              	.LCFI30:
- 607              	 .cfi_def_cfa_register 7
- 608 0006 7860     	 str r0,[r7,#4]
-  95:../main.c     **** 	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
-  96:../main.c     **** 	uint32_t now = _msCounter;
- 609              	 .loc 4 96 0
- 610 0008 084B     	 ldr r3,.L33
- 611 000a 1B68     	 ldr r3,[r3]
- 612 000c FB60     	 str r3,[r7,#12]
-  97:../main.c     **** 	while(now+ms > _msCounter)
- 613              	 .loc 4 97 0
- 614 000e 00E0     	 b .L31
- 615              	.L32:
-  98:../main.c     **** 		__NOP(); // do nothing
- 616              	 .loc 4 98 0
- 617              	
- 618 0010 00BF     	 nop
- 619              	
- 620              	 .thumb
- 621              	.L31:
-  97:../main.c     **** 	while(now+ms > _msCounter)
- 622              	 .loc 4 97 0
- 623 0012 FA68     	 ldr r2,[r7,#12]
- 624 0014 7B68     	 ldr r3,[r7,#4]
- 625 0016 1A44     	 add r2,r2,r3
- 626 0018 044B     	 ldr r3,.L33
- 627 001a 1B68     	 ldr r3,[r3]
- 628 001c 9A42     	 cmp r2,r3
- 629 001e F7D8     	 bhi .L32
-  99:../main.c     **** }
- 630              	 .loc 4 99 0
- 631 0020 1437     	 adds r7,r7,#20
- 632              	.LCFI31:
- 633              	 .cfi_def_cfa_offset 4
- 634 0022 BD46     	 mov sp,r7
- 635              	.LCFI32:
- 636              	 .cfi_def_cfa_register 13
- 637              	 
- 638 0024 5DF8047B 	 ldr r7,[sp],#4
- 639              	.LCFI33:
- 640              	 .cfi_restore 7
- 641              	 .cfi_def_cfa_offset 0
- 642 0028 7047     	 bx lr
- 643              	.L34:
- 644 002a 00BF     	 .align 2
- 645              	.L33:
- 646 002c 00000000 	 .word _msCounter
- 647              	 .cfi_endproc
- 648              	.LFE439:
- 650              	 .section .text.main,"ax",%progbits
- 651              	 .align 2
- 652              	 .global main
- 653              	 .thumb
- 654              	 .thumb_func
- 656              	main:
- 657              	.LFB440:
- 100:../main.c     **** 
- 101:../main.c     **** 
- 102:../main.c     **** 
- 103:../main.c     **** int main(void)
- 104:../main.c     **** {
- 658              	 .loc 4 104 0
- 659              	 .cfi_startproc
- 660              	 
- 661              	 
- 662 0000 80B5     	 push {r7,lr}
- 663              	.LCFI34:
- 664              	 .cfi_def_cfa_offset 8
- 665              	 .cfi_offset 7,-8
- 666              	 .cfi_offset 14,-4
- 667 0002 82B0     	 sub sp,sp,#8
- 668              	.LCFI35:
- 669              	 .cfi_def_cfa_offset 16
- 670 0004 00AF     	 add r7,sp,#0
- 671              	.LCFI36:
- 672              	 .cfi_def_cfa_register 7
- 105:../main.c     **** 	#if defined (DEBUG_ENABLE)
- 106:../main.c     **** 	initialise_monitor_handles();
- 107:../main.c     **** 	#endif
- 108:../main.c     **** 
- 109:../main.c     **** 	DAVE_STATUS_t status;
- 110:../main.c     **** 	status = DAVE_Init();           /* Initialization of DAVE APPs  */
- 673              	 .loc 4 110 0
- 674 0006 FFF7FEFF 	 bl DAVE_Init
- 675 000a 0346     	 mov r3,r0
- 676 000c BB71     	 strb r3,[r7,#6]
- 111:../main.c     **** 	if(status != DAVE_STATUS_SUCCESS) {
- 677              	 .loc 4 111 0
- 678 000e BB79     	 ldrb r3,[r7,#6]
- 679 0010 002B     	 cmp r3,#0
- 680 0012 00D0     	 beq .L36
- 681              	.L37:
- 112:../main.c     **** 		/* Placeholder for error handler code. The while loop below can be replaced with an user error ha
- 113:../main.c     **** 		printf("DAVE APPs initialization failed\n");
- 114:../main.c     **** 
- 115:../main.c     **** 		while(1U){ }
- 682              	 .loc 4 115 0 discriminator 1
- 683 0014 FEE7     	 b .L37
- 684              	.L36:
- 116:../main.c     **** 	}
- 117:../main.c     **** 	else{ printf("DAVE APPs initialization successful\n"); }
- 118:../main.c     **** 
- 119:../main.c     **** 	// Arm-M internal interrupt init
- 120:../main.c     **** 	SysTick_Config(SystemCoreClock / 144);
- 685              	 .loc 4 120 0
- 686 0016 1D4B     	 ldr r3,.L42
- 687 0018 1B68     	 ldr r3,[r3]
- 688 001a 1D4A     	 ldr r2,.L42+4
- 689 001c A2FB0323 	 umull r2,r3,r2,r3
- 690 0020 5B09     	 lsrs r3,r3,#5
- 691 0022 1846     	 mov r0,r3
- 692 0024 FFF7FEFF 	 bl SysTick_Config
- 121:../main.c     **** 
- 122:../main.c     **** 	// Counter for TFT_display init
- 123:../main.c     **** 	uint8_t display_delay = 0;
- 693              	 .loc 4 123 0
- 694 0028 0023     	 movs r3,#0
- 695 002a FB71     	 strb r3,[r7,#7]
- 124:../main.c     **** 
- 125:../main.c     **** 	// Initial deactivation of CS pin
- 126:../main.c     **** 	DIGITAL_IO_SetOutputHigh(&IO_DIO_DIGOUT_CS_TFT);
- 696              	 .loc 4 126 0
- 697 002c 1948     	 ldr r0,.L42+8
- 698 002e FFF7FEFF 	 bl DIGITAL_IO_SetOutputHigh
- 127:../main.c     **** 
- 128:../main.c     **** 	// Initialize Display
- 129:../main.c     **** 	if(TFT_init()){ printf("TFT init done 1\n"); }
- 699              	 .loc 4 129 0
- 700 0032 FFF7FEFF 	 bl TFT_init
- 130:../main.c     **** 	else{ printf("TFT init failed 0\n"); }
- 131:../main.c     **** 
- 132:../main.c     **** 
- 133:../main.c     **** 	// Show Logo for 1 seconds
- 134:../main.c     **** 	TFT_display_init_screen();
- 701              	 .loc 4 134 0
- 702 0036 FFF7FEFF 	 bl TFT_display_init_screen
- 135:../main.c     **** 	_msCounter = 0;
- 703              	 .loc 4 135 0
- 704 003a 174B     	 ldr r3,.L42+12
- 705 003c 0022     	 movs r2,#0
- 706 003e 1A60     	 str r2,[r3]
- 136:../main.c     **** 	while (_msCounter < 600){__NOP();}
- 707              	 .loc 4 136 0
- 708 0040 00E0     	 b .L38
- 709              	.L39:
- 710              	 .loc 4 136 0 is_stmt 0 discriminator 2
- 711              	
- 712 0042 00BF     	 nop
- 713              	
- 714              	 .thumb
- 715              	.L38:
- 716              	 .loc 4 136 0 discriminator 1
- 717 0044 144B     	 ldr r3,.L42+12
- 718 0046 1B68     	 ldr r3,[r3]
- 719 0048 B3F5167F 	 cmp r3,#600
- 720 004c F9D3     	 bcc .L39
- 137:../main.c     **** 
- 138:../main.c     **** 	// Init static Background (menu + basic graph)
- 139:../main.c     **** 	initStaticGraphBackground();
- 721              	 .loc 4 139 0 is_stmt 1
- 722 004e FFF7FEFF 	 bl initStaticGraphBackground
- 723              	.L41:
- 140:../main.c     **** 
- 141:../main.c     **** 
- 142:../main.c     **** 	// Main loop
- 143:../main.c     **** 	printf("Start Main Loop -------------------------------------\n");
- 144:../main.c     **** 	while(1U) {
- 145:../main.c     **** 		if(tft_tick) { // Is set every 5ms by Adc_Measurement_Handler
- 724              	 .loc 4 145 0
- 725 0052 124B     	 ldr r3,.L42+16
- 726 0054 1B78     	 ldrb r3,[r3]
- 727 0056 DBB2     	 uxtb r3,r3
- 728 0058 002B     	 cmp r3,#0
- 729 005a 15D0     	 beq .L40
- 146:../main.c     **** 			// reset tick
- 147:../main.c     **** 			tft_tick = 0;
- 730              	 .loc 4 147 0
- 731 005c 0F4B     	 ldr r3,.L42+16
- 732 005e 0022     	 movs r2,#0
- 733 0060 1A70     	 strb r2,[r3]
- 148:../main.c     **** 
- 149:../main.c     **** 			// Evaluate touches
- 150:../main.c     **** 			TFT_touch();
- 734              	 .loc 4 150 0
- 735 0062 FFF7FEFF 	 bl TFT_touch
- 151:../main.c     **** 
- 152:../main.c     **** 			// Evaluate and rewrite display list
- 153:../main.c     **** 			display_delay++;
- 736              	 .loc 4 153 0
- 737 0066 FB79     	 ldrb r3,[r7,#7]
- 738 0068 0133     	 adds r3,r3,#1
- 739 006a FB71     	 strb r3,[r7,#7]
- 154:../main.c     **** 			if(MeasurementCounter%4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
- 740              	 .loc 4 154 0
- 741 006c 0C4B     	 ldr r3,.L42+20
- 742 006e 1B68     	 ldr r3,[r3]
- 743 0070 03F00303 	 and r3,r3,#3
- 744 0074 002B     	 cmp r3,#0
- 745 0076 07D1     	 bne .L40
- 155:../main.c     **** 				display_delay = 0;
- 746              	 .loc 4 155 0
- 747 0078 0023     	 movs r3,#0
- 748 007a FB71     	 strb r3,[r7,#7]
- 156:../main.c     **** 				TFT_display(&InputBuffer1[0], InputBuffer1_size, &InputBuffer1_idx);
- 749              	 .loc 4 156 0
- 750 007c 0948     	 ldr r0,.L42+24
- 751 007e 4FF4DC71 	 mov r1,#440
- 752 0082 094A     	 ldr r2,.L42+28
- 753 0084 FFF7FEFF 	 bl TFT_display
- 754              	.L40:
- 157:../main.c     **** 			}
- 158:../main.c     **** 
- 159:../main.c     **** 		}
- 160:../main.c     **** 	}
- 755              	 .loc 4 160 0
- 756 0088 E3E7     	 b .L41
- 757              	.L43:
- 758 008a 00BF     	 .align 2
- 759              	.L42:
- 760 008c 00000000 	 .word SystemCoreClock
- 761 0090 398EE338 	 .word 954437177
- 762 0094 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
- 763 0098 00000000 	 .word _msCounter
- 764 009c 00000000 	 .word tft_tick
- 765 00a0 00000000 	 .word MeasurementCounter
- 766 00a4 00000000 	 .word InputBuffer1
- 767 00a8 00000000 	 .word InputBuffer1_idx
- 768              	 .cfi_endproc
- 769              	.LFE440:
- 771              	 .text
- 772              	.Letext0:
- 773              	 .file 5 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 774              	 .file 6 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 775              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
- 776              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
- 777              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 778              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
- 779              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/ADC_MEASUREMENT/adc_measurement.h"
- 780              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h"
- 781              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 782              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
- 783              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
- 784              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/ADC_MEASUREMENT/ADC_MEASUREMENT_Extern.h"
- 785              	 .file 17 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h"
+  44:../main.c     **** 	// Counter for TFT_display init
+  45:../main.c     **** 	uint8_t display_delay = 0;
+ 304              	 .loc 4 45 0
+ 305 0028 0023     	 movs r3,#0
+ 306 002a FB71     	 strb r3,[r7,#7]
+  46:../main.c     **** 
+  47:../main.c     **** 	// Initial deactivation of CS pin
+  48:../main.c     **** 	DIGITAL_IO_SetOutputHigh(&IO_DIO_DIGOUT_CS_TFT);
+ 307              	 .loc 4 48 0
+ 308 002c 1948     	 ldr r0,.L20+8
+ 309 002e FFF7FEFF 	 bl DIGITAL_IO_SetOutputHigh
+  49:../main.c     **** 
+  50:../main.c     **** 	// Initialize Display
+  51:../main.c     **** 	if(TFT_init()){ printf("TFT init done 1\n"); }
+ 310              	 .loc 4 51 0
+ 311 0032 FFF7FEFF 	 bl TFT_init
+  52:../main.c     **** 	else{ printf("TFT init failed 0\n"); }
+  53:../main.c     **** 
+  54:../main.c     **** 
+  55:../main.c     **** 	// Show initial Logo for 1 seconds
+  56:../main.c     **** 	TFT_display_init_screen();
+ 312              	 .loc 4 56 0
+ 313 0036 FFF7FEFF 	 bl TFT_display_init_screen
+  57:../main.c     **** 	_msCounter = 0;
+ 314              	 .loc 4 57 0
+ 315 003a 174B     	 ldr r3,.L20+12
+ 316 003c 0022     	 movs r2,#0
+ 317 003e 1A60     	 str r2,[r3]
+  58:../main.c     **** 	while (_msCounter < 600){__NOP();}
+ 318              	 .loc 4 58 0
+ 319 0040 00E0     	 b .L16
+ 320              	.L17:
+ 321              	 .loc 4 58 0 is_stmt 0 discriminator 2
+ 322              	
+ 323 0042 00BF     	 nop
+ 324              	
+ 325              	 .thumb
+ 326              	.L16:
+ 327              	 .loc 4 58 0 discriminator 1
+ 328 0044 144B     	 ldr r3,.L20+12
+ 329 0046 1B68     	 ldr r3,[r3]
+ 330 0048 B3F5167F 	 cmp r3,#600
+ 331 004c F9D3     	 bcc .L17
+  59:../main.c     **** 
+  60:../main.c     **** 	// Init static Background (menu + basic graph)
+  61:../main.c     **** 	initStaticGraphBackground();
+ 332              	 .loc 4 61 0 is_stmt 1
+ 333 004e FFF7FEFF 	 bl initStaticGraphBackground
+ 334              	.L19:
+  62:../main.c     **** 
+  63:../main.c     **** 
+  64:../main.c     **** 	// Main loop
+  65:../main.c     **** 	printf("Start Main Loop -------------------------------------\n");
+  66:../main.c     **** 	while(1U) {
+  67:../main.c     **** 		if(tft_tick) { // Is set every 5ms by Adc_Measurement_Handler
+ 335              	 .loc 4 67 0
+ 336 0052 124B     	 ldr r3,.L20+16
+ 337 0054 1B78     	 ldrb r3,[r3]
+ 338 0056 DBB2     	 uxtb r3,r3
+ 339 0058 002B     	 cmp r3,#0
+ 340 005a 15D0     	 beq .L18
+  68:../main.c     **** 			// reset tick
+  69:../main.c     **** 			tft_tick = 0;
+ 341              	 .loc 4 69 0
+ 342 005c 0F4B     	 ldr r3,.L20+16
+ 343 005e 0022     	 movs r2,#0
+ 344 0060 1A70     	 strb r2,[r3]
+  70:../main.c     **** 
+  71:../main.c     **** 			// Evaluate touches
+  72:../main.c     **** 			TFT_touch();
+ 345              	 .loc 4 72 0
+ 346 0062 FFF7FEFF 	 bl TFT_touch
+  73:../main.c     **** 
+  74:../main.c     **** 			// Evaluate and rewrite display list
+  75:../main.c     **** 			display_delay++;
+ 347              	 .loc 4 75 0
+ 348 0066 FB79     	 ldrb r3,[r7,#7]
+ 349 0068 0133     	 adds r3,r3,#1
+ 350 006a FB71     	 strb r3,[r7,#7]
+  76:../main.c     **** 			if(MeasurementCounter%4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
+ 351              	 .loc 4 76 0
+ 352 006c 0C4B     	 ldr r3,.L20+20
+ 353 006e 1B68     	 ldr r3,[r3]
+ 354 0070 03F00303 	 and r3,r3,#3
+ 355 0074 002B     	 cmp r3,#0
+ 356 0076 07D1     	 bne .L18
+  77:../main.c     **** 				display_delay = 0;
+ 357              	 .loc 4 77 0
+ 358 0078 0023     	 movs r3,#0
+ 359 007a FB71     	 strb r3,[r7,#7]
+  78:../main.c     **** 				TFT_display(&InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx);
+ 360              	 .loc 4 78 0
+ 361 007c 0948     	 ldr r0,.L20+24
+ 362 007e 4FF4DC71 	 mov r1,#440
+ 363 0082 094A     	 ldr r2,.L20+28
+ 364 0084 FFF7FEFF 	 bl TFT_display
+ 365              	.L18:
+  79:../main.c     **** 			}
+  80:../main.c     **** 
+  81:../main.c     **** 		}
+  82:../main.c     **** 	}
+ 366              	 .loc 4 82 0
+ 367 0088 E3E7     	 b .L19
+ 368              	.L21:
+ 369 008a 00BF     	 .align 2
+ 370              	.L20:
+ 371 008c 00000000 	 .word SystemCoreClock
+ 372 0090 398EE338 	 .word 954437177
+ 373 0094 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
+ 374 0098 00000000 	 .word _msCounter
+ 375 009c 00000000 	 .word tft_tick
+ 376 00a0 00000000 	 .word MeasurementCounter
+ 377 00a4 00000000 	 .word InputBuffer1
+ 378 00a8 00000000 	 .word InputBuffer1_idx
+ 379              	 .cfi_endproc
+ 380              	.LFE437:
+ 382              	 .text
+ 383              	.Letext0:
+ 384              	 .file 5 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 385              	 .file 6 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 386              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
+ 387              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 388              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 389              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
+ 390              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h"
+ 391              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 392              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 393              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 394              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
     {standard input}:20     .text.__NVIC_SetPriority:00000000 $t
@@ -3498,47 +3040,18 @@ DEFINED SYMBOLS
     {standard input}:167    .text.XMC_GPIO_SetOutputHigh:00000000 XMC_GPIO_SetOutputHigh
     {standard input}:211    .text.DIGITAL_IO_SetOutputHigh:00000000 $t
     {standard input}:215    .text.DIGITAL_IO_SetOutputHigh:00000000 DIGITAL_IO_SetOutputHigh
+                            *COM*:00000004 _msCounter
+                            *COM*:00000001 tft_tick
+                            *COM*:00000004 MeasurementCounter
+                            *COM*:00000002 InputBuffer1_idx
                             *COM*:00000001 InputType
                             *COM*:00000001 frameover
-    {standard input}:261    .bss.InputBuffer1_idx:00000000 InputBuffer1_idx
-    {standard input}:258    .bss.InputBuffer1_idx:00000000 $d
-    {standard input}:268    .bss.InputBuffer1:00000000 InputBuffer1
-    {standard input}:265    .bss.InputBuffer1:00000000 $d
-                            *COM*:00000002 result
-    {standard input}:275    .bss.tft_tick:00000000 tft_tick
-    {standard input}:276    .bss.tft_tick:00000000 $d
-    {standard input}:282    .bss._msCounter:00000000 _msCounter
-    {standard input}:279    .bss._msCounter:00000000 $d
-    {standard input}:289    .bss.MeasurementCounter:00000000 MeasurementCounter
-    {standard input}:286    .bss.MeasurementCounter:00000000 $d
-    {standard input}:296    .bss.lastval:00000000 lastval
-    {standard input}:293    .bss.lastval:00000000 $d
-    {standard input}:304    .text.VADC0_C0_2_IRQHandler:00000000 $t
-    {standard input}:309    .text.VADC0_C0_2_IRQHandler:00000000 VADC0_C0_2_IRQHandler
-    {standard input}:357    .text.VADC0_C0_2_IRQHandler:00000038 $d
-    {standard input}:361    .text.VADC0_C0_2_IRQHandler:00000048 $t
-    {standard input}:522    .text.VADC0_C0_2_IRQHandler:00000188 $d
-    {standard input}:543    .text.SysTick_Handler:00000000 $t
-    {standard input}:548    .text.SysTick_Handler:00000000 SysTick_Handler
-    {standard input}:581    .text.SysTick_Handler:00000018 $d
-    {standard input}:586    .text.delay_ms:00000000 $t
-    {standard input}:591    .text.delay_ms:00000000 delay_ms
-    {standard input}:646    .text.delay_ms:0000002c $d
-    {standard input}:651    .text.main:00000000 $t
-    {standard input}:656    .text.main:00000000 main
-    {standard input}:760    .text.main:0000008c $d
+    {standard input}:261    .text.main:00000000 $t
+    {standard input}:266    .text.main:00000000 main
+    {standard input}:371    .text.main:0000008c $d
                      .debug_frame:00000010 $d
-    {standard input}:542    .text.VADC0_C0_2_IRQHandler:000001cc $t
 
 UNDEFINED SYMBOLS
-__aeabi_ui2d
-__aeabi_ddiv
-__aeabi_dmul
-__aeabi_dadd
-__aeabi_d2uiz
-ADC_MEASUREMENT_GetResult
-sin
-ADC_MEASUREMENT_Channel_A_handle
 DAVE_Init
 TFT_init
 TFT_display_init_screen
@@ -3547,3 +3060,4 @@ TFT_touch
 TFT_display
 SystemCoreClock
 IO_DIO_DIGOUT_CS_TFT
+InputBuffer1

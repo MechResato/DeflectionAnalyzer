@@ -1,7 +1,4 @@
-Libraries/FT800-FT813-5.x/tft.o \
- Libraries/FT800-FT813-5.x/tft.d Libraries/FT800-FT813-5.x/tft.o: \
- ../Libraries/FT800-FT813-5.x/tft.c \
- C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h \
+globals.o globals.d globals.o: ../globals.c \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_common.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_device.h \
@@ -53,13 +50,7 @@ Libraries/FT800-FT813-5.x/tft.o \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/TIMER/timer_conf.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/GLOBAL_CCU4/global_ccu4.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/TIMER/timer_extern.h \
- ../Libraries/FT800-FT813-5.x/EVE.h \
- ../Libraries/FT800-FT813-5.x/EVE_target.h \
- ../Libraries/FT800-FT813-5.x/EVE_config.h \
- ../Libraries/FT800-FT813-5.x/EVE_commands.h \
- ../Libraries/FT800-FT813-5.x/tft_data.h
-
-C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h:
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h:
 
@@ -163,12 +154,4 @@ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/GLOBAL_CCU4/
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/TIMER/timer_extern.h:
 
-../Libraries/FT800-FT813-5.x/EVE.h:
-
-../Libraries/FT800-FT813-5.x/EVE_target.h:
-
-../Libraries/FT800-FT813-5.x/EVE_config.h:
-
-../Libraries/FT800-FT813-5.x/EVE_commands.h:
-
-../Libraries/FT800-FT813-5.x/tft_data.h:
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h:
