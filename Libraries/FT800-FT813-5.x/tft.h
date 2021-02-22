@@ -3,6 +3,8 @@
 #ifndef TFT_H_
 #define TFT_H_
 
+int TFT_cur_Menu;
+
 
 //volatile uint8_t InputType; // Input signal type used in main for measurement and here for swithcen on touch -> see tft.c!
 //volatile uint8_t frameover;
@@ -14,6 +16,8 @@ void TFT_display_init_screen(void);
 void initStaticGraphBackground(void);
 uint8_t TFT_init(void);
 void TFT_touch(void);
-void TFT_display(XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx);
+
+void TFT_display(void);
+// Declaration of TFT_display_menu's is moved to tft.c because they cant be used by the inteded function pointer otherwise
 
 #endif /* TFT_H_ */

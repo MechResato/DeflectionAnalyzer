@@ -17,6 +17,12 @@
 
 // This file is kept as clean as possible. All variables and functions used by more than one component are stated in the 'globals' files
 
+// See "globals" for details on how everything works together
+
+///*  INTERRUPT HANDLER */
+// SysTick_Handler in "globals"
+// Adc_Measurement_Handler in "measure"
+
 
 int main(void)
 {
@@ -31,7 +37,6 @@ int main(void)
 	if(status != DAVE_STATUS_SUCCESS) {
 		/* Placeholder for error handler code. The while loop below can be replaced with an user error handler. */
 		printf("DAVE APPs initialization failed\n");
-
 		while(1U){ }
 	}
 	else{ printf("DAVE APPs initialization successful\n"); }
@@ -42,17 +47,17 @@ int main(void)
 	// Counter for TFT_display init
 	uint8_t display_delay = 0;
 
-	// Initial deactivation of CS pin
+	// Initial disable of CS pin
 	DIGITAL_IO_SetOutputHigh(&IO_DIO_DIGOUT_CS_TFT);
 
 	// Initialize Display
-	if(TFT_init()){ printf("TFT init done 1\n"); }
+	if( TFT_init() ){ printf("TFT init done 1\n"); }
 	else{ printf("TFT init failed 0\n"); }
 
-	// Show initial Logo
+	// Show initial logo
 	TFT_display_init_screen();
 	_msCounter = 0;
-	while (_msCounter < 600) __NOP();
+	while (_msCounter < 100) __NOP();
 
 	// Init static Background (menu + basic graph)
 	initStaticGraphBackground();
@@ -72,7 +77,7 @@ int main(void)
 			display_delay++;
 			if(MeasurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
 				display_delay = 0;
-				TFT_display(&InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx);
+				TFT_display();
 			}
 
 		}

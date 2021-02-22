@@ -45,7 +45,7 @@
 #define GRAPH_DATA2COLOR   0x0064584B // graph data 2 (alternative/additional color)
 #define GRAPH_POSMARKCOLOR 0x00ff0000 // graph position marker
 
-/* simple pre-definded colors */
+/* simple pre-defined colors */
 #define RED		0xff0000UL
 #define ORANGE	0xffa500UL
 #define GREEN	0x00ff00UL
@@ -85,12 +85,28 @@ uint32_t num_dl_static; // amount of bytes in the static part of our display-lis
 
 /////////// General Variables
 uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
-//volatile uint8_t frameover = 0; // Debug value - is set to one if the sensor buffer gets full the first time (used to only run debugcode when actual data is there...)
-// Input signal type used in main for measurement and here for swithcen on touch
-//volatile uint8_t InputType = 3; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+
+// Current menu display function pointer - At the end of the TFT_display() the function referenced to this pointer is executed
+int TFT_cur_Menu = 0;
+void TFT_display_menu0(void);
+void TFT_display_menu1(void);
+void (*TFT_display_cur_Menu__fptr_arr[])(void) = {&TFT_display_menu0, &TFT_display_menu1};
+
+void TFT_touch_menu0(uint8_t);
+void TFT_touch_menu1(uint8_t);
+void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t) = {&TFT_touch_menu0, &TFT_touch_menu1};
+
+/////////// Debug
+uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by TFT_display()
+uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by TFT_display()
+uint32_t TouchXY = 0; // Currently touched X and Y coordinate from register (1.byte=X, 2.byte=Y). Used by TFT_display()
+uint16_t BGtouchInitial_X = 32768;
+uint16_t BGtouchInitial_Y = 32768;
 
 
 /////////// Button states
+uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
+
 uint16_t toggle_state_graphmode = 0;
 uint16_t toggle_state_dimmer = 0;
 
@@ -298,52 +314,6 @@ void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 
 void touch_calibrate(void) {
 // Sends pre-recorded touch calibration values, depending on the display the code is compiled for. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
-
-#if defined (EVE_CFAF240400C1_030SC)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x0000ed11);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x00001139);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff76809);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x00000000);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00010690);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xfffadf2e);
-#endif
-
-#if defined (EVE_CFAF320240F_035T)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x00005614);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x0000009e);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff43422);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x0000001d);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0xffffbda4);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0x00f8f2ef);
-#endif
-
-#if defined (EVE_CFAF480128A0_039TC)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x00010485);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x0000017f);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfffb0bd3);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x00000073);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x0000e293);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0x00069904);
-#endif
-
-#if defined (EVE_CFAF800480E0_050SC)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000107f9);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0xffffff8c);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff451ae);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000000d2);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x0000feac);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xfffcfaaf);
-#endif
-
-#if defined (EVE_PAF90)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x00000159);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x0001019c);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff93625);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x00010157);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00000000);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0x0000c101);
-#endif
-
 #if defined (EVE_RiTFT43)
 	// Original library values
 	//EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000062cd);
@@ -362,86 +332,7 @@ void touch_calibrate(void) {
 	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFFac7ab);
 #endif
 
-#if defined (EVE_EVE2_38)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x00007bed);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x000001b0);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff60aa5);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x00000095);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0xffffdcda);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0x00829c08);
-#endif
-
-#if defined (EVE_EVE2_35G) ||  defined (EVE_EVE3_35G)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000109E4);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x000007A6);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xFFEC1EBA);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x0000072C);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x0001096A);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFF469CF);
-#endif
-
-#if defined (EVE_EVE2_43G) ||  defined (EVE_EVE3_43G)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x0000a1ff);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x00000680);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xffe54cc2);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0xffffff53);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x0000912c);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xfffe628d);
-#endif
-
-#if defined (EVE_EVE2_50G) || defined (EVE_EVE3_50G)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000109E4);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x000007A6);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xFFEC1EBA);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x0000072C);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x0001096A);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFF469CF);
-#endif
-
-#if defined (EVE_EVE2_70G)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000105BC);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0xFFFFFA8A);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0x00004670);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0xFFFFFF75);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00010074);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFFF14C8);
-#endif
-
-#if defined (EVE_NHD_35)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x0000f78b);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x00000427);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfffcedf8);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0xfffffba4);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x0000f756);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0x0009279e);
-#endif
-
-#if defined (EVE_RVT70)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000074df);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x000000e6);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfffd5474);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000001af);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00007e79);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xffe9a63c);
-#endif
-
-#if defined (EVE_FT811CB_HY50HD)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 66353);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 712);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 4293876677);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 4294966157);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 67516);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 418276);
-#endif
-
-#if defined (EVE_ADAM101)
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000101E3);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x00000114);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xFFF5EEBA);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0xFFFFFF5E);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00010226);
-	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0x0000C783);
-#endif
+// All targets other than EVE_RiTFT43 where deleted -> see original lib 4
 
 /* activate this if you are using a module for the first time or if you need to re-calibrate it */
 /* write down the numbers on the screen and either place them in one of the pre-defined blocks above or make a new block */
@@ -527,9 +418,15 @@ void initStaticGraphBackground(void)
 	EVE_cmd_dl(CMD_DLSTART); // Start a new display list (resets REG_CMD_DL to 0)
 
 	/// Main settings
-	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
+	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
 	EVE_cmd_bgcolor(MAIN_BGCOLOR); /* light grey */
 	EVE_cmd_dl(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
+	// Main Rectangle
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BGCOLOR);
+	EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
+	EVE_cmd_dl(VERTEX2F(0, 0));
+	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
+	EVE_cmd_dl(DL_END);
 
 	/// Draw Banner and divider line on top
 	// Banner
@@ -550,8 +447,8 @@ void initStaticGraphBackground(void)
 	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
 	EVE_cmd_dl(DL_END);
 
-
 	// Add the static text
+	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
 	#if defined (EVE_DMA)
 		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
@@ -572,6 +469,7 @@ void initStaticGraphBackground(void)
 	EVE_cmd_memcpy(MEM_DL_STATIC, EVE_RAM_DL, num_dl_static);
 	while (EVE_busy());
 
+	EVE_cmd_track(0, 0, EVE_HSIZE, EVE_VSIZE, 1);
 }
 
 uint8_t TFT_init(void)
@@ -614,7 +512,6 @@ void TFT_touch(void)
 	/// Check for touch events and setup vars for TFT_display() (Buttons). Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
 	// Init vars
 	uint8_t tag; // temporary store of received touched tag
-	static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
 	
 	// If Display is still busy, skip this evaluation to prevent hanging, glitches and flickers
 	if(EVE_busy()) { return; } /* is EVE still processing the last display list? */
@@ -628,7 +525,196 @@ void TFT_touch(void)
 		// nothing touched - reset states and locks
 		case 0:
 			toggle_lock = 0;
+			BGtouchInitial_X = 32768;
+			BGtouchInitial_Y = 32768;
 			break;
+		case 1:
+			TouchXY = EVE_memRead32(REG_TOUCH_SCREEN_XY);
+			uint16_t X = TouchXY;
+			uint16_t Y = TouchXY >> 16;
+
+			// Detect initial touch on BG - save coordinates to determine where the user swipes
+			if(BGtouchInitial_X == 32768 && BGtouchInitial_Y == 32768){
+				BGtouchInitial_X = X;
+				BGtouchInitial_Y = Y;
+			}
+			else if(BGtouchInitial_X < 32768 && BGtouchInitial_Y < 32768){
+				int16_t swipe_X = BGtouchInitial_X - X;
+				int16_t swipe_Y = BGtouchInitial_Y - Y;
+
+				if(abs(swipe_X) > abs(swipe_Y)){
+					if(swipe_X > 100){
+						// swipe to left
+						TFT_cur_Menu = 1; //dummy
+					}
+					else{
+						// swipe to right
+						TFT_cur_Menu = 0; //dummy
+					}
+				}
+				else{
+					if(swipe_Y > 100){
+						// swipe down
+					}
+					else{
+						// swipe up
+					}
+				}
+			}
+
+			break;
+		default:
+			// Execute current menu specific code
+			(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag);
+	}
+}
+
+void TFT_display(void)
+{
+	/// Dynamic portion of display-handling, meant to be called every 20ms or more. Created by Rudolph Riedel, extensively adapted by RS @ MCI 2020/21
+	///
+	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
+
+	if(tft_active != 0)
+	{
+		#if defined (EVE_DMA)
+			uint16_t cmd_fifo_size;
+			cmd_fifo_size = EVE_dma_buffer_index*4; /* without DMA there is no way to tell how many bytes are written to the cmd-fifo */
+		#endif
+
+		//EVE_cmd_track(0, 0, EVE_VSIZE, EVE_HSIZE, 1);
+
+
+		// Get size of last display list to be printed on screen (section "Debug Values")
+		display_list_size = EVE_memRead16(REG_CMD_DL);
+		tracker = EVE_memRead32(REG_TRACKER);
+
+
+		// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address once)
+		EVE_start_cmd_burst();
+
+
+
+		/////////////// Start the actual display list
+		EVE_cmd_dl_burst(CMD_DLSTART);
+		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
+		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the previous prevent artifacts between lists, Attributes are the color, stencil and tag buffers */
+		EVE_cmd_dl_burst(TAG(0));
+
+		// Insert static part of display-list from copy in gfx-mem
+		EVE_cmd_append_burst(MEM_DL_STATIC, num_dl_static);
+
+
+		// Execute current menu specific code
+		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
+
+
+		/////////////// Finish Display list and burst
+		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
+		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
+
+		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
+	}
+}
+
+void TFT_display_menu0(void)
+{
+	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
+
+	/////////////// Display BUTTONS and Toggles
+	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+
+	EVE_cmd_dl_burst(TAG(13)); /* assign tag-value '13' to the button that follows */
+	if(InputType == 0){ 		EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sensor");	}
+	else if(InputType == 1){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Imp");	}
+	else if(InputType == 2){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Saw");	}
+	else{						EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sine");	}
+
+	EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
+	if(toggle_state_graphmode){
+		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "Roll");
+	}
+	else{
+		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "Frame");
+	}
+
+	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+
+	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+
+
+
+	/////////////// Debug Values
+	#if defined (EVE_DMA)
+	EVE_cmd_number_burst(120, EVE_VSIZE - 65, 26, EVE_OPT_RIGHTX, cmd_fifo_size); /* number of bytes written to the cmd-fifo */
+	#endif
+	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
+
+	// Write current sensor value with unit
+	char buffer[32]; // buffer for double to string conversion
+	sprintf(buffer, "%.2lf", (G_amp_max/G_y_max)*InputBuffer1[InputBuffer1_idx]); // double to string conversion
+	strcat(buffer, unit_Sensor);
+	EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
+
+
+
+	/////////////// GRAPH
+	///// Print dynamic part of the Graph (data & marker)
+	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, toggle_state_graphmode, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
+
+}
+
+void TFT_display_menu1(void)
+{
+	/// Test menu
+
+	/////////////// Display BUTTONS and Toggles
+	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+
+	EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
+	if(toggle_state_graphmode){
+		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "li");
+	}
+	else{
+		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "re");
+	}
+
+	EVE_cmd_dl_burst(TAG(2));
+
+	int val = tracker >> 16;
+	if ((tracker & 0xff) == 2){
+		EVE_cmd_slider_burst(20, 100, 100, 20, 0, val, 65535);
+	}
+	if ((tracker & 0xff) == 1){
+		EVE_cmd_slider_burst(20, 100, 100, 20, 0, val, 65535);
+	}
+	else{
+		EVE_cmd_slider_burst(20, 100, 100, 20, 0, val, 65535);
+	}
+	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+
+	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, val); /* number of bytes written to the display-list by the command co-pro */
+
+	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
+	uint16_t X = TouchXY;
+	uint16_t Y = TouchXY >> 16;
+	EVE_cmd_number_burst(470, EVE_VSIZE-50, 26, EVE_OPT_RIGHTX, X);
+	EVE_cmd_number_burst(470, EVE_VSIZE-25, 26, EVE_OPT_RIGHTX, Y);
+
+}
+
+
+void TFT_touch_menu0(uint8_t tag){
+	// Determine which tag was touched
+	switch(tag)
+	{
 		// dimmer button on top as on/off radio-switch
 		case 10:
 			if(toggle_lock == 0) {
@@ -664,100 +750,32 @@ void TFT_touch(void)
 				toggle_lock = 42;
 				InputType++;
 				if(InputType > 3){ InputType = 0; }
+				TFT_cur_Menu = 1;
 			}
 			break;
 	}
 }
-
-void TFT_display(XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx)
-{
-	/// Dynamic portion of display-handling, meant to be called every 20ms or more. Created by Rudolph Riedel, extensively adapted by RS @ MCI 2020/21
-	///
-	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
-
-	//static int32_t rotate = 0;
-	uint16_t display_list_size = 0;
-
-	if(tft_active != 0)
+void TFT_touch_menu1(uint8_t tag){
+	// Determine which tag was touched
+	switch(tag)
 	{
-		#if defined (EVE_DMA)
-			uint16_t cmd_fifo_size;
-			cmd_fifo_size = EVE_dma_buffer_index*4; /* without DMA there is no way to tell how many bytes are written to the cmd-fifo */
-		#endif
-
-		// get size of last display list to be printed on screen (section "Debug Values")
-		display_list_size = EVE_memRead16(REG_CMD_DL);
-
-		// start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address once)
-		EVE_start_cmd_burst();
-
-
-
-		/////////////// Start the actual display list
-		EVE_cmd_dl_burst(CMD_DLSTART);
-		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
-		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the previous prevent artifacts between lists, Attributes are the color, stencil and tag buffers */
-		EVE_cmd_dl_burst(TAG(0));
-
-		// insert static part of display-list from copy in gfx-mem
-		EVE_cmd_append_burst(MEM_DL_STATIC, num_dl_static);
-
-
-
-		/////////////// Display BUTTONS and Toggles
-		EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
-		EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
-		EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
-		EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
-
-		EVE_cmd_dl_burst(TAG(13)); /* assign tag-value '13' to the button that follows */
-		if(InputType == 0){ 		EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sensor");	}
-		else if(InputType == 1){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Imp");	}
-		else if(InputType == 2){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Saw");	}
-		else{						EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sine");	}
-
-		EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
-		if(toggle_state_graphmode){
-			EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "Roll");
-		}
-		else{
-			EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "Frame");
-		}
-
-		EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
-		EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
-
-		EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
-
-
-
-		/////////////// Debug Values
-		#if defined (EVE_DMA)
-		EVE_cmd_number_burst(120, EVE_VSIZE - 65, 26, EVE_OPT_RIGHTX, cmd_fifo_size); /* number of bytes written to the cmd-fifo */
-		#endif
-		EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
-
-		// Write current sensor value with unit
-		char buffer[32]; // buffer for double to string conversion
-		sprintf(buffer, "%.2lf", (G_amp_max/G_y_max)*SBuffer[*SBuffer_curidx]); // double to string conversion
-		strcat(buffer, unit_Sensor);
-		EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
-
-
-
-		/////////////// GRAPH
-		///// Print static part of the Graph ---> Moved to initStaticBackground()
-		//TFT_GraphStatic(1, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
-
-		///// Print dynamic part of the Graph (data & marker)
-		TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, SBuffer, size, SBuffer_curidx, toggle_state_graphmode, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
-
-
-
-		/////////////// Finish Display list and burst
-		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
-		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
-
-		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
+		// nothing touched - reset states and locks
+		case 0:
+			toggle_lock = 0;
+			break;
+		// li/re mode toggle on top
+		case 12:
+			if(toggle_lock == 0) {
+				printf("Toggle li/re touched\n");
+				toggle_lock = 42;
+				if(toggle_state_graphmode == 0)	{
+					toggle_state_graphmode = 1;
+				}
+				else {
+					toggle_state_graphmode = 0;
+				}
+			}
+			break;
 	}
+
 }
