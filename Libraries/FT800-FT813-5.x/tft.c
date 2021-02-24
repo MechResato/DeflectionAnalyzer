@@ -87,7 +87,8 @@ uint32_t num_dl_static; // amount of bytes in the static part of our display-lis
 uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
 
 // Current menu display function pointer - At the end of the TFT_display() the function referenced to this pointer is executed
-int TFT_cur_Menu = 0;
+int8_t TFT_cur_Menu = 0; // Used as index of currently used menu (TFT_display,TFT_touch)
+int8_t TFT_last_Menu = -1; // Used as index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 void TFT_display_menu0(void);
 void TFT_display_menu1(void);
 void (*TFT_display_cur_Menu__fptr_arr[])(void) = {&TFT_display_menu0, &TFT_display_menu1};
@@ -96,13 +97,22 @@ void TFT_touch_menu0(uint8_t);
 void TFT_touch_menu1(uint8_t);
 void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t) = {&TFT_touch_menu0, &TFT_touch_menu1};
 
+void TFT_display_static_menu0(void);
+void TFT_display_static_menu1(void);
+void (*TFT_display_static_cur_Menu__fptr_arr[])(void) = {&TFT_display_static_menu0, &TFT_display_static_menu1};
+
+#define TFT_MENU_SIZE (sizeof(TFT_display_cur_Menu__fptr_arr) / sizeof(*(TFT_display_cur_Menu__fptr_arr)))
+
 /////////// Debug
 uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by TFT_display()
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by TFT_display()
 uint32_t TouchXY = 0; // Currently touched X and Y coordinate from register (1.byte=X, 2.byte=Y). Used by TFT_display()
 uint16_t BGtouchInitial_X = 32768;
 uint16_t BGtouchInitial_Y = 32768;
-
+enum SwipeDetection{None, Up, Down, Left, Right};
+enum SwipeDetection swipeDetect = None;
+uint8_t swipeInProgress = 0;
+uint8_t swipeDebounce = 0;
 
 /////////// Button states
 uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
@@ -411,66 +421,66 @@ void TFT_display_init_screen(void)
 		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
 	}
 }
-
-void initStaticGraphBackground(void)
-{
-	// Static portion of display-handling, meant to be called once at startup. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
-	EVE_cmd_dl(CMD_DLSTART); // Start a new display list (resets REG_CMD_DL to 0)
-
-	/// Main settings
-	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_bgcolor(MAIN_BGCOLOR); /* light grey */
-	EVE_cmd_dl(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
-	// Main Rectangle
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BGCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
-	EVE_cmd_dl(VERTEX2F(0, 0));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
-	EVE_cmd_dl(DL_END);
-
-	/// Draw Banner and divider line on top
-	// Banner
-	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
-	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl(DL_END);
-	// Divider
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
-	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl(DL_END);
-
-	// Add the static text
-	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
-	#if defined (EVE_DMA)
-		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
-	#endif
-	EVE_cmd_text(360, 10, 26, 0, "DL-size:");
-	EVE_cmd_text(360, 25, 26, 0, "Sensor:");
-
-	/// Write the static part of the Graph to the display list
-	TFT_GraphStatic(0, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
-
-	// Wait for Display to be finished
-	while (EVE_busy());
-
-	// Get size of the current display list
-	num_dl_static = EVE_memRead16(REG_CMD_DL); // REG_CMD_DL = Command display list offset
-
-	// Copy "num_dl_static" bytes from pointer "EVE_RAM_DL" to pointer "MEM_DL_STATIC"
-	EVE_cmd_memcpy(MEM_DL_STATIC, EVE_RAM_DL, num_dl_static);
-	while (EVE_busy());
-
-	EVE_cmd_track(0, 0, EVE_HSIZE, EVE_VSIZE, 1);
-}
+//
+//void initStaticGraphBackground(void)
+//{
+//	// Static portion of display-handling, meant to be called once at startup. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
+//	EVE_cmd_dl(CMD_DLSTART); // Start a new display list (resets REG_CMD_DL to 0)
+//
+//	/// Main settings
+//	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+//	EVE_cmd_bgcolor(MAIN_BGCOLOR); /* light grey */
+//	EVE_cmd_dl(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
+//	// Main Rectangle
+//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BGCOLOR);
+//	EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
+//	EVE_cmd_dl(VERTEX2F(0, 0));
+//	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
+//	EVE_cmd_dl(DL_END);
+//
+//	/// Draw Banner and divider line on top
+//	// Banner
+//	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+//	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
+//	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+//	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+//	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+//	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+//	EVE_cmd_dl(DL_END);
+//	// Divider
+//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+//	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
+//	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+//	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+//	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+//	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+//	EVE_cmd_dl(DL_END);
+//
+//	// Add the static text
+//	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
+//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+//	#if defined (EVE_DMA)
+//		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
+//	#endif
+//	EVE_cmd_text(360, 10, 26, 0, "DL-size:");
+//	EVE_cmd_text(360, 25, 26, 0, "Sensor:");
+//
+//	/// Write the static part of the Graph to the display list
+//	TFT_GraphStatic(0, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
+//
+//	// Wait for Display to be finished
+//	while (EVE_busy());
+//
+//	// Get size of the current display list
+//	num_dl_static = EVE_memRead16(REG_CMD_DL); // REG_CMD_DL = Command display list offset
+//
+//	// Copy "num_dl_static" bytes from pointer "EVE_RAM_DL" to pointer "MEM_DL_STATIC"
+//	EVE_cmd_memcpy(MEM_DL_STATIC, EVE_RAM_DL, num_dl_static);
+//	while (EVE_busy());
+//
+//	//EVE_cmd_track(0, 0, EVE_HSIZE, EVE_VSIZE, 1);
+//}
 
 uint8_t TFT_init(void)
 {
@@ -507,6 +517,45 @@ uint8_t TFT_init(void)
 	}
 }
 
+
+
+
+void TFT_display_static(void)
+{
+	// Static portion of display-handling, meant to be called once at startup. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
+	EVE_cmd_dl(CMD_DLSTART); // Start a new display list (resets REG_CMD_DL to 0)
+
+	/// Main settings
+	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	EVE_cmd_bgcolor(MAIN_BGCOLOR); /* light grey */
+	EVE_cmd_dl(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
+	// Main Rectangle
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BGCOLOR);
+	EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
+	EVE_cmd_dl(VERTEX2F(0, 0));
+	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
+	EVE_cmd_dl(DL_END);
+
+
+	/////////////// Execute current menu specific code
+	(*TFT_display_static_cur_Menu__fptr_arr[TFT_cur_Menu])();
+
+
+
+	// Wait for Display to be finished
+	while (EVE_busy());
+
+	// Get size of the current display list
+	num_dl_static = EVE_memRead16(REG_CMD_DL); // REG_CMD_DL = Command display list offset
+
+	// Copy "num_dl_static" bytes from pointer "EVE_RAM_DL" to pointer "MEM_DL_STATIC"
+	EVE_cmd_memcpy(MEM_DL_STATIC, EVE_RAM_DL, num_dl_static);
+	while (EVE_busy());
+
+	// The menu is now established and can be set as last known menu
+	TFT_last_Menu = TFT_cur_Menu;
+}
+
 void TFT_touch(void)
 {
 	/// Check for touch events and setup vars for TFT_display() (Buttons). Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
@@ -518,55 +567,83 @@ void TFT_touch(void)
 
 	// Read the value for the first touch point
 	tag = EVE_memRead8(REG_TOUCH_TAG);
+	TouchXY = EVE_memRead32(REG_TOUCH_SCREEN_XY);
+	uint16_t Y = TouchXY;
+	uint16_t X = TouchXY >> 16;
 
-	// Determine which tag was touched
-	switch(tag)
-	{
-		// nothing touched - reset states and locks
-		case 0:
-			toggle_lock = 0;
+
+	if(swipeInProgress){
+
+		if(tag == 1 && X < 32768 && Y < 32768){
+			int32_t swipe_X = BGtouchInitial_X - X;
+			int32_t swipe_Y = BGtouchInitial_Y - Y;
+
+			if(abs(swipe_X) > abs(swipe_Y)){
+				if(swipe_X > 50)      	// swipe to left
+					swipeDetect = Left;
+				else if(swipe_X < -50)	// swipe to right
+					swipeDetect = Right;
+				else
+					swipeDetect = None;
+			}
+			else{
+				if(swipe_Y > 50)		// swipe down
+					swipeDetect = Down;
+				else if(swipe_Y < -50)	// swipe up
+					swipeDetect = Up;
+				else
+					swipeDetect = None;
+			}
+		}
+
+
+
+
+		if(tag == 0) swipeDebounce++;
+
+		if(swipeDebounce >= 5){
+			swipeInProgress = 0;
+			swipeDebounce = 0;
+
+			// Change menu if swipe was detected
+			if(swipeDetect == Left && TFT_cur_Menu < (TFT_MENU_SIZE-1)) TFT_cur_Menu++;
+			else if(swipeDetect == Right && TFT_cur_Menu > 0) TFT_cur_Menu--;
+
+			//if(TFT_cur_Menu > TFT_MENU_SIZE-1) TFT_cur_Menu = TFT_MENU_SIZE-1;
+			//else if(TFT_cur_Menu < 0) TFT_cur_Menu = 0;
+
+			// Reset swipe feature variables
 			BGtouchInitial_X = 32768;
 			BGtouchInitial_Y = 32768;
-			break;
-		case 1:
-			TouchXY = EVE_memRead32(REG_TOUCH_SCREEN_XY);
-			uint16_t X = TouchXY;
-			uint16_t Y = TouchXY >> 16;
-
-			// Detect initial touch on BG - save coordinates to determine where the user swipes
-			if(BGtouchInitial_X == 32768 && BGtouchInitial_Y == 32768){
-				BGtouchInitial_X = X;
-				BGtouchInitial_Y = Y;
-			}
-			else if(BGtouchInitial_X < 32768 && BGtouchInitial_Y < 32768){
-				int16_t swipe_X = BGtouchInitial_X - X;
-				int16_t swipe_Y = BGtouchInitial_Y - Y;
-
-				if(abs(swipe_X) > abs(swipe_Y)){
-					if(swipe_X > 100){
-						// swipe to left
-						TFT_cur_Menu = 1; //dummy
-					}
-					else{
-						// swipe to right
-						TFT_cur_Menu = 0; //dummy
-					}
-				}
-				else{
-					if(swipe_Y > 100){
-						// swipe down
-					}
-					else{
-						// swipe up
-					}
-				}
-			}
-
-			break;
-		default:
-			// Execute current menu specific code
-			(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag);
+			swipeDetect = None;
+		}
 	}
+	else{
+		// Execute action based on touched tag
+		switch(tag)
+		{
+			// nothing touched - reset states and locks
+			case 0:
+				toggle_lock = 0;
+				break;
+			case 1:
+
+				// Detect initial touch on BG - save coordinates to determine to where the user swipes
+				if(X < 32768 && Y < 32768){
+					BGtouchInitial_X = X;
+					BGtouchInitial_Y = Y;
+					swipeInProgress = 1;
+				}
+
+
+				break;
+			default:
+				// Execute current menu specific code
+				(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag);
+				break;
+		}
+	}
+	//printf("%d %d %d %d-%d\n", swipeInProgress, (int)swipeDetect, TFT_cur_Menu, BGtouchInitial_X, X);
 }
 
 void TFT_display(void)
@@ -577,22 +654,22 @@ void TFT_display(void)
 
 	if(tft_active != 0)
 	{
+		// Setup static part of the current menu - only needed once when the menu is changed
+		if(TFT_last_Menu != TFT_cur_Menu)
+			TFT_display_static();
+
+		// Debug
 		#if defined (EVE_DMA)
 			uint16_t cmd_fifo_size;
 			cmd_fifo_size = EVE_dma_buffer_index*4; /* without DMA there is no way to tell how many bytes are written to the cmd-fifo */
 		#endif
 
-		//EVE_cmd_track(0, 0, EVE_VSIZE, EVE_HSIZE, 1);
-
-
 		// Get size of last display list to be printed on screen (section "Debug Values")
 		display_list_size = EVE_memRead16(REG_CMD_DL);
 		tracker = EVE_memRead32(REG_TRACKER);
 
-
 		// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address once)
 		EVE_start_cmd_burst();
-
 
 
 		/////////////// Start the actual display list
@@ -605,7 +682,7 @@ void TFT_display(void)
 		EVE_cmd_append_burst(MEM_DL_STATIC, num_dl_static);
 
 
-		// Execute current menu specific code
+		/////////////// Execute current menu specific code
 		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
 
 
@@ -615,6 +692,70 @@ void TFT_display(void)
 
 		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
 	}
+}
+
+void TFT_display_static_menu0(void){
+	/// Draw Banner and divider line on top
+	// Banner
+	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
+	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl(DL_END);
+	// Divider
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
+	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl(DL_END);
+
+	// Add the static text
+	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	#if defined (EVE_DMA)
+		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
+	#endif
+	EVE_cmd_text(360, 10, 26, 0, "DL-size:");
+	EVE_cmd_text(360, 25, 26, 0, "Sensor:");
+
+	/// Write the static part of the Graph to the display list
+	TFT_GraphStatic(0, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
+
+
+}
+void TFT_display_static_menu1(void){
+	/// Draw Banner and divider line on top
+	// Banner
+	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
+	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl(DL_END);
+	// Divider
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
+	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl(DL_END);
+
+	// Add the static text
+	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
+	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	EVE_cmd_text(360, 10, 26, 0, "X:");
+	EVE_cmd_text(360, 25, 26, 0, "Y:");
+
 }
 
 void TFT_display_menu0(void)
@@ -667,7 +808,6 @@ void TFT_display_menu0(void)
 	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, toggle_state_graphmode, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
 
 }
-
 void TFT_display_menu1(void)
 {
 	/// Test menu
@@ -686,30 +826,15 @@ void TFT_display_menu1(void)
 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "re");
 	}
 
-	EVE_cmd_dl_burst(TAG(2));
-
-	int val = tracker >> 16;
-	if ((tracker & 0xff) == 2){
-		EVE_cmd_slider_burst(20, 100, 100, 20, 0, val, 65535);
-	}
-	if ((tracker & 0xff) == 1){
-		EVE_cmd_slider_burst(20, 100, 100, 20, 0, val, 65535);
-	}
-	else{
-		EVE_cmd_slider_burst(20, 100, 100, 20, 0, val, 65535);
-	}
 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
-
-	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, val); /* number of bytes written to the display-list by the command co-pro */
 
 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
 	uint16_t X = TouchXY;
 	uint16_t Y = TouchXY >> 16;
-	EVE_cmd_number_burst(470, EVE_VSIZE-50, 26, EVE_OPT_RIGHTX, X);
-	EVE_cmd_number_burst(470, EVE_VSIZE-25, 26, EVE_OPT_RIGHTX, Y);
+	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, X);
+	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, Y);
 
 }
-
 
 void TFT_touch_menu0(uint8_t tag){
 	// Determine which tag was touched
@@ -750,7 +875,6 @@ void TFT_touch_menu0(uint8_t tag){
 				toggle_lock = 42;
 				InputType++;
 				if(InputType > 3){ InputType = 0; }
-				TFT_cur_Menu = 1;
 			}
 			break;
 	}

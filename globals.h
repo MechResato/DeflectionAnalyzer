@@ -10,7 +10,7 @@
 #define GLOBALS_H_
 
 /*  MACROS - DEFINEs */
-//#define DEBUG_ENABLE // self implemented Debug flag
+#define DEBUG_ENABLE // self implemented Debug flag
 #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
 

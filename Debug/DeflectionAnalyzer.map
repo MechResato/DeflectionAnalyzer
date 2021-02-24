@@ -125,7 +125,7 @@ c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-4
 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-msizer.o)
                               c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-reallocr.o) (_malloc_usable_size_r)
 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                              c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-readr.o) (_read)
+                              ./main.o (initialise_monitor_handles)
 
 Allocating common symbols
 Common symbol       size              file
@@ -1975,6 +1975,8 @@ Discarded input sections
                 0x00000000       0x2c ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .text.EVE_cmd_snapshot2
                 0x00000000       0xa8 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+ .text.EVE_cmd_track
+                0x00000000       0xcc ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .text.EVE_cmd_videoframe
                 0x00000000       0x34 ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .text.EVE_init_flash
@@ -2107,6 +2109,8 @@ Discarded input sections
                 0x00000000       0x5c ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .text.EVE_cmd_slider
                 0x00000000       0xfc ./Libraries/FT800-FT813-5.x/EVE_commands.o
+ .text.EVE_cmd_slider_burst
+                0x00000000       0x68 ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .text.EVE_cmd_spinner
                 0x00000000       0xa4 ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .text.EVE_cmd_spinner_burst
@@ -2617,8 +2621,6 @@ Discarded input sections
  .text          0x00000000        0x0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .data          0x00000000        0x0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .bss           0x00000000        0x0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
- .text.initialise_monitor_handles
-                0x00000000       0xa4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .text._getpid  0x00000000        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .text._sbrk    0x00000000       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .text._stat    0x00000000       0x3a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
@@ -2633,15 +2635,7 @@ Discarded input sections
  .text._times   0x00000000       0x16 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .text._system  0x00000000       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .text._rename  0x00000000       0x36 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
- .bss.monitor_stdout
-                0x00000000        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
- .bss.monitor_stdin
-                0x00000000        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
- .rodata.str1.1
-                0x00000000        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .bss.heap_end.5855
-                0x00000000        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
- .bss.monitor_stderr
                 0x00000000        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
 
 Memory Configuration
@@ -2744,7 +2738,7 @@ END GROUP
                 0x00000800                stack_size = DEFINED (stack_size)?stack_size:0x800
                 0x00000040                no_init_size = 0x40
 
-.text           0x08000000     0xf808 load address 0x0c000000
+.text           0x08000000     0xfa44 load address 0x0c000000
                 0x08000000                sText = .
  *(.reset)
  .reset         0x08000000      0x294 ./Startup/startup_XMC4700.o
@@ -3121,542 +3115,546 @@ END GROUP
  .text.EVE_cmd_memcpy
                 0x08002108       0x3c ./Libraries/FT800-FT813-5.x/EVE_commands.o
                 0x08002108                EVE_cmd_memcpy
- .text.EVE_cmd_track
-                0x08002144       0xcc ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002144                EVE_cmd_track
  .text.EVE_init
-                0x08002210      0x270 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002210                EVE_init
+                0x08002144      0x270 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002144                EVE_init
  .text.EVE_start_cmd_burst
-                0x08002480       0x4c ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002480                EVE_start_cmd_burst
+                0x080023b4       0x4c ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080023b4                EVE_start_cmd_burst
  .text.EVE_end_cmd_burst
-                0x080024cc       0x14 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x080024cc                EVE_end_cmd_burst
+                0x08002400       0x14 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002400                EVE_end_cmd_burst
  .text.EVE_start_command
-                0x080024e0       0x48 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x080024e0                EVE_start_command
+                0x08002414       0x48 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002414                EVE_start_command
  .text.EVE_write_string
-                0x08002528      0x114 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002528                EVE_write_string
+                0x0800245c      0x114 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x0800245c                EVE_write_string
  .text.EVE_cmd_dl
-                0x0800263c       0x28 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x0800263c                EVE_cmd_dl
+                0x08002570       0x28 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002570                EVE_cmd_dl
  .text.EVE_cmd_dl_burst
-                0x08002664       0x14 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002664                EVE_cmd_dl_burst
+                0x08002598       0x14 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002598                EVE_cmd_dl_burst
  .text.EVE_cmd_append_burst
-                0x08002678       0x24 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002678                EVE_cmd_append_burst
+                0x080025ac       0x24 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080025ac                EVE_cmd_append_burst
  .text.EVE_cmd_bgcolor
-                0x0800269c       0x50 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x0800269c                EVE_cmd_bgcolor
+                0x080025d0       0x50 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080025d0                EVE_cmd_bgcolor
  .text.EVE_cmd_bgcolor_burst
-                0x080026ec       0x1c ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x080026ec                EVE_cmd_bgcolor_burst
+                0x08002620       0x1c ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002620                EVE_cmd_bgcolor_burst
  .text.EVE_cmd_button_burst
-                0x08002708       0x68 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002708                EVE_cmd_button_burst
+                0x0800263c       0x68 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x0800263c                EVE_cmd_button_burst
  .text.EVE_cmd_fgcolor_burst
-                0x08002770       0x1c ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002770                EVE_cmd_fgcolor_burst
+                0x080026a4       0x1c ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080026a4                EVE_cmd_fgcolor_burst
  .text.EVE_cmd_gradcolor_burst
-                0x0800278c       0x1c ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x0800278c                EVE_cmd_gradcolor_burst
+                0x080026c0       0x1c ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080026c0                EVE_cmd_gradcolor_burst
  .text.EVE_cmd_number
-                0x080027a8       0xac ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x080027a8                EVE_cmd_number
+                0x080026dc       0xac ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080026dc                EVE_cmd_number
  .text.EVE_cmd_number_burst
-                0x08002854       0x58 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002854                EVE_cmd_number_burst
+                0x08002788       0x58 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002788                EVE_cmd_number_burst
  .text.EVE_cmd_setbitmap_burst
-                0x080028ac       0x44 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x080028ac                EVE_cmd_setbitmap_burst
- .text.EVE_cmd_slider_burst
-                0x080028f0       0x68 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x080028f0                EVE_cmd_slider_burst
+                0x080027e0       0x44 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080027e0                EVE_cmd_setbitmap_burst
  .text.EVE_cmd_text
-                0x08002958       0xac ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002958                EVE_cmd_text
+                0x08002824       0xac ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002824                EVE_cmd_text
  .text.EVE_cmd_text_burst
-                0x08002a04       0x54 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002a04                EVE_cmd_text_burst
+                0x080028d0       0x54 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x080028d0                EVE_cmd_text_burst
  .text.EVE_cmd_toggle_burst
-                0x08002a58       0x64 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x08002a58                EVE_cmd_toggle_burst
+                0x08002924       0x64 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x08002924                EVE_cmd_toggle_burst
  .text.TFT_GraphStatic
-                0x08002abc      0x9c4 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08002abc                TFT_GraphStatic
+                0x08002988      0x9c4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08002988                TFT_GraphStatic
  .text.TFT_GraphData
-                0x08003480      0x210 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003480                TFT_GraphData
+                0x0800334c      0x210 ./Libraries/FT800-FT813-5.x/tft.o
+                0x0800334c                TFT_GraphData
  .text.touch_calibrate
-                0x08003690       0x60 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003690                touch_calibrate
+                0x0800355c       0x60 ./Libraries/FT800-FT813-5.x/tft.o
+                0x0800355c                touch_calibrate
  .text.TFT_display_init_screen
-                0x080036f0       0x84 ./Libraries/FT800-FT813-5.x/tft.o
-                0x080036f0                TFT_display_init_screen
- .text.initStaticGraphBackground
-                0x08003774      0x1e0 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003774                initStaticGraphBackground
+                0x080035bc       0x84 ./Libraries/FT800-FT813-5.x/tft.o
+                0x080035bc                TFT_display_init_screen
  .text.TFT_init
-                0x08003954       0x7c ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003954                TFT_init
+                0x08003640       0x88 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003640                TFT_init
+ .text.TFT_display_static
+                0x080036c8       0xbc ./Libraries/FT800-FT813-5.x/tft.o
+                0x080036c8                TFT_display_static
  .text.TFT_touch
-                0x080039d0      0x118 ./Libraries/FT800-FT813-5.x/tft.o
-                0x080039d0                TFT_touch
+                0x08003784      0x1d4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003784                TFT_touch
  .text.TFT_display
-                0x08003ae8       0x9c ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003ae8                TFT_display
+                0x08003958       0xb4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003958                TFT_display
+ .text.TFT_display_static_menu0
+                0x08003a0c      0x144 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003a0c                TFT_display_static_menu0
+ .text.TFT_display_static_menu1
+                0x08003b50       0xd0 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003b50                TFT_display_static_menu1
  .text.TFT_display_menu0
-                0x08003b84      0x268 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003b84                TFT_display_menu0
+                0x08003c20      0x268 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003c20                TFT_display_menu0
  .text.TFT_display_menu1
-                0x08003dec      0x168 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003dec                TFT_display_menu1
+                0x08003e88       0xd4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003e88                TFT_display_menu1
  .text.TFT_touch_menu0
-                0x08003f54       0xcc ./Libraries/FT800-FT813-5.x/tft.o
-                0x08003f54                TFT_touch_menu0
+                0x08003f5c       0xe0 ./Libraries/FT800-FT813-5.x/tft.o
+                0x08003f5c                TFT_touch_menu0
  .text.TFT_touch_menu1
-                0x08004020       0x58 ./Libraries/FT800-FT813-5.x/tft.o
-                0x08004020                TFT_touch_menu1
+                0x0800403c       0x5c ./Libraries/FT800-FT813-5.x/tft.o
+                0x0800403c                TFT_touch_menu1
  .text.XMC_CCU4_EnableClock
-                0x08004078       0x20 ./Dave/Generated/TIMER/timer.o
+                0x08004098       0x20 ./Dave/Generated/TIMER/timer.o
  .text.XMC_CCU4_SLICE_StartTimer
-                0x08004098       0x18 ./Dave/Generated/TIMER/timer.o
+                0x080040b8       0x18 ./Dave/Generated/TIMER/timer.o
  .text.XMC_CCU4_SLICE_ClearTimer
-                0x080040b0       0x18 ./Dave/Generated/TIMER/timer.o
+                0x080040d0       0x18 ./Dave/Generated/TIMER/timer.o
  .text.XMC_CCU4_SLICE_SetTimerPeriodMatch
-                0x080040c8       0x1c ./Dave/Generated/TIMER/timer.o
+                0x080040e8       0x1c ./Dave/Generated/TIMER/timer.o
  .text.XMC_CCU4_SLICE_SetTimerCompareMatch
-                0x080040e4       0x1c ./Dave/Generated/TIMER/timer.o
+                0x08004104       0x1c ./Dave/Generated/TIMER/timer.o
  .text.XMC_CCU4_EnableShadowTransfer
-                0x08004100       0x1c ./Dave/Generated/TIMER/timer.o
+                0x08004120       0x1c ./Dave/Generated/TIMER/timer.o
  .text.XMC_CCU4_SLICE_EnableEvent
-                0x0800411c       0x2c ./Dave/Generated/TIMER/timer.o
+                0x0800413c       0x2c ./Dave/Generated/TIMER/timer.o
  .text.TIMER_Init
-                0x08004148       0x3c ./Dave/Generated/TIMER/timer.o
-                0x08004148                TIMER_Init
+                0x08004168       0x3c ./Dave/Generated/TIMER/timer.o
+                0x08004168                TIMER_Init
  .text.TIMER_CCU4_lInit
-                0x08004184       0x98 ./Dave/Generated/TIMER/timer.o
-                0x08004184                TIMER_CCU4_lInit
+                0x080041a4       0x98 ./Dave/Generated/TIMER/timer.o
+                0x080041a4                TIMER_CCU4_lInit
  .text.TIMER_CCU4_lShadowTransfer
-                0x0800421c       0x3c ./Dave/Generated/TIMER/timer.o
-                0x0800421c                TIMER_CCU4_lShadowTransfer
+                0x0800423c       0x3c ./Dave/Generated/TIMER/timer.o
+                0x0800423c                TIMER_CCU4_lShadowTransfer
  .text.XMC_USIC_CH_WriteToTBUFTCI
-                0x08004258       0x24 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004278       0x24 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_GetTransmitBufferStatus
-                0x0800427c       0x20 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x0800429c       0x20 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_GetReceiveBufferStatus
-                0x0800429c       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x080042bc       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_TXFIFO_PutDataHPCMode
-                0x080042b8       0x24 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x080042d8       0x24 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_TXFIFO_Flush
-                0x080042dc       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x080042fc       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_TXFIFO_IsFull
-                0x080042f8       0x28 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004318       0x28 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_RXFIFO_Flush
-                0x08004320       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004340       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_RXFIFO_IsEmpty
-                0x0800433c       0x28 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x0800435c       0x28 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_RXFIFO_ClearEvent
-                0x08004364       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004384       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_SPI_CH_SetTransmitMode
-                0x08004380       0x2c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x080043a0       0x2c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_SPI_CH_GetStatusFlag
-                0x080043ac       0x18 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x080043cc       0x18 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_SPI_CH_ClearStatusFlag
-                0x080043c4       0x20 ./Dave/Generated/SPI_MASTER/spi_master.o
- .text.SPI_MASTER_Init
                 0x080043e4       0x20 ./Dave/Generated/SPI_MASTER/spi_master.o
-                0x080043e4                SPI_MASTER_Init
+ .text.SPI_MASTER_Init
+                0x08004404       0x20 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004404                SPI_MASTER_Init
  .text.SPI_MASTER_Transmit
-                0x08004404       0x34 ./Dave/Generated/SPI_MASTER/spi_master.o
-                0x08004404                SPI_MASTER_Transmit
+                0x08004424       0x34 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004424                SPI_MASTER_Transmit
  .text.SPI_MASTER_Receive
-                0x08004438       0x34 ./Dave/Generated/SPI_MASTER/spi_master.o
-                0x08004438                SPI_MASTER_Receive
+                0x08004458       0x34 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004458                SPI_MASTER_Receive
  .text.SPI_MASTER_lStartTransmitPolling
-                0x0800446c      0x21c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x0800448c      0x21c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.SPI_MASTER_lStartReceivePolling
-                0x08004688       0x98 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x080046a8       0x98 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.SPI_MASTER_lReceivePolling
-                0x08004720      0x400 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004740      0x400 ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.SPI_MASTER_lStdRBUFFlush
-                0x08004b20       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x08004b40       0x1c ./Dave/Generated/SPI_MASTER/spi_master.o
  .text.XMC_USIC_CH_SetInputSource
-                0x08004b3c       0x3c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004b5c       0x3c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_USIC_CH_SetWordLength
-                0x08004b78       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004b98       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_USIC_CH_SetFrameLength
-                0x08004ba4       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004bc4       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_USIC_CH_ConfigureShiftClockOutput
-                0x08004bd0       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004bf0       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_USIC_CH_SetMode
-                0x08004bfc       0x28 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004c1c       0x28 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_Start
-                0x08004c24       0x18 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004c44       0x18 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_SetBitOrderMsbFirst
-                0x08004c3c       0x20 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004c5c       0x20 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_SetSlaveSelectDelay
-                0x08004c5c       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004c7c       0x2c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_DisableFEM
-                0x08004c88       0x20 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004ca8       0x20 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_ConfigureShiftClockOutput
-                0x08004ca8       0x1c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004cc8       0x1c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_SetWordLength
-                0x08004cc4       0x1c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004ce4       0x1c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_SetFrameLength
-                0x08004ce0       0x1c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004d00       0x1c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_SPI_CH_SetInputSource
-                0x08004cfc       0x44 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004d1c       0x44 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.SPI_MASTER_0_lInit
-                0x08004d40       0x9c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x08004d60       0x9c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .text.XMC_CCU4_StartPrescaler
-                0x08004ddc       0x1c ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+                0x08004dfc       0x1c ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
  .text.GLOBAL_CCU4_Init
-                0x08004df8       0x40 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
-                0x08004df8                GLOBAL_CCU4_Init
+                0x08004e18       0x40 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+                0x08004e18                GLOBAL_CCU4_Init
  .text.XMC_VADC_GLOBAL_DisablePostCalibration
-                0x08004e38       0x2c ./Dave/Generated/GLOBAL_ADC/global_adc.o
+                0x08004e58       0x2c ./Dave/Generated/GLOBAL_ADC/global_adc.o
  .text.GLOBAL_ADC_Init
-                0x08004e64       0xb0 ./Dave/Generated/GLOBAL_ADC/global_adc.o
-                0x08004e64                GLOBAL_ADC_Init
+                0x08004e84       0xb0 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+                0x08004e84                GLOBAL_ADC_Init
  .text.DIGITAL_IO_Init
-                0x08004f14       0x40 ./Dave/Generated/DIGITAL_IO/digital_io.o
-                0x08004f14                DIGITAL_IO_Init
+                0x08004f34       0x40 ./Dave/Generated/DIGITAL_IO/digital_io.o
+                0x08004f34                DIGITAL_IO_Init
  .text.__NVIC_SetPriorityGrouping
-                0x08004f54       0x48 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+                0x08004f74       0x48 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
  .text.SystemCoreSetup
-                0x08004f9c       0xa0 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
-                0x08004f9c                SystemCoreSetup
+                0x08004fbc       0xa0 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+                0x08004fbc                SystemCoreSetup
  .text.CLOCK_XMC4_Init
-                0x0800503c       0x20 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
-                0x0800503c                CLOCK_XMC4_Init
+                0x0800505c       0x20 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+                0x0800505c                CLOCK_XMC4_Init
  .text.OSCHP_GetFrequency
-                0x0800505c       0x14 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
-                0x0800505c                OSCHP_GetFrequency
+                0x0800507c       0x14 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+                0x0800507c                OSCHP_GetFrequency
  .text.SystemCoreClockSetup
-                0x08005070       0x54 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
-                0x08005070                SystemCoreClockSetup
+                0x08005090       0x54 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+                0x08005090                SystemCoreClockSetup
  .text.__NVIC_GetPriorityGrouping
-                0x080050c4       0x1c ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x080050e4       0x1c ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.__NVIC_EnableIRQ
-                0x080050e0       0x38 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x08005100       0x38 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.__NVIC_SetPriority
-                0x08005118       0x54 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x08005138       0x54 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.NVIC_EncodePriority
-                0x0800516c       0x64 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x0800518c       0x64 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.XMC_VADC_GLOBAL_BackgroundTriggerConversion
-                0x080051d0       0x24 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x080051f0       0x24 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.XMC_VADC_GLOBAL_BackgroundAddChannelToSequence
-                0x080051f4       0x38 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x08005214       0x38 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.XMC_VADC_GROUP_ResultInit
-                0x0800522c       0x24 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x0800524c       0x24 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.XMC_VADC_GROUP_GetResult
-                0x08005250       0x24 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x08005270       0x24 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .text.ADC_MEASUREMENT_Init
-                0x08005274      0x150 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
-                0x08005274                ADC_MEASUREMENT_Init
+                0x08005294      0x150 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x08005294                ADC_MEASUREMENT_Init
  .text.ADC_MEASUREMENT_GetResult
-                0x080053c4       0x30 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
-                0x080053c4                ADC_MEASUREMENT_GetResult
+                0x080053e4       0x30 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x080053e4                ADC_MEASUREMENT_GetResult
  .text.DAVE_Init
-                0x080053f4       0x88 ./Dave/Generated/DAVE.o
-                0x080053f4                DAVE_Init
+                0x08005414       0x88 ./Dave/Generated/DAVE.o
+                0x08005414                DAVE_Init
  .text.SysTick_Handler
-                0x0800547c       0x1c ./globals.o
-                0x0800547c                SysTick_Handler
+                0x0800549c       0x1c ./globals.o
+                0x0800549c                SysTick_Handler
  .text.delay_ms
-                0x08005498       0x30 ./globals.o
-                0x08005498                delay_ms
+                0x080054b8       0x30 ./globals.o
+                0x080054b8                delay_ms
  .text.__NVIC_SetPriority
-                0x080054c8       0x54 ./main.o
+                0x080054e8       0x54 ./main.o
  .text.SysTick_Config
-                0x0800551c       0x44 ./main.o
+                0x0800553c       0x44 ./main.o
  .text.XMC_GPIO_SetOutputHigh
-                0x08005560       0x20 ./main.o
- .text.DIGITAL_IO_SetOutputHigh
                 0x08005580       0x20 ./main.o
- .text.main     0x080055a0       0x98 ./main.o
-                0x080055a0                main
+ .text.DIGITAL_IO_SetOutputHigh
+                0x080055a0       0x20 ./main.o
+ .text.main     0x080055c0       0xd4 ./main.o
+                0x080055c0                main
+ *fill*         0x08005694        0x4 
  .text.VADC0_C0_2_IRQHandler
-                0x08005638      0x1d0 ./measure.o
-                0x08005638                VADC0_C0_2_IRQHandler
- .text.ceil     0x08005808      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_ceil.o)
-                0x08005808                ceil
- .text.floor    0x08005910      0x110 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_floor.o)
-                0x08005910                floor
- .text.sin      0x08005a20       0x94 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_sin.o)
-                0x08005a20                sin
- *fill*         0x08005ab4        0x4 
+                0x08005698      0x1d0 ./measure.o
+                0x08005698                VADC0_C0_2_IRQHandler
+ .text.ceil     0x08005868      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_ceil.o)
+                0x08005868                ceil
+ .text.floor    0x08005970      0x110 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_floor.o)
+                0x08005970                floor
+ .text.sin      0x08005a80       0x94 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_sin.o)
+                0x08005a80                sin
+ *fill*         0x08005b14        0x4 
  .text.__ieee754_rem_pio2
-                0x08005ab8      0x440 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
-                0x08005ab8                __ieee754_rem_pio2
+                0x08005b18      0x440 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
+                0x08005b18                __ieee754_rem_pio2
  .text.__kernel_cos
-                0x08005ef8      0x250 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_cos.o)
-                0x08005ef8                __kernel_cos
+                0x08005f58      0x250 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_cos.o)
+                0x08005f58                __kernel_cos
  .text.__kernel_rem_pio2
-                0x08006148      0x7d8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
-                0x08006148                __kernel_rem_pio2
+                0x080061a8      0x7d8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
+                0x080061a8                __kernel_rem_pio2
  .text.__kernel_sin
-                0x08006920      0x170 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_sin.o)
-                0x08006920                __kernel_sin
- .text.fabs     0x08006a90        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_fabs.o)
-                0x08006a90                fabs
- .text.scalbn   0x08006a98      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_scalbn.o)
-                0x08006a98                scalbn
+                0x08006980      0x170 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_sin.o)
+                0x08006980                __kernel_sin
+ .text.fabs     0x08006af0        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_fabs.o)
+                0x08006af0                fabs
+ .text.scalbn   0x08006af8      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_scalbn.o)
+                0x08006af8                scalbn
  .text.copysign
-                0x08006ba0       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_copysign.o)
-                0x08006ba0                copysign
- .text          0x08006bb0      0x370 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_addsubdf3.o)
-                0x08006bb0                __aeabi_drsub
-                0x08006bb8                __aeabi_dsub
-                0x08006bb8                __subdf3
-                0x08006bbc                __aeabi_dadd
-                0x08006bbc                __adddf3
-                0x08006e34                __floatunsidf
-                0x08006e34                __aeabi_ui2d
-                0x08006e54                __floatsidf
-                0x08006e54                __aeabi_i2d
-                0x08006e78                __aeabi_f2d
-                0x08006e78                __extendsfdf2
-                0x08006eb4                __floatundidf
-                0x08006eb4                __aeabi_ul2d
-                0x08006ec4                __floatdidf
-                0x08006ec4                __aeabi_l2d
- .text          0x08006f20      0x424 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_muldivdf3.o)
-                0x08006f20                __aeabi_dmul
-                0x08006f20                __muldf3
-                0x08007174                __divdf3
-                0x08007174                __aeabi_ddiv
- .text          0x08007344      0x110 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_cmpdf2.o)
-                0x08007344                __gtdf2
-                0x08007344                __gedf2
-                0x0800734c                __ltdf2
-                0x0800734c                __ledf2
-                0x08007354                __nedf2
-                0x08007354                __eqdf2
-                0x08007354                __cmpdf2
-                0x080073d0                __aeabi_cdrcmple
-                0x080073e0                __aeabi_cdcmpeq
-                0x080073e0                __aeabi_cdcmple
-                0x080073f0                __aeabi_dcmpeq
-                0x08007404                __aeabi_dcmplt
-                0x08007418                __aeabi_dcmple
-                0x0800742c                __aeabi_dcmpge
-                0x08007440                __aeabi_dcmpgt
- .text          0x08007454       0x50 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_fixdfsi.o)
-                0x08007454                __aeabi_d2iz
-                0x08007454                __fixdfsi
- .text          0x080074a4       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_fixunsdfsi.o)
-                0x080074a4                __aeabi_d2uiz
-                0x080074a4                __fixunsdfsi
- .text.__errno  0x080074e4        0xc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-errno.o)
-                0x080074e4                __errno
- .text.memcpy   0x080074f0       0x16 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memcpy.o)
-                0x080074f0                memcpy
- .text.memset   0x08007506       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memset.o)
-                0x08007506                memset
- .text.__cvt    0x08007516       0xc0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
-                0x08007516                __cvt
+                0x08006c00       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_copysign.o)
+                0x08006c00                copysign
+ .text          0x08006c10      0x370 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_addsubdf3.o)
+                0x08006c10                __aeabi_drsub
+                0x08006c18                __aeabi_dsub
+                0x08006c18                __subdf3
+                0x08006c1c                __aeabi_dadd
+                0x08006c1c                __adddf3
+                0x08006e94                __floatunsidf
+                0x08006e94                __aeabi_ui2d
+                0x08006eb4                __floatsidf
+                0x08006eb4                __aeabi_i2d
+                0x08006ed8                __aeabi_f2d
+                0x08006ed8                __extendsfdf2
+                0x08006f14                __floatundidf
+                0x08006f14                __aeabi_ul2d
+                0x08006f24                __floatdidf
+                0x08006f24                __aeabi_l2d
+ .text          0x08006f80      0x424 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_muldivdf3.o)
+                0x08006f80                __aeabi_dmul
+                0x08006f80                __muldf3
+                0x080071d4                __divdf3
+                0x080071d4                __aeabi_ddiv
+ .text          0x080073a4      0x110 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_cmpdf2.o)
+                0x080073a4                __gtdf2
+                0x080073a4                __gedf2
+                0x080073ac                __ltdf2
+                0x080073ac                __ledf2
+                0x080073b4                __nedf2
+                0x080073b4                __eqdf2
+                0x080073b4                __cmpdf2
+                0x08007430                __aeabi_cdrcmple
+                0x08007440                __aeabi_cdcmpeq
+                0x08007440                __aeabi_cdcmple
+                0x08007450                __aeabi_dcmpeq
+                0x08007464                __aeabi_dcmplt
+                0x08007478                __aeabi_dcmple
+                0x0800748c                __aeabi_dcmpge
+                0x080074a0                __aeabi_dcmpgt
+ .text          0x080074b4       0x50 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_fixdfsi.o)
+                0x080074b4                __aeabi_d2iz
+                0x080074b4                __fixdfsi
+ .text          0x08007504       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/softfp\libgcc.a(_arm_fixunsdfsi.o)
+                0x08007504                __aeabi_d2uiz
+                0x08007504                __fixunsdfsi
+ .text.__errno  0x08007544        0xc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-errno.o)
+                0x08007544                __errno
+ .text.memcpy   0x08007550       0x16 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memcpy.o)
+                0x08007550                memcpy
+ .text.memset   0x08007566       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memset.o)
+                0x08007566                memset
+ .text.__cvt    0x08007576       0xc0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
+                0x08007576                __cvt
  .text.__exponent
-                0x080075d6       0x60 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
-                0x080075d6                __exponent
- *fill*         0x08007636        0x2 
+                0x08007636       0x60 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
+                0x08007636                __exponent
+ *fill*         0x08007696        0x2 
  .text._printf_float
-                0x08007638      0x488 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
-                0x08007638                _printf_float
+                0x08007698      0x488 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
+                0x08007698                _printf_float
  .text._printf_common
-                0x08007ac0       0xea c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x08007ac0                _printf_common
- *fill*         0x08007baa        0x2 
+                0x08007b20       0xea c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x08007b20                _printf_common
+ *fill*         0x08007c0a        0x2 
  .text._printf_i
-                0x08007bac      0x234 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x08007bac                _printf_i
- .text.printf   0x08007de0       0x30 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-printf.o)
-                0x08007de0                iprintf
-                0x08007de0                printf
- .text._puts_r  0x08007e10       0xbc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-puts.o)
-                0x08007e10                _puts_r
- .text.puts     0x08007ecc       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-puts.o)
-                0x08007ecc                puts
+                0x08007c0c      0x234 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x08007c0c                _printf_i
+ .text.printf   0x08007e40       0x30 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-printf.o)
+                0x08007e40                iprintf
+                0x08007e40                printf
+ .text._puts_r  0x08007e70       0xbc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-puts.o)
+                0x08007e70                _puts_r
+ .text.puts     0x08007f2c       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-puts.o)
+                0x08007f2c                puts
  .text.__fpclassifyd
-                0x08007edc       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-s_fpclassify.o)
-                0x08007edc                __fpclassifyd
- .text.sprintf  0x08007f30       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sprintf.o)
-                0x08007f30                siprintf
-                0x08007f30                sprintf
- .text.strlen   0x08007f78       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-strlen.o)
-                0x08007f78                strlen
+                0x08007f3c       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-s_fpclassify.o)
+                0x08007f3c                __fpclassifyd
+ .text.sprintf  0x08007f90       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sprintf.o)
+                0x08007f90                siprintf
+                0x08007f90                sprintf
+ .text.strlen   0x08007fd8       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-strlen.o)
+                0x08007fd8                strlen
  .text.__swbuf_r
-                0x08007f88       0xa8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wbuf.o)
-                0x08007f88                __swbuf_r
+                0x08007fe8       0xa8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wbuf.o)
+                0x08007fe8                __swbuf_r
  .text.__swsetup_r
-                0x08008030       0xd8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wsetup.o)
-                0x08008030                __swsetup_r
- .text.quorem   0x08008108      0x11a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
- *fill*         0x08008222        0x6 
- .text._dtoa_r  0x08008228      0xb88 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
-                0x08008228                _dtoa_r
+                0x08008090       0xd8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wsetup.o)
+                0x08008090                __swsetup_r
+ .text.quorem   0x08008168      0x11a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
+ *fill*         0x08008282        0x6 
+ .text._dtoa_r  0x08008288      0xb88 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
+                0x08008288                _dtoa_r
  .text.__sflush_r
-                0x08008db0      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fflush.o)
-                0x08008db0                __sflush_r
+                0x08008e10      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fflush.o)
+                0x08008e10                __sflush_r
  .text._fflush_r
-                0x08008eb8       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fflush.o)
-                0x08008eb8                _fflush_r
+                0x08008f18       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fflush.o)
+                0x08008f18                _fflush_r
  .text._cleanup_r
-                0x08008f0c        0xc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x08008f0c                _cleanup_r
+                0x08008f6c        0xc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x08008f6c                _cleanup_r
  .text.std.isra.0
-                0x08008f18       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x08008f78       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
  .text.__sfmoreglue
-                0x08008f60       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x08008f60                __sfmoreglue
- .text.__sinit  0x08008f8c       0x60 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x08008f8c                __sinit
- .text.__sfp    0x08008fec       0x74 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x08008fec                __sfp
+                0x08008fc0       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x08008fc0                __sfmoreglue
+ .text.__sinit  0x08008fec       0x60 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x08008fec                __sinit
+ .text.__sfp    0x0800904c       0x74 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x0800904c                __sfp
  .text._fwalk_reent
-                0x08009060       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fwalk.o)
-                0x08009060                _fwalk_reent
+                0x080090c0       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fwalk.o)
+                0x080090c0                _fwalk_reent
  .text._localeconv_r
-                0x0800909c        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
-                0x0800909c                _localeconv_r
+                0x080090fc        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
+                0x080090fc                _localeconv_r
  .text.__smakebuf_r
-                0x080090a4       0x9c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-makebuf.o)
-                0x080090a4                __smakebuf_r
- .text.malloc   0x08009140       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-malloc.o)
-                0x08009140                malloc
- .text.memchr   0x08009150       0x1e c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memchr.o)
-                0x08009150                memchr
- .text._Balloc  0x0800916e       0x6a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x0800916e                _Balloc
- .text._Bfree   0x080091d8       0x2e c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x080091d8                _Bfree
+                0x08009104       0x9c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-makebuf.o)
+                0x08009104                __smakebuf_r
+ .text.malloc   0x080091a0       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-malloc.o)
+                0x080091a0                malloc
+ .text.memchr   0x080091b0       0x1e c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memchr.o)
+                0x080091b0                memchr
+ .text._Balloc  0x080091ce       0x6a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x080091ce                _Balloc
+ .text._Bfree   0x08009238       0x2e c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x08009238                _Bfree
  .text.__multadd
-                0x08009206       0x7c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x08009206                __multadd
+                0x08009266       0x7c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x08009266                __multadd
  .text.__hi0bits
-                0x08009282       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x08009282                __hi0bits
+                0x080092e2       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x080092e2                __hi0bits
  .text.__lo0bits
-                0x080092c2       0x5a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x080092c2                __lo0bits
- .text.__i2b    0x0800931c       0x12 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x0800931c                __i2b
+                0x08009322       0x5a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x08009322                __lo0bits
+ .text.__i2b    0x0800937c       0x12 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800937c                __i2b
  .text.__multiply
-                0x0800932e      0x122 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x0800932e                __multiply
+                0x0800938e      0x122 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800938e                __multiply
  .text.__pow5mult
-                0x08009450       0x9c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x08009450                __pow5mult
+                0x080094b0       0x9c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x080094b0                __pow5mult
  .text.__lshift
-                0x080094ec       0xa6 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x080094ec                __lshift
- .text.__mcmp   0x08009592       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x08009592                __mcmp
- .text.__mdiff  0x080095ca       0xbe c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x080095ca                __mdiff
- .text.__d2b    0x08009688       0xa4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x08009688                __d2b
+                0x0800954c       0xa6 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800954c                __lshift
+ .text.__mcmp   0x080095f2       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x080095f2                __mcmp
+ .text.__mdiff  0x0800962a       0xbe c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800962a                __mdiff
+ .text.__d2b    0x080096e8       0xa4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x080096e8                __d2b
  .text._calloc_r
-                0x0800972c       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-callocr.o)
-                0x0800972c                _calloc_r
- .text._free_r  0x08009748       0x88 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-freer.o)
-                0x08009748                _free_r
+                0x0800978c       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-callocr.o)
+                0x0800978c                _calloc_r
+ .text._free_r  0x080097a8       0x88 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-freer.o)
+                0x080097a8                _free_r
  .text._malloc_r
-                0x080097d0       0xac c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
-                0x080097d0                _malloc_r
+                0x08009830       0xac c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
+                0x08009830                _malloc_r
  .text.__ssputs_r
-                0x0800987c       0xb2 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
-                0x0800987c                __ssputs_r
- *fill*         0x0800992e        0x2 
+                0x080098dc       0xb2 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x080098dc                __ssputs_r
+ *fill*         0x0800998e        0x2 
  .text._svfprintf_r
-                0x08009930      0x1e4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
-                0x08009930                _svfiprintf_r
-                0x08009930                _svfprintf_r
+                0x08009990      0x1e4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x08009990                _svfiprintf_r
+                0x08009990                _svfprintf_r
  .text.__sfputc_r
-                0x08009b14       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x08009b74       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
  .text.__sfputs_r
-                0x08009b40       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
-                0x08009b40                __sfputs_r
+                0x08009ba0       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x08009ba0                __sfputs_r
  .text._vfprintf_r
-                0x08009b64      0x210 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
-                0x08009b64                _vfprintf_r
-                0x08009b64                _vfiprintf_r
- .text._sbrk_r  0x08009d74       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sbrkr.o)
-                0x08009d74                _sbrk_r
- .text.__sread  0x08009d94       0x22 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
-                0x08009d94                __sread
+                0x08009bc4      0x210 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x08009bc4                _vfprintf_r
+                0x08009bc4                _vfiprintf_r
+ .text._sbrk_r  0x08009dd4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sbrkr.o)
+                0x08009dd4                _sbrk_r
+ .text.__sread  0x08009df4       0x22 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
+                0x08009df4                __sread
  .text.__swrite
-                0x08009db6       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
-                0x08009db6                __swrite
- .text.__sseek  0x08009dee       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
-                0x08009dee                __sseek
+                0x08009e16       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
+                0x08009e16                __swrite
+ .text.__sseek  0x08009e4e       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
+                0x08009e4e                __sseek
  .text.__sclose
-                0x08009e12        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
-                0x08009e12                __sclose
- *fill*         0x08009e1a        0x2 
+                0x08009e72        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
+                0x08009e72                __sclose
+ *fill*         0x08009e7a        0x2 
  .text._write_r
-                0x08009e1c       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-writer.o)
-                0x08009e1c                _write_r
+                0x08009e7c       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-writer.o)
+                0x08009e7c                _write_r
  .text._close_r
-                0x08009e40       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-closer.o)
-                0x08009e40                _close_r
+                0x08009ea0       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-closer.o)
+                0x08009ea0                _close_r
  .text._fstat_r
-                0x08009e60       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fstatr.o)
-                0x08009e60                _fstat_r
+                0x08009ec0       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fstatr.o)
+                0x08009ec0                _fstat_r
  .text._isatty_r
-                0x08009e84       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-isattyr.o)
-                0x08009e84                _isatty_r
+                0x08009ee4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-isattyr.o)
+                0x08009ee4                _isatty_r
  .text._lseek_r
-                0x08009ea4       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-lseekr.o)
-                0x08009ea4                _lseek_r
- .text.memmove  0x08009ec8       0x36 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memmove.o)
-                0x08009ec8                memmove
+                0x08009f04       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-lseekr.o)
+                0x08009f04                _lseek_r
+ .text.memmove  0x08009f28       0x36 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memmove.o)
+                0x08009f28                memmove
  .text._realloc_r
-                0x08009efe       0x4c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-reallocr.o)
-                0x08009efe                _realloc_r
- *fill*         0x08009f4a        0x2 
- .text._read_r  0x08009f4c       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-readr.o)
-                0x08009f4c                _read_r
+                0x08009f5e       0x4c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-reallocr.o)
+                0x08009f5e                _realloc_r
+ *fill*         0x08009faa        0x2 
+ .text._read_r  0x08009fac       0x24 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-readr.o)
+                0x08009fac                _read_r
  .text._malloc_usable_size_r
-                0x08009f70       0x14 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-msizer.o)
-                0x08009f70                _malloc_usable_size_r
+                0x08009fd0       0x14 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-msizer.o)
+                0x08009fd0                _malloc_usable_size_r
  .text.findslot
-                0x08009f84       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
- .text.error    0x08009fb8       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x08009fe4       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+ .text.error    0x0800a018       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .text.checkerror
-                0x08009fd4        0xa c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a034        0xa c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+ *fill*         0x0800a03e        0x2 
+ .text.initialise_monitor_handles
+                0x0800a040       0xa4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a040                initialise_monitor_handles
  .text._swiread
-                0x08009fde       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x08009fde                _swiread
- .text._read    0x08009ffe       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x08009ffe                _read
+                0x0800a0e4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a0e4                _swiread
+ .text._read    0x0800a104       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a104                _read
  .text._swilseek
-                0x0800a032       0x7a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a032                _swilseek
- .text._lseek   0x0800a0ac        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a0ac                _lseek
+                0x0800a138       0x7a c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a138                _swilseek
+ .text._lseek   0x0800a1b2        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a1b2                _lseek
  .text._swiwrite
-                0x0800a0b0       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a0b0                _swiwrite
- .text._write   0x0800a0d0       0x42 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a0d0                _write
+                0x0800a1b6       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a1b6                _swiwrite
+ .text._write   0x0800a1d6       0x42 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a1d6                _write
  .text._swiclose
-                0x0800a112       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a112                _swiclose
- *fill*         0x0800a12e        0x2 
- .text._close   0x0800a130       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a130                _close
+                0x0800a218       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a218                _swiclose
+ .text._close   0x0800a234       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a234                _close
  .text._swistat
-                0x0800a178       0x42 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a178                _swistat
- .text._fstat   0x0800a1ba       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a1ba                _fstat
- .text._isatty  0x0800a1d6       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
-                0x0800a1d6                _isatty
+                0x0800a27c       0x42 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a27c                _swistat
+ .text._fstat   0x0800a2be       0x1c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a2be                _fstat
+ .text._isatty  0x0800a2da       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x0800a2da                _isatty
  *(.init)
  *(.fini)
  *crtbegin.o(.ctors)
@@ -3670,146 +3668,150 @@ END GROUP
  *(SORT(.dtors.*))
  *(.dtors)
  *(.rodata .rodata.*)
- *fill*         0x0800a20e        0x2 
+ *fill*         0x0800a312        0x2 
  .rodata.g_xmc_vadc_group_array
-                0x0800a210       0x10 ./Libraries/XMCLib/src/xmc_vadc.o
- .rodata        0x0800a220      0x14c ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .rodata        0x0800a36c       0x80 ./Libraries/FT800-FT813-5.x/tft.o
+                0x0800a314       0x10 ./Libraries/XMCLib/src/xmc_vadc.o
+ .rodata        0x0800a324      0x14c ./Libraries/FT800-FT813-5.x/EVE_commands.o
+ .rodata        0x0800a470      0x110 ./Libraries/FT800-FT813-5.x/tft.o
  .rodata.logo_init
-                0x0800a3ec     0x4f04 ./Libraries/FT800-FT813-5.x/tft_data.o
-                0x0800a3ec                logo_init
+                0x0800a580     0x4f04 ./Libraries/FT800-FT813-5.x/tft_data.o
+                0x0800a580                logo_init
  .rodata.SPI_MASTER_0_MOSI
-                0x0800f2f0        0x8 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x0800f2f0                SPI_MASTER_0_MOSI
+                0x0800f484        0x8 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x0800f484                SPI_MASTER_0_MOSI
  .rodata.SPI_MASTER_0_MISO
-                0x0800f2f8        0x8 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x0800f2f8                SPI_MASTER_0_MISO
+                0x0800f48c        0x8 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x0800f48c                SPI_MASTER_0_MISO
  .rodata.SPI_MASTER_0_SCLKOUT
-                0x0800f300        0x8 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x0800f300                SPI_MASTER_0_SCLKOUT
+                0x0800f494        0x8 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x0800f494                SPI_MASTER_0_SCLKOUT
  .rodata.SPI_MASTER_0_SCLKOUT_Config
-                0x0800f308       0x14 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x0800f308                SPI_MASTER_0_SCLKOUT_Config
+                0x0800f49c       0x14 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x0800f49c                SPI_MASTER_0_SCLKOUT_Config
  .rodata.SPI_MASTER_0_Config
-                0x0800f31c       0x8c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x0800f31c                SPI_MASTER_0_Config
+                0x0800f4b0       0x8c ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x0800f4b0                SPI_MASTER_0_Config
  .rodata.group_init_handle0
-                0x0800f3a8       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x0800f3a8                group_init_handle0
+                0x0800f53c       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x0800f53c                group_init_handle0
  .rodata.group_init_handle1
-                0x0800f3bc       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x0800f3bc                group_init_handle1
+                0x0800f550       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x0800f550                group_init_handle1
  .rodata.group_init_handle2
-                0x0800f3d0       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x0800f3d0                group_init_handle2
+                0x0800f564       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x0800f564                group_init_handle2
  .rodata.group_init_handle3
-                0x0800f3e4       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x0800f3e4                group_init_handle3
+                0x0800f578       0x14 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x0800f578                group_init_handle3
  .rodata.global_config
-                0x0800f3f8       0x18 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x0800f3f8                global_config
+                0x0800f58c       0x18 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x0800f58c                global_config
  .rodata.IO_DIO_DIGOUT_PD_TFT
-                0x0800f410       0x14 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
-                0x0800f410                IO_DIO_DIGOUT_PD_TFT
+                0x0800f5a4       0x14 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+                0x0800f5a4                IO_DIO_DIGOUT_PD_TFT
  .rodata.IO_DIO_DIGOUT_CS_TFT
-                0x0800f424       0x14 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
-                0x0800f424                IO_DIO_DIGOUT_CS_TFT
- .rodata        0x0800f438       0x14 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+                0x0800f5b8       0x14 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+                0x0800f5b8                IO_DIO_DIGOUT_CS_TFT
+ .rodata        0x0800f5cc       0x14 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
  .rodata.global_iclass_config
-                0x0800f44c        0x4 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x0800f44c                global_iclass_config
+                0x0800f5e0        0x4 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x0800f5e0                global_iclass_config
  .rodata.backgnd_rs_intr_handle
-                0x0800f450        0xc ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x0800f450                backgnd_rs_intr_handle
+                0x0800f5e4        0xc ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x0800f5e4                backgnd_rs_intr_handle
  .rodata.backgnd_config
-                0x0800f45c        0xc ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x0800f45c                backgnd_config
+                0x0800f5f0        0xc ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x0800f5f0                backgnd_config
+ .rodata        0x0800f5fc       0xa0 ./main.o
  .rodata.npio2_hw
-                0x0800f468       0x80 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
+                0x0800f69c       0x80 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
  .rodata.two_over_pi
-                0x0800f4e8      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
+                0x0800f71c      0x108 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
  .rodata.init_jk
-                0x0800f5f0       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
- .rodata.PIo2   0x0800f600       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
+                0x0800f824       0x10 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
+ *fill*         0x0800f834        0x4 
+ .rodata.PIo2   0x0800f838       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
  .rodata.str1.1
-                0x0800f640        0x2 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
- *fill*         0x0800f642        0x2 
+                0x0800f878        0x2 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
+ *fill*         0x0800f87a        0x2 
  .rodata._global_impure_ptr
-                0x0800f644        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
-                0x0800f644                _global_impure_ptr
+                0x0800f87c        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
+                0x0800f87c                _global_impure_ptr
  .rodata.str1.1
-                0x0800f648       0x12 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
+                0x0800f880       0x12 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
  .rodata.str1.1
-                0x0800f65a       0x22 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x0800f892       0x22 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
  .rodata.str1.1
-                0x0800f67c        0xd c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
+                0x0800f8b4        0xd c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
                                   0xf (size before relaxing)
- *fill*         0x0800f689        0x3 
+ *fill*         0x0800f8c1        0x3 
  .rodata.__sf_fake_stdin
-                0x0800f68c       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x0800f68c                __sf_fake_stdin
+                0x0800f8c4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x0800f8c4                __sf_fake_stdin
  .rodata.__sf_fake_stdout
-                0x0800f6ac       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x0800f6ac                __sf_fake_stdout
+                0x0800f8e4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x0800f8e4                __sf_fake_stdout
  .rodata.__sf_fake_stderr
-                0x0800f6cc       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
-                0x0800f6cc                __sf_fake_stderr
+                0x0800f904       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+                0x0800f904                __sf_fake_stderr
  .rodata.str1.1
-                0x0800f6ec        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
+                0x0800f924        0x8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
                                   0xb (size before relaxing)
- *fill*         0x0800f6f4        0x4 
+ *fill*         0x0800f92c        0x4 
  .rodata.__mprec_tens
-                0x0800f6f8       0xc8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x0800f6f8                __mprec_tens
+                0x0800f930       0xc8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800f930                __mprec_tens
  .rodata.__mprec_bigtens
-                0x0800f7c0       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
-                0x0800f7c0                __mprec_bigtens
+                0x0800f9f8       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800f9f8                __mprec_bigtens
  .rodata.p05.5277
-                0x0800f7e8        0xc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+                0x0800fa20        0xc c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
  .rodata.str1.1
-                0x0800f7f4       0x11 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x0800fa2c       0x11 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
  .rodata.str1.1
                 0x00000000       0x11 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
+ .rodata.str1.1
+                0x0800fa3d        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  *(.gnu.linkonce.r*)
  *(vtable)
-                0x0800f808                . = ALIGN (0x4)
- *fill*         0x0800f805        0x3 
+                0x0800fa44                . = ALIGN (0x4)
+ *fill*         0x0800fa41        0x3 
 
-.glue_7         0x0800f808        0x0 load address 0x0c00f808
+.glue_7         0x0800fa44        0x0 load address 0x0c00fa44
  .glue_7        0x00000000        0x0 linker stubs
 
-.glue_7t        0x0800f808        0x0 load address 0x0c00f808
+.glue_7t        0x0800fa44        0x0 load address 0x0c00fa44
  .glue_7t       0x00000000        0x0 linker stubs
 
-.vfp11_veneer   0x0800f808        0x0 load address 0x0c00f808
+.vfp11_veneer   0x0800fa44        0x0 load address 0x0c00fa44
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x0800f808        0x0 load address 0x0c00f808
+.v4_bx          0x0800fa44        0x0 load address 0x0c00fa44
  .v4_bx         0x00000000        0x0 linker stubs
 
-.iplt           0x0800f808        0x0 load address 0x0c00f808
+.iplt           0x0800fa44        0x0 load address 0x0c00fa44
  .iplt          0x00000000        0x0 ./Startup/startup_XMC4700.o
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
 
-.eh_frame       0x0800f808        0x0 load address 0x0c00f808
+.eh_frame       0x0800fa44        0x0 load address 0x0c00fa44
  *(.eh_frame)
- .eh_frame      0x0800f808        0x0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-strcmp.o)
+ .eh_frame      0x0800fa44        0x0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-strcmp.o)
                                  0x28 (size before relaxing)
 
-.rel.dyn        0x0800f808        0x0 load address 0x0c00f808
+.rel.dyn        0x0800fa44        0x0 load address 0x0c00fa44
  .rel.iplt      0x00000000        0x0 ./Startup/startup_XMC4700.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x0800f808                . = ALIGN (0x4)
-                0x0800f808                __exidx_start = .
+                0x0800fa44                . = ALIGN (0x4)
+                0x0800fa44                __exidx_start = .
 
 .ARM.exidx
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x0800f808                __exidx_end = .
-                0x0800f808                . = ALIGN (0x4)
+                0x0800fa44                __exidx_end = .
+                0x0800fa44                . = ALIGN (0x4)
 
 Stack           0x1ffe8000      0x800
                 0x1ffe8000                __stack_start = .
@@ -3818,16 +3820,16 @@ Stack           0x1ffe8000      0x800
                 0x1ffe8800                __stack_end = .
                 0x1ffe8800                __initial_sp = .
 
-.ram_code       0x1ffe8800        0x0 load address 0x0c00f808
+.ram_code       0x1ffe8800        0x0 load address 0x0c00fa44
                 0x1ffe8800                . = ALIGN (0x4)
                 0x1ffe8800                __ram_code_start = .
  *(.ram_code)
                 0x1ffe8800                . = ALIGN (0x4)
                 0x1ffe8800                __ram_code_end = .
-                0x0c00f808                __ram_code_load = LOADADDR (.ram_code)
+                0x0c00fa44                __ram_code_load = LOADADDR (.ram_code)
                 0x00000000                __ram_code_size = (__ram_code_end - __ram_code_start)
 
-.data           0x1ffe8800      0x204 load address 0x0c00f808
+.data           0x1ffe8800      0x210 load address 0x0c00fa44
                 0x1ffe8800                . = ALIGN (0x4)
                 0x1ffe8800                __data_start = .
  *(.data)
@@ -3854,190 +3856,210 @@ Stack           0x1ffe8000      0x800
  .data.G_v_grid_lines
                 0x1ffe8828        0x8 ./Libraries/FT800-FT813-5.x/tft.o
                 0x1ffe8828                G_v_grid_lines
+ .data.TFT_last_Menu
+                0x1ffe8830        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8830                TFT_last_Menu
+ *fill*         0x1ffe8831        0x3 
  .data.TFT_display_cur_Menu__fptr_arr
-                0x1ffe8830        0x8 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8830                TFT_display_cur_Menu__fptr_arr
+                0x1ffe8834        0x8 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8834                TFT_display_cur_Menu__fptr_arr
  .data.TFT_touch_cur_Menu__fptr_arr
-                0x1ffe8838        0x8 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8838                TFT_touch_cur_Menu__fptr_arr
+                0x1ffe883c        0x8 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe883c                TFT_touch_cur_Menu__fptr_arr
+ .data.TFT_display_static_cur_Menu__fptr_arr
+                0x1ffe8844        0x8 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8844                TFT_display_static_cur_Menu__fptr_arr
  .data.BGtouchInitial_X
-                0x1ffe8840        0x2 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8840                BGtouchInitial_X
+                0x1ffe884c        0x2 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe884c                BGtouchInitial_X
  .data.BGtouchInitial_Y
-                0x1ffe8842        0x2 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8842                BGtouchInitial_Y
+                0x1ffe884e        0x2 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe884e                BGtouchInitial_Y
  .data.TIMER_0_config
-                0x1ffe8844        0x8 ./Dave/Generated/TIMER/timer_conf.o
-                0x1ffe8844                TIMER_0_config
- .data.TIMER_0  0x1ffe884c       0x28 ./Dave/Generated/TIMER/timer_conf.o
-                0x1ffe884c                TIMER_0
+                0x1ffe8850        0x8 ./Dave/Generated/TIMER/timer_conf.o
+                0x1ffe8850                TIMER_0_config
+ .data.TIMER_0  0x1ffe8858       0x28 ./Dave/Generated/TIMER/timer_conf.o
+                0x1ffe8858                TIMER_0
  .data.dummy_data.8701
-                0x1ffe8874        0x4 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x1ffe8880        0x4 ./Dave/Generated/SPI_MASTER/spi_master.o
  .data.SPI_MASTER_0_MOSI_Config
-                0x1ffe8878       0x14 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x1ffe8878                SPI_MASTER_0_MOSI_Config
+                0x1ffe8884       0x14 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x1ffe8884                SPI_MASTER_0_MOSI_Config
  .data.SPI_MASTER_0_Channel_Config
-                0x1ffe888c        0xc ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x1ffe888c                SPI_MASTER_0_Channel_Config
+                0x1ffe8898        0xc ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x1ffe8898                SPI_MASTER_0_Channel_Config
  .data.SPI_MASTER_0_runtime
-                0x1ffe8898       0x24 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x1ffe8898                SPI_MASTER_0_runtime
+                0x1ffe88a4       0x24 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x1ffe88a4                SPI_MASTER_0_runtime
  .data.SPI_MASTER_0
-                0x1ffe88bc        0xc ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x1ffe88bc                SPI_MASTER_0
+                0x1ffe88c8        0xc ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x1ffe88c8                SPI_MASTER_0
  .data.GLOBAL_CCU4_0
-                0x1ffe88c8       0x10 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
-                0x1ffe88c8                GLOBAL_CCU4_0
+                0x1ffe88d4       0x10 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
+                0x1ffe88d4                GLOBAL_CCU4_0
  .data.group_0_config
-                0x1ffe88d8        0xc ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x1ffe88d8                group_0_config
- .data.group_1_config
                 0x1ffe88e4        0xc ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x1ffe88e4                group_1_config
- .data.group_2_config
+                0x1ffe88e4                group_0_config
+ .data.group_1_config
                 0x1ffe88f0        0xc ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x1ffe88f0                group_2_config
- .data.group_3_config
+                0x1ffe88f0                group_1_config
+ .data.group_2_config
                 0x1ffe88fc        0xc ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x1ffe88fc                group_3_config
+                0x1ffe88fc                group_2_config
+ .data.group_3_config
+                0x1ffe8908        0xc ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x1ffe8908                group_3_config
  .data.GLOBAL_ADC_0
-                0x1ffe8908       0x1c ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
-                0x1ffe8908                GLOBAL_ADC_0
+                0x1ffe8914       0x1c ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x1ffe8914                GLOBAL_ADC_0
  .data.Channel_A_ch_config
-                0x1ffe8924       0x10 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x1ffe8924                Channel_A_ch_config
+                0x1ffe8930       0x10 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x1ffe8930                Channel_A_ch_config
  .data.ADC_MEASUREMENT_Channel_A_handle
-                0x1ffe8934       0x10 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x1ffe8934                ADC_MEASUREMENT_Channel_A_handle
+                0x1ffe8940       0x10 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x1ffe8940                ADC_MEASUREMENT_Channel_A_handle
  .data.ADC_MEASUREMENT_channel_array
-                0x1ffe8944        0x4 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x1ffe8944                ADC_MEASUREMENT_channel_array
+                0x1ffe8950        0x4 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x1ffe8950                ADC_MEASUREMENT_channel_array
  .data.ADC_MEASUREMENT_0
-                0x1ffe8948       0x1c ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x1ffe8948                ADC_MEASUREMENT_0
+                0x1ffe8954       0x1c ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x1ffe8954                ADC_MEASUREMENT_0
  .data.InputType
-                0x1ffe8964        0x1 ./globals.o
-                0x1ffe8964                InputType
- *fill*         0x1ffe8965        0x3 
+                0x1ffe8970        0x1 ./globals.o
+                0x1ffe8970                InputType
+ *fill*         0x1ffe8971        0x3 
  .data.impure_data
-                0x1ffe8968       0x60 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
+                0x1ffe8974       0x60 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
  .data._impure_ptr
-                0x1ffe89c8        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
-                0x1ffe89c8                _impure_ptr
- .data.lconv    0x1ffe89cc       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
+                0x1ffe89d4        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-impure.o)
+                0x1ffe89d4                _impure_ptr
+ .data.lconv    0x1ffe89d8       0x38 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
  *(*.data)
  *(.gnu.linkonce.d*)
-                0x1ffe8a04                . = ALIGN (0x4)
-                0x1ffe8a04                PROVIDE (__preinit_array_start, .)
+                0x1ffe8a10                . = ALIGN (0x4)
+                0x1ffe8a10                PROVIDE (__preinit_array_start, .)
  *(.preinit_array)
-                0x1ffe8a04                PROVIDE (__preinit_array_end, .)
-                0x1ffe8a04                . = ALIGN (0x4)
-                0x1ffe8a04                PROVIDE (__init_array_start, .)
+                0x1ffe8a10                PROVIDE (__preinit_array_end, .)
+                0x1ffe8a10                . = ALIGN (0x4)
+                0x1ffe8a10                PROVIDE (__init_array_start, .)
  *(SORT(.init_array.*))
  *(.init_array)
-                0x1ffe8a04                PROVIDE (__init_array_end, .)
-                0x1ffe8a04                . = ALIGN (0x4)
-                0x1ffe8a04                PROVIDE (__fini_array_start, .)
+                0x1ffe8a10                PROVIDE (__init_array_end, .)
+                0x1ffe8a10                . = ALIGN (0x4)
+                0x1ffe8a10                PROVIDE (__fini_array_start, .)
  *(SORT(.fini_array.*))
  *(.fini_array)
-                0x1ffe8a04                PROVIDE (__fini_array_end, .)
-                0x1ffe8a04                . = ALIGN (0x4)
-                0x1ffe8a04                __data_end = .
-                0x0c00f808                __data_load = LOADADDR (.data)
-                0x00000204                __data_size = (__data_end - __data_start)
-                0x0000fa0c                __text_size = (((__exidx_end - sText) + __data_size) + __ram_code_size)
-                0x0800fa0c                eText = (sText + __text_size)
+                0x1ffe8a10                PROVIDE (__fini_array_end, .)
+                0x1ffe8a10                . = ALIGN (0x4)
+                0x1ffe8a10                __data_end = .
+                0x0c00fa44                __data_load = LOADADDR (.data)
+                0x00000210                __data_size = (__data_end - __data_start)
+                0x0000fc54                __text_size = (((__exidx_end - sText) + __data_size) + __ram_code_size)
+                0x0800fc54                eText = (sText + __text_size)
 
-.igot.plt       0x1ffe8a04        0x0 load address 0x0c00fa0c
+.igot.plt       0x1ffe8a10        0x0 load address 0x0c00fc54
  .igot.plt      0x00000000        0x0 ./Startup/startup_XMC4700.o
 
-.bss            0x1ffe8a04      0x474 load address 0x0c00fa0c
-                0x1ffe8a04                . = ALIGN (0x4)
-                0x1ffe8a04                __bss_start = .
+.bss            0x1ffe8a10      0x47c load address 0x0c00fc54
+                0x1ffe8a10                . = ALIGN (0x4)
+                0x1ffe8a10                __bss_start = .
  *(.bss)
  *(.bss*)
  .bss.heap_ptr.4331
-                0x1ffe8a04        0x4 ./Libraries/Newlib/syscalls.o
+                0x1ffe8a10        0x4 ./Libraries/Newlib/syscalls.o
  .bss.cmd_burst
-                0x1ffe8a08        0x1 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x1ffe8a08                cmd_burst
+                0x1ffe8a14        0x1 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x1ffe8a14                cmd_burst
  .bss.tft_active
-                0x1ffe8a09        0x1 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a09                tft_active
- *fill*         0x1ffe8a0a        0x2 
+                0x1ffe8a15        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a15                tft_active
  .bss.TFT_cur_Menu
-                0x1ffe8a0c        0x4 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a0c                TFT_cur_Menu
+                0x1ffe8a16        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a16                TFT_cur_Menu
+ *fill*         0x1ffe8a17        0x1 
  .bss.display_list_size
-                0x1ffe8a10        0x2 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a10                display_list_size
- *fill*         0x1ffe8a12        0x2 
- .bss.tracker   0x1ffe8a14        0x4 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a14                tracker
- .bss.TouchXY   0x1ffe8a18        0x4 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a18                TouchXY
+                0x1ffe8a18        0x2 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a18                display_list_size
+ *fill*         0x1ffe8a1a        0x2 
+ .bss.tracker   0x1ffe8a1c        0x4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a1c                tracker
+ .bss.TouchXY   0x1ffe8a20        0x4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a20                TouchXY
+ .bss.swipeDetect
+                0x1ffe8a24        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a24                swipeDetect
+ .bss.swipeInProgress
+                0x1ffe8a25        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a25                swipeInProgress
+ .bss.swipeDebounce
+                0x1ffe8a26        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a26                swipeDebounce
  .bss.toggle_lock
-                0x1ffe8a1c        0x1 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a1c                toggle_lock
- *fill*         0x1ffe8a1d        0x1 
+                0x1ffe8a27        0x1 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a27                toggle_lock
  .bss.toggle_state_graphmode
-                0x1ffe8a1e        0x2 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a1e                toggle_state_graphmode
+                0x1ffe8a28        0x2 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a28                toggle_state_graphmode
  .bss.toggle_state_dimmer
-                0x1ffe8a20        0x2 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8a20                toggle_state_dimmer
- *fill*         0x1ffe8a22        0x2 
+                0x1ffe8a2a        0x2 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8a2a                toggle_state_dimmer
  .bss.SPI_MASTER_0_MISO_Config
-                0x1ffe8a24       0x14 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
-                0x1ffe8a24                SPI_MASTER_0_MISO_Config
+                0x1ffe8a2c       0x14 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x1ffe8a2c                SPI_MASTER_0_MISO_Config
  .bss.CLOCK_XMC4_0
-                0x1ffe8a38        0x4 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
-                0x1ffe8a38                CLOCK_XMC4_0
+                0x1ffe8a40        0x4 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+                0x1ffe8a40                CLOCK_XMC4_0
  .bss.Channel_A_res_config
-                0x1ffe8a3c        0x4 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
-                0x1ffe8a3c                Channel_A_res_config
+                0x1ffe8a44        0x4 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x1ffe8a44                Channel_A_res_config
  .bss._msCounter
-                0x1ffe8a40        0x4 ./globals.o
-                0x1ffe8a40                _msCounter
- .bss.tft_tick  0x1ffe8a44        0x1 ./globals.o
-                0x1ffe8a44                tft_tick
- *fill*         0x1ffe8a45        0x3 
- .bss.MeasurementCounter
                 0x1ffe8a48        0x4 ./globals.o
-                0x1ffe8a48                MeasurementCounter
+                0x1ffe8a48                _msCounter
+ .bss.tft_tick  0x1ffe8a4c        0x1 ./globals.o
+                0x1ffe8a4c                tft_tick
+ *fill*         0x1ffe8a4d        0x3 
+ .bss.MeasurementCounter
+                0x1ffe8a50        0x4 ./globals.o
+                0x1ffe8a50                MeasurementCounter
  .bss.InputBuffer1_idx
-                0x1ffe8a4c        0x2 ./globals.o
-                0x1ffe8a4c                InputBuffer1_idx
+                0x1ffe8a54        0x2 ./globals.o
+                0x1ffe8a54                InputBuffer1_idx
  .bss.frameover
-                0x1ffe8a4e        0x1 ./globals.o
-                0x1ffe8a4e                frameover
- *fill*         0x1ffe8a4f        0x1 
+                0x1ffe8a56        0x1 ./globals.o
+                0x1ffe8a56                frameover
+ *fill*         0x1ffe8a57        0x1 
  .bss.InputBuffer1
-                0x1ffe8a50      0x370 ./globals.o
-                0x1ffe8a50                InputBuffer1
- .bss.lastval   0x1ffe8dc0        0x4 ./measure.o
-                0x1ffe8dc0                lastval
+                0x1ffe8a58      0x370 ./globals.o
+                0x1ffe8a58                InputBuffer1
+ .bss.lastval   0x1ffe8dc8        0x4 ./measure.o
+                0x1ffe8dc8                lastval
  .bss.__malloc_sbrk_start
-                0x1ffe8dc4        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
-                0x1ffe8dc4                __malloc_sbrk_start
+                0x1ffe8dcc        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
+                0x1ffe8dcc                __malloc_sbrk_start
  .bss.__malloc_free_list
-                0x1ffe8dc8        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
-                0x1ffe8dc8                __malloc_free_list
+                0x1ffe8dd0        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
+                0x1ffe8dd0                __malloc_free_list
+ .bss.monitor_stdout
+                0x1ffe8dd4        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+ .bss.monitor_stdin
+                0x1ffe8dd8        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+ .bss.monitor_stderr
+                0x1ffe8ddc        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  .bss.openfiles
-                0x1ffe8dcc       0xa0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+                0x1ffe8de0       0xa0 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
  *(COMMON)
- COMMON         0x1ffe8e6c        0x1 ./Libraries/FT800-FT813-5.x/EVE_commands.o
-                0x1ffe8e6c                ReadData
- *fill*         0x1ffe8e6d        0x3 
- COMMON         0x1ffe8e70        0x4 ./Libraries/FT800-FT813-5.x/tft.o
-                0x1ffe8e70                num_dl_static
- COMMON         0x1ffe8e74        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-reent.o)
-                0x1ffe8e74                errno
+ COMMON         0x1ffe8e80        0x1 ./Libraries/FT800-FT813-5.x/EVE_commands.o
+                0x1ffe8e80                ReadData
+ *fill*         0x1ffe8e81        0x3 
+ COMMON         0x1ffe8e84        0x4 ./Libraries/FT800-FT813-5.x/tft.o
+                0x1ffe8e84                num_dl_static
+ COMMON         0x1ffe8e88        0x4 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-reent.o)
+                0x1ffe8e88                errno
  *(.gnu.linkonce.b*)
-                0x1ffe8e78                . = ALIGN (0x4)
-                0x1ffe8e78                __bss_end = .
-                0x00000474                __bss_size = (__bss_end - __bss_start)
-                0x00017188                __shift_loc = (__bss_end >= ORIGIN (DSRAM_1_system))?0x0:(ORIGIN (DSRAM_1_system) - __bss_end)
+                0x1ffe8e8c                . = ALIGN (0x4)
+                0x1ffe8e8c                __bss_end = .
+                0x0000047c                __bss_size = (__bss_end - __bss_start)
+                0x00017174                __shift_loc = (__bss_end >= ORIGIN (DSRAM_1_system))?0x0:(ORIGIN (DSRAM_1_system) - __bss_end)
 
 USB_RAM         0x20000000        0x0
                 0x20000000                . = ALIGN (0x4)
@@ -4087,7 +4109,7 @@ ETH_RAM         0x20000000        0x0
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000     0x1470
+.debug_aranges  0x00000000     0x1480
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x20 ./Startup/startup_XMC4700.o
@@ -4112,47 +4134,47 @@ ETH_RAM         0x20000000        0x0
  .debug_aranges
                 0x000009b0      0x4d8 ./Libraries/FT800-FT813-5.x/EVE_commands.o
  .debug_aranges
-                0x00000e88       0x78 ./Libraries/FT800-FT813-5.x/tft.o
+                0x00000e88       0x88 ./Libraries/FT800-FT813-5.x/tft.o
  .debug_aranges
-                0x00000f00       0x18 ./Libraries/FT800-FT813-5.x/tft_data.o
+                0x00000f10       0x18 ./Libraries/FT800-FT813-5.x/tft_data.o
  .debug_aranges
-                0x00000f18       0xd8 ./Dave/Generated/TIMER/timer.o
+                0x00000f28       0xd8 ./Dave/Generated/TIMER/timer.o
  .debug_aranges
-                0x00000ff0       0x18 ./Dave/Generated/TIMER/timer_conf.o
+                0x00001000       0x18 ./Dave/Generated/TIMER/timer_conf.o
  .debug_aranges
-                0x00001008      0x148 ./Dave/Generated/SPI_MASTER/spi_master.o
+                0x00001018      0x148 ./Dave/Generated/SPI_MASTER/spi_master.o
  .debug_aranges
-                0x00001150       0x88 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+                0x00001160       0x88 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
  .debug_aranges
-                0x000011d8       0x30 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+                0x000011e8       0x30 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
  .debug_aranges
-                0x00001208       0x18 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
+                0x00001218       0x18 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
  .debug_aranges
-                0x00001220       0x30 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+                0x00001230       0x30 ./Dave/Generated/GLOBAL_ADC/global_adc.o
  .debug_aranges
-                0x00001250       0x18 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+                0x00001260       0x18 ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
  .debug_aranges
-                0x00001268       0x28 ./Dave/Generated/DIGITAL_IO/digital_io.o
+                0x00001278       0x28 ./Dave/Generated/DIGITAL_IO/digital_io.o
  .debug_aranges
-                0x00001290       0x18 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+                0x000012a0       0x18 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
  .debug_aranges
-                0x000012a8       0x28 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+                0x000012b8       0x28 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
  .debug_aranges
-                0x000012d0       0x38 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+                0x000012e0       0x38 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
  .debug_aranges
-                0x00001308       0x20 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+                0x00001318       0x20 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
  .debug_aranges
-                0x00001328       0x88 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+                0x00001338       0x88 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
  .debug_aranges
-                0x000013b0       0x18 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+                0x000013c0       0x18 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
  .debug_aranges
-                0x000013c8       0x20 ./Dave/Generated/DAVE.o
+                0x000013d8       0x20 ./Dave/Generated/DAVE.o
  .debug_aranges
-                0x000013e8       0x28 ./globals.o
+                0x000013f8       0x28 ./globals.o
  .debug_aranges
-                0x00001410       0x40 ./main.o
+                0x00001420       0x40 ./main.o
  .debug_aranges
-                0x00001450       0x20 ./measure.o
+                0x00001460       0x20 ./measure.o
 
 .debug_pubnames
  *(.debug_pubnames)
@@ -4160,7 +4182,7 @@ ETH_RAM         0x20000000        0x0
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_info     0x00000000    0x1f837
+.debug_info     0x00000000    0x1f8f3
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000       0x80 ./Startup/startup_XMC4700.o
  .debug_info    0x00000080      0x9dc ./Startup/system_XMC4700.o
@@ -4173,29 +4195,29 @@ ETH_RAM         0x20000000        0x0
  .debug_info    0x0000695c     0x3161 ./Libraries/XMCLib/src/xmc_vadc.o
  .debug_info    0x00009abd      0x11f ./Libraries/Newlib/syscalls.o
  .debug_info    0x00009bdc     0x3eb9 ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .debug_info    0x0000da95     0x1825 ./Libraries/FT800-FT813-5.x/tft.o
- .debug_info    0x0000f2ba       0xa9 ./Libraries/FT800-FT813-5.x/tft_data.o
- .debug_info    0x0000f363      0xe3f ./Dave/Generated/TIMER/timer.o
- .debug_info    0x000101a2      0x8e8 ./Dave/Generated/TIMER/timer_conf.o
- .debug_info    0x00010a8a     0x1b50 ./Dave/Generated/SPI_MASTER/spi_master.o
- .debug_info    0x000125da     0x13c3 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
- .debug_info    0x0001399d      0x43a ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
- .debug_info    0x00013dd7      0x33a ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
- .debug_info    0x00014111     0x10a9 ./Dave/Generated/GLOBAL_ADC/global_adc.o
- .debug_info    0x000151ba     0x10ac ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
- .debug_info    0x00016266      0x595 ./Dave/Generated/DIGITAL_IO/digital_io.o
- .debug_info    0x000167fb      0x4e2 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
- .debug_info    0x00016cdd      0x52e ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
- .debug_info    0x0001720b      0x2dd ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
- .debug_info    0x000174e8      0x43e ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
- .debug_info    0x00017926     0x1fc7 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
- .debug_info    0x000198ed     0x1953 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
- .debug_info    0x0001b240     0x29d9 ./Dave/Generated/DAVE.o
- .debug_info    0x0001dc19      0x322 ./globals.o
- .debug_info    0x0001df3b      0xd5a ./main.o
- .debug_info    0x0001ec95      0xba2 ./measure.o
+ .debug_info    0x0000da95     0x18e1 ./Libraries/FT800-FT813-5.x/tft.o
+ .debug_info    0x0000f376       0xa9 ./Libraries/FT800-FT813-5.x/tft_data.o
+ .debug_info    0x0000f41f      0xe3f ./Dave/Generated/TIMER/timer.o
+ .debug_info    0x0001025e      0x8e8 ./Dave/Generated/TIMER/timer_conf.o
+ .debug_info    0x00010b46     0x1b50 ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_info    0x00012696     0x13c3 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_info    0x00013a59      0x43a ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_info    0x00013e93      0x33a ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
+ .debug_info    0x000141cd     0x10a9 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_info    0x00015276     0x10ac ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+ .debug_info    0x00016322      0x595 ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_info    0x000168b7      0x4e2 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+ .debug_info    0x00016d99      0x52e ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_info    0x000172c7      0x2dd ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_info    0x000175a4      0x43e ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_info    0x000179e2     0x1fc7 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_info    0x000199a9     0x1953 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+ .debug_info    0x0001b2fc     0x29d9 ./Dave/Generated/DAVE.o
+ .debug_info    0x0001dcd5      0x322 ./globals.o
+ .debug_info    0x0001dff7      0xd5a ./main.o
+ .debug_info    0x0001ed51      0xba2 ./measure.o
 
-.debug_abbrev   0x00000000     0x389e
+.debug_abbrev   0x00000000     0x389c
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0x14 ./Startup/startup_XMC4700.o
  .debug_abbrev  0x00000014      0x1f1 ./Startup/system_XMC4700.o
@@ -4208,29 +4230,29 @@ ETH_RAM         0x20000000        0x0
  .debug_abbrev  0x00000e52      0x29c ./Libraries/XMCLib/src/xmc_vadc.o
  .debug_abbrev  0x000010ee       0xbd ./Libraries/Newlib/syscalls.o
  .debug_abbrev  0x000011ab      0x35d ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .debug_abbrev  0x00001508      0x2cc ./Libraries/FT800-FT813-5.x/tft.o
- .debug_abbrev  0x000017d4       0x5d ./Libraries/FT800-FT813-5.x/tft_data.o
- .debug_abbrev  0x00001831      0x252 ./Dave/Generated/TIMER/timer.o
- .debug_abbrev  0x00001a83      0x181 ./Dave/Generated/TIMER/timer_conf.o
- .debug_abbrev  0x00001c04      0x26d ./Dave/Generated/SPI_MASTER/spi_master.o
- .debug_abbrev  0x00001e71      0x203 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
- .debug_abbrev  0x00002074      0x196 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
- .debug_abbrev  0x0000220a      0x124 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
- .debug_abbrev  0x0000232e      0x20d ./Dave/Generated/GLOBAL_ADC/global_adc.o
- .debug_abbrev  0x0000253b      0x1ac ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
- .debug_abbrev  0x000026e7      0x171 ./Dave/Generated/DIGITAL_IO/digital_io.o
- .debug_abbrev  0x00002858      0x126 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
- .debug_abbrev  0x0000297e      0x1b4 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
- .debug_abbrev  0x00002b32      0x13d ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
- .debug_abbrev  0x00002c6f      0x134 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
- .debug_abbrev  0x00002da3      0x294 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
- .debug_abbrev  0x00003037      0x1a2 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
- .debug_abbrev  0x000031d9      0x1da ./Dave/Generated/DAVE.o
- .debug_abbrev  0x000033b3      0x13e ./globals.o
- .debug_abbrev  0x000034f1      0x1fe ./main.o
- .debug_abbrev  0x000036ef      0x1af ./measure.o
+ .debug_abbrev  0x00001508      0x2ca ./Libraries/FT800-FT813-5.x/tft.o
+ .debug_abbrev  0x000017d2       0x5d ./Libraries/FT800-FT813-5.x/tft_data.o
+ .debug_abbrev  0x0000182f      0x252 ./Dave/Generated/TIMER/timer.o
+ .debug_abbrev  0x00001a81      0x181 ./Dave/Generated/TIMER/timer_conf.o
+ .debug_abbrev  0x00001c02      0x26d ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_abbrev  0x00001e6f      0x203 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_abbrev  0x00002072      0x196 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_abbrev  0x00002208      0x124 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
+ .debug_abbrev  0x0000232c      0x20d ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_abbrev  0x00002539      0x1ac ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+ .debug_abbrev  0x000026e5      0x171 ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_abbrev  0x00002856      0x126 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+ .debug_abbrev  0x0000297c      0x1b4 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_abbrev  0x00002b30      0x13d ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_abbrev  0x00002c6d      0x134 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_abbrev  0x00002da1      0x294 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_abbrev  0x00003035      0x1a2 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+ .debug_abbrev  0x000031d7      0x1da ./Dave/Generated/DAVE.o
+ .debug_abbrev  0x000033b1      0x13e ./globals.o
+ .debug_abbrev  0x000034ef      0x1fe ./main.o
+ .debug_abbrev  0x000036ed      0x1af ./measure.o
 
-.debug_line     0x00000000     0x944a
+.debug_line     0x00000000     0x94b7
  *(.debug_line)
  .debug_line    0x00000000       0x86 ./Startup/startup_XMC4700.o
  .debug_line    0x00000086      0x30f ./Startup/system_XMC4700.o
@@ -4243,29 +4265,29 @@ ETH_RAM         0x20000000        0x0
  .debug_line    0x000025a6      0xb15 ./Libraries/XMCLib/src/xmc_vadc.o
  .debug_line    0x000030bb       0xe1 ./Libraries/Newlib/syscalls.o
  .debug_line    0x0000319c     0x15eb ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .debug_line    0x00004787      0x6c4 ./Libraries/FT800-FT813-5.x/tft.o
- .debug_line    0x00004e4b      0x140 ./Libraries/FT800-FT813-5.x/tft_data.o
- .debug_line    0x00004f8b      0x57e ./Dave/Generated/TIMER/timer.o
- .debug_line    0x00005509      0x317 ./Dave/Generated/TIMER/timer_conf.o
- .debug_line    0x00005820      0x835 ./Dave/Generated/SPI_MASTER/spi_master.o
- .debug_line    0x00006055      0x3e6 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
- .debug_line    0x0000643b      0x342 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
- .debug_line    0x0000677d      0x2b0 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
- .debug_line    0x00006a2d      0x34e ./Dave/Generated/GLOBAL_ADC/global_adc.o
- .debug_line    0x00006d7b      0x29f ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
- .debug_line    0x0000701a      0x2a2 ./Dave/Generated/DIGITAL_IO/digital_io.o
- .debug_line    0x000072bc      0x228 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
- .debug_line    0x000074e4      0x2a1 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
- .debug_line    0x00007785      0x2d8 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
- .debug_line    0x00007a5d      0x2ae ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
- .debug_line    0x00007d0b      0x4fd ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
- .debug_line    0x00008208      0x324 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
- .debug_line    0x0000852c      0x4a4 ./Dave/Generated/DAVE.o
- .debug_line    0x000089d0      0x293 ./globals.o
- .debug_line    0x00008c63      0x46d ./main.o
- .debug_line    0x000090d0      0x37a ./measure.o
+ .debug_line    0x00004787      0x726 ./Libraries/FT800-FT813-5.x/tft.o
+ .debug_line    0x00004ead      0x140 ./Libraries/FT800-FT813-5.x/tft_data.o
+ .debug_line    0x00004fed      0x57e ./Dave/Generated/TIMER/timer.o
+ .debug_line    0x0000556b      0x317 ./Dave/Generated/TIMER/timer_conf.o
+ .debug_line    0x00005882      0x835 ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_line    0x000060b7      0x3e6 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_line    0x0000649d      0x342 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_line    0x000067df      0x2b0 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
+ .debug_line    0x00006a8f      0x34e ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_line    0x00006ddd      0x29f ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+ .debug_line    0x0000707c      0x2a2 ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_line    0x0000731e      0x228 ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+ .debug_line    0x00007546      0x2a1 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_line    0x000077e7      0x2d8 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_line    0x00007abf      0x2ae ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_line    0x00007d6d      0x4fd ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_line    0x0000826a      0x324 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+ .debug_line    0x0000858e      0x4a4 ./Dave/Generated/DAVE.o
+ .debug_line    0x00008a32      0x293 ./globals.o
+ .debug_line    0x00008cc5      0x478 ./main.o
+ .debug_line    0x0000913d      0x37a ./measure.o
 
-.debug_frame    0x00000000     0x6a00
+.debug_frame    0x00000000     0x6a40
  *(.debug_frame)
  .debug_frame   0x00000000       0xec ./Startup/system_XMC4700.o
  .debug_frame   0x000000ec       0x60 ./Libraries/XMCLib/src/xmc4_gpio.o
@@ -4277,72 +4299,72 @@ ETH_RAM         0x20000000        0x0
  .debug_frame   0x00001edc      0xc00 ./Libraries/XMCLib/src/xmc_vadc.o
  .debug_frame   0x00002adc       0x5c ./Libraries/Newlib/syscalls.o
  .debug_frame   0x00002b38     0x179c ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .debug_frame   0x000042d4      0x1f0 ./Libraries/FT800-FT813-5.x/tft.o
- .debug_frame   0x000044c4      0x3e0 ./Dave/Generated/TIMER/timer.o
- .debug_frame   0x000048a4      0x608 ./Dave/Generated/SPI_MASTER/spi_master.o
- .debug_frame   0x00004eac      0x240 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
- .debug_frame   0x000050ec       0x88 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
- .debug_frame   0x00005174       0x88 ./Dave/Generated/GLOBAL_ADC/global_adc.o
- .debug_frame   0x000051fc       0x60 ./Dave/Generated/DIGITAL_IO/digital_io.o
- .debug_frame   0x0000525c       0x60 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
- .debug_frame   0x000052bc       0xac ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
- .debug_frame   0x00005368       0x3c ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
- .debug_frame   0x000053a4      0x240 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
- .debug_frame   0x000055e4       0x38 ./Dave/Generated/DAVE.o
- .debug_frame   0x0000561c       0x5c ./globals.o
- .debug_frame   0x00005678       0xd0 ./main.o
- .debug_frame   0x00005748       0x34 ./measure.o
- .debug_frame   0x0000577c       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_ceil.o)
- .debug_frame   0x000057b0       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_floor.o)
- .debug_frame   0x000057e4       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_sin.o)
- .debug_frame   0x00005824       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
- .debug_frame   0x0000586c       0x4c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_cos.o)
- .debug_frame   0x000058b8       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
- .debug_frame   0x0000590c       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_sin.o)
- .debug_frame   0x00005954       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_fabs.o)
- .debug_frame   0x00005974       0x30 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_scalbn.o)
- .debug_frame   0x000059a4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_copysign.o)
- .debug_frame   0x000059c4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-errno.o)
- .debug_frame   0x000059e4       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memcpy.o)
- .debug_frame   0x00005a0c       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memset.o)
- .debug_frame   0x00005a2c       0x8c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
- .debug_frame   0x00005ab8       0x58 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
- .debug_frame   0x00005b10       0x74 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-printf.o)
- .debug_frame   0x00005b84       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-puts.o)
- .debug_frame   0x00005bc0       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-s_fpclassify.o)
- .debug_frame   0x00005be8       0x70 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sprintf.o)
- .debug_frame   0x00005c58       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-strlen.o)
- .debug_frame   0x00005c78       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wbuf.o)
- .debug_frame   0x00005cb4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wsetup.o)
- .debug_frame   0x00005ce0       0x6c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
- .debug_frame   0x00005d4c       0x68 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fflush.o)
- .debug_frame   0x00005db4      0x11c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
- .debug_frame   0x00005ed0       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fwalk.o)
- .debug_frame   0x00005f24       0x98 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
- .debug_frame   0x00005fbc       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-makebuf.o)
- .debug_frame   0x00005ff0       0x30 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-malloc.o)
- .debug_frame   0x00006020       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memchr.o)
- .debug_frame   0x00006048      0x230 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
- .debug_frame   0x00006278       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-callocr.o)
- .debug_frame   0x000062a4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-freer.o)
- .debug_frame   0x000062d0       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
- .debug_frame   0x000062fc       0x8c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
- .debug_frame   0x00006388       0xb8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
- .debug_frame   0x00006440       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sbrkr.o)
- .debug_frame   0x0000646c       0x88 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
- .debug_frame   0x000064f4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-writer.o)
- .debug_frame   0x00006520       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-closer.o)
- .debug_frame   0x0000654c       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fstatr.o)
- .debug_frame   0x00006578       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-isattyr.o)
- .debug_frame   0x000065a4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-lseekr.o)
- .debug_frame   0x000065d0       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memmove.o)
- .debug_frame   0x000065f8       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-reallocr.o)
- .debug_frame   0x00006634       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-readr.o)
- .debug_frame   0x00006660       0x5c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-reent.o)
- .debug_frame   0x000066bc       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-msizer.o)
- .debug_frame   0x000066dc      0x324 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
+ .debug_frame   0x000042d4      0x230 ./Libraries/FT800-FT813-5.x/tft.o
+ .debug_frame   0x00004504      0x3e0 ./Dave/Generated/TIMER/timer.o
+ .debug_frame   0x000048e4      0x608 ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_frame   0x00004eec      0x240 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_frame   0x0000512c       0x88 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_frame   0x000051b4       0x88 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_frame   0x0000523c       0x60 ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_frame   0x0000529c       0x60 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_frame   0x000052fc       0xac ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_frame   0x000053a8       0x3c ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_frame   0x000053e4      0x240 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_frame   0x00005624       0x38 ./Dave/Generated/DAVE.o
+ .debug_frame   0x0000565c       0x5c ./globals.o
+ .debug_frame   0x000056b8       0xd0 ./main.o
+ .debug_frame   0x00005788       0x34 ./measure.o
+ .debug_frame   0x000057bc       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_ceil.o)
+ .debug_frame   0x000057f0       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_floor.o)
+ .debug_frame   0x00005824       0x40 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_sin.o)
+ .debug_frame   0x00005864       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-e_rem_pio2.o)
+ .debug_frame   0x000058ac       0x4c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_cos.o)
+ .debug_frame   0x000058f8       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_rem_pio2.o)
+ .debug_frame   0x0000594c       0x48 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-k_sin.o)
+ .debug_frame   0x00005994       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_fabs.o)
+ .debug_frame   0x000059b4       0x30 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_scalbn.o)
+ .debug_frame   0x000059e4       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libm.a(lib_a-s_copysign.o)
+ .debug_frame   0x00005a04       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-errno.o)
+ .debug_frame   0x00005a24       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memcpy.o)
+ .debug_frame   0x00005a4c       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memset.o)
+ .debug_frame   0x00005a6c       0x8c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_float.o)
+ .debug_frame   0x00005af8       0x58 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf_i.o)
+ .debug_frame   0x00005b50       0x74 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-printf.o)
+ .debug_frame   0x00005bc4       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-puts.o)
+ .debug_frame   0x00005c00       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-s_fpclassify.o)
+ .debug_frame   0x00005c28       0x70 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sprintf.o)
+ .debug_frame   0x00005c98       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-strlen.o)
+ .debug_frame   0x00005cb8       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wbuf.o)
+ .debug_frame   0x00005cf4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-wsetup.o)
+ .debug_frame   0x00005d20       0x6c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-dtoa.o)
+ .debug_frame   0x00005d8c       0x68 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fflush.o)
+ .debug_frame   0x00005df4      0x11c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-findfp.o)
+ .debug_frame   0x00005f10       0x54 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fwalk.o)
+ .debug_frame   0x00005f64       0x98 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-locale.o)
+ .debug_frame   0x00005ffc       0x34 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-makebuf.o)
+ .debug_frame   0x00006030       0x30 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-malloc.o)
+ .debug_frame   0x00006060       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memchr.o)
+ .debug_frame   0x00006088      0x230 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-mprec.o)
+ .debug_frame   0x000062b8       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-callocr.o)
+ .debug_frame   0x000062e4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-freer.o)
+ .debug_frame   0x00006310       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-mallocr.o)
+ .debug_frame   0x0000633c       0x8c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-svfprintf.o)
+ .debug_frame   0x000063c8       0xb8 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-vfprintf.o)
+ .debug_frame   0x00006480       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-sbrkr.o)
+ .debug_frame   0x000064ac       0x88 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-stdio.o)
+ .debug_frame   0x00006534       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-writer.o)
+ .debug_frame   0x00006560       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-closer.o)
+ .debug_frame   0x0000658c       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-fstatr.o)
+ .debug_frame   0x000065b8       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-isattyr.o)
+ .debug_frame   0x000065e4       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-lseekr.o)
+ .debug_frame   0x00006610       0x28 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-memmove.o)
+ .debug_frame   0x00006638       0x3c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-reallocr.o)
+ .debug_frame   0x00006674       0x2c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-readr.o)
+ .debug_frame   0x000066a0       0x5c c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-reent.o)
+ .debug_frame   0x000066fc       0x20 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\libg_nano.a(lib_a-nano-msizer.o)
+ .debug_frame   0x0000671c      0x324 c:/workspaces/dave_4-4-2_64bit_2018-02-23/dave-ide-4.4.2-64bit/eclipse/arm-gcc-49/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/softfp\librdimon_nano.a(rdimon-syscalls.o)
 
-.debug_str      0x00000000     0xbe9f
+.debug_str      0x00000000     0xbf4c
  *(.debug_str)
  .debug_str     0x00000000      0x5a0 ./Startup/system_XMC4700.o
                                 0x62b (size before relaxing)
@@ -4364,50 +4386,50 @@ ETH_RAM         0x20000000        0x0
                                 0x21b (size before relaxing)
  .debug_str     0x00007ca8     0x1626 ./Libraries/FT800-FT813-5.x/EVE_commands.o
                                0x27b5 (size before relaxing)
- .debug_str     0x000092ce      0x3d4 ./Libraries/FT800-FT813-5.x/tft.o
-                               0x1c60 (size before relaxing)
- .debug_str     0x000096a2       0x28 ./Libraries/FT800-FT813-5.x/tft_data.o
+ .debug_str     0x000092ce      0x481 ./Libraries/FT800-FT813-5.x/tft.o
+                               0x1d1d (size before relaxing)
+ .debug_str     0x0000974f       0x28 ./Libraries/FT800-FT813-5.x/tft_data.o
                                 0x1e5 (size before relaxing)
- .debug_str     0x000096ca      0x56e ./Dave/Generated/TIMER/timer.o
+ .debug_str     0x00009777      0x56e ./Dave/Generated/TIMER/timer.o
                                 0xc9a (size before relaxing)
- .debug_str     0x00009c38      0x29a ./Dave/Generated/TIMER/timer_conf.o
+ .debug_str     0x00009ce5      0x29a ./Dave/Generated/TIMER/timer_conf.o
                                 0xbdf (size before relaxing)
- .debug_str     0x00009ed2      0x85c ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_str     0x00009f7f      0x85c ./Dave/Generated/SPI_MASTER/spi_master.o
                                0x23cb (size before relaxing)
- .debug_str     0x0000a72e      0x1ab ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_str     0x0000a7db      0x1ab ./Dave/Generated/SPI_MASTER/spi_master_conf.o
                                0x1d43 (size before relaxing)
- .debug_str     0x0000a8d9       0xb5 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_str     0x0000a986       0xb5 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
                                 0x5dd (size before relaxing)
- .debug_str     0x0000a98e       0x31 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
+ .debug_str     0x0000aa3b       0x31 ./Dave/Generated/GLOBAL_CCU4/global_ccu4_conf.o
                                 0x4f1 (size before relaxing)
- .debug_str     0x0000a9bf      0x1b2 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_str     0x0000aa6c      0x1b2 ./Dave/Generated/GLOBAL_ADC/global_adc.o
                                 0xab8 (size before relaxing)
- .debug_str     0x0000ab71      0x21d ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
+ .debug_str     0x0000ac1e      0x21d ./Dave/Generated/GLOBAL_ADC/global_adc_conf.o
                                 0xbb7 (size before relaxing)
- .debug_str     0x0000ad8e       0xa8 ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_str     0x0000ae3b       0xa8 ./Dave/Generated/DIGITAL_IO/digital_io.o
                                 0x91c (size before relaxing)
- .debug_str     0x0000ae36       0x2f ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
+ .debug_str     0x0000aee3       0x2f ./Dave/Generated/DIGITAL_IO/digital_io_conf.o
                                 0x887 (size before relaxing)
- .debug_str     0x0000ae65       0xa7 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_str     0x0000af12       0xa7 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
                                 0x41f (size before relaxing)
- .debug_str     0x0000af0c       0xf3 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_str     0x0000afb9       0xf3 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
                                 0x3d0 (size before relaxing)
- .debug_str     0x0000afff       0x50 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_str     0x0000b0ac       0x50 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
                                 0x7b0 (size before relaxing)
- .debug_str     0x0000b04f      0xa92 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_str     0x0000b0fc      0xa92 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
                                0x19aa (size before relaxing)
- .debug_str     0x0000bae1      0x2c8 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
+ .debug_str     0x0000bb8e      0x2c8 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement_conf.o
                                0x1919 (size before relaxing)
- .debug_str     0x0000bda9       0x65 ./Dave/Generated/DAVE.o
+ .debug_str     0x0000be56       0x65 ./Dave/Generated/DAVE.o
                                0x2898 (size before relaxing)
- .debug_str     0x0000be0e       0x26 ./globals.o
+ .debug_str     0x0000bebb       0x26 ./globals.o
                                 0x5bd (size before relaxing)
- .debug_str     0x0000be34       0x40 ./main.o
+ .debug_str     0x0000bee1       0x40 ./main.o
                                0x12ed (size before relaxing)
- .debug_str     0x0000be74       0x2b ./measure.o
+ .debug_str     0x0000bf21       0x2b ./measure.o
                                 0xb22 (size before relaxing)
 
-.debug_loc      0x00000000     0xb37e
+.debug_loc      0x00000000     0xb3e2
  *(.debug_loc)
  .debug_loc     0x00000000      0x1a4 ./Startup/system_XMC4700.o
  .debug_loc     0x000001a4       0xb8 ./Libraries/XMCLib/src/xmc4_gpio.o
@@ -4419,26 +4441,26 @@ ETH_RAM         0x20000000        0x0
  .debug_loc     0x000040dc     0x1ac8 ./Libraries/XMCLib/src/xmc_vadc.o
  .debug_loc     0x00005ba4       0x94 ./Libraries/Newlib/syscalls.o
  .debug_loc     0x00005c38     0x2df6 ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .debug_loc     0x00008a2e      0x334 ./Libraries/FT800-FT813-5.x/tft.o
- .debug_loc     0x00008d62      0x81c ./Dave/Generated/TIMER/timer.o
- .debug_loc     0x0000957e      0xcd0 ./Dave/Generated/SPI_MASTER/spi_master.o
- .debug_loc     0x0000a24e      0x4c0 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
- .debug_loc     0x0000a70e      0x108 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
- .debug_loc     0x0000a816      0x108 ./Dave/Generated/GLOBAL_ADC/global_adc.o
- .debug_loc     0x0000a91e       0xac ./Dave/Generated/DIGITAL_IO/digital_io.o
- .debug_loc     0x0000a9ca       0xac ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
- .debug_loc     0x0000aa76      0x14c ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
- .debug_loc     0x0000abc2       0x50 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
- .debug_loc     0x0000ac12      0x4c0 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
- .debug_loc     0x0000b0d2       0x50 ./Dave/Generated/DAVE.o
- .debug_loc     0x0000b122       0xa0 ./globals.o
- .debug_loc     0x0000b1c2      0x190 ./main.o
- .debug_loc     0x0000b352       0x2c ./measure.o
+ .debug_loc     0x00008a2e      0x398 ./Libraries/FT800-FT813-5.x/tft.o
+ .debug_loc     0x00008dc6      0x81c ./Dave/Generated/TIMER/timer.o
+ .debug_loc     0x000095e2      0xcd0 ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_loc     0x0000a2b2      0x4c0 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_loc     0x0000a772      0x108 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_loc     0x0000a87a      0x108 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_loc     0x0000a982       0xac ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_loc     0x0000aa2e       0xac ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_loc     0x0000aada      0x14c ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_loc     0x0000ac26       0x50 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_loc     0x0000ac76      0x4c0 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_loc     0x0000b136       0x50 ./Dave/Generated/DAVE.o
+ .debug_loc     0x0000b186       0xa0 ./globals.o
+ .debug_loc     0x0000b226      0x190 ./main.o
+ .debug_loc     0x0000b3b6       0x2c ./measure.o
 
 .debug_macinfo
  *(.debug_macinfo)
 
-.debug_ranges   0x00000000     0x1230
+.debug_ranges   0x00000000     0x1240
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x38 ./Startup/system_XMC4700.o
  .debug_ranges  0x00000038       0x18 ./Libraries/XMCLib/src/xmc4_gpio.o
@@ -4450,21 +4472,21 @@ ETH_RAM         0x20000000        0x0
  .debug_ranges  0x00000678      0x270 ./Libraries/XMCLib/src/xmc_vadc.o
  .debug_ranges  0x000008e8       0x18 ./Libraries/Newlib/syscalls.o
  .debug_ranges  0x00000900      0x4c8 ./Libraries/FT800-FT813-5.x/EVE_commands.o
- .debug_ranges  0x00000dc8       0x68 ./Libraries/FT800-FT813-5.x/tft.o
- .debug_ranges  0x00000e30       0xc8 ./Dave/Generated/TIMER/timer.o
- .debug_ranges  0x00000ef8      0x138 ./Dave/Generated/SPI_MASTER/spi_master.o
- .debug_ranges  0x00001030       0x78 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
- .debug_ranges  0x000010a8       0x20 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
- .debug_ranges  0x000010c8       0x20 ./Dave/Generated/GLOBAL_ADC/global_adc.o
- .debug_ranges  0x000010e8       0x18 ./Dave/Generated/DIGITAL_IO/digital_io.o
- .debug_ranges  0x00001100       0x18 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
- .debug_ranges  0x00001118       0x28 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
- .debug_ranges  0x00001140       0x10 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
- .debug_ranges  0x00001150       0x78 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
- .debug_ranges  0x000011c8       0x10 ./Dave/Generated/DAVE.o
- .debug_ranges  0x000011d8       0x18 ./globals.o
- .debug_ranges  0x000011f0       0x30 ./main.o
- .debug_ranges  0x00001220       0x10 ./measure.o
+ .debug_ranges  0x00000dc8       0x78 ./Libraries/FT800-FT813-5.x/tft.o
+ .debug_ranges  0x00000e40       0xc8 ./Dave/Generated/TIMER/timer.o
+ .debug_ranges  0x00000f08      0x138 ./Dave/Generated/SPI_MASTER/spi_master.o
+ .debug_ranges  0x00001040       0x78 ./Dave/Generated/SPI_MASTER/spi_master_conf.o
+ .debug_ranges  0x000010b8       0x20 ./Dave/Generated/GLOBAL_CCU4/global_ccu4.o
+ .debug_ranges  0x000010d8       0x20 ./Dave/Generated/GLOBAL_ADC/global_adc.o
+ .debug_ranges  0x000010f8       0x18 ./Dave/Generated/DIGITAL_IO/digital_io.o
+ .debug_ranges  0x00001110       0x18 ./Dave/Generated/CPU_CTRL_XMC4/cpu_ctrl_xmc4_conf.o
+ .debug_ranges  0x00001128       0x28 ./Dave/Generated/CLOCK_XMC4/clock_xmc4.o
+ .debug_ranges  0x00001150       0x10 ./Dave/Generated/CLOCK_XMC4/clock_xmc4_conf.o
+ .debug_ranges  0x00001160       0x78 ./Dave/Generated/ADC_MEASUREMENT/adc_measurement.o
+ .debug_ranges  0x000011d8       0x10 ./Dave/Generated/DAVE.o
+ .debug_ranges  0x000011e8       0x18 ./globals.o
+ .debug_ranges  0x00001200       0x30 ./main.o
+ .debug_ranges  0x00001230       0x10 ./measure.o
 
 .debug_weaknames
  *(.debug_weaknames)
