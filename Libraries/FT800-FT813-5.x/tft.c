@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 #include <globals.h>
 #include "EVE.h"
@@ -106,13 +107,17 @@ void (*TFT_display_static_cur_Menu__fptr_arr[])(void) = {&TFT_display_static_men
 /////////// Debug
 uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by TFT_display()
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by TFT_display()
-uint32_t TouchXY = 0; // Currently touched X and Y coordinate from register (1.byte=X, 2.byte=Y). Used by TFT_display()
-uint16_t BGtouchInitial_X = 32768;
-uint16_t BGtouchInitial_Y = 32768;
+
+/////////// Swipe feature (TFT_touch)
 enum SwipeDetection{None, Up, Down, Left, Right};
 enum SwipeDetection swipeDetect = None;
 uint8_t swipeInProgress = 0;
-uint8_t swipeDebounce = 0;
+uint8_t swipeEvokedBy = 0; 			  // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
+int32_t swipeInitialTouch_X = 32768; // X position of the initial touch of an swipe
+int32_t swipeInitialTouch_Y = 32768;
+int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch and the current position of an swipe
+int32_t swipeDistance_Y = 0;
+uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an swipe is finished
 
 /////////// Button states
 uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
@@ -567,90 +572,96 @@ void TFT_touch(void)
 
 	// Read the value for the first touch point
 	tag = EVE_memRead8(REG_TOUCH_TAG);
-	TouchXY = EVE_memRead32(REG_TOUCH_SCREEN_XY);
+	// Read currently touched position in pixels
+	uint32_t TouchXY = EVE_memRead32(REG_TOUCH_SCREEN_XY); // Currently touched X and Y coordinate from register (1.byte=X, 2.byte=Y)
 	uint16_t Y = TouchXY;
 	uint16_t X = TouchXY >> 16;
 
-
+	/// If a swipe is in progress save start coordinates (once at start), calculate swipe distance and detect the end-of-touch (debounced).
+	/// A swipe gets started by a touch tag action (switch statement below) and lasts till no touch was detected for at least 5 executions (debounce).
+	/// At an end-of-touch the evoking tag is run one again so it can execute final actions.
 	if(swipeInProgress){
-
-		if(tag == 1 && X < 32768 && Y < 32768){
-			int32_t swipe_X = BGtouchInitial_X - X;
-			int32_t swipe_Y = BGtouchInitial_Y - Y;
-
-			if(abs(swipe_X) > abs(swipe_Y)){
-				if(swipe_X > 50)      	// swipe to left
-					swipeDetect = Left;
-				else if(swipe_X < -50)	// swipe to right
-					swipeDetect = Right;
-				else
-					swipeDetect = None;
-			}
-			else{
-				if(swipe_Y > 50)		// swipe down
-					swipeDetect = Down;
-				else if(swipe_Y < -50)	// swipe up
-					swipeDetect = Up;
-				else
-					swipeDetect = None;
-			}
+		// If the initial touched position is not set, remember it (used to determine how far the user swiped)
+		if(swipeInitialTouch_X == 32768 && swipeInitialTouch_Y == 32768){
+			swipeInitialTouch_X = X;
+			swipeInitialTouch_Y = Y;
 		}
 
+		// Update the currently swiped distance and its direction if the background is still touched (tag==1) and the positions are valid
+		// Note a positive effect: If the tag somehow changes or the position get invalid (happens at corners) the last valid distances and effects survive
+		if(X < 32768 && Y < 32768){
+			swipeDistance_X = swipeInitialTouch_X - X;
+			swipeDistance_Y = swipeInitialTouch_Y - Y;
+		}
 
+		// Increase end-of-touch debounce timer
+		if(tag == 0) swipeEndOfTouch_Debounce++;
 
-
-		if(tag == 0) swipeDebounce++;
-
-		if(swipeDebounce >= 5){
-			swipeInProgress = 0;
-			swipeDebounce = 0;
-
-			// Change menu if swipe was detected
-			if(swipeDetect == Left && TFT_cur_Menu < (TFT_MENU_SIZE-1)) TFT_cur_Menu++;
-			else if(swipeDetect == Right && TFT_cur_Menu > 0) TFT_cur_Menu--;
-
-			//if(TFT_cur_Menu > TFT_MENU_SIZE-1) TFT_cur_Menu = TFT_MENU_SIZE-1;
-			//else if(TFT_cur_Menu < 0) TFT_cur_Menu = 0;
+		// Detect end-of-touch (Swipe ends if there was no touch detected for 5 cycles)
+		if(swipeEndOfTouch_Debounce >= 5){
+			// Execute the tag action that invoked the swipe process one last time
+			tag = swipeEvokedBy;
 
 			// Reset swipe feature variables
-			BGtouchInitial_X = 32768;
-			BGtouchInitial_Y = 32768;
-			swipeDetect = None;
+			swipeInProgress = 0;
+			swipeEndOfTouch_Debounce = 0;
+			swipeInitialTouch_X = 32768;
+			swipeInitialTouch_Y = 32768;
 		}
 	}
-	else{
-		// Execute action based on touched tag
-		switch(tag)
-		{
-			// nothing touched - reset states and locks
-			case 0:
-				toggle_lock = 0;
-				break;
-			case 1:
 
-				// Detect initial touch on BG - save coordinates to determine to where the user swipes
-				if(X < 32768 && Y < 32768){
-					BGtouchInitial_X = X;
-					BGtouchInitial_Y = Y;
-					swipeInProgress = 1;
+
+	// Execute action based on touched tag
+	switch(tag)
+	{
+		// nothing touched - reset states and locks
+		case 0:
+			toggle_lock = 0;
+			break;
+		// Background elements are touched - detect swipes to left/right for menu changes
+		case 1:
+			// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
+			if(swipeInProgress == 0 && swipeEvokedBy == 0){
+				// Initial touch on background was detected - init swipe and mark me as elicitor
+				swipeInProgress = 1;
+				swipeEvokedBy = 1;
+			}
+			// Evaluate current status of the swipe - if it is in progress and evoked by me
+			else if(swipeInProgress == 1 && swipeEvokedBy == 1){
+				// If the user swiped more on x than on y-axis he probably wants to swipe left/right
+				if(abs(swipeDistance_X) > abs(swipeDistance_Y)){
+					if(swipeDistance_X > 50)      	// swipe to left
+						swipeDetect = Left;
+					else if(swipeDistance_X < -50)	// swipe to right
+						swipeDetect = Right;
+					else
+						swipeDetect = None;
 				}
+			}
+			// Final actions after end-of-touch was detected - if the swipe is not in progress but swipeEvokedBy is still on me
+			else if(swipeInProgress == 0 && swipeEvokedBy == 1){
+				// Change menu if swipe was detected
+				if(swipeDetect == Left && TFT_cur_Menu < (TFT_MENU_SIZE-1)) TFT_cur_Menu++;
+				else if(swipeDetect == Right && TFT_cur_Menu > 0) TFT_cur_Menu--;
 
-
-				break;
-			default:
-				// Execute current menu specific code
-				(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag);
-				break;
-		}
+				// Finalize swipe by resetting swipeEvokedBy
+				swipeEvokedBy = 0;
+			}
+			break;
+		default:
+			// Execute current menu specific code
+			(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag);
+			break;
 	}
-	//printf("%d %d %d %d-%d\n", swipeInProgress, (int)swipeDetect, TFT_cur_Menu, BGtouchInitial_X, X);
+
+	//printf("%d %d %d %d-%d\n", swipeInProgress, (int)swipeDetect, TFT_cur_Menu, swipeInitialTouch_X, X);
 }
+
 
 void TFT_display(void)
 {
 	/// Dynamic portion of display-handling, meant to be called every 20ms or more. Created by Rudolph Riedel, extensively adapted by RS @ MCI 2020/21
 	///
-	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
 
 	if(tft_active != 0)
 	{
@@ -829,11 +840,10 @@ void TFT_display_menu1(void)
 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
-	uint16_t X = TouchXY;
-	uint16_t Y = TouchXY >> 16;
-	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, X);
-	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, Y);
 
+	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
+	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
 }
 
 void TFT_touch_menu0(uint8_t tag){
@@ -901,5 +911,25 @@ void TFT_touch_menu1(uint8_t tag){
 			}
 			break;
 	}
+
+	//// If the user swiped more on x-axis he probably wants to swipe left/right
+	//if(abs(swipeDistance_X) > abs(swipeDistance_Y)){
+	//	if(swipeDistance_X > 50)      	// swipe to left
+	//		swipeDetect = Left;
+	//	else if(swipeDistance_X < -50)	// swipe to right
+	//		swipeDetect = Right;
+	//	else
+	//		swipeDetect = None;
+	//}
+	//// If the user swiped more on y-axis he probably wants to swipe up/down
+	//else{
+	//	if(swipeDistance_Y > 50)		// swipe down
+	//		swipeDetect = Down;
+	//	else if(swipeDistance_Y < -50)	// swipe up
+	//		swipeDetect = Up;
+	//	else
+	//		swipeDetect = None;
+	//}
+
 
 }

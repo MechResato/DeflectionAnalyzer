@@ -58,10 +58,6 @@ int main(void)
 	_msCounter = 0;
 	while (_msCounter < 100) __NOP();
 
-	// Init static Background (menu + basic graph)
-	//initStaticGraphBackground();
-
-
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");
 	while(1U) {

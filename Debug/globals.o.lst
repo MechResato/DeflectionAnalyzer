@@ -35,23 +35,23 @@
   41              	 .align 1
   44              	InputBuffer1_idx:
   45 0000 0000     	 .space 2
-  46              	 .global InputType
-  47              	 .section .data.InputType,"aw",%progbits
-  50              	InputType:
-  51 0000 03       	 .byte 3
-  52              	 .global frameover
-  53              	 .section .bss.frameover,"aw",%nobits
-  56              	frameover:
-  57 0000 00       	 .space 1
-  58              	 .global InputBuffer1
-  59              	 .section .bss.InputBuffer1,"aw",%nobits
-  60              	 .align 2
-  63              	InputBuffer1:
-  64 0000 00000000 	 .space 880
-  64      00000000 
-  64      00000000 
-  64      00000000 
-  64      00000000 
+  46              	 .global InputBuffer1
+  47              	 .section .bss.InputBuffer1,"aw",%nobits
+  48              	 .align 2
+  51              	InputBuffer1:
+  52 0000 00000000 	 .space 880
+  52      00000000 
+  52      00000000 
+  52      00000000 
+  52      00000000 
+  53              	 .global InputType
+  54              	 .section .data.InputType,"aw",%progbits
+  57              	InputType:
+  58 0000 03       	 .byte 3
+  59              	 .global frameover
+  60              	 .section .bss.frameover,"aw",%nobits
+  63              	frameover:
+  64 0000 00       	 .space 1
   65              	 .section .text.SysTick_Handler,"ax",%progbits
   66              	 .align 2
   67              	 .global SysTick_Handler
@@ -68,39 +68,52 @@
    6:../globals.c  ****  */
    7:../globals.c  **** 
    8:../globals.c  **** #include <DAVE.h>
-   9:../globals.c  **** #include <globals.h>
+   9:../globals.c  **** //#include <globals.h>
   10:../globals.c  **** 
-  11:../globals.c  **** ///*  SYSTEM VARIABLEs */
-  12:../globals.c  **** // Counter used for function delay_ms
-  13:../globals.c  **** volatile uint32_t _msCounter = 0;
-  14:../globals.c  **** volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measuremen
-  15:../globals.c  **** 
-  16:../globals.c  **** 
-  17:../globals.c  **** 
-  18:../globals.c  **** ///*  MEASUREMENTs */
-  19:../globals.c  **** volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
-  20:../globals.c  **** 
-  21:../globals.c  **** // Buffer 1
-  22:../globals.c  **** uint16_t InputBuffer1_idx = 0; // Current index in Buffer
-  23:../globals.c  **** XMC_VADC_RESULT_SIZE_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
-  24:../globals.c  **** 
-  25:../globals.c  **** 
-  26:../globals.c  **** 
-  27:../globals.c  **** ///*  MENU AND USER INTERFACE */
-  28:../globals.c  **** // Input signal type used for measurement and GUI display
-  29:../globals.c  **** volatile uint8_t InputType = 3; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+  11:../globals.c  **** /*  MACROS - DEFINEs */
+  12:../globals.c  **** #define DEBUG_ENABLE // self implemented Debug flag
+  13:../globals.c  **** #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage      
+  14:../globals.c  **** 
+  15:../globals.c  **** /* DEBUG */
+  16:../globals.c  **** #if defined (DEBUG_ENABLE)
+  17:../globals.c  **** 	extern void initialise_monitor_handles(void);
+  18:../globals.c  **** #else
+  19:../globals.c  **** 	#define printf(...) { ; }
+  20:../globals.c  **** #endif
+  21:../globals.c  **** 
+  22:../globals.c  **** 
+  23:../globals.c  **** 
+  24:../globals.c  **** ///*  SYSTEM VARIABLEs */
+  25:../globals.c  **** // Counter used for function delay_ms
+  26:../globals.c  **** volatile uint32_t _msCounter = 0;
+  27:../globals.c  **** volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measuremen
+  28:../globals.c  **** 
+  29:../globals.c  **** 
   30:../globals.c  **** 
-  31:../globals.c  **** 
-  32:../globals.c  **** 
-  33:../globals.c  **** ///* DEBUG */
-  34:../globals.c  **** // Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debugc
-  35:../globals.c  **** volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
-  36:../globals.c  **** 
+  31:../globals.c  **** ///*  MEASUREMENTs */
+  32:../globals.c  **** volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
+  33:../globals.c  **** 
+  34:../globals.c  **** // Buffer 1
+  35:../globals.c  **** uint16_t InputBuffer1_idx = 0; // Current index in Buffer
+  36:../globals.c  **** XMC_VADC_RESULT_SIZE_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
   37:../globals.c  **** 
   38:../globals.c  **** 
-  39:../globals.c  **** ///*  FUNCTIONS -----------------------------------------------------------------------------------
-  40:../globals.c  **** void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
-  74              	 .loc 1 40 0
+  39:../globals.c  **** 
+  40:../globals.c  **** ///*  MENU AND USER INTERFACE */
+  41:../globals.c  **** // Input signal type used for measurement and GUI display
+  42:../globals.c  **** volatile uint8_t InputType = 3; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+  43:../globals.c  **** 
+  44:../globals.c  **** 
+  45:../globals.c  **** 
+  46:../globals.c  **** ///* DEBUG */
+  47:../globals.c  **** // Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debugc
+  48:../globals.c  **** volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
+  49:../globals.c  **** 
+  50:../globals.c  **** 
+  51:../globals.c  **** 
+  52:../globals.c  **** ///*  FUNCTIONS -----------------------------------------------------------------------------------
+  53:../globals.c  **** void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
+  74              	 .loc 1 53 0
   75              	 .cfi_startproc
   76              	 
   77              	 
@@ -112,15 +125,15 @@
   83 0002 00AF     	 add r7,sp,#0
   84              	.LCFI1:
   85              	 .cfi_def_cfa_register 7
-  41:../globals.c  **** 	_msCounter++;
-  86              	 .loc 1 41 0
+  54:../globals.c  **** 	_msCounter++;
+  86              	 .loc 1 54 0
   87 0004 044B     	 ldr r3,.L2
   88 0006 1B68     	 ldr r3,[r3]
   89 0008 0133     	 adds r3,r3,#1
   90 000a 034A     	 ldr r2,.L2
   91 000c 1360     	 str r3,[r2]
-  42:../globals.c  **** }
-  92              	 .loc 1 42 0
+  55:../globals.c  **** }
+  92              	 .loc 1 55 0
   93 000e BD46     	 mov sp,r7
   94              	.LCFI2:
   95              	 .cfi_def_cfa_register 13
@@ -143,8 +156,8 @@
  113              	 .thumb_func
  115              	delay_ms:
  116              	.LFB438:
-  43:../globals.c  **** void delay_ms(uint32_t ms){
- 117              	 .loc 1 43 0
+  56:../globals.c  **** void delay_ms(uint32_t ms){
+ 117              	 .loc 1 56 0
  118              	 .cfi_startproc
  119              	 
  120              	 
@@ -160,25 +173,25 @@
  130              	.LCFI6:
  131              	 .cfi_def_cfa_register 7
  132 0006 7860     	 str r0,[r7,#4]
-  44:../globals.c  **** 	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
-  45:../globals.c  **** 	uint32_t now = _msCounter;
- 133              	 .loc 1 45 0
+  57:../globals.c  **** 	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
+  58:../globals.c  **** 	uint32_t now = _msCounter;
+ 133              	 .loc 1 58 0
  134 0008 084B     	 ldr r3,.L7
  135 000a 1B68     	 ldr r3,[r3]
  136 000c FB60     	 str r3,[r7,#12]
-  46:../globals.c  **** 	while(now+ms > _msCounter)
- 137              	 .loc 1 46 0
+  59:../globals.c  **** 	while(now+ms > _msCounter)
+ 137              	 .loc 1 59 0
  138 000e 00E0     	 b .L5
  139              	.L6:
-  47:../globals.c  **** 		__NOP(); // do nothing
- 140              	 .loc 1 47 0
+  60:../globals.c  **** 		__NOP(); // do nothing
+ 140              	 .loc 1 60 0
  141              	
  142 0010 00BF     	 nop
  143              	
  144              	 .thumb
  145              	.L5:
-  46:../globals.c  **** 	while(now+ms > _msCounter)
- 146              	 .loc 1 46 0
+  59:../globals.c  **** 	while(now+ms > _msCounter)
+ 146              	 .loc 1 59 0
  147 0012 FA68     	 ldr r2,[r7,#12]
  148 0014 7B68     	 ldr r3,[r7,#4]
  149 0016 1A44     	 add r2,r2,r3
@@ -186,8 +199,8 @@
  151 001a 1B68     	 ldr r3,[r3]
  152 001c 9A42     	 cmp r2,r3
  153 001e F7D8     	 bhi .L6
-  48:../globals.c  **** }
- 154              	 .loc 1 48 0
+  61:../globals.c  **** }
+ 154              	 .loc 1 61 0
  155 0020 1437     	 adds r7,r7,#20
  156              	.LCFI7:
  157              	 .cfi_def_cfa_offset 4
@@ -225,11 +238,11 @@ DEFINED SYMBOLS
     {standard input}:34     .bss.MeasurementCounter:00000000 $d
     {standard input}:44     .bss.InputBuffer1_idx:00000000 InputBuffer1_idx
     {standard input}:41     .bss.InputBuffer1_idx:00000000 $d
-    {standard input}:50     .data.InputType:00000000 InputType
-    {standard input}:56     .bss.frameover:00000000 frameover
-    {standard input}:57     .bss.frameover:00000000 $d
-    {standard input}:63     .bss.InputBuffer1:00000000 InputBuffer1
-    {standard input}:60     .bss.InputBuffer1:00000000 $d
+    {standard input}:51     .bss.InputBuffer1:00000000 InputBuffer1
+    {standard input}:48     .bss.InputBuffer1:00000000 $d
+    {standard input}:57     .data.InputType:00000000 InputType
+    {standard input}:63     .bss.frameover:00000000 frameover
+    {standard input}:64     .bss.frameover:00000000 $d
     {standard input}:66     .text.SysTick_Handler:00000000 $t
     {standard input}:71     .text.SysTick_Handler:00000000 SysTick_Handler
     {standard input}:105    .text.SysTick_Handler:00000018 $d

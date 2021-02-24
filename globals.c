@@ -6,7 +6,20 @@
  */
 
 #include <DAVE.h>
-#include <globals.h>
+//#include <globals.h>
+
+/*  MACROS - DEFINEs */
+#define DEBUG_ENABLE // self implemented Debug flag
+#define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
+
+/* DEBUG */
+#if defined (DEBUG_ENABLE)
+	extern void initialise_monitor_handles(void);
+#else
+	#define printf(...) { ; }
+#endif
+
+
 
 ///*  SYSTEM VARIABLEs */
 // Counter used for function delay_ms

@@ -3,7 +3,6 @@
 #ifndef TFT_H_
 #define TFT_H_
 
-int TFT_cur_Menu;
 
 
 //volatile uint8_t InputType; // Input signal type used in main for measurement and here for swithcen on touch -> see tft.c!
