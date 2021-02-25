@@ -1,0 +1,1559 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "menu.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .comm _msCounter,4,4
+  20              	 .comm tft_tick,1,1
+  21              	 .comm MeasurementCounter,4,4
+  22              	 .comm InputBuffer1_idx,2,2
+  23              	 .comm InputType,1,1
+  24              	 .comm frameover,1,1
+  25              	 .comm ReadData,1,1
+  26              	 .comm swipeDistance_X,4,4
+  27              	 .comm swipeDistance_Y,4,4
+  28              	 .global G_x
+  29              	 .section .data.G_x,"aw",%progbits
+  30              	 .align 1
+  33              	G_x:
+  34 0000 0A00     	 .short 10
+  35              	 .global G_y
+  36              	 .section .data.G_y,"aw",%progbits
+  37              	 .align 1
+  40              	G_y:
+  41 0000 5100     	 .short 81
+  42              	 .global G_width
+  43              	 .section .data.G_width,"aw",%progbits
+  44              	 .align 1
+  47              	G_width:
+  48 0000 B801     	 .short 440
+  49              	 .global G_height
+  50              	 .section .data.G_height,"aw",%progbits
+  51              	 .align 1
+  54              	G_height:
+  55 0000 A100     	 .short 161
+  56              	 .global unit_Sensor
+  57              	 .section .rodata.unit_Sensor,"a",%progbits
+  58              	 .align 2
+  61              	unit_Sensor:
+  62 0000 205600   	 .ascii " V\000"
+  63              	 .global G_amp_max
+  64 0003 00       	 .section .data.G_amp_max,"aw",%progbits
+  65              	 .align 3
+  68              	G_amp_max:
+  69 0000 00000000 	 .word 0
+  70 0004 00002440 	 .word 1076101120
+  71              	 .global G_t_max
+  72              	 .section .data.G_t_max,"aw",%progbits
+  73              	 .align 3
+  76              	G_t_max:
+  77 0000 9A999999 	 .word -1717986918
+  78 0004 99990140 	 .word 1073846681
+  79              	 .global G_y_max
+  80              	 .section .data.G_y_max,"aw",%progbits
+  81              	 .align 3
+  84              	G_y_max:
+  85 0000 00000000 	 .word 0
+  86 0004 00FEAF40 	 .word 1085275648
+  87              	 .global G_h_grid_lines
+  88              	 .section .data.G_h_grid_lines,"aw",%progbits
+  89              	 .align 3
+  92              	G_h_grid_lines:
+  93 0000 00000000 	 .word 0
+  94 0004 00001040 	 .word 1074790400
+  95              	 .global G_v_grid_lines
+  96              	 .section .data.G_v_grid_lines,"aw",%progbits
+  97              	 .align 3
+ 100              	G_v_grid_lines:
+ 101 0000 9A999999 	 .word -1717986918
+ 102 0004 99990140 	 .word 1073846681
+ 103              	 .global toggle_lock
+ 104              	 .section .bss.toggle_lock,"aw",%nobits
+ 107              	toggle_lock:
+ 108 0000 00       	 .space 1
+ 109              	 .global toggle_state_graphmode
+ 110              	 .section .bss.toggle_state_graphmode,"aw",%nobits
+ 111              	 .align 1
+ 114              	toggle_state_graphmode:
+ 115 0000 0000     	 .space 2
+ 116              	 .global toggle_state_dimmer
+ 117              	 .section .bss.toggle_state_dimmer,"aw",%nobits
+ 118              	 .align 1
+ 121              	toggle_state_dimmer:
+ 122 0000 0000     	 .space 2
+ 123              	 .global display_list_size
+ 124              	 .section .bss.display_list_size,"aw",%nobits
+ 125              	 .align 1
+ 128              	display_list_size:
+ 129 0000 0000     	 .space 2
+ 130              	 .global tracker
+ 131              	 .section .bss.tracker,"aw",%nobits
+ 132              	 .align 2
+ 135              	tracker:
+ 136 0000 00000000 	 .space 4
+ 137              	 .section .rodata
+ 138              	 .align 2
+ 139              	.LC0:
+ 140 0000 444C2D73 	 .ascii "DL-size:\000"
+ 140      697A653A 
+ 140      00
+ 141 0009 000000   	 .align 2
+ 142              	.LC1:
+ 143 000c 53656E73 	 .ascii "Sensor:\000"
+ 143      6F723A00 
+ 144              	 .section .text.TFT_display_static_menu0,"ax",%progbits
+ 145              	 .align 2
+ 146              	 .global TFT_display_static_menu0
+ 147              	 .thumb
+ 148              	 .thumb_func
+ 150              	TFT_display_static_menu0:
+ 151              	.LFB494:
+ 152              	 .file 1 "../menu.c"
+   1:../menu.c     **** /*
+   2:../menu.c     ****  * menu.c
+   3:../menu.c     ****  *
+   4:../menu.c     ****  *  Created on: 25 Feb 2021
+   5:../menu.c     ****  *      Author: Admin
+   6:../menu.c     ****  */
+   7:../menu.c     **** 
+   8:../menu.c     **** #include <stdint.h>
+   9:../menu.c     **** #include <stdio.h>
+  10:../menu.c     **** #include <string.h>
+  11:../menu.c     **** #include <stdlib.h>
+  12:../menu.c     **** #include <math.h>
+  13:../menu.c     **** #include <globals.h>
+  14:../menu.c     **** #include "FT800-FT813-5.x/EVE.h"
+  15:../menu.c     **** #include "FT800-FT813-5.x/tft.h"
+  16:../menu.c     **** #include "record.h"
+  17:../menu.c     **** #include "menu.h"
+  18:../menu.c     **** 
+  19:../menu.c     **** /////////// Banner line strip edge positions (from left to right: Y1 is held horizontal till X1, in
+  20:../menu.c     **** #define LAYOUT_Y1 66
+  21:../menu.c     **** #define LAYOUT_Y2 50
+  22:../menu.c     **** #define LAYOUT_X1 280
+  23:../menu.c     **** #define LAYOUT_X2 320
+  24:../menu.c     **** 
+  25:../menu.c     **** 
+  26:../menu.c     **** 
+  27:../menu.c     **** 
+  28:../menu.c     **** 
+  29:../menu.c     **** /////////// Graph Definitions
+  30:../menu.c     **** // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be 
+  31:../menu.c     **** #define G_PADDING 10 									// Only needed because we want to calc how much width and height can 
+  32:../menu.c     **** uint16_t G_x        = 10;													 // 10 px from left to leave some room
+  33:../menu.c     **** uint16_t G_y      	= (LAYOUT_Y1 + 15);										 // end of banner plus 10 to leave some room  (for 
+  34:../menu.c     **** uint16_t G_width 	= (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10);			   // actual width of the data are
+  35:../menu.c     **** uint16_t G_height	= (0 + EVE_VSIZE - (LAYOUT_Y1 + 15) - (2*G_PADDING) - 10); // actual height of th
+  36:../menu.c     **** // axes
+  37:../menu.c     **** const char unit_Sensor[] = " V"; // unit string used at print of current sensor value
+  38:../menu.c     **** double G_amp_max = 10.0; // volts - used at print of vertical grid value labels
+  39:../menu.c     **** double G_t_max = 2.2;    // seconds - used at print of horizontal grid value labels
+  40:../menu.c     **** // data properties
+  41:../menu.c     **** double G_y_max = 4095.0; // maximum allowed amplitude y (here for 12bit sensor value)
+  42:../menu.c     **** // grid
+  43:../menu.c     **** double G_h_grid_lines = 4.0; // number of grey horizontal grid lines
+  44:../menu.c     **** double G_v_grid_lines = 2.2; // number of grey vertical grid lines
+  45:../menu.c     **** /////////// Graph Definitions END
+  46:../menu.c     **** 
+  47:../menu.c     **** /////////// Button states
+  48:../menu.c     **** uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prev
+  49:../menu.c     **** 
+  50:../menu.c     **** uint16_t toggle_state_graphmode = 0;
+  51:../menu.c     **** uint16_t toggle_state_dimmer = 0;
+  52:../menu.c     **** 
+  53:../menu.c     **** /////////// Debug
+  54:../menu.c     **** uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by the TF
+  55:../menu.c     **** uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_disp
+  56:../menu.c     **** 
+  57:../menu.c     **** 
+  58:../menu.c     **** 
+  59:../menu.c     **** void TFT_display_static_menu0(void){
+ 153              	 .loc 1 59 0
+ 154              	 .cfi_startproc
+ 155              	 
+ 156              	 
+ 157 0000 2DE9F047 	 push {r4,r5,r6,r7,r8,r9,r10,lr}
+ 158              	.LCFI0:
+ 159              	 .cfi_def_cfa_offset 32
+ 160              	 .cfi_offset 4,-32
+ 161              	 .cfi_offset 5,-28
+ 162              	 .cfi_offset 6,-24
+ 163              	 .cfi_offset 7,-20
+ 164              	 .cfi_offset 8,-16
+ 165              	 .cfi_offset 9,-12
+ 166              	 .cfi_offset 10,-8
+ 167              	 .cfi_offset 14,-4
+ 168 0004 8AB0     	 sub sp,sp,#40
+ 169              	.LCFI1:
+ 170              	 .cfi_def_cfa_offset 72
+ 171 0006 0AAF     	 add r7,sp,#40
+ 172              	.LCFI2:
+ 173              	 .cfi_def_cfa 7,32
+  60:../menu.c     **** 	/// Draw Banner and divider line on top
+  61:../menu.c     **** 	// Banner
+  62:../menu.c     **** 	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+ 174              	 .loc 1 62 0
+ 175 0008 3A48     	 ldr r0,.L2
+ 176 000a FFF7FEFF 	 bl EVE_cmd_dl
+  63:../menu.c     **** 	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+ 177              	 .loc 1 63 0
+ 178 000e 3A48     	 ldr r0,.L2+4
+ 179 0010 FFF7FEFF 	 bl EVE_cmd_dl
+  64:../menu.c     **** 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+ 180              	 .loc 1 64 0
+ 181 0014 3948     	 ldr r0,.L2+8
+ 182 0016 FFF7FEFF 	 bl EVE_cmd_dl
+  65:../menu.c     **** 	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
+ 183              	 .loc 1 65 0
+ 184 001a 3948     	 ldr r0,.L2+12
+ 185 001c FFF7FEFF 	 bl EVE_cmd_dl
+  66:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+ 186              	 .loc 1 66 0
+ 187 0020 3848     	 ldr r0,.L2+16
+ 188 0022 FFF7FEFF 	 bl EVE_cmd_dl
+  67:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+ 189              	 .loc 1 67 0
+ 190 0026 3848     	 ldr r0,.L2+20
+ 191 0028 FFF7FEFF 	 bl EVE_cmd_dl
+  68:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+ 192              	 .loc 1 68 0
+ 193 002c 3748     	 ldr r0,.L2+24
+ 194 002e FFF7FEFF 	 bl EVE_cmd_dl
+  69:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+ 195              	 .loc 1 69 0
+ 196 0032 3748     	 ldr r0,.L2+28
+ 197 0034 FFF7FEFF 	 bl EVE_cmd_dl
+  70:../menu.c     **** 	EVE_cmd_dl(DL_END);
+ 198              	 .loc 1 70 0
+ 199 0038 4FF00450 	 mov r0,#553648128
+ 200 003c FFF7FEFF 	 bl EVE_cmd_dl
+  71:../menu.c     **** 	// Divider
+  72:../menu.c     **** 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+ 201              	 .loc 1 72 0
+ 202 0040 3448     	 ldr r0,.L2+32
+ 203 0042 FFF7FEFF 	 bl EVE_cmd_dl
+  73:../menu.c     **** 	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
+ 204              	 .loc 1 73 0
+ 205 0046 3448     	 ldr r0,.L2+36
+ 206 0048 FFF7FEFF 	 bl EVE_cmd_dl
+  74:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+ 207              	 .loc 1 74 0
+ 208 004c 2D48     	 ldr r0,.L2+16
+ 209 004e FFF7FEFF 	 bl EVE_cmd_dl
+  75:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+ 210              	 .loc 1 75 0
+ 211 0052 2D48     	 ldr r0,.L2+20
+ 212 0054 FFF7FEFF 	 bl EVE_cmd_dl
+  76:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+ 213              	 .loc 1 76 0
+ 214 0058 2C48     	 ldr r0,.L2+24
+ 215 005a FFF7FEFF 	 bl EVE_cmd_dl
+  77:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+ 216              	 .loc 1 77 0
+ 217 005e 2C48     	 ldr r0,.L2+28
+ 218 0060 FFF7FEFF 	 bl EVE_cmd_dl
+  78:../menu.c     **** 	EVE_cmd_dl(DL_END);
+ 219              	 .loc 1 78 0
+ 220 0064 4FF00450 	 mov r0,#553648128
+ 221 0068 FFF7FEFF 	 bl EVE_cmd_dl
+  79:../menu.c     **** 
+  80:../menu.c     **** 	// Add the static text
+  81:../menu.c     **** 	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
+ 222              	 .loc 1 81 0
+ 223 006c 4FF04070 	 mov r0,#50331648
+ 224 0070 FFF7FEFF 	 bl EVE_cmd_dl
+  82:../menu.c     **** 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+ 225              	 .loc 1 82 0
+ 226 0074 2748     	 ldr r0,.L2+32
+ 227 0076 FFF7FEFF 	 bl EVE_cmd_dl
+  83:../menu.c     **** 	#if defined (EVE_DMA)
+  84:../menu.c     **** 		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
+  85:../menu.c     **** 	#endif
+  86:../menu.c     **** 	EVE_cmd_text(360, 10, 26, 0, "DL-size:");
+ 228              	 .loc 1 86 0
+ 229 007a 284B     	 ldr r3,.L2+40
+ 230 007c 0093     	 str r3,[sp]
+ 231 007e 4FF4B470 	 mov r0,#360
+ 232 0082 0A21     	 movs r1,#10
+ 233 0084 1A22     	 movs r2,#26
+ 234 0086 0023     	 movs r3,#0
+ 235 0088 FFF7FEFF 	 bl EVE_cmd_text
+  87:../menu.c     **** 	EVE_cmd_text(360, 25, 26, 0, "Sensor:");
+ 236              	 .loc 1 87 0
+ 237 008c 244B     	 ldr r3,.L2+44
+ 238 008e 0093     	 str r3,[sp]
+ 239 0090 4FF4B470 	 mov r0,#360
+ 240 0094 1921     	 movs r1,#25
+ 241 0096 1A22     	 movs r2,#26
+ 242 0098 0023     	 movs r3,#0
+ 243 009a FFF7FEFF 	 bl EVE_cmd_text
+  88:../menu.c     **** 
+  89:../menu.c     **** 	/// Write the static part of the Graph to the display list
+  90:../menu.c     **** 	TFT_GraphStatic(0, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v
+ 244              	 .loc 1 90 0
+ 245 009e 214B     	 ldr r3,.L2+48
+ 246 00a0 B3F800A0 	 ldrh r10,[r3]
+ 247 00a4 204B     	 ldr r3,.L2+52
+ 248 00a6 B3F800C0 	 ldrh ip,[r3]
+ 249 00aa 204B     	 ldr r3,.L2+56
+ 250 00ac B3F800E0 	 ldrh lr,[r3]
+ 251 00b0 1F4B     	 ldr r3,.L2+60
+ 252 00b2 1E88     	 ldrh r6,[r3]
+ 253 00b4 1F4B     	 ldr r3,.L2+64
+ 254 00b6 D3E90089 	 ldrd r8,[r3]
+ 255 00ba 1F4B     	 ldr r3,.L2+68
+ 256 00bc D3E90045 	 ldrd r4,[r3]
+ 257 00c0 1E4B     	 ldr r3,.L2+72
+ 258 00c2 D3E90001 	 ldrd r0,[r3]
+ 259 00c6 1E4B     	 ldr r3,.L2+76
+ 260 00c8 D3E90023 	 ldrd r2,[r3]
+ 261 00cc 0096     	 str r6,[sp]
+ 262 00ce 0A26     	 movs r6,#10
+ 263 00d0 0196     	 str r6,[sp,#4]
+ 264 00d2 CDE90289 	 strd r8,[sp,#8]
+ 265 00d6 CDE90445 	 strd r4,[sp,#16]
+ 266 00da CDE90601 	 strd r0,[sp,#24]
+ 267 00de CDE90823 	 strd r2,[sp,#32]
+ 268 00e2 0020     	 movs r0,#0
+ 269 00e4 5146     	 mov r1,r10
+ 270 00e6 6246     	 mov r2,ip
+ 271 00e8 7346     	 mov r3,lr
+ 272 00ea FFF7FEFF 	 bl TFT_GraphStatic
+  91:../menu.c     **** 
+  92:../menu.c     **** 
+  93:../menu.c     **** }
+ 273              	 .loc 1 93 0
+ 274 00ee BD46     	 mov sp,r7
+ 275              	.LCFI3:
+ 276              	 .cfi_def_cfa_register 13
+ 277              	 
+ 278 00f0 BDE8F087 	 pop {r4,r5,r6,r7,r8,r9,r10,pc}
+ 279              	.L3:
+ 280              	 .align 2
+ 281              	.L2:
+ 282 00f4 01000003 	 .word 50331649
+ 283 00f8 1000000E 	 .word 234881040
+ 284 00fc 4B586404 	 .word 73685067
+ 285 0100 0700001F 	 .word 520093703
+ 286 0104 42000040 	 .word 1073741890
+ 287 0108 42008C40 	 .word 1082916930
+ 288 010c 3200A040 	 .word 1084227634
+ 289 0110 3200F040 	 .word 1089470514
+ 290 0114 29CDF304 	 .word 83086633
+ 291 0118 0400001F 	 .word 520093700
+ 292 011c 00000000 	 .word .LC0
+ 293 0120 0C000000 	 .word .LC1
+ 294 0124 00000000 	 .word G_x
+ 295 0128 00000000 	 .word G_y
+ 296 012c 00000000 	 .word G_width
+ 297 0130 00000000 	 .word G_height
+ 298 0134 00000000 	 .word G_amp_max
+ 299 0138 00000000 	 .word G_t_max
+ 300 013c 00000000 	 .word G_h_grid_lines
+ 301 0140 00000000 	 .word G_v_grid_lines
+ 302              	 .cfi_endproc
+ 303              	.LFE494:
+ 305              	 .section .rodata
+ 306              	 .align 2
+ 307              	.LC2:
+ 308 0014 583A00   	 .ascii "X:\000"
+ 309 0017 00       	 .align 2
+ 310              	.LC3:
+ 311 0018 593A00   	 .ascii "Y:\000"
+ 312              	 .section .text.TFT_display_static_menu1,"ax",%progbits
+ 313              	 .align 2
+ 314              	 .global TFT_display_static_menu1
+ 315              	 .thumb
+ 316              	 .thumb_func
+ 318              	TFT_display_static_menu1:
+ 319              	.LFB495:
+  94:../menu.c     **** void TFT_display_static_menu1(void){
+ 320              	 .loc 1 94 0
+ 321              	 .cfi_startproc
+ 322              	 
+ 323              	 
+ 324 0000 80B5     	 push {r7,lr}
+ 325              	.LCFI4:
+ 326              	 .cfi_def_cfa_offset 8
+ 327              	 .cfi_offset 7,-8
+ 328              	 .cfi_offset 14,-4
+ 329 0002 82B0     	 sub sp,sp,#8
+ 330              	.LCFI5:
+ 331              	 .cfi_def_cfa_offset 16
+ 332 0004 02AF     	 add r7,sp,#8
+ 333              	.LCFI6:
+ 334              	 .cfi_def_cfa 7,8
+  95:../menu.c     **** 	/// Draw Banner and divider line on top
+  96:../menu.c     **** 	// Banner
+  97:../menu.c     **** 	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+ 335              	 .loc 1 97 0
+ 336 0006 2648     	 ldr r0,.L5
+ 337 0008 FFF7FEFF 	 bl EVE_cmd_dl
+  98:../menu.c     **** 	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+ 338              	 .loc 1 98 0
+ 339 000c 2548     	 ldr r0,.L5+4
+ 340 000e FFF7FEFF 	 bl EVE_cmd_dl
+  99:../menu.c     **** 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+ 341              	 .loc 1 99 0
+ 342 0012 2548     	 ldr r0,.L5+8
+ 343 0014 FFF7FEFF 	 bl EVE_cmd_dl
+ 100:../menu.c     **** 	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
+ 344              	 .loc 1 100 0
+ 345 0018 2448     	 ldr r0,.L5+12
+ 346 001a FFF7FEFF 	 bl EVE_cmd_dl
+ 101:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+ 347              	 .loc 1 101 0
+ 348 001e 2448     	 ldr r0,.L5+16
+ 349 0020 FFF7FEFF 	 bl EVE_cmd_dl
+ 102:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+ 350              	 .loc 1 102 0
+ 351 0024 2348     	 ldr r0,.L5+20
+ 352 0026 FFF7FEFF 	 bl EVE_cmd_dl
+ 103:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+ 353              	 .loc 1 103 0
+ 354 002a 2348     	 ldr r0,.L5+24
+ 355 002c FFF7FEFF 	 bl EVE_cmd_dl
+ 104:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+ 356              	 .loc 1 104 0
+ 357 0030 2248     	 ldr r0,.L5+28
+ 358 0032 FFF7FEFF 	 bl EVE_cmd_dl
+ 105:../menu.c     **** 	EVE_cmd_dl(DL_END);
+ 359              	 .loc 1 105 0
+ 360 0036 4FF00450 	 mov r0,#553648128
+ 361 003a FFF7FEFF 	 bl EVE_cmd_dl
+ 106:../menu.c     **** 	// Divider
+ 107:../menu.c     **** 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+ 362              	 .loc 1 107 0
+ 363 003e 2048     	 ldr r0,.L5+32
+ 364 0040 FFF7FEFF 	 bl EVE_cmd_dl
+ 108:../menu.c     **** 	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
+ 365              	 .loc 1 108 0
+ 366 0044 1F48     	 ldr r0,.L5+36
+ 367 0046 FFF7FEFF 	 bl EVE_cmd_dl
+ 109:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
+ 368              	 .loc 1 109 0
+ 369 004a 1948     	 ldr r0,.L5+16
+ 370 004c FFF7FEFF 	 bl EVE_cmd_dl
+ 110:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+ 371              	 .loc 1 110 0
+ 372 0050 1848     	 ldr r0,.L5+20
+ 373 0052 FFF7FEFF 	 bl EVE_cmd_dl
+ 111:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+ 374              	 .loc 1 111 0
+ 375 0056 1848     	 ldr r0,.L5+24
+ 376 0058 FFF7FEFF 	 bl EVE_cmd_dl
+ 112:../menu.c     **** 	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+ 377              	 .loc 1 112 0
+ 378 005c 1748     	 ldr r0,.L5+28
+ 379 005e FFF7FEFF 	 bl EVE_cmd_dl
+ 113:../menu.c     **** 	EVE_cmd_dl(DL_END);
+ 380              	 .loc 1 113 0
+ 381 0062 4FF00450 	 mov r0,#553648128
+ 382 0066 FFF7FEFF 	 bl EVE_cmd_dl
+ 114:../menu.c     **** 
+ 115:../menu.c     **** 	// Add the static text
+ 116:../menu.c     **** 	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
+ 383              	 .loc 1 116 0
+ 384 006a 4FF04070 	 mov r0,#50331648
+ 385 006e FFF7FEFF 	 bl EVE_cmd_dl
+ 117:../menu.c     **** 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+ 386              	 .loc 1 117 0
+ 387 0072 1348     	 ldr r0,.L5+32
+ 388 0074 FFF7FEFF 	 bl EVE_cmd_dl
+ 118:../menu.c     **** 	EVE_cmd_text(360, 10, 26, 0, "X:");
+ 389              	 .loc 1 118 0
+ 390 0078 134B     	 ldr r3,.L5+40
+ 391 007a 0093     	 str r3,[sp]
+ 392 007c 4FF4B470 	 mov r0,#360
+ 393 0080 0A21     	 movs r1,#10
+ 394 0082 1A22     	 movs r2,#26
+ 395 0084 0023     	 movs r3,#0
+ 396 0086 FFF7FEFF 	 bl EVE_cmd_text
+ 119:../menu.c     **** 	EVE_cmd_text(360, 25, 26, 0, "Y:");
+ 397              	 .loc 1 119 0
+ 398 008a 104B     	 ldr r3,.L5+44
+ 399 008c 0093     	 str r3,[sp]
+ 400 008e 4FF4B470 	 mov r0,#360
+ 401 0092 1921     	 movs r1,#25
+ 402 0094 1A22     	 movs r2,#26
+ 403 0096 0023     	 movs r3,#0
+ 404 0098 FFF7FEFF 	 bl EVE_cmd_text
+ 120:../menu.c     **** 
+ 121:../menu.c     **** }
+ 405              	 .loc 1 121 0
+ 406 009c BD46     	 mov sp,r7
+ 407              	.LCFI7:
+ 408              	 .cfi_def_cfa_register 13
+ 409              	 
+ 410 009e 80BD     	 pop {r7,pc}
+ 411              	.L6:
+ 412              	 .align 2
+ 413              	.L5:
+ 414 00a0 01000003 	 .word 50331649
+ 415 00a4 1000000E 	 .word 234881040
+ 416 00a8 4B586404 	 .word 73685067
+ 417 00ac 0700001F 	 .word 520093703
+ 418 00b0 42000040 	 .word 1073741890
+ 419 00b4 42008C40 	 .word 1082916930
+ 420 00b8 3200A040 	 .word 1084227634
+ 421 00bc 3200F040 	 .word 1089470514
+ 422 00c0 29CDF304 	 .word 83086633
+ 423 00c4 0400001F 	 .word 520093700
+ 424 00c8 14000000 	 .word .LC2
+ 425 00cc 18000000 	 .word .LC3
+ 426              	 .cfi_endproc
+ 427              	.LFE495:
+ 429              	 .section .rodata
+ 430 001b 00       	 .align 2
+ 431              	.LC4:
+ 432 001c 53656E73 	 .ascii "Sensor\000"
+ 432      6F7200
+ 433 0023 00       	 .align 2
+ 434              	.LC5:
+ 435 0024 496D7000 	 .ascii "Imp\000"
+ 436              	 .align 2
+ 437              	.LC6:
+ 438 0028 53617700 	 .ascii "Saw\000"
+ 439              	 .align 2
+ 440              	.LC7:
+ 441 002c 53696E65 	 .ascii "Sine\000"
+ 441      00
+ 442 0031 000000   	 .align 2
+ 443              	.LC8:
+ 444 0034 526F6C6C 	 .ascii "Roll\000"
+ 444      00
+ 445 0039 000000   	 .align 2
+ 446              	.LC9:
+ 447 003c 4672616D 	 .ascii "Frame\000"
+ 447      6500
+ 448 0042 0000     	 .align 2
+ 449              	.LC10:
+ 450 0044 44696D6D 	 .ascii "Dimmer\000"
+ 450      657200
+ 451              	 .global __aeabi_ddiv
+ 452              	 .global __aeabi_i2d
+ 453              	 .global __aeabi_dmul
+ 454 004b 00       	 .align 2
+ 455              	.LC11:
+ 456 004c 252E326C 	 .ascii "%.2lf\000"
+ 456      6600
+ 457 0052 0000     	 .align 2
+ 458              	.LC12:
+ 459 0054 205600   	 .ascii " V\000"
+ 460              	 .section .text.TFT_display_menu0,"ax",%progbits
+ 461              	 .align 2
+ 462              	 .global TFT_display_menu0
+ 463              	 .thumb
+ 464              	 .thumb_func
+ 466              	TFT_display_menu0:
+ 467              	.LFB496:
+ 122:../menu.c     **** 
+ 123:../menu.c     **** void TFT_display_menu0(void)
+ 124:../menu.c     **** {
+ 468              	 .loc 1 124 0
+ 469              	 .cfi_startproc
+ 470              	 
+ 471              	 
+ 472 0000 F0B5     	 push {r4,r5,r6,r7,lr}
+ 473              	.LCFI8:
+ 474              	 .cfi_def_cfa_offset 20
+ 475              	 .cfi_offset 4,-20
+ 476              	 .cfi_offset 5,-16
+ 477              	 .cfi_offset 6,-12
+ 478              	 .cfi_offset 7,-8
+ 479              	 .cfi_offset 14,-4
+ 480 0002 93B0     	 sub sp,sp,#76
+ 481              	.LCFI9:
+ 482              	 .cfi_def_cfa_offset 96
+ 483 0004 0AAF     	 add r7,sp,#40
+ 484              	.LCFI10:
+ 485              	 .cfi_def_cfa 7,56
+ 125:../menu.c     **** 	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are 
+ 126:../menu.c     **** 
+ 127:../menu.c     **** 	/////////////// Display BUTTONS and Toggles
+ 128:../menu.c     **** 	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+ 486              	 .loc 1 128 0
+ 487 0006 7C48     	 ldr r0,.L14
+ 488 0008 FFF7FEFF 	 bl EVE_cmd_gradcolor_burst
+ 129:../menu.c     **** 	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+ 489              	 .loc 1 129 0
+ 490 000c 7B48     	 ldr r0,.L14+4
+ 491 000e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 130:../menu.c     **** 	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+ 492              	 .loc 1 130 0
+ 493 0012 7B48     	 ldr r0,.L14+8
+ 494 0014 FFF7FEFF 	 bl EVE_cmd_fgcolor_burst
+ 131:../menu.c     **** 	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+ 495              	 .loc 1 131 0
+ 496 0018 7A48     	 ldr r0,.L14+12
+ 497 001a FFF7FEFF 	 bl EVE_cmd_bgcolor_burst
+ 132:../menu.c     **** 
+ 133:../menu.c     **** 	EVE_cmd_dl_burst(TAG(13)); /* assign tag-value '13' to the button that follows */
+ 498              	 .loc 1 133 0
+ 499 001e 7A48     	 ldr r0,.L14+16
+ 500 0020 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 134:../menu.c     **** 	if(InputType == 0){ 		EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sensor");	}
+ 501              	 .loc 1 134 0
+ 502 0024 794B     	 ldr r3,.L14+20
+ 503 0026 1B78     	 ldrb r3,[r3]
+ 504 0028 DBB2     	 uxtb r3,r3
+ 505 002a 002B     	 cmp r3,#0
+ 506 002c 0CD1     	 bne .L8
+ 507              	 .loc 1 134 0 is_stmt 0 discriminator 1
+ 508 002e 1B23     	 movs r3,#27
+ 509 0030 0093     	 str r3,[sp]
+ 510 0032 0023     	 movs r3,#0
+ 511 0034 0193     	 str r3,[sp,#4]
+ 512 0036 764B     	 ldr r3,.L14+24
+ 513 0038 0293     	 str r3,[sp,#8]
+ 514 003a 1420     	 movs r0,#20
+ 515 003c 0F21     	 movs r1,#15
+ 516 003e 5022     	 movs r2,#80
+ 517 0040 1E23     	 movs r3,#30
+ 518 0042 FFF7FEFF 	 bl EVE_cmd_button_burst
+ 519 0046 2FE0     	 b .L9
+ 520              	.L8:
+ 135:../menu.c     **** 	else if(InputType == 1){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Imp");	}
+ 521              	 .loc 1 135 0 is_stmt 1
+ 522 0048 704B     	 ldr r3,.L14+20
+ 523 004a 1B78     	 ldrb r3,[r3]
+ 524 004c DBB2     	 uxtb r3,r3
+ 525 004e 012B     	 cmp r3,#1
+ 526 0050 0CD1     	 bne .L10
+ 527              	 .loc 1 135 0 is_stmt 0 discriminator 1
+ 528 0052 1B23     	 movs r3,#27
+ 529 0054 0093     	 str r3,[sp]
+ 530 0056 0023     	 movs r3,#0
+ 531 0058 0193     	 str r3,[sp,#4]
+ 532 005a 6E4B     	 ldr r3,.L14+28
+ 533 005c 0293     	 str r3,[sp,#8]
+ 534 005e 1420     	 movs r0,#20
+ 535 0060 0F21     	 movs r1,#15
+ 536 0062 5022     	 movs r2,#80
+ 537 0064 1E23     	 movs r3,#30
+ 538 0066 FFF7FEFF 	 bl EVE_cmd_button_burst
+ 539 006a 1DE0     	 b .L9
+ 540              	.L10:
+ 136:../menu.c     **** 	else if(InputType == 2){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Saw");	}
+ 541              	 .loc 1 136 0 is_stmt 1
+ 542 006c 674B     	 ldr r3,.L14+20
+ 543 006e 1B78     	 ldrb r3,[r3]
+ 544 0070 DBB2     	 uxtb r3,r3
+ 545 0072 022B     	 cmp r3,#2
+ 546 0074 0CD1     	 bne .L11
+ 547              	 .loc 1 136 0 is_stmt 0 discriminator 1
+ 548 0076 1B23     	 movs r3,#27
+ 549 0078 0093     	 str r3,[sp]
+ 550 007a 0023     	 movs r3,#0
+ 551 007c 0193     	 str r3,[sp,#4]
+ 552 007e 664B     	 ldr r3,.L14+32
+ 553 0080 0293     	 str r3,[sp,#8]
+ 554 0082 1420     	 movs r0,#20
+ 555 0084 0F21     	 movs r1,#15
+ 556 0086 5022     	 movs r2,#80
+ 557 0088 1E23     	 movs r3,#30
+ 558 008a FFF7FEFF 	 bl EVE_cmd_button_burst
+ 559 008e 0BE0     	 b .L9
+ 560              	.L11:
+ 137:../menu.c     **** 	else{						EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sine");	}
+ 561              	 .loc 1 137 0 is_stmt 1
+ 562 0090 1B23     	 movs r3,#27
+ 563 0092 0093     	 str r3,[sp]
+ 564 0094 0023     	 movs r3,#0
+ 565 0096 0193     	 str r3,[sp,#4]
+ 566 0098 604B     	 ldr r3,.L14+36
+ 567 009a 0293     	 str r3,[sp,#8]
+ 568 009c 1420     	 movs r0,#20
+ 569 009e 0F21     	 movs r1,#15
+ 570 00a0 5022     	 movs r2,#80
+ 571 00a2 1E23     	 movs r3,#30
+ 572 00a4 FFF7FEFF 	 bl EVE_cmd_button_burst
+ 573              	.L9:
+ 138:../menu.c     **** 
+ 139:../menu.c     **** 	EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
+ 574              	 .loc 1 139 0
+ 575 00a8 5D48     	 ldr r0,.L14+40
+ 576 00aa FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 140:../menu.c     **** 	if(toggle_state_graphmode){
+ 577              	 .loc 1 140 0
+ 578 00ae 5D4B     	 ldr r3,.L14+44
+ 579 00b0 1B88     	 ldrh r3,[r3]
+ 580 00b2 002B     	 cmp r3,#0
+ 581 00b4 0DD0     	 beq .L12
+ 141:../menu.c     **** 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "Roll");
+ 582              	 .loc 1 141 0
+ 583 00b6 0023     	 movs r3,#0
+ 584 00b8 0093     	 str r3,[sp]
+ 585 00ba 4FF6FF73 	 movw r3,#65535
+ 586 00be 0193     	 str r3,[sp,#4]
+ 587 00c0 594B     	 ldr r3,.L14+48
+ 588 00c2 0293     	 str r3,[sp,#8]
+ 589 00c4 7820     	 movs r0,#120
+ 590 00c6 1821     	 movs r1,#24
+ 591 00c8 3E22     	 movs r2,#62
+ 592 00ca 1B23     	 movs r3,#27
+ 593 00cc FFF7FEFF 	 bl EVE_cmd_toggle_burst
+ 594 00d0 0BE0     	 b .L13
+ 595              	.L12:
+ 142:../menu.c     **** 	}
+ 143:../menu.c     **** 	else{
+ 144:../menu.c     **** 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "Frame");
+ 596              	 .loc 1 144 0
+ 597 00d2 0023     	 movs r3,#0
+ 598 00d4 0093     	 str r3,[sp]
+ 599 00d6 0023     	 movs r3,#0
+ 600 00d8 0193     	 str r3,[sp,#4]
+ 601 00da 544B     	 ldr r3,.L14+52
+ 602 00dc 0293     	 str r3,[sp,#8]
+ 603 00de 7820     	 movs r0,#120
+ 604 00e0 1821     	 movs r1,#24
+ 605 00e2 3E22     	 movs r2,#62
+ 606 00e4 1B23     	 movs r3,#27
+ 607 00e6 FFF7FEFF 	 bl EVE_cmd_toggle_burst
+ 608              	.L13:
+ 145:../menu.c     **** 	}
+ 146:../menu.c     **** 
+ 147:../menu.c     **** 	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+ 609              	 .loc 1 147 0
+ 610 00ea 5148     	 ldr r0,.L14+56
+ 611 00ec FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 148:../menu.c     **** 	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+ 612              	 .loc 1 148 0
+ 613 00f0 504B     	 ldr r3,.L14+60
+ 614 00f2 1B88     	 ldrh r3,[r3]
+ 615 00f4 1B22     	 movs r2,#27
+ 616 00f6 0092     	 str r2,[sp]
+ 617 00f8 0193     	 str r3,[sp,#4]
+ 618 00fa 4F4B     	 ldr r3,.L14+64
+ 619 00fc 0293     	 str r3,[sp,#8]
+ 620 00fe CD20     	 movs r0,#205
+ 621 0100 0F21     	 movs r1,#15
+ 622 0102 5022     	 movs r2,#80
+ 623 0104 1E23     	 movs r3,#30
+ 624 0106 FFF7FEFF 	 bl EVE_cmd_button_burst
+ 149:../menu.c     **** 
+ 150:../menu.c     **** 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+ 625              	 .loc 1 150 0
+ 626 010a 4FF04070 	 mov r0,#50331648
+ 627 010e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 151:../menu.c     **** 
+ 152:../menu.c     **** 
+ 153:../menu.c     **** 
+ 154:../menu.c     **** 	/////////////// Debug Values
+ 155:../menu.c     **** 	#if defined (EVE_DMA)
+ 156:../menu.c     **** 	EVE_cmd_number_burst(120, EVE_VSIZE - 65, 26, EVE_OPT_RIGHTX, cmd_fifo_size); /* number of bytes w
+ 157:../menu.c     **** 	#endif
+ 158:../menu.c     **** 	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written t
+ 628              	 .loc 1 158 0
+ 629 0112 4A4B     	 ldr r3,.L14+68
+ 630 0114 1B88     	 ldrh r3,[r3]
+ 631 0116 0093     	 str r3,[sp]
+ 632 0118 4FF4EB70 	 mov r0,#470
+ 633 011c 0A21     	 movs r1,#10
+ 634 011e 1A22     	 movs r2,#26
+ 635 0120 4FF40063 	 mov r3,#2048
+ 636 0124 FFF7FEFF 	 bl EVE_cmd_number_burst
+ 159:../menu.c     **** 
+ 160:../menu.c     **** 	// Write current sensor value with unit
+ 161:../menu.c     **** 	char buffer[32]; // buffer for double to string conversion
+ 162:../menu.c     **** 	sprintf(buffer, "%.2lf", (G_amp_max/G_y_max)*InputBuffer1[InputBuffer1_idx]); // double to string 
+ 637              	 .loc 1 162 0
+ 638 0128 454B     	 ldr r3,.L14+72
+ 639 012a D3E90001 	 ldrd r0,[r3]
+ 640 012e 454B     	 ldr r3,.L14+76
+ 641 0130 D3E90023 	 ldrd r2,[r3]
+ 642 0134 FFF7FEFF 	 bl __aeabi_ddiv
+ 643 0138 0246     	 mov r2,r0
+ 644 013a 0B46     	 mov r3,r1
+ 645 013c 1446     	 mov r4,r2
+ 646 013e 1D46     	 mov r5,r3
+ 647 0140 414B     	 ldr r3,.L14+80
+ 648 0142 1B88     	 ldrh r3,[r3]
+ 649 0144 1A46     	 mov r2,r3
+ 650 0146 414B     	 ldr r3,.L14+84
+ 651 0148 33F81230 	 ldrh r3,[r3,r2,lsl#1]
+ 652 014c 1846     	 mov r0,r3
+ 653 014e FFF7FEFF 	 bl __aeabi_i2d
+ 654 0152 0246     	 mov r2,r0
+ 655 0154 0B46     	 mov r3,r1
+ 656 0156 2046     	 mov r0,r4
+ 657 0158 2946     	 mov r1,r5
+ 658 015a FFF7FEFF 	 bl __aeabi_dmul
+ 659 015e 0246     	 mov r2,r0
+ 660 0160 0B46     	 mov r3,r1
+ 661 0162 1446     	 mov r4,r2
+ 662 0164 1D46     	 mov r5,r3
+ 663 0166 3B46     	 mov r3,r7
+ 664 0168 1846     	 mov r0,r3
+ 665 016a 3949     	 ldr r1,.L14+88
+ 666 016c 2246     	 mov r2,r4
+ 667 016e 2B46     	 mov r3,r5
+ 668 0170 FFF7FEFF 	 bl sprintf
+ 163:../menu.c     **** 	strcat(buffer, unit_Sensor);
+ 669              	 .loc 1 163 0
+ 670 0174 3B46     	 mov r3,r7
+ 671 0176 1846     	 mov r0,r3
+ 672 0178 FFF7FEFF 	 bl strlen
+ 673 017c 0346     	 mov r3,r0
+ 674 017e 1A46     	 mov r2,r3
+ 675 0180 3B46     	 mov r3,r7
+ 676 0182 1344     	 add r3,r3,r2
+ 677 0184 334A     	 ldr r2,.L14+92
+ 678 0186 1188     	 ldrh r1,[r2]
+ 679 0188 9278     	 ldrb r2,[r2,#2]
+ 680 018a 1980     	 strh r1,[r3]
+ 681 018c 9A70     	 strb r2,[r3,#2]
+ 164:../menu.c     **** 	EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
+ 682              	 .loc 1 164 0
+ 683 018e 3B46     	 mov r3,r7
+ 684 0190 0093     	 str r3,[sp]
+ 685 0192 4FF4EB70 	 mov r0,#470
+ 686 0196 1921     	 movs r1,#25
+ 687 0198 1A22     	 movs r2,#26
+ 688 019a 4FF40063 	 mov r3,#2048
+ 689 019e FFF7FEFF 	 bl EVE_cmd_text_burst
+ 165:../menu.c     **** 
+ 166:../menu.c     **** 
+ 167:../menu.c     **** 
+ 168:../menu.c     **** 	/////////////// GRAPH
+ 169:../menu.c     **** 	///// Print dynamic part of the Graph (data & marker)
+ 170:../menu.c     **** 	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE
+ 690              	 .loc 1 170 0
+ 691 01a2 2D4B     	 ldr r3,.L14+96
+ 692 01a4 B3F800E0 	 ldrh lr,[r3]
+ 693 01a8 2C4B     	 ldr r3,.L14+100
+ 694 01aa 1E88     	 ldrh r6,[r3]
+ 695 01ac 2C4B     	 ldr r3,.L14+104
+ 696 01ae 1D88     	 ldrh r5,[r3]
+ 697 01b0 2C4B     	 ldr r3,.L14+108
+ 698 01b2 1C88     	 ldrh r4,[r3]
+ 699 01b4 234B     	 ldr r3,.L14+76
+ 700 01b6 D3E90023 	 ldrd r2,[r3]
+ 701 01ba 1A49     	 ldr r1,.L14+44
+ 702 01bc 0988     	 ldrh r1,[r1]
+ 703 01be C9B2     	 uxtb r1,r1
+ 704 01c0 0A20     	 movs r0,#10
+ 705 01c2 0090     	 str r0,[sp]
+ 706 01c4 CDE90223 	 strd r2,[sp,#8]
+ 707 01c8 204B     	 ldr r3,.L14+84
+ 708 01ca 0493     	 str r3,[sp,#16]
+ 709 01cc 4FF4DC73 	 mov r3,#440
+ 710 01d0 0593     	 str r3,[sp,#20]
+ 711 01d2 1D4B     	 ldr r3,.L14+80
+ 712 01d4 0693     	 str r3,[sp,#24]
+ 713 01d6 0791     	 str r1,[sp,#28]
+ 714 01d8 43F69E73 	 movw r3,#16286
+ 715 01dc 0893     	 str r3,[sp,#32]
+ 716 01de 4FF47F03 	 mov r3,#16711680
+ 717 01e2 0993     	 str r3,[sp,#36]
+ 718 01e4 7046     	 mov r0,lr
+ 719 01e6 3146     	 mov r1,r6
+ 720 01e8 2A46     	 mov r2,r5
+ 721 01ea 2346     	 mov r3,r4
+ 722 01ec FFF7FEFF 	 bl TFT_GraphData
+ 171:../menu.c     **** 
+ 172:../menu.c     **** }
+ 723              	 .loc 1 172 0
+ 724 01f0 2437     	 adds r7,r7,#36
+ 725              	.LCFI11:
+ 726              	 .cfi_def_cfa_offset 20
+ 727 01f2 BD46     	 mov sp,r7
+ 728              	.LCFI12:
+ 729              	 .cfi_def_cfa_register 13
+ 730              	 
+ 731 01f4 F0BD     	 pop {r4,r5,r6,r7,pc}
+ 732              	.L15:
+ 733 01f6 00BF     	 .align 2
+ 734              	.L14:
+ 735 01f8 124B8C00 	 .word 9194258
+ 736 01fc EEF8FF04 	 .word 83884270
+ 737 0200 2BA9EA00 	 .word 15378731
+ 738 0204 6696AD00 	 .word 11376230
+ 739 0208 0D000003 	 .word 50331661
+ 740 020c 00000000 	 .word InputType
+ 741 0210 1C000000 	 .word .LC4
+ 742 0214 24000000 	 .word .LC5
+ 743 0218 28000000 	 .word .LC6
+ 744 021c 2C000000 	 .word .LC7
+ 745 0220 0C000003 	 .word 50331660
+ 746 0224 00000000 	 .word toggle_state_graphmode
+ 747 0228 34000000 	 .word .LC8
+ 748 022c 3C000000 	 .word .LC9
+ 749 0230 0A000003 	 .word 50331658
+ 750 0234 00000000 	 .word toggle_state_dimmer
+ 751 0238 44000000 	 .word .LC10
+ 752 023c 00000000 	 .word display_list_size
+ 753 0240 00000000 	 .word G_amp_max
+ 754 0244 00000000 	 .word G_y_max
+ 755 0248 00000000 	 .word InputBuffer1_idx
+ 756 024c 00000000 	 .word InputBuffer1
+ 757 0250 4C000000 	 .word .LC11
+ 758 0254 54000000 	 .word .LC12
+ 759 0258 00000000 	 .word G_x
+ 760 025c 00000000 	 .word G_y
+ 761 0260 00000000 	 .word G_width
+ 762 0264 00000000 	 .word G_height
+ 763              	 .cfi_endproc
+ 764              	.LFE496:
+ 766              	 .section .rodata
+ 767 0057 00       	 .align 2
+ 768              	.LC13:
+ 769 0058 6C6900   	 .ascii "li\000"
+ 770 005b 00       	 .align 2
+ 771              	.LC14:
+ 772 005c 726500   	 .ascii "re\000"
+ 773              	 .section .text.TFT_display_menu1,"ax",%progbits
+ 774              	 .align 2
+ 775              	 .global TFT_display_menu1
+ 776              	 .thumb
+ 777              	 .thumb_func
+ 779              	TFT_display_menu1:
+ 780              	.LFB497:
+ 173:../menu.c     **** void TFT_display_menu1(void)
+ 174:../menu.c     **** {
+ 781              	 .loc 1 174 0
+ 782              	 .cfi_startproc
+ 783              	 
+ 784              	 
+ 785 0000 80B5     	 push {r7,lr}
+ 786              	.LCFI13:
+ 787              	 .cfi_def_cfa_offset 8
+ 788              	 .cfi_offset 7,-8
+ 789              	 .cfi_offset 14,-4
+ 790 0002 84B0     	 sub sp,sp,#16
+ 791              	.LCFI14:
+ 792              	 .cfi_def_cfa_offset 24
+ 793 0004 04AF     	 add r7,sp,#16
+ 794              	.LCFI15:
+ 795              	 .cfi_def_cfa 7,8
+ 175:../menu.c     **** 	/// Test menu
+ 176:../menu.c     **** 
+ 177:../menu.c     **** 	// Get size of last display list to be printed on screen (section "Debug Values")
+ 178:../menu.c     **** 	display_list_size = EVE_memRead16(REG_CMD_DL);
+ 796              	 .loc 1 178 0
+ 797 0006 2C48     	 ldr r0,.L19
+ 798 0008 FFF7FEFF 	 bl EVE_memRead16
+ 799 000c 0346     	 mov r3,r0
+ 800 000e 1A46     	 mov r2,r3
+ 801 0010 2A4B     	 ldr r3,.L19+4
+ 802 0012 1A80     	 strh r2,[r3]
+ 179:../menu.c     **** 	tracker = EVE_memRead32(REG_TRACKER);
+ 803              	 .loc 1 179 0
+ 804 0014 2A48     	 ldr r0,.L19+8
+ 805 0016 FFF7FEFF 	 bl EVE_memRead32
+ 806 001a 0246     	 mov r2,r0
+ 807 001c 294B     	 ldr r3,.L19+12
+ 808 001e 1A60     	 str r2,[r3]
+ 180:../menu.c     **** 
+ 181:../menu.c     **** 
+ 182:../menu.c     **** 	/////////////// Display BUTTONS and Toggles
+ 183:../menu.c     **** 	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+ 809              	 .loc 1 183 0
+ 810 0020 2948     	 ldr r0,.L19+16
+ 811 0022 FFF7FEFF 	 bl EVE_cmd_gradcolor_burst
+ 184:../menu.c     **** 	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+ 812              	 .loc 1 184 0
+ 813 0026 2948     	 ldr r0,.L19+20
+ 814 0028 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 185:../menu.c     **** 	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+ 815              	 .loc 1 185 0
+ 816 002c 2848     	 ldr r0,.L19+24
+ 817 002e FFF7FEFF 	 bl EVE_cmd_fgcolor_burst
+ 186:../menu.c     **** 	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+ 818              	 .loc 1 186 0
+ 819 0032 2848     	 ldr r0,.L19+28
+ 820 0034 FFF7FEFF 	 bl EVE_cmd_bgcolor_burst
+ 187:../menu.c     **** 
+ 188:../menu.c     **** 	EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
+ 821              	 .loc 1 188 0
+ 822 0038 2748     	 ldr r0,.L19+32
+ 823 003a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 189:../menu.c     **** 	if(toggle_state_graphmode){
+ 824              	 .loc 1 189 0
+ 825 003e 274B     	 ldr r3,.L19+36
+ 826 0040 1B88     	 ldrh r3,[r3]
+ 827 0042 002B     	 cmp r3,#0
+ 828 0044 0DD0     	 beq .L17
+ 190:../menu.c     **** 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "li");
+ 829              	 .loc 1 190 0
+ 830 0046 0023     	 movs r3,#0
+ 831 0048 0093     	 str r3,[sp]
+ 832 004a 4FF6FF73 	 movw r3,#65535
+ 833 004e 0193     	 str r3,[sp,#4]
+ 834 0050 234B     	 ldr r3,.L19+40
+ 835 0052 0293     	 str r3,[sp,#8]
+ 836 0054 7820     	 movs r0,#120
+ 837 0056 1821     	 movs r1,#24
+ 838 0058 3E22     	 movs r2,#62
+ 839 005a 1B23     	 movs r3,#27
+ 840 005c FFF7FEFF 	 bl EVE_cmd_toggle_burst
+ 841 0060 0BE0     	 b .L18
+ 842              	.L17:
+ 191:../menu.c     **** 	}
+ 192:../menu.c     **** 	else{
+ 193:../menu.c     **** 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "re");
+ 843              	 .loc 1 193 0
+ 844 0062 0023     	 movs r3,#0
+ 845 0064 0093     	 str r3,[sp]
+ 846 0066 0023     	 movs r3,#0
+ 847 0068 0193     	 str r3,[sp,#4]
+ 848 006a 1E4B     	 ldr r3,.L19+44
+ 849 006c 0293     	 str r3,[sp,#8]
+ 850 006e 7820     	 movs r0,#120
+ 851 0070 1821     	 movs r1,#24
+ 852 0072 3E22     	 movs r2,#62
+ 853 0074 1B23     	 movs r3,#27
+ 854 0076 FFF7FEFF 	 bl EVE_cmd_toggle_burst
+ 855              	.L18:
+ 194:../menu.c     **** 	}
+ 195:../menu.c     **** 
+ 196:../menu.c     **** 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+ 856              	 .loc 1 196 0
+ 857 007a 4FF04070 	 mov r0,#50331648
+ 858 007e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 197:../menu.c     **** 
+ 198:../menu.c     **** 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
+ 859              	 .loc 1 198 0
+ 860 0082 1948     	 ldr r0,.L19+48
+ 861 0084 FFF7FEFF 	 bl EVE_cmd_fgcolor_burst
+ 199:../menu.c     **** 
+ 200:../menu.c     **** 	EVE_cmd_int_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
+ 862              	 .loc 1 200 0
+ 863 0088 184B     	 ldr r3,.L19+52
+ 864 008a 1B68     	 ldr r3,[r3]
+ 865 008c 0093     	 str r3,[sp]
+ 866 008e 4FF4EB70 	 mov r0,#470
+ 867 0092 0A21     	 movs r1,#10
+ 868 0094 1A22     	 movs r2,#26
+ 869 0096 4FF40063 	 mov r3,#2048
+ 870 009a FFF7FEFF 	 bl EVE_cmd_int_burst
+ 201:../menu.c     **** 	EVE_cmd_int_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+ 871              	 .loc 1 201 0
+ 872 009e 144B     	 ldr r3,.L19+56
+ 873 00a0 1B68     	 ldr r3,[r3]
+ 874 00a2 0093     	 str r3,[sp]
+ 875 00a4 4FF4EB70 	 mov r0,#470
+ 876 00a8 1921     	 movs r1,#25
+ 877 00aa 1A22     	 movs r2,#26
+ 878 00ac 4FF40063 	 mov r3,#2048
+ 879 00b0 FFF7FEFF 	 bl EVE_cmd_int_burst
+ 202:../menu.c     **** 	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
+ 203:../menu.c     **** 	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+ 204:../menu.c     **** 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
+ 205:../menu.c     **** }
+ 880              	 .loc 1 205 0
+ 881 00b4 BD46     	 mov sp,r7
+ 882              	.LCFI16:
+ 883              	 .cfi_def_cfa_register 13
+ 884              	 
+ 885 00b6 80BD     	 pop {r7,pc}
+ 886              	.L20:
+ 887              	 .align 2
+ 888              	.L19:
+ 889 00b8 00213000 	 .word 3154176
+ 890 00bc 00000000 	 .word display_list_size
+ 891 00c0 00903000 	 .word 3182592
+ 892 00c4 00000000 	 .word tracker
+ 893 00c8 124B8C00 	 .word 9194258
+ 894 00cc EEF8FF04 	 .word 83884270
+ 895 00d0 2BA9EA00 	 .word 15378731
+ 896 00d4 6696AD00 	 .word 11376230
+ 897 00d8 0C000003 	 .word 50331660
+ 898 00dc 00000000 	 .word toggle_state_graphmode
+ 899 00e0 58000000 	 .word .LC13
+ 900 00e4 5C000000 	 .word .LC14
+ 901 00e8 29CDF300 	 .word 15977769
+ 902 00ec 00000000 	 .word swipeDistance_X
+ 903 00f0 00000000 	 .word swipeDistance_Y
+ 904              	 .cfi_endproc
+ 905              	.LFE497:
+ 907              	 .section .rodata
+ 908 005f 00       	 .align 2
+ 909              	.LC15:
+ 910 0060 42757474 	 .ascii "Button Dimmer touched\000"
+ 910      6F6E2044 
+ 910      696D6D65 
+ 910      7220746F 
+ 910      75636865 
+ 911 0076 0000     	 .align 2
+ 912              	.LC16:
+ 913 0078 546F6767 	 .ascii "Toggle Roll touched\000"
+ 913      6C652052 
+ 913      6F6C6C20 
+ 913      746F7563 
+ 913      68656400 
+ 914              	 .align 2
+ 915              	.LC17:
+ 916 008c 53776974 	 .ascii "Switch Signal\000"
+ 916      63682053 
+ 916      69676E61 
+ 916      6C00
+ 917              	 .section .text.TFT_touch_menu0,"ax",%progbits
+ 918              	 .align 2
+ 919              	 .global TFT_touch_menu0
+ 920              	 .thumb
+ 921              	 .thumb_func
+ 923              	TFT_touch_menu0:
+ 924              	.LFB498:
+ 206:../menu.c     **** 
+ 207:../menu.c     **** void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDi
+ 925              	 .loc 1 207 0
+ 926              	 .cfi_startproc
+ 927              	 
+ 928              	 
+ 929 0000 80B5     	 push {r7,lr}
+ 930              	.LCFI17:
+ 931              	 .cfi_def_cfa_offset 8
+ 932              	 .cfi_offset 7,-8
+ 933              	 .cfi_offset 14,-4
+ 934 0002 84B0     	 sub sp,sp,#16
+ 935              	.LCFI18:
+ 936              	 .cfi_def_cfa_offset 24
+ 937 0004 00AF     	 add r7,sp,#0
+ 938              	.LCFI19:
+ 939              	 .cfi_def_cfa_register 7
+ 940 0006 BA60     	 str r2,[r7,#8]
+ 941 0008 7B60     	 str r3,[r7,#4]
+ 942 000a 0346     	 mov r3,r0
+ 943 000c FB73     	 strb r3,[r7,#15]
+ 944 000e 0B46     	 mov r3,r1
+ 945 0010 BB73     	 strb r3,[r7,#14]
+ 208:../menu.c     **** 	// Determine which tag was touched
+ 209:../menu.c     **** 	switch(tag)
+ 946              	 .loc 1 209 0
+ 947 0012 FB7B     	 ldrb r3,[r7,#15]
+ 948 0014 0C2B     	 cmp r3,#12
+ 949 0016 23D0     	 beq .L23
+ 950 0018 0D2B     	 cmp r3,#13
+ 951 001a 38D0     	 beq .L24
+ 952 001c 0A2B     	 cmp r3,#10
+ 953 001e 50D1     	 bne .L21
+ 210:../menu.c     **** 	{
+ 211:../menu.c     **** 		// dimmer button on top as on/off radio-switch
+ 212:../menu.c     **** 		case 10:
+ 213:../menu.c     **** 			if(toggle_lock == 0) {
+ 954              	 .loc 1 213 0
+ 955 0020 294B     	 ldr r3,.L31
+ 956 0022 1B78     	 ldrb r3,[r3]
+ 957 0024 002B     	 cmp r3,#0
+ 958 0026 1AD1     	 bne .L26
+ 214:../menu.c     **** 				printf("Button Dimmer touched\n");
+ 959              	 .loc 1 214 0
+ 960 0028 2848     	 ldr r0,.L31+4
+ 961 002a FFF7FEFF 	 bl puts
+ 215:../menu.c     **** 				toggle_lock = 42;
+ 962              	 .loc 1 215 0
+ 963 002e 264B     	 ldr r3,.L31
+ 964 0030 2A22     	 movs r2,#42
+ 965 0032 1A70     	 strb r2,[r3]
+ 216:../menu.c     **** 				if(toggle_state_dimmer == 0){
+ 966              	 .loc 1 216 0
+ 967 0034 264B     	 ldr r3,.L31+8
+ 968 0036 1B88     	 ldrh r3,[r3]
+ 969 0038 002B     	 cmp r3,#0
+ 970 003a 08D1     	 bne .L27
+ 217:../menu.c     **** 					toggle_state_dimmer = EVE_OPT_FLAT;
+ 971              	 .loc 1 217 0
+ 972 003c 244B     	 ldr r3,.L31+8
+ 973 003e 4FF48072 	 mov r2,#256
+ 974 0042 1A80     	 strh r2,[r3]
+ 218:../menu.c     **** 					EVE_memWrite8(REG_PWM_DUTY, 0x01);	/* setup backlight, range is from 0 = off to 0x80 = max */
+ 975              	 .loc 1 218 0
+ 976 0044 2348     	 ldr r0,.L31+12
+ 977 0046 0121     	 movs r1,#1
+ 978 0048 FFF7FEFF 	 bl EVE_memWrite8
+ 979 004c 07E0     	 b .L26
+ 980              	.L27:
+ 219:../menu.c     **** 				}
+ 220:../menu.c     **** 				else {
+ 221:../menu.c     **** 					toggle_state_dimmer = 0;
+ 981              	 .loc 1 221 0
+ 982 004e 204B     	 ldr r3,.L31+8
+ 983 0050 0022     	 movs r2,#0
+ 984 0052 1A80     	 strh r2,[r3]
+ 222:../menu.c     **** 					EVE_memWrite8(REG_PWM_DUTY, 0x80);	/* setup backlight, range is from 0 = off to 0x80 = max */
+ 985              	 .loc 1 222 0
+ 986 0054 1F48     	 ldr r0,.L31+12
+ 987 0056 8021     	 movs r1,#128
+ 988 0058 FFF7FEFF 	 bl EVE_memWrite8
+ 223:../menu.c     **** 				}
+ 224:../menu.c     **** 			}
+ 225:../menu.c     **** 			break;
+ 989              	 .loc 1 225 0
+ 990 005c 31E0     	 b .L21
+ 991              	.L26:
+ 992 005e 30E0     	 b .L21
+ 993              	.L23:
+ 226:../menu.c     **** 		// roll/frame mode toggle on top
+ 227:../menu.c     **** 		case 12:
+ 228:../menu.c     **** 			if(toggle_lock == 0) {
+ 994              	 .loc 1 228 0
+ 995 0060 194B     	 ldr r3,.L31
+ 996 0062 1B78     	 ldrb r3,[r3]
+ 997 0064 002B     	 cmp r3,#0
+ 998 0066 11D1     	 bne .L28
+ 229:../menu.c     **** 				printf("Toggle Roll touched\n");
+ 999              	 .loc 1 229 0
+ 1000 0068 1B48     	 ldr r0,.L31+16
+ 1001 006a FFF7FEFF 	 bl puts
+ 230:../menu.c     **** 				toggle_lock = 42;
+ 1002              	 .loc 1 230 0
+ 1003 006e 164B     	 ldr r3,.L31
+ 1004 0070 2A22     	 movs r2,#42
+ 1005 0072 1A70     	 strb r2,[r3]
+ 231:../menu.c     **** 				if(toggle_state_graphmode == 0)	{
+ 1006              	 .loc 1 231 0
+ 1007 0074 194B     	 ldr r3,.L31+20
+ 1008 0076 1B88     	 ldrh r3,[r3]
+ 1009 0078 002B     	 cmp r3,#0
+ 1010 007a 03D1     	 bne .L29
+ 232:../menu.c     **** 					toggle_state_graphmode = 1;
+ 1011              	 .loc 1 232 0
+ 1012 007c 174B     	 ldr r3,.L31+20
+ 1013 007e 0122     	 movs r2,#1
+ 1014 0080 1A80     	 strh r2,[r3]
+ 1015 0082 03E0     	 b .L28
+ 1016              	.L29:
+ 233:../menu.c     **** 				}
+ 234:../menu.c     **** 				else {
+ 235:../menu.c     **** 					toggle_state_graphmode = 0;
+ 1017              	 .loc 1 235 0
+ 1018 0084 154B     	 ldr r3,.L31+20
+ 1019 0086 0022     	 movs r2,#0
+ 1020 0088 1A80     	 strh r2,[r3]
+ 236:../menu.c     **** 				}
+ 237:../menu.c     **** 			}
+ 238:../menu.c     **** 			break;
+ 1021              	 .loc 1 238 0
+ 1022 008a 1AE0     	 b .L21
+ 1023              	.L28:
+ 1024 008c 19E0     	 b .L21
+ 1025              	.L24:
+ 239:../menu.c     **** 		// signal switcher button
+ 240:../menu.c     **** 		case 13:
+ 241:../menu.c     **** 			if(toggle_lock == 0) {
+ 1026              	 .loc 1 241 0
+ 1027 008e 0E4B     	 ldr r3,.L31
+ 1028 0090 1B78     	 ldrb r3,[r3]
+ 1029 0092 002B     	 cmp r3,#0
+ 1030 0094 14D1     	 bne .L30
+ 242:../menu.c     **** 				printf("Switch Signal\n");
+ 1031              	 .loc 1 242 0
+ 1032 0096 1248     	 ldr r0,.L31+24
+ 1033 0098 FFF7FEFF 	 bl puts
+ 243:../menu.c     **** 				toggle_lock = 42;
+ 1034              	 .loc 1 243 0
+ 1035 009c 0A4B     	 ldr r3,.L31
+ 1036 009e 2A22     	 movs r2,#42
+ 1037 00a0 1A70     	 strb r2,[r3]
+ 244:../menu.c     **** 				InputType++;
+ 1038              	 .loc 1 244 0
+ 1039 00a2 104B     	 ldr r3,.L31+28
+ 1040 00a4 1B78     	 ldrb r3,[r3]
+ 1041 00a6 DBB2     	 uxtb r3,r3
+ 1042 00a8 0133     	 adds r3,r3,#1
+ 1043 00aa DAB2     	 uxtb r2,r3
+ 1044 00ac 0D4B     	 ldr r3,.L31+28
+ 1045 00ae 1A70     	 strb r2,[r3]
+ 245:../menu.c     **** 				if(InputType > 3){ InputType = 0; }
+ 1046              	 .loc 1 245 0
+ 1047 00b0 0C4B     	 ldr r3,.L31+28
+ 1048 00b2 1B78     	 ldrb r3,[r3]
+ 1049 00b4 DBB2     	 uxtb r3,r3
+ 1050 00b6 032B     	 cmp r3,#3
+ 1051 00b8 02D9     	 bls .L30
+ 1052              	 .loc 1 245 0 is_stmt 0 discriminator 1
+ 1053 00ba 0A4B     	 ldr r3,.L31+28
+ 1054 00bc 0022     	 movs r2,#0
+ 1055 00be 1A70     	 strb r2,[r3]
+ 1056              	.L30:
+ 246:../menu.c     **** 			}
+ 247:../menu.c     **** 			break;
+ 1057              	 .loc 1 247 0 is_stmt 1
+ 1058 00c0 00BF     	 nop
+ 1059              	.L21:
+ 248:../menu.c     **** 	}
+ 249:../menu.c     **** }
+ 1060              	 .loc 1 249 0
+ 1061 00c2 1037     	 adds r7,r7,#16
+ 1062              	.LCFI20:
+ 1063              	 .cfi_def_cfa_offset 8
+ 1064 00c4 BD46     	 mov sp,r7
+ 1065              	.LCFI21:
+ 1066              	 .cfi_def_cfa_register 13
+ 1067              	 
+ 1068 00c6 80BD     	 pop {r7,pc}
+ 1069              	.L32:
+ 1070              	 .align 2
+ 1071              	.L31:
+ 1072 00c8 00000000 	 .word toggle_lock
+ 1073 00cc 60000000 	 .word .LC15
+ 1074 00d0 00000000 	 .word toggle_state_dimmer
+ 1075 00d4 D4203000 	 .word 3154132
+ 1076 00d8 78000000 	 .word .LC16
+ 1077 00dc 00000000 	 .word toggle_state_graphmode
+ 1078 00e0 8C000000 	 .word .LC17
+ 1079 00e4 00000000 	 .word InputType
+ 1080              	 .cfi_endproc
+ 1081              	.LFE498:
+ 1083              	 .section .rodata
+ 1084 009a 0000     	 .align 2
+ 1085              	.LC18:
+ 1086 009c 546F6767 	 .ascii "Toggle li/re touched\000"
+ 1086      6C65206C 
+ 1086      692F7265 
+ 1086      20746F75 
+ 1086      63686564 
+ 1087 00b1 000000   	 .section .text.TFT_touch_menu1,"ax",%progbits
+ 1088              	 .align 2
+ 1089              	 .global TFT_touch_menu1
+ 1090              	 .thumb
+ 1091              	 .thumb_func
+ 1093              	TFT_touch_menu1:
+ 1094              	.LFB499:
+ 250:../menu.c     **** void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDi
+ 1095              	 .loc 1 250 0
+ 1096              	 .cfi_startproc
+ 1097              	 
+ 1098              	 
+ 1099 0000 80B5     	 push {r7,lr}
+ 1100              	.LCFI22:
+ 1101              	 .cfi_def_cfa_offset 8
+ 1102              	 .cfi_offset 7,-8
+ 1103              	 .cfi_offset 14,-4
+ 1104 0002 84B0     	 sub sp,sp,#16
+ 1105              	.LCFI23:
+ 1106              	 .cfi_def_cfa_offset 24
+ 1107 0004 00AF     	 add r7,sp,#0
+ 1108              	.LCFI24:
+ 1109              	 .cfi_def_cfa_register 7
+ 1110 0006 BA60     	 str r2,[r7,#8]
+ 1111 0008 7B60     	 str r3,[r7,#4]
+ 1112 000a 0346     	 mov r3,r0
+ 1113 000c FB73     	 strb r3,[r7,#15]
+ 1114 000e 0B46     	 mov r3,r1
+ 1115 0010 BB73     	 strb r3,[r7,#14]
+ 251:../menu.c     **** 	// Determine which tag was touched
+ 252:../menu.c     **** 	switch(tag)
+ 1116              	 .loc 1 252 0
+ 1117 0012 FB7B     	 ldrb r3,[r7,#15]
+ 1118 0014 002B     	 cmp r3,#0
+ 1119 0016 02D0     	 beq .L35
+ 1120 0018 0C2B     	 cmp r3,#12
+ 1121 001a 04D0     	 beq .L36
+ 1122 001c 19E0     	 b .L33
+ 1123              	.L35:
+ 253:../menu.c     **** 	{
+ 254:../menu.c     **** 		// nothing touched - reset states and locks
+ 255:../menu.c     **** 		case 0:
+ 256:../menu.c     **** 			toggle_lock = 0;
+ 1124              	 .loc 1 256 0
+ 1125 001e 0E4B     	 ldr r3,.L39
+ 1126 0020 0022     	 movs r2,#0
+ 1127 0022 1A70     	 strb r2,[r3]
+ 257:../menu.c     **** 			break;
+ 1128              	 .loc 1 257 0
+ 1129 0024 15E0     	 b .L33
+ 1130              	.L36:
+ 258:../menu.c     **** 		// li/re mode toggle on top
+ 259:../menu.c     **** 		case 12:
+ 260:../menu.c     **** 			if(toggle_lock == 0) {
+ 1131              	 .loc 1 260 0
+ 1132 0026 0C4B     	 ldr r3,.L39
+ 1133 0028 1B78     	 ldrb r3,[r3]
+ 1134 002a 002B     	 cmp r3,#0
+ 1135 002c 10D1     	 bne .L37
+ 261:../menu.c     **** 				printf("Toggle li/re touched\n");
+ 1136              	 .loc 1 261 0
+ 1137 002e 0B48     	 ldr r0,.L39+4
+ 1138 0030 FFF7FEFF 	 bl puts
+ 262:../menu.c     **** 				toggle_lock = 42;
+ 1139              	 .loc 1 262 0
+ 1140 0034 084B     	 ldr r3,.L39
+ 1141 0036 2A22     	 movs r2,#42
+ 1142 0038 1A70     	 strb r2,[r3]
+ 263:../menu.c     **** 				if(toggle_state_graphmode == 0)	{
+ 1143              	 .loc 1 263 0
+ 1144 003a 094B     	 ldr r3,.L39+8
+ 1145 003c 1B88     	 ldrh r3,[r3]
+ 1146 003e 002B     	 cmp r3,#0
+ 1147 0040 03D1     	 bne .L38
+ 264:../menu.c     **** 					toggle_state_graphmode = 1;
+ 1148              	 .loc 1 264 0
+ 1149 0042 074B     	 ldr r3,.L39+8
+ 1150 0044 0122     	 movs r2,#1
+ 1151 0046 1A80     	 strh r2,[r3]
+ 1152 0048 02E0     	 b .L37
+ 1153              	.L38:
+ 265:../menu.c     **** 				}
+ 266:../menu.c     **** 				else {
+ 267:../menu.c     **** 					toggle_state_graphmode = 0;
+ 1154              	 .loc 1 267 0
+ 1155 004a 054B     	 ldr r3,.L39+8
+ 1156 004c 0022     	 movs r2,#0
+ 1157 004e 1A80     	 strh r2,[r3]
+ 1158              	.L37:
+ 268:../menu.c     **** 				}
+ 269:../menu.c     **** 			}
+ 270:../menu.c     **** 			break;
+ 1159              	 .loc 1 270 0
+ 1160 0050 00BF     	 nop
+ 1161              	.L33:
+ 271:../menu.c     **** 	}
+ 272:../menu.c     **** 
+ 273:../menu.c     **** 	//// If the user swiped more on x-axis he probably wants to swipe left/right
+ 274:../menu.c     **** 	//if(abs(swipeDistance_X) > abs(swipeDistance_Y)){
+ 275:../menu.c     **** 	//	if(swipeDistance_X > 50)      	// swipe to left
+ 276:../menu.c     **** 	//		swipeDetect = Left;
+ 277:../menu.c     **** 	//	else if(swipeDistance_X < -50)	// swipe to right
+ 278:../menu.c     **** 	//		swipeDetect = Right;
+ 279:../menu.c     **** 	//	else
+ 280:../menu.c     **** 	//		swipeDetect = None;
+ 281:../menu.c     **** 	//}
+ 282:../menu.c     **** 	//// If the user swiped more on y-axis he probably wants to swipe up/down
+ 283:../menu.c     **** 	//else{
+ 284:../menu.c     **** 	//	if(swipeDistance_Y > 50)		// swipe down
+ 285:../menu.c     **** 	//		swipeDetect = Down;
+ 286:../menu.c     **** 	//	else if(swipeDistance_Y < -50)	// swipe up
+ 287:../menu.c     **** 	//		swipeDetect = Up;
+ 288:../menu.c     **** 	//	else
+ 289:../menu.c     **** 	//		swipeDetect = None;
+ 290:../menu.c     **** 	//}
+ 291:../menu.c     **** 
+ 292:../menu.c     **** 
+ 293:../menu.c     **** }
+ 1162              	 .loc 1 293 0
+ 1163 0052 1037     	 adds r7,r7,#16
+ 1164              	.LCFI25:
+ 1165              	 .cfi_def_cfa_offset 8
+ 1166 0054 BD46     	 mov sp,r7
+ 1167              	.LCFI26:
+ 1168              	 .cfi_def_cfa_register 13
+ 1169              	 
+ 1170 0056 80BD     	 pop {r7,pc}
+ 1171              	.L40:
+ 1172              	 .align 2
+ 1173              	.L39:
+ 1174 0058 00000000 	 .word toggle_lock
+ 1175 005c 9C000000 	 .word .LC18
+ 1176 0060 00000000 	 .word toggle_state_graphmode
+ 1177              	 .cfi_endproc
+ 1178              	.LFE499:
+ 1180              	 .text
+ 1181              	.Letext0:
+ 1182              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1183              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 1184              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_gpio.h"
+ 1185              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 1186              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 1187              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_spi.h"
+ 1188              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master.h"
+ 1189              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io.h"
+ 1190              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
+ 1191              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 1192              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 1193              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 1194              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master_extern.h"
+ 1195              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 1196              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
+ 1197              	 .file 17 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_target.h"
+ 1198              	 .file 18 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 menu.c
+                            *COM*:00000004 _msCounter
+                            *COM*:00000001 tft_tick
+                            *COM*:00000004 MeasurementCounter
+                            *COM*:00000002 InputBuffer1_idx
+                            *COM*:00000001 InputType
+                            *COM*:00000001 frameover
+                            *COM*:00000001 ReadData
+                            *COM*:00000004 swipeDistance_X
+                            *COM*:00000004 swipeDistance_Y
+    {standard input}:33     .data.G_x:00000000 G_x
+    {standard input}:30     .data.G_x:00000000 $d
+    {standard input}:40     .data.G_y:00000000 G_y
+    {standard input}:37     .data.G_y:00000000 $d
+    {standard input}:47     .data.G_width:00000000 G_width
+    {standard input}:44     .data.G_width:00000000 $d
+    {standard input}:54     .data.G_height:00000000 G_height
+    {standard input}:51     .data.G_height:00000000 $d
+    {standard input}:61     .rodata.unit_Sensor:00000000 unit_Sensor
+    {standard input}:58     .rodata.unit_Sensor:00000000 $d
+    {standard input}:68     .data.G_amp_max:00000000 G_amp_max
+    {standard input}:65     .data.G_amp_max:00000000 $d
+    {standard input}:76     .data.G_t_max:00000000 G_t_max
+    {standard input}:73     .data.G_t_max:00000000 $d
+    {standard input}:84     .data.G_y_max:00000000 G_y_max
+    {standard input}:81     .data.G_y_max:00000000 $d
+    {standard input}:92     .data.G_h_grid_lines:00000000 G_h_grid_lines
+    {standard input}:89     .data.G_h_grid_lines:00000000 $d
+    {standard input}:100    .data.G_v_grid_lines:00000000 G_v_grid_lines
+    {standard input}:97     .data.G_v_grid_lines:00000000 $d
+    {standard input}:107    .bss.toggle_lock:00000000 toggle_lock
+    {standard input}:108    .bss.toggle_lock:00000000 $d
+    {standard input}:114    .bss.toggle_state_graphmode:00000000 toggle_state_graphmode
+    {standard input}:111    .bss.toggle_state_graphmode:00000000 $d
+    {standard input}:121    .bss.toggle_state_dimmer:00000000 toggle_state_dimmer
+    {standard input}:118    .bss.toggle_state_dimmer:00000000 $d
+    {standard input}:128    .bss.display_list_size:00000000 display_list_size
+    {standard input}:125    .bss.display_list_size:00000000 $d
+    {standard input}:135    .bss.tracker:00000000 tracker
+    {standard input}:132    .bss.tracker:00000000 $d
+    {standard input}:138    .rodata:00000000 $d
+    {standard input}:145    .text.TFT_display_static_menu0:00000000 $t
+    {standard input}:150    .text.TFT_display_static_menu0:00000000 TFT_display_static_menu0
+    {standard input}:282    .text.TFT_display_static_menu0:000000f4 $d
+    {standard input}:313    .text.TFT_display_static_menu1:00000000 $t
+    {standard input}:318    .text.TFT_display_static_menu1:00000000 TFT_display_static_menu1
+    {standard input}:414    .text.TFT_display_static_menu1:000000a0 $d
+    {standard input}:461    .text.TFT_display_menu0:00000000 $t
+    {standard input}:466    .text.TFT_display_menu0:00000000 TFT_display_menu0
+    {standard input}:735    .text.TFT_display_menu0:000001f8 $d
+    {standard input}:774    .text.TFT_display_menu1:00000000 $t
+    {standard input}:779    .text.TFT_display_menu1:00000000 TFT_display_menu1
+    {standard input}:889    .text.TFT_display_menu1:000000b8 $d
+    {standard input}:918    .text.TFT_touch_menu0:00000000 $t
+    {standard input}:923    .text.TFT_touch_menu0:00000000 TFT_touch_menu0
+    {standard input}:1072   .text.TFT_touch_menu0:000000c8 $d
+    {standard input}:1088   .text.TFT_touch_menu1:00000000 $t
+    {standard input}:1093   .text.TFT_touch_menu1:00000000 TFT_touch_menu1
+    {standard input}:1174   .text.TFT_touch_menu1:00000058 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+EVE_cmd_dl
+EVE_cmd_text
+TFT_GraphStatic
+__aeabi_ddiv
+__aeabi_i2d
+__aeabi_dmul
+EVE_cmd_gradcolor_burst
+EVE_cmd_dl_burst
+EVE_cmd_fgcolor_burst
+EVE_cmd_bgcolor_burst
+EVE_cmd_button_burst
+EVE_cmd_toggle_burst
+EVE_cmd_number_burst
+sprintf
+strlen
+EVE_cmd_text_burst
+TFT_GraphData
+InputBuffer1
+EVE_memRead16
+EVE_memRead32
+EVE_cmd_int_burst
+puts
+EVE_memWrite8

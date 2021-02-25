@@ -6,17 +6,23 @@
 C_SRCS += \
 ../globals.c \
 ../main.c \
-../measure.c 
+../measure.c \
+../menu.c \
+../record.c 
 
 OBJS += \
 ./globals.o \
 ./main.o \
-./measure.o 
+./measure.o \
+./menu.o \
+./record.o 
 
 C_DEPS += \
 ./globals.d \
 ./main.d \
-./measure.d 
+./measure.d \
+./menu.d \
+./record.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

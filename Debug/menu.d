@@ -1,6 +1,4 @@
-Libraries/FT800-FT813-5.x/tft.o \
- Libraries/FT800-FT813-5.x/tft.d Libraries/FT800-FT813-5.x/tft.o: \
- ../Libraries/FT800-FT813-5.x/tft.c \
+menu.o menu.d menu.o: ../menu.c \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_common.h \
@@ -77,12 +75,12 @@ Libraries/FT800-FT813-5.x/tft.o \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SDMMC_BLOCK/SDMMC_BLOCK.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/RTC/rtc.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/FATFS/fatfs_extern.h \
- ../Libraries/FT800-FT813-5.x/EVE.h \
- ../Libraries/FT800-FT813-5.x/EVE_target.h \
- ../Libraries/FT800-FT813-5.x/EVE_config.h \
- ../Libraries/FT800-FT813-5.x/EVE_commands.h \
- ../Libraries/FT800-FT813-5.x/tft_data.h \
- C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/menu.h
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_target.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_config.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_commands.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h \
+ ../record.h ../menu.h
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h:
 
@@ -236,14 +234,16 @@ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/RTC/rtc.h:
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/FATFS/fatfs_extern.h:
 
-../Libraries/FT800-FT813-5.x/EVE.h:
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE.h:
 
-../Libraries/FT800-FT813-5.x/EVE_target.h:
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_target.h:
 
-../Libraries/FT800-FT813-5.x/EVE_config.h:
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_config.h:
 
-../Libraries/FT800-FT813-5.x/EVE_commands.h:
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/EVE_commands.h:
 
-../Libraries/FT800-FT813-5.x/tft_data.h:
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h:
 
-C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/menu.h:
+../record.h:
+
+../menu.h:
