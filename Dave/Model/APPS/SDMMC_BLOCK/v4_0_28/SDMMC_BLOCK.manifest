@@ -1,0 +1,497 @@
+package Model.APPS.SDMMC_BLOCK.v4_0_28;
+
+
+/*
+ Copyright (c) 2016-2019, Infineon Technologies AG
+ All rights reserved.
+											
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ following conditions are met:
+																			 
+ Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ disclaimer.
+  
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ disclaimer in the documentation and/or other materials provided with the distribution.
+  
+ Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ products derived from this software without specific prior written permission.
+																			 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+																			 
+ To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes with
+ Infineon Technologies AG: dave@infineon.com. */
+
+ /*************** Revision History **********************************************
+  Version     Date          Description
+  
+  4.0.1       20-Jan-2016   Initial version for DAVEv4. <br>
+  4.0.3       05-Feb-2016   RTOS support added. <br>
+  4.0.5       08-Feb-2016   Help doc updated. <br>
+  4.0.7       11-Feb-2016   Added a check to verify that the SDMMC clock is enabled or not in the CLOCK_XMC4 APP. <br>
+                            SD mode RTOS functionality enabled. <br>
+  4.0.8       05-Apr-2016   Bug fixes and enhancements for public release. <br>
+  4.0.10      25-Apr-2016   APP help documentation, contents page updated for formatting errors. 
+  4.0.12      07-Jun-2016   Fixed code generation error for project folder paths with spaces in between. <br>
+  4.0.14      20-Jul-2016   lReadResponse(): Fixes in handling XMC_SDMMC_RESPONSE_TYPE_R2 <br>
+  4.0.16      01-Aug-2016   Code generation issue for XMC4300 device fixed. <br>
+  4.0.18      24-Aug-2016   Introduce timeout mechanism in SDMMC_BLOCK_SD_lCheckDataCommandLines() <br>
+  4.0.20      14-Feb-2017   Fix card detection issues when SDCD pin is used for other purposes.  <br>
+  4.0.22      08-Jun-2017   Fix SDMMC_BLOCK_SD_GetSectorCount() for Standard Capacity cards.  <br>
+  4.0.24      08-Aug-2018   XMC43/XMC47/XMC48 Fix card write protection status when SDWP pin is used for other purposes.  <br>
+  4.0.26      09-Nov-2018   Fixed code generation for SPI mode and XMC1 family <br>
+                            Fixed SDMMC_BLOCK_SD_GetSectorCount()
+  4.0.28      06-Jun-2019   Fixed SDMMC_BLOCK_SPI_GetSectorCount() and SDMMC_BLOCK_SD_GetSectorCount()
+  *******************************************************************************/
+ 
+// Import statements
+import ifx.davex.app.manifest.*
+
+class  SDMMC_BLOCK extends SDMMC_BLOCK_GUI {
+	def version  = '4.0.28'
+    def categoriesDescription = ["Communication/SDMMC"] 
+	def minDaveVersion = '4.1.2'	
+	def keywords = [
+		'SDMMC',
+		'SD Card',
+		'Multimedia Card',
+		'Block device',
+		'Block Layer',
+		'File System',
+		'FATFS',
+		'all'
+	]
+	
+	def softwareIDs = [
+		"XMC4.8.*.*.*" : "1.0.0",
+		"XMC4.7.*.*.*" : "1.0.0",
+		"XMC4.5.*.*.*" : "1.0.0",
+		"XMC4.4.*.*.*" : "1.0.0",
+		"XMC4.3.*.*.*" : "1.0.0",
+		"XMC4.2.*.*.*" : "1.0.0",
+		"XMC4.1.*.*.*" : "1.0.0",
+		"XMC1.4.*.*.*" : "1.0.0",
+		"XMC1.3.*.*.*" : "1.0.0",
+		"XMC1.2.*.*.*" : "1.0.0",
+		"XMC1.1.*.*.*" : "1.0.0"	
+	]
+	
+	def singleton = false
+	def initProvider = true	
+	def deprecated = false
+	def sharable = false
+	def description = "This APP is a generic SD & MMC card block device driver designed to \ndrive SDMMC cards with all relevant functionalities \nlike writing or reading blocks of data from the card."
+	
+	MVirtualResourceGroup hwres_sdmmc_host  /* Hardware resource of SDMMC host */
+	MVirtualResourceGroup hwres_cpu_nvic_interrupt_sdnode  /* Hardware resource of SDMMC host */
+	
+	MVirtualResourceGroup hwres_port_pad_data_0 /* Data signal 0 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_1 /* Data signal 1 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_2 /* Data signal 2 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_3 /* Data signal 3 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_4 /* Data signal 4 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_5 /* Data signal 5 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_6 /* Data signal 6 pad resource */
+	MVirtualResourceGroup hwres_port_pad_data_7 /* Data signal 7 pad resource */
+	MVirtualResourceGroup hwres_port_pad_cmd /* Data signal 7 pad resource */
+	MVirtualResourceGroup hwres_port_pad_clk /* Data signal 7 pad resource */
+	
+	MVirtualResourceGroup hwres_port_pad_sdcd   /* Card detect signal pad resource */
+	MVirtualResourceGroup hwres_port_pad_sdwc   /* Write protect signal pad resource */
+	MVirtualResourceGroup hwres_port_pad_rst    /* Reset signal pad resource */
+	MVirtualResourceGroup hwres_port_pad_bus_pwr /* Bus power signal pad resource */
+	MVirtualResourceGroup hwres_port_pad_led    /* LED signal pad resource */
+	
+	MVirtualSignal vs_sdmmc_block_data_out_0
+	MVirtualSignal vs_sdmmc_block_data_out_1
+	MVirtualSignal vs_sdmmc_block_data_out_2
+	MVirtualSignal vs_sdmmc_block_data_out_3
+	MVirtualSignal vs_sdmmc_block_data_out_4
+	MVirtualSignal vs_sdmmc_block_data_out_5
+	MVirtualSignal vs_sdmmc_block_data_out_6
+	MVirtualSignal vs_sdmmc_block_data_out_7
+	MVirtualSignal vs_sdmmc_block_cmd_out
+	MVirtualSignal vs_sdmmc_block_clk_out
+	MVirtualSignal vs_sdmmc_block_sdcd
+	MVirtualSignal vs_sdmmc_block_sdwc
+	MVirtualSignal vs_sdmmc_block_rst
+	MVirtualSignal vs_sdmmc_block_bus_pwr
+    MVirtualSignal vs_sdmmc_block_led
+	MVirtualSignal vs_sdmmc_block_pad_data_0
+	MVirtualSignal vs_sdmmc_block_pad_data_1
+	MVirtualSignal vs_sdmmc_block_pad_data_2
+	MVirtualSignal vs_sdmmc_block_pad_data_3
+	MVirtualSignal vs_sdmmc_block_pad_data_4
+	MVirtualSignal vs_sdmmc_block_pad_data_5
+	MVirtualSignal vs_sdmmc_block_pad_data_6
+	MVirtualSignal vs_sdmmc_block_pad_data_7
+	MVirtualSignal vs_sdmmc_block_pad_cmd
+	MVirtualSignal vs_sdmmc_block_pad_clk
+	MVirtualSignal vs_sdmmc_block_pad_sdcd
+	MVirtualSignal vs_sdmmc_block_pad_sdwc
+	MVirtualSignal vs_sdmmc_block_pad_rst
+	MVirtualSignal vs_sdmmc_block_pad_bus_pwr
+	MVirtualSignal vs_sdmmc_block_pad_led
+	
+	/* To connect the signals with HW control functionality */
+	MVirtualSignal vs_sdmmc_block_port_data_0_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_1_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_2_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_3_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_4_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_5_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_6_hw_o
+	MVirtualSignal vs_sdmmc_block_port_data_7_hw_o
+	MVirtualSignal vs_sdmmc_block_port_cmd_hw_o
+	MVirtualSignal vs_sdmmc_block_port_clk_hw_o
+	MVirtualSignal vs_sdmmc_block_port_rst_hw_o
+	MVirtualSignal vs_sdmmc_block_port_bus_pwr_hw_o
+	MVirtualSignal vs_sdmmc_block_port_led_hw_o
+	
+	MVirtualSignal vs_sdmmc_block_interrupt
+	MVirtualSignal vs_interrupt_sdmmc_host
+	
+	MRequiredApp appres_spi_master /* Consume SPI_MASTER APP, acts as interface for card */
+	MRequiredApp appres_cmsis_rtos /* Consume the CMSIS_RTOS APP to work in RTOS mode */
+	MRequiredApp appres_cpu_ctrl   /* Consume the CPU_CTRL_XMC4/CPU_CTRL_XMC1 APP to work in SD mode */
+	MRequiredApp appres_systimer   /* used in SD mode in non-rtos mode for time out settings */
+	MRequiredApp appres_clock      /* Consume CLOCK_XMC4 to check the clock is enabled or not. 
+	                                  Just for this reason only clock is consumed in XMC4000 devices. */
+	
+	/* APP Constructor */
+	public SDMMC_BLOCK(DaveEnv daveEnv) {
+		/* -------------------------------------------------------------- */
+		/* ---------- Target Specific User Variable Initialization ------ */
+		/* -------------------------------------------------------------- */
+		String fn_regexp = ~/^[^\d\W]\w*\Z/ /* This is a regular expression used to check the callback handler format */
+		String family = 'null' /* Used for execution of code based on the microcontroller family, eg. xmc4*/
+		String series = 'null' /* Used for execution of code based on the microcontroller series, eg. xmc45*/
+		Boolean is_sdmmc_host_available /* Used to check whether SDMMC host is available or not */
+		MF is_sd_mode /* Used to check if SD mode is selected */
+		MF is_spi_mode /* Used to check if SPI mode is selected */
+		MF is_4_8_bit_interface /* Used to check if SPI mode is selected */
+		MF is_8_bit_interface /* Used to check if SPI mode is selected */
+		
+		MF is_card_detection_sig_en /* Used to check if SD mode is selected */
+		MF is_write_protection_sig_en /* Used to check if SPI mode is selected */
+		MF is_reset_signal_en /* Used to check if SPI mode is selected */
+		MF is_bus_power_sig_en /* Used to check if SPI mode is selected */
+		MF is_led_sig_en /* Used to check if SPI mode is selected */
+		
+		Boolean is_xmc4_family = false /* Used to check if SPI mode is selected */
+
+		family = daveEnv.project.selectedDevice.deviceId.family
+		series = daveEnv.project.selectedDevice.deviceId.series
+		
+		is_sd_mode = MF({(gcombo_sd_mode.value == 'SD Mode')},Boolean)
+		is_spi_mode = MF({(gcombo_sd_mode.value == 'SPI Mode')},Boolean)
+		
+		is_4_8_bit_interface = MF({(gcombo_sd_mode.value == 'SD Mode') && ((gcombo_data_bus_width.value == '4-bit SD/MMC') || (gcombo_data_bus_width.value == '8-bit MMC'))},Boolean)
+		is_8_bit_interface = MF({(gcombo_sd_mode.value == 'SD Mode') && (gcombo_data_bus_width.value == '8-bit MMC')}, Boolean)
+		
+		if (family == "XMC4") {
+			is_xmc4_family = true
+		}
+		  
+		if ((family+series == "XMC48") || (family+series == "XMC47") || (family+series == "XMC45") || (family+series == "XMC43")) {
+			is_sdmmc_host_available = true
+		} else {
+			is_sdmmc_host_available = false
+	    }		
+
+		is_card_detection_sig_en = MF({(gcheck_sdcd.value)},Boolean)
+		is_write_protection_sig_en = MF({(gcheck_sdwc.value)},Boolean)
+		is_reset_signal_en = MF({(gcheck_rst.value)},Boolean)
+		is_bus_power_sig_en = MF({(gcheck_bus_power.value)},Boolean)
+		is_led_sig_en = MF({(gcheck_led.value)},Boolean)
+		
+	    /* -------------------------------------------------------------- */
+	    /* -------------- Hardware resource consumption block ----------- */
+	    /* -------------------------------------------------------------- */
+	  
+		hwres_sdmmc_host =  MVirtualResourceGroup("SDMMC Host", ["peripheral", "sdmmc", "*", "host"], is_sd_mode)
+		hwres_cpu_nvic_interrupt_sdnode = MVirtualResourceGroup("SDMMC NVIC Node", ["peripheral","cpu","0","nvic","interrupt","*"], is_sd_mode)
+		hwres_port_pad_data_0 = MVirtualResourceGroup("Data pin 0", ["port", "p", "*", "pad", "*"], is_sd_mode)
+		hwres_port_pad_data_1 = MVirtualResourceGroup("Data pin 1", ["port", "p", "*", "pad", "*"], is_4_8_bit_interface)
+		hwres_port_pad_data_2 = MVirtualResourceGroup("Data pin 2", ["port", "p", "*", "pad", "*"], is_4_8_bit_interface)
+		hwres_port_pad_data_3 = MVirtualResourceGroup("Data pin 3", ["port", "p", "*", "pad", "*"], is_4_8_bit_interface)
+		hwres_port_pad_data_4 = MVirtualResourceGroup("Data pin 4", ["port", "p", "*", "pad", "*"], is_8_bit_interface)
+		hwres_port_pad_data_5 = MVirtualResourceGroup("Data pin 5", ["port", "p", "*", "pad", "*"], is_8_bit_interface)
+		hwres_port_pad_data_6 = MVirtualResourceGroup("Data pin 6", ["port", "p", "*", "pad", "*"], is_8_bit_interface)
+		hwres_port_pad_data_7 = MVirtualResourceGroup("Data pin 7", ["port", "p", "*", "pad", "*"], is_8_bit_interface)
+		hwres_port_pad_cmd = MVirtualResourceGroup("Command pin", ["port", "p", "*", "pad", "*"], is_sd_mode)
+		hwres_port_pad_clk = MVirtualResourceGroup("Clock pin", ["port", "p", "*", "pad", "*"], is_sd_mode)
+		
+		addRegisterBitFieldConstraint(hwres_port_pad_data_0, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode')},Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_1, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && ((gcombo_data_bus_width.value == '4-bit SD/MMC') || (gcombo_data_bus_width.value == '8-bit MMC'))},Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_2, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && ((gcombo_data_bus_width.value == '4-bit SD/MMC') || (gcombo_data_bus_width.value == '8-bit MMC'))}, Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_3, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && ((gcombo_data_bus_width.value == '4-bit SD/MMC') || (gcombo_data_bus_width.value == '8-bit MMC'))}, Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_4, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcombo_data_bus_width.value == '8-bit MMC')},Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_5, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcombo_data_bus_width.value == '8-bit MMC')}, Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_6, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcombo_data_bus_width.value == '8-bit MMC')}, Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_data_7, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcombo_data_bus_width.value == '8-bit MMC')}, Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_cmd, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode')}, Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_clk, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode')}, Boolean))
+
+		
+		hwres_port_pad_sdcd = MVirtualResourceGroup("Card Detect", ["port", "p", "*", "pad", "*"], is_card_detection_sig_en)
+		hwres_port_pad_sdwc = MVirtualResourceGroup("Write Protect", ["port", "p", "*", "pad", "*"], is_write_protection_sig_en)
+		hwres_port_pad_rst = MVirtualResourceGroup("Reset", ["port", "p", "*", "pad", "*"], is_reset_signal_en)
+		hwres_port_pad_bus_pwr = MVirtualResourceGroup("Bus Power", ["port", "p", "*", "pad", "*"], is_bus_power_sig_en)
+		hwres_port_pad_led = MVirtualResourceGroup("LED", ["port", "p", "*", "pad", "*"], is_led_sig_en)
+			
+		/* SDCD and SDWC are input signals, so the below condition is not set */
+		addRegisterBitFieldConstraint(hwres_port_pad_rst, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcheck_rst.value)},Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_bus_pwr, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcheck_bus_power.value)},Boolean))
+		addRegisterBitFieldConstraint(hwres_port_pad_led, "iocr_oe", MF({[1]}, List), MF({(gcombo_sd_mode.value == 'SD Mode') && (gcheck_led.value)},Boolean))
+			
+		appres_systimer = MRequiredApp("SYSTIMER", "SYSTIMER", RSHARABLE, "4.0.2", MF({(gcombo_sd_mode.value == 'SD Mode') && (!gcheck_use_rtos.value)},Boolean))
+			  
+		if (is_xmc4_family) {
+			appres_clock =  MRequiredApp("CLOCK_XMC4","CLOCK APP for XMC4X", RSHARABLE, "4.0.18", is_sd_mode)
+			appres_cpu_ctrl = MRequiredApp("CPU_CTRL_XMC4", "CPU_CTRL", RSHARABLE, "4.0.2", is_sd_mode)
+			gmessage_clock_settings.visible = MF({if ((gcombo_sd_mode.value == 'SD Mode') && (!appres_clock.getVal(["gcheck_enable_usb_clock","value"]))) true else false},Boolean)
+		} else {
+			appres_cpu_ctrl = MRequiredApp("CPU_CTRL_XMC1", "CPU_CTRL", RSHARABLE, "4.0.2", is_sd_mode)
+			gmessage_clock_settings.visible = MF({false},Boolean)
+		}
+		
+		/* SPI Mode specific consumption */
+		appres_spi_master =  MRequiredApp("SPI_MASTER", "SPI_MASTER", RNOTSHARABLE, "4.0.2", is_spi_mode)
+		
+		/* Generic resource consumption */
+		appres_cmsis_rtos =  MRequiredApp("CMSIS_RTOS", "CMSIS_RTOS", RSHARABLE, "4.0.2", MF({(gcheck_use_rtos.value)}, Boolean))
+		
+		/* -------------------------------------------------------------- */
+		/* ------------------ Virtual signals  -------------------------- */
+		/* -------------------------------------------------------------- */
+			
+		vs_sdmmc_block_data_out_0 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_0", "mmc_data_out0", is_sd_mode, false)
+		vs_sdmmc_block_data_out_1 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_1", "mmc_data_out1", is_4_8_bit_interface, false)
+		vs_sdmmc_block_data_out_2 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_2", "mmc_data_out2", is_4_8_bit_interface, false)
+		vs_sdmmc_block_data_out_3 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_3", "mmc_data_out3", is_4_8_bit_interface, false)
+		vs_sdmmc_block_data_out_4 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_4", "mmc_data_out4", is_8_bit_interface, false)
+		vs_sdmmc_block_data_out_5 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_5", "mmc_data_out5", is_8_bit_interface, false)
+		vs_sdmmc_block_data_out_6 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_6", "mmc_data_out6", is_8_bit_interface, false)
+		vs_sdmmc_block_data_out_7 =  MVirtualSignal( hwres_sdmmc_host,"mmc_data_out_7", "mmc_data_out7", is_8_bit_interface, false)
+		vs_sdmmc_block_cmd_out =  MVirtualSignal( hwres_sdmmc_host,"mmc_cmd_out", "mmc_cmd_out", is_sd_mode, false)
+		vs_sdmmc_block_clk_out =  MVirtualSignal( hwres_sdmmc_host,"mmc_clk_out", "mmc_clk_out", is_sd_mode, false)
+		
+		vs_interrupt_sdmmc_host =  MVirtualSignal( hwres_cpu_nvic_interrupt_sdnode, "sd_host_interrupt", "signal_in", is_sd_mode, false)
+		vs_sdmmc_block_interrupt = MVirtualSignal( hwres_sdmmc_host,"interrupt", "interrupt", is_sd_mode, false)
+		
+		vs_sdmmc_block_sdcd =  MVirtualSignal( hwres_sdmmc_host,"mmc_sdcd", "mmc_sdcd", is_card_detection_sig_en, false)
+		vs_sdmmc_block_sdwc =  MVirtualSignal( hwres_sdmmc_host,"mmc_sdwc", "mmc_sdwc", is_write_protection_sig_en, false)
+		vs_sdmmc_block_rst =  MVirtualSignal( hwres_sdmmc_host,"mmc_reset", "mmc_reset", is_reset_signal_en, false)
+		vs_sdmmc_block_bus_pwr =  MVirtualSignal( hwres_sdmmc_host,"mmc_bus_power", "mmc_bus_power", is_bus_power_sig_en, false)
+		vs_sdmmc_block_led =  MVirtualSignal( hwres_sdmmc_host,"mmc_led", "mmc_led", is_led_sig_en, false)
+		@AddPin
+		vs_sdmmc_block_pad_data_0 =  MVirtualSignal( hwres_port_pad_data_0,"data_0_pad", "pad",is_sd_mode, false)
+		vs_sdmmc_block_port_data_0_hw_o  =  MVirtualSignal( hwres_port_pad_data_0,"data_0_hw_o", "hw_o",is_sd_mode, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_1 =  MVirtualSignal( hwres_port_pad_data_1,"data_1_pad", "pad",is_4_8_bit_interface, false)
+		vs_sdmmc_block_port_data_1_hw_o  =  MVirtualSignal( hwres_port_pad_data_1,"data_1_hw_o", "hw_o",is_4_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_2 =  MVirtualSignal( hwres_port_pad_data_2,"data_2_pad", "pad", is_4_8_bit_interface, false)
+		vs_sdmmc_block_port_data_2_hw_o  =  MVirtualSignal( hwres_port_pad_data_2,"data_2_hw_o", "hw_o", is_4_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_3 =  MVirtualSignal( hwres_port_pad_data_3,"data_3_pad", "pad", is_4_8_bit_interface,false)
+		vs_sdmmc_block_port_data_3_hw_o  =  MVirtualSignal( hwres_port_pad_data_3,"data_3_hw_o", "hw_o", is_4_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_4 =  MVirtualSignal( hwres_port_pad_data_4,"data_4_pad", "pad", is_8_bit_interface,false)
+		vs_sdmmc_block_port_data_4_hw_o  =  MVirtualSignal( hwres_port_pad_data_4,"data_4_hw_o", "hw_o", is_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_5 =  MVirtualSignal( hwres_port_pad_data_5,"data_5_pad", "pad", is_8_bit_interface,false)
+		vs_sdmmc_block_port_data_5_hw_o  =  MVirtualSignal( hwres_port_pad_data_5,"data_5_hw_o", "hw_o", is_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_6 =  MVirtualSignal( hwres_port_pad_data_6,"data_6_pad", "pad", is_8_bit_interface ,false)
+		vs_sdmmc_block_port_data_6_hw_o  =  MVirtualSignal( hwres_port_pad_data_6,"data_6_hw_o", "hw_o", is_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_data_7 =  MVirtualSignal( hwres_port_pad_data_7,"data_7_pad", "pad",is_8_bit_interface,false)
+		vs_sdmmc_block_port_data_7_hw_o  =  MVirtualSignal( hwres_port_pad_data_7,"data_7_hw_o", "hw_o", is_8_bit_interface, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_cmd =  MVirtualSignal( hwres_port_pad_cmd,"cmd_pad", "pad", is_sd_mode ,false)
+		vs_sdmmc_block_port_cmd_hw_o  =  MVirtualSignal( hwres_port_pad_cmd,"cmd_hw_o", "hw_o", is_sd_mode, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_clk =  MVirtualSignal( hwres_port_pad_clk,"clk_pad", "pad",is_sd_mode,false)
+		vs_sdmmc_block_port_clk_hw_o  =  MVirtualSignal( hwres_port_pad_clk,"clk_hw_o", "hw_o", is_sd_mode, false)
+		
+		@AddPin
+		vs_sdmmc_block_pad_sdcd =  MVirtualSignal( hwres_port_pad_sdcd,"sdcd_pad", "pad", is_card_detection_sig_en,false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_sdwc =  MVirtualSignal( hwres_port_pad_sdwc,"sdwc_pad", "pad", is_write_protection_sig_en,false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_rst =  MVirtualSignal( hwres_port_pad_rst,"rst_pad", "pad", is_reset_signal_en,false)
+		vs_sdmmc_block_port_rst_hw_o  =  MVirtualSignal( hwres_port_pad_rst,"rst_hw_o", "hw_o", is_reset_signal_en, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_bus_pwr =  MVirtualSignal( hwres_port_pad_bus_pwr,"bus_pwr_pad", "pad", is_bus_power_sig_en ,false)
+		vs_sdmmc_block_port_bus_pwr_hw_o  =  MVirtualSignal( hwres_port_pad_bus_pwr,"bus_pwr_hw_o", "hw_o", is_bus_power_sig_en, false)
+			
+		@AddPin
+		vs_sdmmc_block_pad_led =  MVirtualSignal( hwres_port_pad_led,"led_pad", "pad",is_led_sig_en,false)
+		vs_sdmmc_block_port_led_hw_o  =  MVirtualSignal( hwres_port_pad_led,"led_hw_o", "hw_o", is_led_sig_en, false)
+		
+		/* -------------------------------------------------------------- */
+		/* ------------------ Required logic ---------------------------- */
+		/* -------------------------------------------------------------- */
+		if (!is_sdmmc_host_available)
+		{
+		  gcombo_sd_mode.options = ['SPI Mode'];
+		}
+		
+		gtab_sd_advanced_settings.visible = is_sd_mode
+		gtab_spi_advanced_settings.visible = is_spi_mode
+		
+		gtab_interrupt_settings.visible = is_sd_mode
+		
+		/* SD Mode specific settings */
+		ginteger_delay_elements.enabled = MF({(gcheck_sdmmc_cmd_dat_delay.value)},Boolean)
+		
+		ginterruptprio_sd_host_controller.visible = is_sd_mode
+		
+		ginterruptprio_sd_host_controller.subPriorityVisible = is_xmc4_family
+		
+		ginterruptprio_sd_host_controller.maxSubPriority = MF({
+			if (gcombo_sd_mode.value == 'SD Mode') {
+                Integer SubPriority = appres_cpu_ctrl.getVal(["gint_maxInterruptSubPriority", "value"]) as Integer
+			    return SubPriority
+			} else {
+                return 0
+			}
+        }, Integer) 
+		
+		/* If SPI Mode is selected setting the SPI_MASTER APP */
+		ggroup_dma_mode.visible = is_xmc4_family
+		
+		appres_spi_master.setVal(["gcombo_oprmode", "value"], MF({"Full Duplex"}, String))
+		
+		appres_spi_master.setVal(["gfloat_desired_bus_speed","value"], MF({(gfloat_desired_bus_speed.value)}, Float))
+		
+		appres_spi_master.setVal(["gcombo_clock_settings","value"], MF({
+			if(gcombo_clock_polarity.value == "Inverted")
+                'High if inactive, transmit on falling clock edge, receive on rising clock edge'
+		    else
+			    'Low if inactive, transmit on rising clock edge, receive on falling clock edge'
+		}, String))
+		
+		appres_spi_master.setVal(["gcombo_transmit_mode","value"], MF({
+			if(gcheck_enable_dma_mode.value == true)
+                'DMA'
+			else
+			    'Interrupt'
+	    }, String))
+
+		appres_spi_master.setVal(["gcombo_receive_mode","value"], MF({
+			if(gcheck_enable_dma_mode.value == true)
+			    'DMA'
+		    else
+			    'Interrupt'
+		}, String))
+		
+		appres_spi_master.setVal(["gint_word_length", "value"], MF({8}, Integer))
+		
+		appres_spi_master.setVal(["gint_frame_length", "value"], MF({64}, Integer))
+		
+		appres_spi_master.setVal(["gcheck_frame_end_mode", "value"], MF({false}, Boolean))
+		
+		appres_spi_master.setVal(["gcombo_bit_order","value"], MF({'Transmit/receive MSB first'}, String))
+		
+		/* port Settings */
+		
+		/* Start - Not Applicable in SPI mode */
+		gcheck_sdcd.visible = MF({gcombo_sd_mode.value == 'SD Mode'},Boolean)
+		gcheck_bus_power.visible = MF({gcombo_sd_mode.value == 'SD Mode'},Boolean)
+		gcheck_rst.visible = MF({gcombo_sd_mode.value == 'SD Mode'},Boolean)
+		
+		/* End - Not APPIlicable in SPI mode */
+
+		ggroup_led_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value)},Boolean)
+		ggroup_sdwc_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value)},Boolean)
+		ggroup_bus_power_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value) && (gcombo_sd_mode.value == 'SD Mode')},Boolean)
+		ggroup_sdcd_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value) && (gcombo_sd_mode.value == 'SD Mode')},Boolean)
+		ggroup_rst_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value) && (gcombo_sd_mode.value == 'SD Mode')},Boolean)
+			
+		ggroup_sdcd_pin_settings.enabled = MF({(gcheck_sdcd.value)},Boolean)
+		glabel_hysteresis_sdcd.visible = MF({!is_xmc4_family},Boolean)
+		gcombo_hysteresis_sdcd.visible = MF({!is_xmc4_family},Boolean)
+		
+		ggroup_sdwc_pin_settings.enabled = MF({(gcheck_sdwc.value)},Boolean)
+		glabel_hysteresis_sdwc.visible = MF({!is_xmc4_family},Boolean)
+		gcombo_hysteresis_sdwc.visible = MF({!is_xmc4_family},Boolean)
+		
+		ggroup_rst_pin_settings.enabled = MF({(gcheck_rst.value)},Boolean)
+		ggroup_bus_power_pin_settings.enabled = MF({(gcheck_bus_power.value)},Boolean)
+		ggroup_led_pin_settings.enabled = MF({(gcheck_led.value)},Boolean)
+		
+		ggroup_sd_data_pins_settings.visible = MF({(gcheck_enable_advanced_pin_config.value) && (gcombo_sd_mode.value == 'SD Mode')},Boolean)
+		ggroup_sd_cmd_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value) && (gcombo_sd_mode.value == 'SD Mode')},Boolean)
+		ggroup_sd_clk_pin_settings.visible = MF({(gcheck_enable_advanced_pin_config.value) && (gcombo_sd_mode.value == 'SD Mode')},Boolean)
+		
+		ggroup_sd_data_pins_settings.enabled = MF({(gcheck_enable_advanced_pin_config.value)},Boolean)
+		ggroup_sd_cmd_pin_settings.enabled = MF({(gcheck_enable_advanced_pin_config.value)},Boolean)
+		ggroup_sd_clk_pin_settings.enabled = MF({(gcheck_enable_advanced_pin_config.value)},Boolean)
+		
+		/* -------------------------------------------------------------- */
+		/* ---------------- APP IO Connections -------------------------- */
+		/* -------------------------------------------------------------- */
+
+		addConnectionConstraint(vs_sdmmc_block_data_out_0, vs_sdmmc_block_port_data_0_hw_o, is_sd_mode)
+		addConnectionConstraint(vs_sdmmc_block_data_out_1, vs_sdmmc_block_port_data_1_hw_o, is_4_8_bit_interface)
+		addConnectionConstraint(vs_sdmmc_block_data_out_2, vs_sdmmc_block_port_data_2_hw_o, is_4_8_bit_interface)
+		addConnectionConstraint(vs_sdmmc_block_data_out_3, vs_sdmmc_block_port_data_3_hw_o, is_4_8_bit_interface)
+		addConnectionConstraint(vs_sdmmc_block_data_out_4, vs_sdmmc_block_port_data_4_hw_o, is_8_bit_interface)
+		addConnectionConstraint(vs_sdmmc_block_data_out_5, vs_sdmmc_block_port_data_5_hw_o, is_8_bit_interface)
+		addConnectionConstraint(vs_sdmmc_block_data_out_6, vs_sdmmc_block_port_data_6_hw_o, is_8_bit_interface)
+		addConnectionConstraint(vs_sdmmc_block_data_out_7, vs_sdmmc_block_port_data_7_hw_o, is_8_bit_interface)
+
+		addConnectionConstraint(vs_sdmmc_block_cmd_out, vs_sdmmc_block_port_cmd_hw_o, is_sd_mode)
+		addConnectionConstraint(vs_sdmmc_block_clk_out, vs_sdmmc_block_port_clk_hw_o, is_sd_mode)
+				
+		addConnectionConstraint(vs_sdmmc_block_interrupt, vs_interrupt_sdmmc_host, is_sd_mode);
+		
+		addConnectionConstraint(vs_sdmmc_block_pad_sdcd, vs_sdmmc_block_sdcd, MF({gcheck_sdcd.value},Boolean))
+		addConnectionConstraint(vs_sdmmc_block_pad_sdwc, vs_sdmmc_block_sdwc, MF({gcheck_sdwc.value},Boolean))
+
+		addConnectionConstraint(vs_sdmmc_block_rst, vs_sdmmc_block_port_rst_hw_o, MF({(gcombo_sd_mode.value == 'SD Mode') && (gcheck_rst.value)},Boolean))
+		addConnectionConstraint(vs_sdmmc_block_bus_pwr, vs_sdmmc_block_port_bus_pwr_hw_o, MF({(gcombo_sd_mode.value == 'SD Mode') && (gcheck_bus_power.value)},Boolean))
+		addConnectionConstraint(vs_sdmmc_block_led, vs_sdmmc_block_port_led_hw_o, MF({(gcombo_sd_mode.value == 'SD Mode') && (gcheck_led.value)},Boolean))
+		addConnectionConstraint(vs_sdmmc_block_rst, vs_sdmmc_block_pad_rst, MF({(gcombo_sd_mode.value == 'SPI Mode') && (gcheck_rst.value)},Boolean))
+		addConnectionConstraint(vs_sdmmc_block_bus_pwr, vs_sdmmc_block_pad_bus_pwr, MF({(gcombo_sd_mode.value == 'SPI Mode') && (gcheck_bus_power.value)},Boolean))
+		addConnectionConstraint(vs_sdmmc_block_led, vs_sdmmc_block_pad_led, MF({(gcombo_sd_mode.value == 'SPI Mode') && (gcheck_led.value)},Boolean))		
+	}
+
+	/* Now, the thing that matters; file generation */	
+	def generateFiles() {
+		copy("sdmmc_block.c", "sdmmc_block.c")
+		copy("sdmmc_block.h", "sdmmc_block.h")
+		copy("sdmmc_block_private_sd.c", "sdmmc_block_private_sd.c")
+		copy("sdmmc_block_private_sd.h", "sdmmc_block_private_sd.h")
+		copy("sdmmc_block_private_spi.c", "sdmmc_block_private_spi.c")
+		copy("sdmmc_block_private_spi.h", "sdmmc_block_private_spi.h")
+		copy("sdmmc_block_private_sd_rtos.c", "sdmmc_block_private_sd_rtos.c")
+		copy("sdmmc_block_private_sd_rtos.h", "sdmmc_block_private_sd_rtos.h")
+		copy("sdmmc_block_private_spi_rtos.c", "sdmmc_block_private_spi_rtos.c")
+		copy("sdmmc_block_private_spi_rtos.h", "sdmmc_block_private_spi_rtos.h")
+		generate("sdmmc_block_confh.tmpl", "sdmmc_block_conf.h", true)
+		generate("sdmmc_block_confc.tmpl", "sdmmc_block_conf.c", true)
+		generate("sdmmc_block_externh.tmpl", "sdmmc_block_extern.h", true)
+	}
+}

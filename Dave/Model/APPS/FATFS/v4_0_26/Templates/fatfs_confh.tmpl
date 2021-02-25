@@ -1,0 +1,223 @@
+package Model.APPS.FATFS.v4_0_26.Templates;
+
+import Model.APPS.FATFS.v4_0_26.FATFS
+
+out.print("""
+/**
+ * @cond
+ ***********************************************************************************************************************
+ *
+ * Copyright (c) 2018, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2015-12-10:
+ *     - Initial version<br>
+ *
+ * @endcond
+ *
+ */
+
+#ifndef FATFS_CONF_H
+#define FATFS_CONF_H
+
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+
+/**********************************************************************************************************************
+ * MACROS
+ **********************************************************************************************************************/
+""");
+
+String appInst  = null;
+List codePage = [437, 720, 737, 771, 775, 850, 852, 855, 857, 860, 861, 862, 863, 864, 865, 866, 869, 932, 936, 949, 950, 0]
+
+for (Object appIns : appInstancesList )
+{
+	appInst = appIns.getInstanceLabel()
+	
+	if(appIns.gcheck_stdlib.value == true)
+	{
+	out.print("""#define FATFS_STANDARDLIBRARY    (1U)\n""");
+    }	
+	else
+	{
+	out.print("""#define FATFS_STANDARDLIBRARY    (0U)\n""");
+	}
+	
+	
+	if(appIns.gcheck_readonly.value == true)
+	{
+	out.print("""#define FF_FS_READONLY           (1U)\n""");
+	out.print("""#define FF_FS_LOCK               (0U)\n""")
+    }	
+	else
+	{
+	out.print("""#define FF_FS_READONLY           (0U)\n""");
+	out.print("""#define FF_FS_LOCK               (${appIns.ginteger_filesharing.value}U)\n""")
+	}
+
+if(appIns.gcheck_find.value == true)
+{
+	out.print("""#define FF_USE_FIND               (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_FIND               (0U)\n""");
+}
+
+if(appIns.gcheck_mkfs.value == true)
+{
+	out.print("""#define FF_USE_MKFS               (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_MKFS               (0U)\n""");
+}
+
+if(appIns.gcheck_fastseek.value == true)
+{
+	out.print("""#define FF_USE_FASTSEEK           (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_FASTSEEK           (0U)\n""");
+}
+
+if(appIns.gcheck_f_expand.value == true)
+{
+	out.print("""#define FF_USE_EXPAND           (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_EXPAND           (0U)\n""");
+}
+
+if(appIns.gcheck_f_chmod.value == true)
+{
+	out.print("""#define FF_USE_CHMOD           (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_CHMOD           (0U)\n""");
+}
+
+if(appIns.gcheck_vollabel.value == true)
+{
+	out.print("""#define FF_USE_LABEL              (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_LABEL              (0U)\n""");
+}
+
+if(appIns.gcheck_forward.value == true)
+{
+	out.print("""#define FF_USE_FORWARD            (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_FORWARD            (0U)\n""");
+}
+if(appIns.gcheck_multipartition.value == true)
+{
+	out.print("""#define FF_MULTI_PARTITION    (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_MULTI_PARTITION    (0U)\n""");
+}
+
+if(appIns.gcheck_trim.value == true)
+{
+	out.print("""#define FF_USE_TRIM               (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_USE_TRIM               (0U)\n""");
+}
+
+
+if(appIns.gcheck_tinymode.value == true)
+{
+	out.print("""#define FF_FS_TINY               (1U)\n""");
+}
+else
+{
+	out.print("""#define FF_FS_TINY               (0U)\n""");
+}
+
+if(appIns.gcheck_timestamp.value == true)
+{
+	out.print("""#define FF_FS_NORTC              (0U)\n""");
+}
+else
+{
+	out.print("""#define FF_FS_NORTC              (1U)\n""");
+	out.print("""#define FF_NORTC_MON          (${appIns.ginteger_month.value}U)\n""");
+	out.print("""#define FF_NORTC_DAY          (${appIns.ginteger_day.value}U)\n""");
+	out.print("""#define FF_NORTC_YEAR         (${appIns.ginteger_year.value}U)\n""");}
+
+if(appIns.gcheck_rtos.value == true)
+{
+	out.print("""#define FF_FS_REENTRANT          (1U)\n""");
+	out.print("""#define FF_FS_TIMEOUT         (${appIns.ginteger_timeout.value}U)\n""");
+	out.print("""#define FF_SYNC_t		osMutexId\n""");
+	out.print("""#include <CMSIS_RTOS/cmsis_rtos.h>\n""");
+	
+}
+else
+{
+	out.print("""#define FF_FS_REENTRANT          (0U)\n""");
+}
+out.print("""#define FF_FS_MINIMIZE          (${appIns.gcombo_minlevel.value}U)\n""");
+
+out.print("""#define FF_USE_STRFUNC            (${appIns.gcombo_stringfunc.options.indexOf(appIns.gcombo_stringfunc.value)}U)\n""");
+
+out.print("""#define FF_CODE_PAGE           ${codePage[appIns.gcombo_codepage.options.indexOf(appIns.gcombo_codepage.value)]}\n""");
+
+out.print("""#define FF_FS_RPATH              (${appIns.gcombo_relativepath.options.indexOf(appIns.gcombo_relativepath.value)}U)\n""");
+
+out.print("""#define FF_VOLUMES            (${appIns.gcombo_volumes.value}U)\n""");
+
+out.print("""#define FF_MIN_SS             (${appIns.gcombo_sectorsize.value}U)\n""");
+out.print("""#define FF_MAX_SS             (${appIns.gcombo_sectorsize.value}U)\n""");
+
+out.print("""#define FF_FS_NOFSINFO           (${appIns.gcombo_filesystem.options.indexOf(appIns.gcombo_filesystem.value)}U)\n""");
+
+} // end of for loop
+
+out.print("""
+#define FATFS_MAJOR_VERSION (${(FATFS.version).findAll( /\d+/ )*.toInteger()[0]}U)
+#define FATFS_MINOR_VERSION (${(FATFS.version).findAll( /\d+/ )*.toInteger()[1]}U)
+#define FATFS_PATCH_VERSION (${(FATFS.version).findAll( /\d+/ )*.toInteger()[2]}U)
+
+#endif  /* ifndef FATFS_CONF_H */
+""");

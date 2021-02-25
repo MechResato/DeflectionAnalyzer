@@ -41,7 +41,7 @@ int main(void)
 	else{ printf("DAVE APPs initialization successful\n"); }
 
 	// Arm-M internal interrupt init
-	SysTick_Config(SystemCoreClock / 144);
+	//SysTick_Config(SystemCoreClock / 144);
 
 	// Counter for TFT_display init
 	uint8_t display_delay = 0;
@@ -55,8 +55,8 @@ int main(void)
 
 	// Show initial logo
 	TFT_display_init_screen();
-	_msCounter = 0;
-	while (_msCounter < 100) __NOP();
+	uint32_t now = SYSTIMER_GetTime();
+	while (SYSTIMER_GetTime() < now + (100*1000)) __NOP();
 
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");

@@ -23,7 +23,7 @@
 
 ///*  SYSTEM VARIABLEs */
 // Counter used for function delay_ms
-volatile uint32_t _msCounter = 0;
+//volatile uint32_t _msCounter = 0;
 volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
 
 
@@ -50,12 +50,14 @@ volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
 
 
 ///*  FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------- */
-void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
-	_msCounter++;
-}
+//void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
+//	_msCounter++;
+//}
 void delay_ms(uint32_t ms){
 	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
-	uint32_t now = _msCounter;
-	while(now+ms > _msCounter)
+	//uint32_t now = SYSTIMER_GetTickCount();
+	//while(now+ms > SYSTIMER_GetTickCount())
+	uint32_t targetMicroSec = SYSTIMER_GetTime() + (ms*1000);
+	while(targetMicroSec > SYSTIMER_GetTime())
 		__NOP(); // do nothing
 }

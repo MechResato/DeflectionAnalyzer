@@ -22,7 +22,7 @@
   22              	 .thumb
   23              	 .thumb_func
   25              	DAVE_Init:
-  26              	.LFB437:
+  26              	.LFB485:
   27              	 .file 1 "../Dave/Generated/DAVE.c"
    1:../Dave/Generated/DAVE.c **** 
    2:../Dave/Generated/DAVE.c **** /**
@@ -116,7 +116,7 @@
   72:../Dave/Generated/DAVE.c ****      /** @Initialization of APPs Init Functions */
   73:../Dave/Generated/DAVE.c ****      init_status = (DAVE_STATUS_t)CLOCK_XMC4_Init(&CLOCK_XMC4_0);
   46              	 .loc 1 73 0
-  47 000a 1948     	 ldr r0,.L8
+  47 000a 1D48     	 ldr r0,.L9
   48 000c FFF7FEFF 	 bl CLOCK_XMC4_Init
   49 0010 0346     	 mov r3,r0
   50 0012 FB71     	 strb r3,[r7,#7]
@@ -130,7 +130,7 @@
   77:../Dave/Generated/DAVE.c **** 	 /**  Initialization of SPI_MASTER APP instance SPI_MASTER_0 */
   78:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)SPI_MASTER_Init(&SPI_MASTER_0); 
   55              	 .loc 1 78 0
-  56 001a 1648     	 ldr r0,.L8+4
+  56 001a 1A48     	 ldr r0,.L9+4
   57 001c FFF7FEFF 	 bl SPI_MASTER_Init
   58 0020 0346     	 mov r3,r0
   59 0022 FB71     	 strb r3,[r7,#7]
@@ -145,7 +145,7 @@
   82:../Dave/Generated/DAVE.c **** 	 /**  Initialization of DIGITAL_IO APP instance IO_DIO_DIGOUT_PD_TFT */
   83:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_DIO_DIGOUT_PD_TFT); 
   65              	 .loc 1 83 0
-  66 002a 1348     	 ldr r0,.L8+8
+  66 002a 1748     	 ldr r0,.L9+8
   67 002c FFF7FEFF 	 bl DIGITAL_IO_Init
   68 0030 0346     	 mov r3,r0
   69 0032 FB71     	 strb r3,[r7,#7]
@@ -160,7 +160,7 @@
   87:../Dave/Generated/DAVE.c **** 	 /**  Initialization of DIGITAL_IO APP instance IO_DIO_DIGOUT_CS_TFT */
   88:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_DIO_DIGOUT_CS_TFT); 
   75              	 .loc 1 88 0
-  76 003a 1048     	 ldr r0,.L8+12
+  76 003a 1448     	 ldr r0,.L9+12
   77 003c FFF7FEFF 	 bl DIGITAL_IO_Init
   78 0040 0346     	 mov r3,r0
   79 0042 FB71     	 strb r3,[r7,#7]
@@ -175,7 +175,7 @@
   92:../Dave/Generated/DAVE.c **** 	 /**  Initialization of ADC_MEASUREMENT APP instance ADC_MEASUREMENT_0 */
   93:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)ADC_MEASUREMENT_Init(&ADC_MEASUREMENT_0); 
   85              	 .loc 1 93 0
-  86 004a 0D48     	 ldr r0,.L8+16
+  86 004a 1148     	 ldr r0,.L9+16
   87 004c FFF7FEFF 	 bl ADC_MEASUREMENT_Init
   88 0050 0346     	 mov r3,r0
   89 0052 FB71     	 strb r3,[r7,#7]
@@ -190,70 +190,90 @@
   97:../Dave/Generated/DAVE.c **** 	 /**  Initialization of TIMER APP instance TIMER_0 */
   98:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)TIMER_Init(&TIMER_0); 
   95              	 .loc 1 98 0
-  96 005a 0A48     	 ldr r0,.L8+20
+  96 005a 0E48     	 ldr r0,.L9+20
   97 005c FFF7FEFF 	 bl TIMER_Init
   98 0060 0346     	 mov r3,r0
   99 0062 FB71     	 strb r3,[r7,#7]
  100              	.L6:
-  99:../Dave/Generated/DAVE.c ****    }  
- 100:../Dave/Generated/DAVE.c ****   return init_status;
+  99:../Dave/Generated/DAVE.c ****    } 
+ 100:../Dave/Generated/DAVE.c ****   if (init_status == DAVE_STATUS_SUCCESS)
  101              	 .loc 1 100 0
  102 0064 FB79     	 ldrb r3,[r7,#7]
- 101:../Dave/Generated/DAVE.c **** } /**  End of function DAVE_Init */
- 103              	 .loc 1 101 0
- 104 0066 1846     	 mov r0,r3
- 105 0068 0837     	 adds r7,r7,#8
- 106              	.LCFI3:
- 107              	 .cfi_def_cfa_offset 8
- 108 006a BD46     	 mov sp,r7
- 109              	.LCFI4:
- 110              	 .cfi_def_cfa_register 13
- 111              	 
- 112 006c 80BD     	 pop {r7,pc}
- 113              	.L9:
- 114 006e 00BF     	 .align 2
- 115              	.L8:
- 116 0070 00000000 	 .word CLOCK_XMC4_0
- 117 0074 00000000 	 .word SPI_MASTER_0
- 118 0078 00000000 	 .word IO_DIO_DIGOUT_PD_TFT
- 119 007c 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
- 120 0080 00000000 	 .word ADC_MEASUREMENT_0
- 121 0084 00000000 	 .word TIMER_0
- 122              	 .cfi_endproc
- 123              	.LFE437:
- 125              	 .text
- 126              	.Letext0:
- 127              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 128              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 129              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
- 130              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_scu.h"
- 131              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_gpio.h"
- 132              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
- 133              	 .file 8 "../Dave/Generated/CLOCK_XMC4/clock_xmc4.h"
- 134              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 135              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_spi.h"
- 136              	 .file 11 "../Dave/Generated/SPI_MASTER/spi_master.h"
- 137              	 .file 12 "../Dave/Generated/DIGITAL_IO/digital_io.h"
- 138              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
- 139              	 .file 14 "../Dave/Generated/GLOBAL_ADC/global_adc.h"
- 140              	 .file 15 "../Dave/Generated/ADC_MEASUREMENT/adc_measurement.h"
- 141              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_ccu4.h"
- 142              	 .file 17 "../Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
- 143              	 .file 18 "../Dave/Generated/TIMER/timer.h"
- 144              	 .file 19 "../Dave/Generated/DAVE.h"
- 145              	 .file 20 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 146              	 .file 21 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
- 147              	 .file 22 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
- 148              	 .file 23 "../Dave/Generated/CLOCK_XMC4/clock_xmc4_extern.h"
- 149              	 .file 24 "../Dave/Generated/SPI_MASTER/spi_master_extern.h"
- 150              	 .file 25 "../Dave/Generated/DIGITAL_IO/digital_io_extern.h"
- 151              	 .file 26 "../Dave/Generated/ADC_MEASUREMENT/ADC_MEASUREMENT_Extern.h"
- 152              	 .file 27 "../Dave/Generated/TIMER/timer_extern.h"
+ 103 0066 002B     	 cmp r3,#0
+ 104 0068 04D1     	 bne .L7
+ 101:../Dave/Generated/DAVE.c ****   {
+ 102:../Dave/Generated/DAVE.c **** 	 /**  Initialization of FATFS APP instance FATFS_0 */
+ 103:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)FATFS_Init(&FATFS_0); 
+ 105              	 .loc 1 103 0
+ 106 006a 0B48     	 ldr r0,.L9+24
+ 107 006c FFF7FEFF 	 bl FATFS_Init
+ 108 0070 0346     	 mov r3,r0
+ 109 0072 FB71     	 strb r3,[r7,#7]
+ 110              	.L7:
+ 104:../Dave/Generated/DAVE.c ****    }  
+ 105:../Dave/Generated/DAVE.c ****   return init_status;
+ 111              	 .loc 1 105 0
+ 112 0074 FB79     	 ldrb r3,[r7,#7]
+ 106:../Dave/Generated/DAVE.c **** } /**  End of function DAVE_Init */
+ 113              	 .loc 1 106 0
+ 114 0076 1846     	 mov r0,r3
+ 115 0078 0837     	 adds r7,r7,#8
+ 116              	.LCFI3:
+ 117              	 .cfi_def_cfa_offset 8
+ 118 007a BD46     	 mov sp,r7
+ 119              	.LCFI4:
+ 120              	 .cfi_def_cfa_register 13
+ 121              	 
+ 122 007c 80BD     	 pop {r7,pc}
+ 123              	.L10:
+ 124 007e 00BF     	 .align 2
+ 125              	.L9:
+ 126 0080 00000000 	 .word CLOCK_XMC4_0
+ 127 0084 00000000 	 .word SPI_MASTER_0
+ 128 0088 00000000 	 .word IO_DIO_DIGOUT_PD_TFT
+ 129 008c 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
+ 130 0090 00000000 	 .word ADC_MEASUREMENT_0
+ 131 0094 00000000 	 .word TIMER_0
+ 132 0098 00000000 	 .word FATFS_0
+ 133              	 .cfi_endproc
+ 134              	.LFE485:
+ 136              	 .text
+ 137              	.Letext0:
+ 138              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 139              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 140              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
+ 141              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_scu.h"
+ 142              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_gpio.h"
+ 143              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 144              	 .file 8 "../Dave/Generated/CLOCK_XMC4/clock_xmc4.h"
+ 145              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 146              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_spi.h"
+ 147              	 .file 11 "../Dave/Generated/SPI_MASTER/spi_master.h"
+ 148              	 .file 12 "../Dave/Generated/DIGITAL_IO/digital_io.h"
+ 149              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
+ 150              	 .file 14 "../Dave/Generated/GLOBAL_ADC/global_adc.h"
+ 151              	 .file 15 "../Dave/Generated/ADC_MEASUREMENT/adc_measurement.h"
+ 152              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_ccu4.h"
+ 153              	 .file 17 "../Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
+ 154              	 .file 18 "../Dave/Generated/TIMER/timer.h"
+ 155              	 .file 19 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_rtc.h"
+ 156              	 .file 20 "../Dave/Generated/RTC/rtc.h"
+ 157              	 .file 21 "../Dave/Generated/FATFS/fatfs.h"
+ 158              	 .file 22 "../Dave/Generated/DAVE.h"
+ 159              	 .file 23 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 160              	 .file 24 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 161              	 .file 25 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 162              	 .file 26 "../Dave/Generated/CLOCK_XMC4/clock_xmc4_extern.h"
+ 163              	 .file 27 "../Dave/Generated/SPI_MASTER/spi_master_extern.h"
+ 164              	 .file 28 "../Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 165              	 .file 29 "../Dave/Generated/ADC_MEASUREMENT/ADC_MEASUREMENT_Extern.h"
+ 166              	 .file 30 "../Dave/Generated/TIMER/timer_extern.h"
+ 167              	 .file 31 "../Dave/Generated/FATFS/fatfs_extern.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 DAVE.c
     {standard input}:20     .text.DAVE_Init:00000000 $t
     {standard input}:25     .text.DAVE_Init:00000000 DAVE_Init
-    {standard input}:116    .text.DAVE_Init:00000070 $d
+    {standard input}:126    .text.DAVE_Init:00000080 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
@@ -262,9 +282,11 @@ SPI_MASTER_Init
 DIGITAL_IO_Init
 ADC_MEASUREMENT_Init
 TIMER_Init
+FATFS_Init
 CLOCK_XMC4_0
 SPI_MASTER_0
 IO_DIO_DIGOUT_PD_TFT
 IO_DIO_DIGOUT_CS_TFT
 ADC_MEASUREMENT_0
 TIMER_0
+FATFS_0

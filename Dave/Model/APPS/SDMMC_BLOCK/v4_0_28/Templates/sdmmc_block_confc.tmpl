@@ -1,0 +1,1194 @@
+package Model.APPS.SDMMC_BLOCK.v4_0_28.Templates;
+
+import Model.APPS.SDMMC_BLOCK.v4_0_28.SDMMC_BLOCK
+
+
+out.print("""
+/**
+ * @cond
+ ***********************************************************************************************************************
+ * Copyright (c) 2016-2018, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2016-01-20:
+ *     - Initial version <br>
+ *
+ * 2016-02-05:
+ *     - RTOS support added <br>
+ *
+ * 2016-04-05:
+ *     - MISRA fixes.<br>
+ *     - Bug fixes done for PR.<br>
+ *
+ * 2016-04-05:
+ *     - Code genration fix for XMC4300 device.<br>
+ *
+ * 2018-08-29:
+ *     - Use XMC_SDMMC_SetWriteProtectionSource() and XMC_SDMMC_SetWriteProtectionStatus() for XMC43/XMC47/XMC48 when WP pin is not used
+ *
+ * 2018-11-09:
+ *     - Fixed code generation for SPI mode and XMC1 family
+ * 
+ * @endcond
+ */
+
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+
+#include "sdmmc_block.h"
+""")
+
+instance = 0
+inner_space = '    '
+outer_space = '  '
+temp = 0
+s = null
+MappedUri_channel = null
+MappedUri_dlr = null
+boolean xmc1_family = false
+String family = daveEnv.project.selectedDevice.deviceId.family
+spi_mode = 0
+sd_mode = 0
+
+// generates n spaces
+def gen_space (def n) {
+    def str = ""
+    for (int i = 0; i < n; i++) {
+        str += " "
+    }
+    return str
+}
+
+out.print("""
+/**********************************************************************************************************************
+ * LOCAL ROUTINES
+ **********************************************************************************************************************/
+""")
+
+// Output strength
+Map output_strength = [
+    "Don't Care" : "Don't Care",
+    "Medium Driver" : "XMC_GPIO_OUTPUT_STRENGTH_MEDIUM",
+    "Weak Driver" : "XMC_GPIO_OUTPUT_STRENGTH_WEAK",
+    "Strong Driver Soft Edge" : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_SOFT_EDGE",
+    "Strong Driver Slow Edge" : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_SLOW_EDGE",
+    "Strong Driver Sharp Edge" : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_SHARP_EDGE",
+    "Strong Driver Medium Edge" : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE"
+]
+
+// Input modes
+Map input_logic = [
+    'Tristate' : 'XMC_GPIO_MODE_INPUT_TRISTATE',
+    'Pull Down' : 'XMC_GPIO_MODE_INPUT_PULL_DOWN',
+    'Pull Up' : 'XMC_GPIO_MODE_INPUT_PULL_UP',
+    'Continuous Sampling Mode' : 'XMC_GPIO_MODE_INPUT_SAMPLING',
+    'Inverted Tristate' : 'XMC_GPIO_MODE_INPUT_INVERTED_TRISTATE',
+    'Inverted Pull Down' : 'XMC_GPIO_MODE_INPUT_INVERTED_PULL_DOWN',
+    'Inverted Pull Up' : 'XMC_GPIO_MODE_INPUT_INVERTED_PULL_UP',
+    'Inverted Continuous Sampling Mode' : 'XMC_GPIO_MODE_INPUT_INVERTED_SAMPLING'
+]
+
+// Alternate functions for output pins
+Map gpio_output_alternate_function = [
+    "Push Pull" : [
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT1',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT2',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT3',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT4',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT5',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT6',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT7',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT8',
+        'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT9'
+    ],
+
+    "Open Drain": [
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT1',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT2',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT3',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT4',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT5',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT6',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT7',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT8',
+        'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT9'
+    ]
+]
+
+// Input hysterisis
+Map gpio_input_hysteresis = [
+    'Standard' : 'XMC_GPIO_INPUT_HYSTERESIS_STANDARD',
+    'Large'    : 'XMC_GPIO_INPUT_HYSTERESIS_LARGE',
+]
+
+// GPIO hardware control
+Map gpio_hw_control = [
+    0 : 'XMC_GPIO_HWCTRL_DISABLED',
+    1 : 'XMC_GPIO_HWCTRL_PERIPHERAL1',
+    2 : 'XMC_GPIO_HWCTRL_PERIPHERAL2'
+]
+
+for (Object i : appInstancesList) {
+    appInst = i.getInstanceLabel();
+    
+    Boolean _4_8_bit_mode = false
+    Boolean _8_bit_mode = false
+    Boolean spi_ext_pin_interface_enable = false
+    
+    advanced_pin_config_enabled = i.gcheck_enable_advanced_pin_config.value
+    
+    if (i.gcombo_sd_mode.value == "SD Mode") {
+        MappedUri_sdhost = i.hwres_sdmmc_host.getSolverUri()
+        if (MappedUri_sdhost != null) {
+            sd_mode = true
+        } else {
+            sd_mode = false
+        }
+        
+        spi_mode = false
+        
+        sd_data_bus_width = i.gcombo_data_bus_width.value
+        
+        if ((sd_data_bus_width == "4-bit SD/MMC") || (sd_data_bus_width == "8-bit MMC"))
+         _4_8_bit_mode = true
+         
+        if (sd_data_bus_width == "8-bit MMC")
+         _8_bit_mode = true
+         
+        data_0_pin_uri = i.hwres_port_pad_data_0.getSolverUri()
+         
+        if (_4_8_bit_mode) {
+           data_1_pin_uri = i.hwres_port_pad_data_1.getSolverUri()
+           data_2_pin_uri = i.hwres_port_pad_data_2.getSolverUri()
+           data_3_pin_uri = i.hwres_port_pad_data_3.getSolverUri()
+        }
+         
+        if (_8_bit_mode) {
+           data_4_pin_uri = i.hwres_port_pad_data_4.getSolverUri()
+           data_5_pin_uri = i.hwres_port_pad_data_5.getSolverUri()
+           data_6_pin_uri = i.hwres_port_pad_data_6.getSolverUri()
+           data_7_pin_uri = i.hwres_port_pad_data_7.getSolverUri()
+        }
+    
+        cmd_pin_uri = i.hwres_port_pad_cmd.getSolverUri()
+        clk_pin_uri = i.hwres_port_pad_clk.getSolverUri()
+    }
+    
+    if (i.gcombo_sd_mode.value == "SPI Mode") {
+        spi_mode = true
+        sd_mode = false
+    }
+
+    if (sd_mode || spi_mode) {
+
+          if(i.gcheck_sdcd.value == true) {
+            card_detect_pin_uri = i.hwres_port_pad_sdcd.getSolverUri()
+          }
+          
+          if(i.gcheck_sdwc.value == true) {
+            write_prot_pin_uri = i.hwres_port_pad_sdwc.getSolverUri()
+          }
+          
+          if(i.gcheck_rst.value == true) {
+            reset_pin_uri = i.hwres_port_pad_rst.getSolverUri()
+          }
+          
+          if(i.gcheck_bus_power.value == true) {
+          bus_power_pin_uri = i.hwres_port_pad_bus_pwr.getSolverUri()
+          }
+          
+          if(i.gcheck_led.value == true) {
+            led_pin_uri  = i.hwres_port_pad_led.getSolverUri()
+          }
+          if (i.gcheck_sdcd.value || i.gcheck_sdwc.value || i.gcheck_rst.value || i.gcheck_bus_power.value || i.gcheck_led.value)
+          {
+            spi_ext_pin_interface_enable = true
+          }
+          
+          if ((spi_mode && spi_ext_pin_interface_enable) || sd_mode)
+          {
+         out.print("""
+/* SDMMC_BLOCK configuration initialization */
+static void ${appInst}_Config_Init(void);
+""")
+         }
+          
+         if (sd_mode) {
+             out.print("\n")
+             out.print("""
+/**********************************************************************************************************************
+ * EXTERNAL REFERENCES
+ **********************************************************************************************************************/
+""")
+             out.print("""
+extern SDMMC_BLOCK_MODE_STATUS_t
+SDMMC_BLOCK_SD_ErrorInterruptHandler(SDMMC_BLOCK_t *const obj,
+                                     uint16_t int_status);
+
+extern SDMMC_BLOCK_MODE_STATUS_t
+SDMMC_BLOCK_SD_NormalInterruptHandler(SDMMC_BLOCK_t *const obj,
+                                      uint16_t int_status);
+""")
+             out.print("\n")
+             out.print("""
+/**********************************************************************************************************************
+ * GLOBAL VARIABLES
+ **********************************************************************************************************************/
+
+volatile uint16_t normal_int_status; /* Normal interrupt status */
+volatile uint16_t err_int_status;    /* Error interrupt status */
+""")
+         }
+
+          out.print("\n")
+          out.print("""
+/**********************************************************************************************************************
+  * DATA STRUCTURES
+ **********************************************************************************************************************/
+""")
+                  
+        if (family == 'XMC1') {
+          xmc1_family = true
+        }
+        
+        if(i.gcheck_sdcd.value == true) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK card detect pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_CARD_DETECT_PIN_CONFIG =
+{
+""")
+            out.print("""${gen_space(2)}.config = \n  { \n""")
+            if (advanced_pin_config_enabled) {
+                out.print("""${gen_space(4)}.mode = ${input_logic[i.gcombo_sdcd_pin_mode.value]},""")
+            } else {
+                out.print("""${gen_space(4)}.mode = XMC_GPIO_MODE_INPUT_TRISTATE,""")
+            }
+            
+            if (xmc1_family) {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.input_hysteresis = ${gpio_input_hysteresis[i.gcombo_hysteresis_sdcd.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.input_hysteresis = XMC_GPIO_INPUT_HYSTERESIS_STANDARD,""")
+                }
+            }
+            out.print("""\n${gen_space(2)}}""")
+            out.print("""
+};""")
+            
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK card detect pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_CARD_DETECT =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${card_detect_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${card_detect_pin_uri[6]},
+  .config = &${appInst}_CARD_DETECT_PIN_CONFIG
+};
+""")
+        }
+        
+        if(i.gcheck_sdwc.value == true) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK card detect pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_CARD_WRITE_PROTECT_PIN_CONFIG =
+{
+""")
+            out.print("""${gen_space(2)}.config = \n  { \n""")
+            if (advanced_pin_config_enabled) {
+                out.print("""${gen_space(4)}.mode = ${input_logic[i.gcombo_sdwc_pin_mode.value]},""")
+            } else {
+                out.print("""${gen_space(4)}.mode = XMC_GPIO_MODE_INPUT_TRISTATE,""")
+            }
+            
+            if (xmc1_family) {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.input_hysteresis = ${gpio_input_hysteresis[i.gcombo_hysteresis_sdwc.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.input_hysteresis = XMC_GPIO_INPUT_HYSTERESIS_STANDARD,""")
+                }
+            }
+            out.print("""\n${gen_space(2)}}""")
+            out.print("""
+};""")
+            
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK card detect pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_WRITE_PROTECT =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${write_prot_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${write_prot_pin_uri[6]},
+  .config = &${appInst}_CARD_WRITE_PROTECT_PIN_CONFIG
+};
+""")
+        }
+        
+        if(i.gcheck_rst.value == true) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Reset pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_RESET_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if ((i.hwres_port_pad_rst.getRegValue("IOCR", "iocr_oe").toInteger() == 1) || (spi_mode))  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_rst_pin_mode.value][i.hwres_port_pad_rst.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_rst_pin_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_rst_pin_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_rst.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_rst.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Reset pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_RESET =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${reset_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${reset_pin_uri[6]},
+  .config = &${appInst}_RESET_PIN_CONFIG
+};
+""")
+        }
+            
+        if(i.gcheck_bus_power.value == true) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Bus Power pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_BUS_POWER_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if ((i.hwres_port_pad_bus_pwr.getRegValue("IOCR", "iocr_oe").toInteger() == 1) || (spi_mode))  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_bus_power_pin_mode.value][i.hwres_port_pad_bus_pwr.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_bus_power_pin_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_bus_power_pin_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_bus_pwr.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_bus_pwr.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Bus Power pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_BUS_POWER =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${bus_power_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${bus_power_pin_uri[6]},
+  .config = &${appInst}_BUS_POWER_PIN_CONFIG
+};
+""")
+        }
+        
+        if(i.gcheck_led.value == true) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK LED pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_LED_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if ((i.hwres_port_pad_led.getRegValue("IOCR", "iocr_oe").toInteger() == 1) || (spi_mode))  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_led_pin_mode.value][i.hwres_port_pad_led.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_led_pin_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_led_pin_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_led.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_led.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK LED pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_LED =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${led_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${led_pin_uri[6]},
+  .config = &${appInst}_LED_PIN_CONFIG
+};
+""")
+        }
+
+        if(sd_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 0 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_0_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_0.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_0.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_0.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_0.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 0 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_0 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_0_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_0_pin_uri[6]},
+  .config = &${appInst}_DATA_0_PIN_CONFIG
+};
+""")
+        }
+        
+        if(sd_mode && _4_8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 1 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_1_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_1.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_1.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_1.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_1.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 1 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_1 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_1_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_1_pin_uri[6]},
+  .config = &${appInst}_DATA_1_PIN_CONFIG
+};
+""")
+        }
+    
+        if(sd_mode && _4_8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 2 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_2_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_2.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_2.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_2.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_2.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 2 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_2 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_2_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_2_pin_uri[6]},
+  .config = &${appInst}_DATA_2_PIN_CONFIG
+};
+""")
+        }
+        
+        if(sd_mode && _4_8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 3 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_3_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_3.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_3.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_3.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_3.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 3 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_3 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_3_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_3_pin_uri[6]},
+  .config = &${appInst}_DATA_3_PIN_CONFIG
+};
+""")
+        }
+        
+        if(sd_mode && _8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 4 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_4_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_4.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_4.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_4.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_4.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 4 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_4 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_4_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_4_pin_uri[6]},
+  .config = &${appInst}_DATA_4_PIN_CONFIG
+};
+""")
+        }
+        
+        if(sd_mode && _8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 5 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_5_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_5.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_5.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_5.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_5.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 5 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_5 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_5_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_5_pin_uri[6]},
+  .config = &${appInst}_DATA_5_PIN_CONFIG
+};
+""")
+        }
+    
+        if(sd_mode && _8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 6 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_6_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(4)}.config = \n  {""")
+            if (i.hwres_port_pad_data_6.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_6.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_6.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_6.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+            
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 6 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_6 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_6_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_6_pin_uri[6]},
+  .config = &${appInst}_DATA_6_PIN_CONFIG
+};
+""")
+        }
+        
+        if(sd_mode && _8_bit_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 7 pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_DATA_7_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_data_7.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_data_pins_mode.value][i.hwres_port_pad_data_7.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_data_pins_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_data_pins_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_data_7.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_data_7.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Data 7 pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_DATA_7 =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${data_7_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${data_7_pin_uri[6]},
+  .config = &${appInst}_DATA_7_PIN_CONFIG
+};
+""")
+        }
+
+        if(sd_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Command pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_COMMAND_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_cmd.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_cmd_pin_mode.value][i.hwres_port_pad_cmd.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_cmd_pin_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_cmd_pin_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_cmd.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_cmd.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Command pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_COMMAND =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${cmd_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${cmd_pin_uri[6]},
+  .config = &${appInst}_COMMAND_PIN_CONFIG
+};
+""")
+        }
+        
+
+        if(sd_mode) {
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Clock pin config */
+const SDMMC_BLOCK_GPIO_CONFIG_t ${appInst}_CLK_PIN_CONFIG =
+{""")
+            out.print("""\n${gen_space(2)}.config = \n  {""")
+            if (i.hwres_port_pad_clk.getRegValue("IOCR", "iocr_oe").toInteger() == 1)  {
+                if (advanced_pin_config_enabled) {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function[i.gcombo_sd_clk_pin_mode.value][i.hwres_port_pad_clk.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family && (i.gcombo_sd_clk_pin_strength.value != "Don't Care"))
+                        out.print("""\n${gen_space(4)}.output_strength = ${output_strength[i.gcombo_sd_clk_pin_strength.value]},""")
+                } else {
+                    out.print("""\n${gen_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][i.hwres_port_pad_clk.getRegValue("IOCR", "iocr_pcr").toInteger()]},""")
+                    if (!xmc1_family)
+                        out.print("""\n${gen_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE,""")
+                }
+                out.print("""\n${gen_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,""");
+                out.print("""\n${gen_space(2)}},""")
+                out.print("""\n${gen_space(2)}.hw_control = ${gpio_hw_control[i.hwres_port_pad_clk.getRegValue("HWSEL", "hwsel_hw").toInteger()]},""")
+            }
+            out.print("""
+};""")
+        
+            out.print("\n")
+            out.print("""
+/* SDMMC_BLOCK Clock pin */
+const SDMMC_BLOCK_PIN_CONFIG_t ${appInst}_CLK =
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${clk_pin_uri[4]}_BASE,
+  .pin  = (uint8_t)${clk_pin_uri[6]},
+  .config = &${appInst}_CLK_PIN_CONFIG
+};
+""")
+        }
+
+        if (i.gcheck_use_rtos.value == true) {
+            out.print("""
+/* RTOS resources for SDMMC_BLOCK APP */
+SDMMC_BLOCK_CMSIS_RTOS_t ${appInst}_CMSIS_RTOS =
+{
+  .os_resources_created = false,
+
+  .os_mutex_cb_cmd_mut_handle = {0U, 0U, 0U, 0U},
+  .os_mutex_def_cmd_mut_handle = {(${appInst}_CMSIS_RTOS.os_mutex_cb_cmd_mut_handle)},
+  .cmd_mut_id = (osMutexId)0,
+
+  .os_mutex_cb_data_mut_handle = {0U, 0U, 0U, 0U},
+  .os_mutex_def_data_mut_handle = {(${appInst}_CMSIS_RTOS.os_mutex_cb_data_mut_handle)},
+  .data_mut_id = (osMutexId)0,
+
+  .os_semaphore_cb_cmd_sem = {0U, 0U},
+  .os_semaphore_def_cmd_sem = {(${appInst}_CMSIS_RTOS.os_semaphore_cb_cmd_sem)},
+  .cmd_sem_id = (osSemaphoreId)0,
+  .cmd_sem_index = 0,
+
+  .os_semaphore_cb_data_sem = {0U, 0U},
+  .os_semaphore_def_data_sem = {(${appInst}_CMSIS_RTOS.os_semaphore_cb_data_sem)},
+  .data_sem_id = (osSemaphoreId)0,
+  .data_sem_index = 0,""")
+
+    if (spi_mode) {
+        out.print("\n")
+        out.print("""
+  .os_mutex_cb_init_mut_handle = {0U, 0U, 0U, 0U},
+  .os_mutex_def_init_mut_handle = {(${appInst}_CMSIS_RTOS.os_mutex_cb_init_mut_handle)},
+  .init_mut_id = 0U,
+""")
+ }
+            
+   if (sd_mode) {
+out.print("\n")
+out.print("""
+  .os_semaphore_cb_transfer_sem = {0U, 0U},
+  .os_semaphore_def_transfer_sem = {(${appInst}_CMSIS_RTOS.os_semaphore_cb_transfer_sem)},
+  .transfer_sem_id = 0U,
+  .transfer_sem_index = 0,
+""")
+  }
+out.print("};")
+}
+        out.print("\n")
+        if (sd_mode) {
+        out.print("""
+/* SDMMC SD mode instance */
+SDMMC_BLOCK_SD_t ${appInst}_SD =
+{
+""")
+        out.print(outer_space + ".sdmmc = XMC_SDMMC, /* SDMMC instance */")
+        
+        out.print("\n")
+        temp = i.ginterruptprio_sd_host_controller.priorityValue
+        out.print(outer_space + ".int_priority = ${temp}U, /* Node interrupt priority */")
+        
+        out.print("\n")
+        temp = i.ginterruptprio_sd_host_controller.subPriorityValue
+        out.print(outer_space + ".int_sub_priority = ${temp}U, /* Node interrupt sub-priority */")
+        
+        out.print("\n")
+        out.print(outer_space + ".mode_init_flag = false, /* Mode initialization false by default */")
+        
+        if (i.gcheck_use_rtos.value) {
+          out.print("\n")
+          out.print(outer_space + ".rtos = &${appInst}_CMSIS_RTOS, /* RTOS resources */")
+        } else {
+          out.print("\n")
+          out.print(outer_space + ".systimer = &${i.appres_systimer.getInstanceLabel()} /* SYSTIMER APP instance */")
+        }
+          out.print("""
+};""")
+          
+        }
+        
+        if (spi_mode) {
+            out.print("""
+/* SDMMC SPI instance */
+SDMMC_BLOCK_SPI_t ${appInst}_SPI =
+{
+""")
+            out.print(outer_space + ".spi_master_handle = &${i.appres_spi_master.getInstanceLabel()}, /* SDMMC SPI instance */")
+            out.print("\n")
+            out.print(outer_space + ".mode_init_flag = false,")
+            
+            if (i.gcheck_use_rtos.value) {
+                out.print("\n")
+                out.print(outer_space + ".rtos = &${appInst}_CMSIS_RTOS /* RTOS resources */")
+            }
+            
+            out.print("""
+};""")
+            }
+        
+        out.print("\n")
+        out.print("""
+/* SDMMC_BLOCK APP instance */
+SDMMC_BLOCK_t ${appInst} =
+{
+""")
+        if (i.gcombo_sd_mode.value == "SD Mode") {
+            out.print(outer_space + ".interface_mode = SDMMC_BLOCK_CARD_INTERFACE_SD, /* SD interface */")
+            out.print("\n")
+            out.print(outer_space + ".sdmmc_sd = &${appInst}_SD, /* SDMMC_SD instance */")
+        }
+        
+        if (i.gcombo_sd_mode.value == "SPI Mode") {
+            out.print(outer_space + ".interface_mode = SDMMC_BLOCK_CARD_INTERFACE_SPI, /* SPI interface */")
+            out.print("\n")
+            out.print(outer_space + ".sdmmc_spi = &${appInst}_SPI, /* SDMMC_SPI instance */")
+            if(i.gcheck_led.value == true) {
+                out.print("\n")
+                out.print(outer_space + ".led = &${appInst}_LED,")
+            }
+        }
+    if(i.gcheck_sdwc.value == true) {
+            out.print("\n")
+            out.print(outer_space + ".sdwc = &${appInst}_WRITE_PROTECT,")
+        }
+        if (i.gcheck_use_rtos.value == true) {
+            out.print("\n")
+            out.print(outer_space + ".rtos_mode = SDMMC_BLOCK_RTOS_MODE_ENABLED, /* RTOS mode is used */")
+            out.print("\n")
+            out.print(outer_space + ".cmsis_rtos = &${i.appres_cmsis_rtos.getInstanceLabel()}, /* RTOS mode is used */")
+        } else {
+            out.print("\n")
+            out.print(outer_space + ".rtos_mode = SDMMC_BLOCK_RTOS_MODE_DISABLED, /* RTOS mose is not used */")
+            out.print("\n")
+            out.print("\n")
+            out.print(outer_space + "#if SDMMC_BLOCK_RTOS_MODE_SELECT")
+            out.print("\n")
+            out.print(outer_space + ".cmsis_rtos = NULL, /* RTOS mose is not used */")
+            out.print("\n")
+            out.print(outer_space + "#endif /* SDMMC_BLOCK_RTOS_MODE_SELECT */")
+            out.print("\n")
+        }
+        out.print("\n")
+        if ((spi_mode && spi_ext_pin_interface_enable) || (sd_mode))
+        {
+          out.print(outer_space + ".init_pins = ${appInst}_Config_Init, /* true: Initialized; false: Uninitialized */")
+        }
+        else
+        {
+          out.print(outer_space + ".init_pins = NULL, /* true: Initialized; false: Uninitialized */")
+        }
+        out.print("\n")
+        out.print(outer_space + ".init_flag = false, /* true: Initialized; false: Uninitialized */")
+        
+        out.print("\n")
+        out.print(outer_space + ".card_state = ((uint8_t)SDMMC_BLOCK_CARD_STATE_NOT_INITIALIZED |\n ${gen_space(16)}(uint8_t)SDMMC_BLOCK_CARD_STATE_NO_CARD) /* Card state */")
+        out.print("""
+};""")
+        
+        out.print("\n")
+        out.print("""
+/**********************************************************************************************************************
+ * FUNCTION DEFINITIONS
+ **********************************************************************************************************************/
+""")
+
+        if (sd_mode) {
+            out.print("""
+/* SDMMC SD interrupt handler */
+void SDMMC0_0_IRQHandler(void)
+{
+  normal_int_status = ${appInst}.sdmmc_sd->sdmmc->INT_STATUS_NORM;
+  err_int_status = ${appInst}.sdmmc_sd->sdmmc->INT_STATUS_ERR;
+
+  if (normal_int_status & SDMMC_INT_STATUS_NORM_ERR_INT_Msk)
+  {
+    SDMMC_BLOCK_SD_ErrorInterruptHandler(&${appInst}, err_int_status);
+  }
+
+  if (normal_int_status & SDMMC_BLOCK_NORMAL_INT_STATUS_BITS)
+  {
+    SDMMC_BLOCK_SD_NormalInterruptHandler(&${appInst}, normal_int_status);
+  }
+}
+""")
+        }
+
+if ((spi_mode && spi_ext_pin_interface_enable) || (sd_mode))
+{
+        out.print("""
+/*
+ * Configuration initialization:
+ * For pins and other mode specific settings
+ */""")
+        out.print("""
+static void ${appInst}_Config_Init(void)
+{""")
+    if(sd_mode) {
+        
+    if (i.gcheck_sdmmc_cmd_dat_delay.value == true) {
+        out.print("\n")
+        out.print(gen_space(2) + "/* Enable delay on command and data lines */")
+        out.print("\n")
+        out.print(gen_space(2) + "XMC_SDMMC_EnableDelayCmdDatLines();")
+        out.print("\n\n")
+        out.print(gen_space(2) + "/* Set the delay value chosen in the APP user interface */")
+        out.print("\n")
+        out.print(gen_space(2) + "XMC_SDMMC_SetDelay(SDMMC_BLOCK_SD_NUM_DELAY_ELEMENTS);")
+        out.print("\n")
+    }
+            out.print("""
+  XMC_GPIO_Init(${appInst}_COMMAND.port,
+                ${appInst}_COMMAND.pin,
+                &${appInst}_COMMAND.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_COMMAND.port,
+                              ${appInst}_COMMAND.pin,
+                              ${appInst}_COMMAND.config->hw_control);
+
+  XMC_GPIO_Init(${appInst}_CLK.port,
+                ${appInst}_CLK.pin,
+                &${appInst}_CLK.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_CLK.port,
+                              ${appInst}_CLK.pin,
+                              ${appInst}_CLK.config->hw_control);
+
+  XMC_GPIO_Init(${appInst}_DATA_0.port,
+                ${appInst}_DATA_0.pin,
+                &${appInst}_DATA_0.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_0.port,
+                              ${appInst}_DATA_0.pin,
+                              ${appInst}_DATA_0.config->hw_control);
+""")
+            if (_4_8_bit_mode){
+                out.print("""
+  XMC_GPIO_Init(${appInst}_DATA_1.port,
+                ${appInst}_DATA_1.pin,
+                &${appInst}_DATA_1.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_1.port,
+                              ${appInst}_DATA_1.pin,
+                              ${appInst}_DATA_1.config->hw_control);
+  
+  XMC_GPIO_Init(${appInst}_DATA_2.port,
+                ${appInst}_DATA_2.pin,
+                &${appInst}_DATA_2.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_2.port,
+                              ${appInst}_DATA_2.pin,
+                              ${appInst}_DATA_2.config->hw_control);
+
+  XMC_GPIO_Init(${appInst}_DATA_3.port,
+                ${appInst}_DATA_3.pin,
+                &${appInst}_DATA_3.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_3.port,
+                              ${appInst}_DATA_3.pin,
+                              ${appInst}_DATA_3.config->hw_control);
+""")
+            } // if (_4_8_bit_mode)
+            if (_8_bit_mode){
+                out.print("""
+  XMC_GPIO_Init(${appInst}_DATA_4.port,
+                ${appInst}_DATA_4.pin,
+                &${appInst}_DATA_4.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_4.port,
+                              ${appInst}_DATA_4.pin,
+                              ${appInst}_DATA_4.config->hw_control);
+  
+  XMC_GPIO_Init(${appInst}_DATA_5.port,
+                ${appInst}_DATA_5.pin,
+                &${appInst}_DATA_5.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_5.port,
+                              ${appInst}_DATA_5.pin,
+                              ${appInst}_DATA_5.config->hw_control);
+
+  XMC_GPIO_Init(${appInst}_DATA_6.port,
+                ${appInst}_DATA_6.pin,
+                &${appInst}_DATA_6.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_6.port,
+                              ${appInst}_DATA_6.pin,
+                              ${appInst}_DATA_6.config->hw_control);
+
+  XMC_GPIO_Init(${appInst}_DATA_7.port,
+                ${appInst}_DATA_7.pin,
+                &${appInst}_DATA_7.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_DATA_7.port,
+                              ${appInst}_DATA_7.pin,
+                              ${appInst}_DATA_7.config->hw_control);
+""")
+            } // if (_8_bit_mode)
+
+  if(i.gcheck_sdcd.value == true) {
+                out.print("""
+  XMC_GPIO_Init(${appInst}_CARD_DETECT.port,
+                ${appInst}_CARD_DETECT.pin,
+                &${appInst}_CARD_DETECT.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_CARD_DETECT.port,
+                              ${appInst}_CARD_DETECT.pin,
+                              ${appInst}_CARD_DETECT.config->hw_control);
+""")
+       }
+  else
+  {
+				out.print("""
+  XMC_SDMMC_SetCardDetectionSource(XMC_SDMMC, XMC_SDMMC_CD_SOURCE_SW);
+  XMC_SDMMC_SetCardDetectionStatus(XMC_SDMMC, XMC_SDMMC_CD_STATUS_INSERTED);
+""")
+  }
+  
+  if(i.gcheck_rst.value == true) {
+      out.print("""
+  XMC_GPIO_Init(${appInst}_RESET.port,
+                ${appInst}_RESET.pin,
+                &${appInst}_RESET.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_RESET.port,
+                              ${appInst}_RESET.pin,
+                              ${appInst}_RESET.config->hw_control);
+""")
+     }
+
+if(i.gcheck_bus_power.value == true) {
+out.print("""
+  XMC_GPIO_Init(${appInst}_BUS_POWER.port,
+                ${appInst}_BUS_POWER.pin,
+                &${appInst}_BUS_POWER.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_BUS_POWER.port,
+                              ${appInst}_BUS_POWER.pin,
+                              ${appInst}_BUS_POWER.config->hw_control);
+""")
+     }
+
+  } // if(sd_mode)
+  
+  if(i.gcheck_sdwc.value == true) {
+                out.print("""
+  XMC_GPIO_Init(${appInst}_WRITE_PROTECT.port,
+                ${appInst}_WRITE_PROTECT.pin,
+                &${appInst}_WRITE_PROTECT.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_WRITE_PROTECT.port,
+                              ${appInst}_WRITE_PROTECT.pin,
+                              ${appInst}_WRITE_PROTECT.config->hw_control);
+""")
+  }
+  else
+  {
+    if (!xmc1_family)
+    {
+				out.print("""
+#if (UC_SERIES != XMC45)
+  XMC_SDMMC_SetWriteProtectionSource(XMC_SDMMC, XMC_SDMMC_WP_SOURCE_SW);
+  XMC_SDMMC_SetWriteProtectionStatus(XMC_SDMMC, XMC_SDMMC_WP_STATUS_NO_WRITE_PROTECTION);
+#endif
+""")
+    }
+  }
+
+  
+  if(i.gcheck_led.value == true) {
+      out.print("""
+  XMC_GPIO_Init(${appInst}_LED.port,
+                ${appInst}_LED.pin,
+                &${appInst}_LED.config->config);
+  XMC_GPIO_SetHardwareControl(${appInst}_LED.port,
+                              ${appInst}_LED.pin,
+                              ${appInst}_LED.config->hw_control);
+""")
+  }
+  out.print("""}""")
+} //if ((spi_mode && spi_ext_pin_interface_enable) || (sd_mode))
+
+    } else { // if (MappedUri_channel != null) {
+        out.print("""/* SDMMC_BLOCK APP is not mapped for APP instance: ${instance} */""")
+    }
+    instance++;
+}

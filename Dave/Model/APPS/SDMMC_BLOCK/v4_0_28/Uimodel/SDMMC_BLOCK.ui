@@ -1,0 +1,345 @@
+<p1:Tab  xmlns="http://www.eclipse.org/xwt/presentation" xmlns:x="http://www.eclipse.org/xwt" xmlns:p1="clr-namespace:com.ifx.davex.ui.controls.app" x:Class="e" layout="{x:Null}">
+	<p1:TabFolder bounds="5, 5, 730, 563">
+		<p1:GTab text="General Settings" widgetName="gtab_general_settings" visible="true" enabled="true" description="General">
+			<p1:GTab.control>
+				<p1:Tab>
+					<p1:Tab.layout>
+						<GridLayout horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+					</p1:Tab.layout>
+					<p1:GGroup text="Mode Configuration" widgetName="ggroup_sd_mode">
+						<p1:GGroup.layoutData>
+							<GridData widthHint="210"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout marginLeft="5" verticalSpacing="10" horizontalSpacing="10" marginRight="5" marginTop="5" numColumns="2"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" visible="true" widgetName="glabel_sd_mode" toolTipText="Configuration of SD card bus protocol."/>
+						<p1:GCombo manifestObj="true" widgetName="gcombo_sd_mode" value="SPI Mode" options="SD Mode&#13;&#10;SPI Mode" description="&lt;Mode&gt;&#13;&#10;Select the mode of operation (SPI or SD mode): A combo-box is provided to set the configuration. &lt;br&gt;"/>
+					</p1:GGroup>
+					<p1:GGroup text="RTOS Configuration" widgetName="ggroup_rtos_configuration">
+						<p1:GGroup.layoutData>
+							<GridData widthHint="210"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout horizontalSpacing="10" verticalSpacing="10" marginTop="5" marginRight="5" marginLeft="5" marginBottom="5"/>
+						</p1:GGroup.layout>
+						<p1:GCheck text="Use SDMMC_BLOCK with RTOS" manifestObj="true" widgetName="gcheck_use_rtos" toolTipText="Enables the RTOS environment." description="&lt;Use SDMMC_BLOCK with RTOS&gt;&#13;&#10;Enable/disable the RTOS mode for the APP. &lt;br&gt;"/>
+					</p1:GGroup>
+					<p1:GGroup text="Functional Signals Configuration" widgetName="ggroup_signal_configuration" toolTipText="Enables optional signals. Signals should be&#13;&#10;checked only when supported by the used&#13;&#10;kit.">
+						<p1:GGroup.layoutData>
+							<GridData widthHint="210"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GCheck manifestObj="true" text="LED signal" widgetName="gcheck_led" toolTipText="Enables optional LED signal." description="&lt;LED signal&gt;&#13;&#10;Enable LED signal to indicate data transmission between the SD card and the MCU &lt;br&gt;"/>
+						<p1:GCheck manifestObj="true" text="Write protection signal (SDWC)" widgetName="gcheck_sdwc" toolTipText="Enables optional write protection signal." description="&lt;Write protection signal (SDWC)&gt;&#13;&#10;Enable write protection signal. &lt;br&gt;&lt;br&gt;&#13;&#10;This signal can be used to indicate if the SD card is write protected."/>
+						<p1:GCheck text="Card detection signal (SDCD)" manifestObj="true" widgetName="gcheck_sdcd" toolTipText="Enables optional card detection signal." description="&lt;Card detection signal (SDCD)&gt;&#13;&#10;Enable card detection signal. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;This signal can be used to trigger an interrupt to the processor&#13;&#10;when the SD card is either inserted OR removed. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This signal is only valid in SD mode. &lt;br&gt;"/>
+						<p1:GCheck manifestObj="true" text="Bus power signal" widgetName="gcheck_bus_power" toolTipText="Enables optional bus power signal. By default, the&#13;&#10;power to the SD card is always active." description="&lt;Bus power signal&gt;&#13;&#10;Enable bus power signal. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;This signal is used to provide an input voltage signal&#13;&#10;to the card. The APP will set the voltage levels in the&#13;&#10;block layer. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This signal is only valid in SD mode. &lt;br&gt;"/>
+						<p1:GCheck manifestObj="true" text="Reset signal (RST)" widgetName="gcheck_rst" toolTipText="Enables optional reset signal." description="&lt;Reset signal (RST)&gt;&#13;&#10;Enable reset signal. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;The RST pin provides a way for the SDMMC peripheral to reset the SD card &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This signal is only valid in SD mode. &lt;br&gt;"/>
+					</p1:GGroup>
+					<p1:GMessage text="SDMMC Clock is not enabled in the &quot;Clock Selection Settings&quot; tab of CLOCK_XMC4 APP. Enable the same to continue." visible="true" manifestObj="true" isError="true" widgetName="gmessage_clock_settings">
+						<p1:GMessage.layoutData>
+							<GridData grabExcessHorizontalSpace="true" widthHint="200"/>
+						</p1:GMessage.layoutData>
+					</p1:GMessage>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Advanced Settings" visible="true" enabled="true" manifestObj="true" widgetName="gtab_sd_advanced_settings" description="Advanced Spi">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite_29">
+					<p1:Tab.layout>
+						<GridLayout horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+					</p1:Tab.layout>
+					<p1:GGroup text="SD Bus Configuration" widgetName="ggroup_sd_bus_configuration">
+						<p1:GGroup.layoutData>
+							<GridData widthHint="269"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="4" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel manifestObj="true" text="Data bus width:" widgetName="glabel_data_bus_width" toolTipText="Configure number of data lines used&#13;&#10;by the SD host controller.">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="85"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo manifestObj="true" options="1-bit SD/MMC&#13;&#10;4-bit SD/MMC&#13;&#10;8-bit MMC" value="4-bit SD/MMC" widgetName="gcombo_data_bus_width" description="&lt;Data bus width&gt;&#13;&#10;Configure number of data lines used by the SD host controller.&lt;br&gt;&lt;br&gt;&#13;&#10;Note: 8-bit MMC mode is not supported in this version of the APP.">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<Label/>
+						<Label/>
+						<p1:GCheck text="Enable SDMMC CMD/DAT delay" manifestObj="true" widgetName="gcheck_sdmmc_cmd_dat_delay" value="true" toolTipText="Enables delay on the CMD/DAT out lines&#13;&#10;of the SD host controller." description="&lt;Enable SDMMC CMD/DAT delay&gt;&#13;&#10;The check-box enables delay on the CMD/DAT out lines of the SD host controller.">
+							<p1:GCheck.layoutData>
+								<GridData horizontalSpan="4"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GLabel text="Num. delay elements:" visible="true" widgetName="glabel_delay_elements" toolTipText="Configure number of delay elements used on&#13;&#10;CMD/DAT out lines of the SD host controller."/>
+						<p1:GInteger x:Style="NONE" minValue="1" maxValue="16" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" manifestObj="true" widgetName="ginteger_delay_elements" value="8" formatVisible="true" description="&lt;Num. delay elements&gt;&#13;&#10;This permits the configuration of the number of delay elements used on CMD/DAT out lines of the SD host controller.">
+							<p1:GInteger.layoutData>
+								<GridData verticalAlignment="FILL" horizontalAlignment="FILL"/>
+							</p1:GInteger.layoutData>
+						</p1:GInteger>
+						<Label/>
+						<Label/>
+					</p1:GGroup>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Advanced Settings" visible="true" enabled="true" manifestObj="true" widgetName="gtab_spi_advanced_settings" description="Advanced Sd">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite_9">
+					<p1:Tab.layout>
+						<GridLayout verticalSpacing="10" marginTop="5" marginRight="5" marginLeft="5" marginBottom="5" horizontalSpacing="10"/>
+					</p1:Tab.layout>
+					<p1:GGroup text="SPI Bus Configuration" widgetName="ggroup_spi_bus_configuration">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Desired bus speed [KHz]:" visible="true" widgetName="glabel_desired_bus_speed"/>
+						<p1:GFloat x:Style="BORDER" minValue="0.1" maxValue="36000" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="*,6" manifestObj="true" widgetName="gfloat_desired_bus_speed" value="10000" description="&lt;Desired bus speed [KHz]&gt;&#13;&#10;Sets the desired SPI bus speed in KiloHertz." toolTipText="Configure SPI bus speed (in KHz).">
+							<p1:GFloat.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GFloat.layoutData>
+						</p1:GFloat>
+						<p1:GLabel text="Clock polarity:" widgetName="glabel_clock_polarity"/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_clock_polarity" options="Inverted&#13;&#10;Non-Inverted&#13;&#10;" value="Inverted" description="&lt;Clock polarity&gt;&#13;&#10;This option is used to select the clock polarity." toolTipText="Configure SPI clock polarity.">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup text="DMA Mode" widgetName="ggroup_dma_mode" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GCheck text="Enable DMA operation in SPI mode" manifestObj="true" widgetName="gcheck_enable_dma_mode" toolTipText="Enables DMA mode for communication&#13;&#10;with SD card over SPI bus. By default, the&#13;&#10;IRQ mode is used." description="&lt;Enable DMA operation in SPI mode&gt;&#13;&#10;Enables DMA mode for communication with SD card over SPI bus. (IRQ mode is used by default)."/>
+					</p1:GGroup>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Interrupt Settings" visible="true" enabled="true" manifestObj="true" widgetName="gtab_interrupt_settings" description="Interrupt">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite_11">
+					<p1:Tab.layout>
+						<GridLayout horizontalSpacing="10" verticalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5"/>
+					</p1:Tab.layout>
+					<p1:GInterruptPrio maxPriority="63" maxSubPriority="0" minPriority="0" minSubPriority="0" priorityMandatory="false" priorityValue="63" subPriorityMandatory="true" subPriorityValue="0" text="SD Host Controller IRQ Configuration" widgetName="ginterruptprio_sd_host_controller" manifestObj="true" description="&lt;SD Host Controller IRQ Configuration&gt;&#13;&#10;This widget permits the configuration of the preemption priority and sub-priority.&#13;&#10;&lt;br&gt;&lt;br&gt;&#13;&#10;Note: The MAX_VALUE (for preemption priority and sub-priority) indicated in the range&#13;&#10;field will be dynamically assigned based on the number of bits configured in the CPU_CTRL APP."/>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Pin Settings" visible="true" enabled="true" widgetName="gtab_pin_settings" description="Pin">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite_12">
+					<p1:Tab.layout>
+						<GridLayout numColumns="2" verticalSpacing="10" marginTop="5" marginRight="5" marginLeft="5" marginBottom="5" horizontalSpacing="10"/>
+					</p1:Tab.layout>
+					<p1:GCheck text="Enable advanced pin configuration" manifestObj="true" widgetName="gcheck_enable_advanced_pin_config" toolTipText="Displays and permits configuration of&#13;&#10;advanced pin characteristics." description="&lt;Enable advanced pin configuration&gt;&#13;&#10;This option is used to enable advanced pin configuration. Once this option is enabled, the user can configure the advanced charecteristics of the pins used for SDMMC."/>
+					<Label/>
+					<p1:GGroup text="LED" widgetName="ggroup_led_pin_settings" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" widgetName="glabel_led_pin_mode" description=""/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_led_pin_mode" options="Push Pull&#13;&#10;Open Drain" value="Push Pull" description="&lt;LED pin -&gt; Mode&gt;&#13;&#10;Select LED pin mode. &lt;br&gt;">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="222"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="Driver strength:" widgetName="glabel_led_pin_strength" description="">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_led_pin_strength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="&lt;LED pin -&gt; Driver strength&gt;&#13;&#10;Select LED driver strength. &lt;br&gt;">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup text="Data x [x = 0...7]" widgetName="ggroup_sd_data_pins_settings" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel manifestObj="true" text="Mode:" widgetName="glabel_sd_data_pins_mode" description=""/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sd_data_pins_mode" value="Push Pull" options="Push Pull&#13;&#10;Open Drain" description="&lt;Data pins -&gt; Mode&gt;&#13;&#10;Select the pin mode for all data pins. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Driver strength:" widgetName="glabel_sd_data_pins_strength" description="">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sd_data_pins_strength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="&lt;Data pins -&gt; Driver strength&gt;&#13;&#10;Select the driver strength for all data pins. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL" widthHint="222"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup text="SDWC" widgetName="ggroup_sdwc_pin_settings" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" widgetName="glabel_sdwc_pin_mode" description=""/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sdwc_pin_mode" value="Tristate" options="Tristate&#13;&#10;Pull Up&#13;&#10;Pull Down&#13;&#10;Continuous Sampling Mode&#13;&#10;Inverted Tristate&#13;&#10;Inverted Pull Up&#13;&#10;Inverted Pull Down&#13;&#10;Inverted Continuous Sampling Mode" description="&lt;SDWC pin -&gt; Mode&gt;&#13;&#10;Select write protection pin mode. &lt;br&gt;">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Hysteresis:" widgetName="glabel_hysteresis_sdwc" description="">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="&lt;SDWC pin -&gt; Hysteresis&gt;&#13;&#10;XMC1000 family devices allow selection of input port pin hysteresis. User can change the receive pin hysteresis to large hysteresis from the default standard hysteresis. This option selects the write protection pin hysteresis. &lt;br&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Standard&#13;&#10;Large" toolTipText="Receive pin input hysteresis (Standard/Large)" value="Standard" widgetName="gcombo_hysteresis_sdwc">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="CMD" widgetName="ggroup_sd_cmd_pin_settings">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel manifestObj="true" text="Mode:" widgetName="glabel_sd_cmd_pin_mode" description=""/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sd_cmd_pin_mode" options="Push Pull&#13;&#10;Open Drain" value="Push Pull" description="&lt;CMD pins -&gt; Mode&gt;&#13;&#10;Select the pin mode for the command pin. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL" widthHint="222"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Driver strength:" widgetName="glabel_sd_cmd_pin_strength" description="">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sd_cmd_pin_strength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="&lt;CMD pins -&gt; Driver strength&gt;&#13;&#10;Select the driver strength for the command pin. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup text="SDCD" widgetName="ggroup_sdcd_pin_settings" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" visible="true" widgetName="glabel_sdcd_pin_mode"/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sdcd_pin_mode" options="Tristate&#13;&#10;Pull Up&#13;&#10;Pull Down&#13;&#10;Continuous Sampling Mode&#13;&#10;Inverted Tristate&#13;&#10;Inverted Pull Up&#13;&#10;Inverted Pull Down&#13;&#10;Inverted Continuous Sampling Mode" value="Tristate" description="&lt;SDCD pin -&gt; Mode&gt;&#13;&#10;Select card detection pin mode. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Hysteresis:" widgetName="glabel_hysteresis_sdcd">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="&lt;SDCD pin -&gt; Hysteresis&gt;&#13;&#10;XMC1000 family devices allow selection of input port pin hysteresis. User can change the receive pin hysteresis to large hysteresis from the default standard hysteresis. This option selects the card detect pin hysteresis. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. " mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Standard&#13;&#10;Large" toolTipText="Receive pin input hysteresis (Standard/Large)" value="Standard" widgetName="gcombo_hysteresis_sdcd">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="CLK" widgetName="ggroup_sd_clk_pin_settings">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel manifestObj="true" text="Mode:" widgetName="glabel_sd_clk_pin_mode"/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sd_clk_pin_mode" value="Push Pull" options="Push Pull&#13;&#10;Open Drain" description="&lt;CLK pin -&gt; Mode&gt;&#13;&#10;Configure the clock pin mode. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Driver strength:" widgetName="glabel_sd_clk_pin_strength">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sd_clk_pin_strength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="&lt;CLK pin -&gt; Driver strength&gt;&#13;&#10;Configure the driver strength for the clock pin. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL" widthHint="222"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup text="RST" widgetName="ggroup_rst_pin_settings" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" widgetName="glabel_rst_pin_mode"/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_rst_pin_mode" options="Push Pull&#13;&#10;Open Drain" value="Push Pull" description="&lt;RST pin -&gt; Mode&gt;&#13;&#10;Select reset pin pin mode. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL" widthHint="222"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="Driver strength:" widgetName="glabel_rst_pin_strength">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_rst_pin_strength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="&lt;RST pin -&gt; Driver strength&gt;&#13;&#10;Select reset pin driver strength. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<Label/>
+					<p1:GGroup text="Bus Power" widgetName="ggroup_bus_power_pin_settings" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" marginBottom="5" marginLeft="5" marginRight="5" marginTop="5" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" widgetName="glabel_bus_power_pin_mode"/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_bus_power_pin_mode" options="Push Pull&#13;&#10;Open Drain" value="Push Pull" description="&lt;Bus Power pin -&gt; Mode&gt;&#13;&#10;Select bus power pin mode. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL" widthHint="222"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="Driver strength:" widgetName="glabel_bus_power_pin_strength">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_bus_power_pin_strength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="&lt;Bus Power pin -&gt; Driver strength&gt;&#13;&#10;Select bus power pin driver strength. &lt;br&gt;&lt;br&gt;&#13;&#10;&#13;&#10;Please note: This pin is only valid in SD mode. ">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<Label/>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+	</p1:TabFolder>
+</p1:Tab>

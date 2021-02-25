@@ -1,0 +1,207 @@
+package Model.APPS.SDMMC_BLOCK.v4_0_28.Templates;
+
+import Model.APPS.SDMMC_BLOCK.v4_0_28.SDMMC_BLOCK
+
+
+out.print("""
+/**
+ * @cond
+ ***********************************************************************************************************************
+ * Copyright (c) 2016, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2016-01-20:
+ *     - Initial version <br>
+ *
+ * 2016-02-05:
+ *     - RTOS support added <br>
+ *
+ * 2016-04-05:
+ *     - Bug fixes done for PR.<br>
+ *
+ * @endcond
+ */
+
+#ifndef SDMMC_BLOCK_CONF_H
+#define SDMMC_BLOCK_CONF_H
+
+""");
+
+Integer spi_mode_selected = 0
+Integer sd_mode_selected = 0
+Integer sdwc_selected = 0
+Integer sd_sdcd_selected = 0
+String sd_bus_width = ""
+Integer spi_mode_led_selected = 0
+Integer sd_rtos_mode_selected = 0
+Integer spi_rtos_mode_selected = 0
+Boolean cmd_dat_delay_enabled = 0
+Integer cmd_dat_delay_value = 0
+
+for (Object i : appInstancesList) {
+    appInst = i.getInstanceLabel();
+    
+    if (i.gcombo_sd_mode.value == "SD Mode")
+    {
+      MappedUri_sdhost = i.hwres_sdmmc_host.getSolverUri()
+      
+      if (i.gcheck_sdmmc_cmd_dat_delay.value == true) {
+          cmd_dat_delay_enabled = true
+          cmd_dat_delay_value = i.ginteger_delay_elements.value
+      }
+    
+      if (MappedUri_sdhost != null) {
+        sd_mode_selected++
+        if (i.gcheck_sdcd.value == true) {
+            sd_sdcd_selected++
+        }
+        
+        sd_bus_width = i.gcombo_data_bus_width.value
+        
+        if (i.gcheck_sdwc.value == true) {
+          sdwc_selected++
+        }
+    
+        if (i.gcheck_use_rtos.value){
+            sd_rtos_mode_selected++
+            out.print("\n")
+        }
+        
+        // add newline
+        out.print("\n")
+        
+      } else {
+        out.print("""/* SDMMC_BLOCK APP is not mapped for APP instance: ${instance} */""")
+      }
+    }
+    else if (i.gcombo_sd_mode.value == "SPI Mode")
+    {
+      spi_mode_selected++
+      if (i.gcheck_sdwc.value == true) {
+          sdwc_selected++
+      }
+      if (i.gcheck_led.value == true) {
+          spi_mode_led_selected++
+      }
+      if (i.gcheck_use_rtos.value == true) {
+          spi_rtos_mode_selected++
+      }
+    }
+}
+
+out.print("""
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+""")
+
+if (spi_mode_selected > 0) {
+  out.print("""
+#include "SPI_MASTER/spi_master.h"
+""")
+}
+
+if (sd_mode_selected > 0) {
+  out.print("""
+#include "xmc_scu.h"
+#include "xmc_sdmmc.h"
+""")
+  if (sd_rtos_mode_selected == 0) {
+  out.print("""
+#include "./SYSTIMER/systimer.h"
+""")
+  }
+}
+
+if ((spi_rtos_mode_selected > 0) || (sd_rtos_mode_selected > 0)) {
+    out.print("""#include "../CMSIS_RTOS/cmsis_rtos.h"
+""")
+}
+
+out.print("""
+/**********************************************************************************************************************
+ * MACROS
+ **********************************************************************************************************************/
+""")
+
+out.print("""
+#define SDMMC_BLOCK_MAJOR_VERSION (${(SDMMC_BLOCK.version).findAll( /\d+/ )*.toInteger()[0]}U) /**< Major version */
+#define SDMMC_BLOCK_MINOR_VERSION (${(SDMMC_BLOCK.version).findAll( /\d+/ )*.toInteger()[1]}U) /**< Minor version */
+#define SDMMC_BLOCK_PATCH_VERSION (${(SDMMC_BLOCK.version).findAll( /\d+/ )*.toInteger()[2]}U) /**< Patch version */""");
+
+if (spi_mode_selected > 0) {
+  out.print("\n")
+  out.print("""#define SDMMC_BLOCK_SPI""")
+  
+  if (spi_mode_led_selected > 0) {
+      spi_mode_led_selected++
+      out.print("\n")
+      out.print("#define SDMMC_BLOCK_SPI_CARD_LED_SIGNAL (1U)")
+  }
+}
+
+if (sd_mode_selected > 0) {
+  out.print("\n")
+  out.print("""
+#define SDMMC_BLOCK_SD
+""")
+  if (cmd_dat_delay_enabled == true) {
+      out.print("""#define SDMMC_BLOCK_SD_NUM_DELAY_ELEMENTS (${cmd_dat_delay_value}U)""")
+  }
+  
+  if (sd_bus_width == "4-bit SD/MMC") {
+      out.print("\n")
+      out.print("#define SDMMC_BLOCK_SD_SUPPORT_4_BUS_WIDTH (1U)")
+  
+  if (sd_sdcd_selected > 0) {
+      out.print("\n")
+      out.print("#define SDMMC_BLOCK_SD_CARD_DETECTION_SUPPORT (1U)")
+  }
+  }
+}
+
+  if (sdwc_selected > 0) {
+      out.print("\n")
+      out.print("#define SDMMC_BLOCK_CARD_WRITE_PROTECT_SIGNAL (1U)")
+  }
+
+if ((spi_rtos_mode_selected > 0) || (sd_rtos_mode_selected > 0)) {
+    out.print("\n")
+    out.print("""#define SDMMC_BLOCK_RTOS_MODE_SELECT (1U)""")
+}
+else
+{
+    out.print("\n")
+    out.print("""#define SDMMC_BLOCK_RTOS_MODE_SELECT (0U)""")
+}
+
+out.print("\n")
+out.print("""
+#endif  /* ifndef SDMMC_BLOCK_CONF_H */""");

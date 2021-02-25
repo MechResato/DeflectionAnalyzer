@@ -48,7 +48,27 @@ Dave/Generated/DAVE.o Dave/Generated/DAVE.d Dave/Generated/DAVE.o: \
  ../Dave/Generated/GLOBAL_CCU4/global_ccu4_extern.h \
  ../Dave/Generated/TIMER/timer.h ../Dave/Generated/TIMER/timer_conf.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/GLOBAL_CCU4/global_ccu4.h \
- ../Dave/Generated/TIMER/timer_extern.h
+ ../Dave/Generated/TIMER/timer_extern.h ../Dave/Generated/RTC/rtc.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_rtc.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_rtc.h \
+ ../Dave/Generated/RTC/rtc_conf.h ../Dave/Generated/RTC/rtc_extern.h \
+ ../Dave/Generated/SYSTIMER/systimer.h \
+ ../Dave/Generated/SYSTIMER/systimer_conf.h \
+ ../Dave/Generated/SYSTIMER/systimer_extern.h \
+ ../Dave/Generated/SDMMC_BLOCK/sdmmc_block.h \
+ ../Dave/Generated/SDMMC_BLOCK/sdmmc_block_conf.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_sdmmc.h \
+ c:\workspaces\dave-4.4.2-64bit_ws\deflectionanalyzer\dave\generated\systimer\systimer.h \
+ ../Dave/Generated/SDMMC_BLOCK/sdmmc_block_extern.h \
+ ../Dave/Generated/FATFS/fatfs.h ../Dave/Generated/FATFS/ff_Src/ffconf.h \
+ ../Dave/Generated/FATFS/ff_Src/../fatfs_conf.h \
+ ../Dave/Generated/FATFS/ff_Src/diskio.h \
+ ../Dave/Generated/FATFS/ff_Src/ff.h \
+ ../Dave/Generated/FATFS/ff_Src/ffconf.h \
+ ../Dave/Generated/FATFS/ff_Src/ff.h ../Dave/Generated/FATFS/fatfs_conf.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SDMMC_BLOCK/SDMMC_BLOCK.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/RTC/rtc.h \
+ ../Dave/Generated/FATFS/fatfs_extern.h
 
 ../Dave/Generated/DAVE.h:
 
@@ -151,3 +171,51 @@ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_c
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/GLOBAL_CCU4/global_ccu4.h:
 
 ../Dave/Generated/TIMER/timer_extern.h:
+
+../Dave/Generated/RTC/rtc.h:
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_rtc.h:
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_rtc.h:
+
+../Dave/Generated/RTC/rtc_conf.h:
+
+../Dave/Generated/RTC/rtc_extern.h:
+
+../Dave/Generated/SYSTIMER/systimer.h:
+
+../Dave/Generated/SYSTIMER/systimer_conf.h:
+
+../Dave/Generated/SYSTIMER/systimer_extern.h:
+
+../Dave/Generated/SDMMC_BLOCK/sdmmc_block.h:
+
+../Dave/Generated/SDMMC_BLOCK/sdmmc_block_conf.h:
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_sdmmc.h:
+
+c:\workspaces\dave-4.4.2-64bit_ws\deflectionanalyzer\dave\generated\systimer\systimer.h:
+
+../Dave/Generated/SDMMC_BLOCK/sdmmc_block_extern.h:
+
+../Dave/Generated/FATFS/fatfs.h:
+
+../Dave/Generated/FATFS/ff_Src/ffconf.h:
+
+../Dave/Generated/FATFS/ff_Src/../fatfs_conf.h:
+
+../Dave/Generated/FATFS/ff_Src/diskio.h:
+
+../Dave/Generated/FATFS/ff_Src/ff.h:
+
+../Dave/Generated/FATFS/ff_Src/ffconf.h:
+
+../Dave/Generated/FATFS/ff_Src/ff.h:
+
+../Dave/Generated/FATFS/fatfs_conf.h:
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SDMMC_BLOCK/SDMMC_BLOCK.h:
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/RTC/rtc.h:
+
+../Dave/Generated/FATFS/fatfs_extern.h:

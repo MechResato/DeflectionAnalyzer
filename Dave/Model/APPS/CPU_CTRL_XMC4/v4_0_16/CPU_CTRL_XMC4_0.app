@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="ASCII"?>
 <ResourceModel:App xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ResourceModel="http://www.infineon.com/Davex/Resource.ecore" name="CPU_CTRL_XMC4" URI="http://resources/4.0.16/app/CPU_CTRL_XMC4/0" description="Defines the number of bits for priority grouping.&#xA; Handles NMI, memmanage, usage, bus &amp; hard fault exceptions and MPU settings." version="4.0.16" minDaveVersion="4.0.0" instanceLabel="CPU_CTRL_XMC4_0" appLabel="">
   <upwardMapList xsi:type="ResourceModel:RequiredApp" href="../../ADC_MEASUREMENT/v4_1_22/ADC_MEASUREMENT_0.app#//@requiredApps.1"/>
+  <upwardMapList xsi:type="ResourceModel:RequiredApp" href="../../SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@requiredApps.2"/>
+  <upwardMapList xsi:type="ResourceModel:RequiredApp" href="../../SYSTIMER/v4_1_16/SYSTIMER_0.app#//@requiredApps.1"/>
   <properties singleton="true" sharable="true"/>
   <virtualSignals name="nmi_irq" URI="http://resources/4.0.16/app/CPU_CTRL_XMC4/0/vs_nmi_irq" hwSignal="nmi_in" hwResource="//@hwResources.0" visible="true"/>
   <virtualSignals name="jtag tck" URI="http://resources/4.0.16/app/CPU_CTRL_XMC4/0/vs_jtag_tck" hwSignal="db_tck" hwResource="//@hwResources.5" required="false" visible="true"/>

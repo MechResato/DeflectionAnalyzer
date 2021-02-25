@@ -206,7 +206,7 @@
  263              	 .thumb
  264              	 .thumb_func
  266              	TFT_GraphStatic:
- 267              	.LFB446:
+ 267              	.LFB494:
  268              	 .file 1 "../Libraries/FT800-FT813-5.x/tft.c"
    1:../Libraries/FT800-FT813-5.x/tft.c **** /*
    2:../Libraries/FT800-FT813-5.x/tft.c **** @file    		tft.c
@@ -1547,14 +1547,14 @@
  1334 09bc 08000000 	 .word .LC5
  1335 09c0 0400001F 	 .word 520093700
  1336              	 .cfi_endproc
- 1337              	.LFE446:
+ 1337              	.LFE494:
  1339              	 .section .text.TFT_GraphData,"ax",%progbits
  1340              	 .align 2
  1341              	 .global TFT_GraphData
  1342              	 .thumb
  1343              	 .thumb_func
  1345              	TFT_GraphData:
- 1346              	.LFB447:
+ 1346              	.LFB495:
  264:../Libraries/FT800-FT813-5.x/tft.c **** 
  265:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, doubl
  1347              	 .loc 1 265 0
@@ -1901,14 +1901,14 @@
  1622              	.L35:
  1623 020c 0400001F 	 .word 520093700
  1624              	 .cfi_endproc
- 1625              	.LFE447:
+ 1625              	.LFE495:
  1627              	 .section .text.touch_calibrate,"ax",%progbits
  1628              	 .align 2
  1629              	 .global touch_calibrate
  1630              	 .thumb
  1631              	 .thumb_func
  1633              	touch_calibrate:
- 1634              	.LFB448:
+ 1634              	.LFB496:
  328:../Libraries/FT800-FT813-5.x/tft.c **** 
  329:../Libraries/FT800-FT813-5.x/tft.c **** 
  330:../Libraries/FT800-FT813-5.x/tft.c **** void touch_calibrate(void) {
@@ -2032,7 +2032,7 @@
  1682 0058 64213000 	 .word 3154276
  1683 005c ABC7FAFF 	 .word -342101
  1684              	 .cfi_endproc
- 1685              	.LFE448:
+ 1685              	.LFE496:
  1687              	 .section .rodata
  1688              	 .align 2
  1689              	.LC6:
@@ -2047,7 +2047,7 @@
  1694              	 .thumb
  1695              	 .thumb_func
  1697              	TFT_init:
- 1698              	.LFB449:
+ 1698              	.LFB497:
  401:../Libraries/FT800-FT813-5.x/tft.c **** 
  402:../Libraries/FT800-FT813-5.x/tft.c **** uint8_t TFT_init(void)
  403:../Libraries/FT800-FT813-5.x/tft.c **** {
@@ -2160,14 +2160,14 @@
  1773 0080 EEF1F500 	 .word 16118254
  1774 0084 07000026 	 .word 637534215
  1775              	 .cfi_endproc
- 1776              	.LFE449:
+ 1776              	.LFE497:
  1778              	 .section .text.TFT_display_init_screen,"ax",%progbits
  1779              	 .align 2
  1780              	 .global TFT_display_init_screen
  1781              	 .thumb
  1782              	 .thumb_func
  1784              	TFT_display_init_screen:
- 1785              	.LFB450:
+ 1785              	.LFB498:
  436:../Libraries/FT800-FT813-5.x/tft.c **** 
  437:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_display_init_screen(void)
  438:../Libraries/FT800-FT813-5.x/tft.c **** {
@@ -2267,14 +2267,14 @@
  1854 007c 0100001F 	 .word 520093697
  1855 0080 B000B042 	 .word 1118830768
  1856              	 .cfi_endproc
- 1857              	.LFE450:
+ 1857              	.LFE498:
  1859              	 .section .text.TFT_display_static,"ax",%progbits
  1860              	 .align 2
  1861              	 .global TFT_display_static
  1862              	 .thumb
  1863              	 .thumb_func
  1865              	TFT_display_static:
- 1866              	.LFB451:
+ 1866              	.LFB499:
  464:../Libraries/FT800-FT813-5.x/tft.c **** 
  465:../Libraries/FT800-FT813-5.x/tft.c **** 
  466:../Libraries/FT800-FT813-5.x/tft.c **** 
@@ -2410,14 +2410,14 @@
  1961 00b4 00000000 	 .word num_dl_static
  1962 00b8 00000000 	 .word TFT_last_Menu
  1963              	 .cfi_endproc
- 1964              	.LFE451:
+ 1964              	.LFE499:
  1966              	 .section .text.TFT_touch,"ax",%progbits
  1967              	 .align 2
  1968              	 .global TFT_touch
  1969              	 .thumb
  1970              	 .thumb_func
  1972              	TFT_touch:
- 1973              	.LFB452:
+ 1973              	.LFB500:
  502:../Libraries/FT800-FT813-5.x/tft.c **** 
  503:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_touch(void)
  504:../Libraries/FT800-FT813-5.x/tft.c **** {
@@ -2838,14 +2838,14 @@
  2294 01f8 00000000 	 .word TFT_cur_Menu
  2295 01fc 00000000 	 .word TFT_touch_cur_Menu__fptr_arr
  2296              	 .cfi_endproc
- 2297              	.LFE452:
+ 2297              	.LFE500:
  2299              	 .section .text.TFT_display,"ax",%progbits
  2300              	 .align 2
  2301              	 .global TFT_display
  2302              	 .thumb
  2303              	 .thumb_func
  2305              	TFT_display:
- 2306              	.LFB453:
+ 2306              	.LFB501:
  598:../Libraries/FT800-FT813-5.x/tft.c **** 
  599:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_display(void)
  600:../Libraries/FT800-FT813-5.x/tft.c **** {
@@ -2987,7 +2987,7 @@
  2398 00ac 00000000 	 .word num_dl_static
  2399 00b0 00000000 	 .word TFT_display_cur_Menu__fptr_arr
  2400              	 .cfi_endproc
- 2401              	.LFE453:
+ 2401              	.LFE501:
  2403              	 .section .rodata
  2404 005a 0000     	 .align 2
  2405              	.LC7:
@@ -3004,7 +3004,7 @@
  2413              	 .thumb
  2414              	 .thumb_func
  2416              	TFT_display_static_menu0:
- 2417              	.LFB454:
+ 2417              	.LFB502:
  645:../Libraries/FT800-FT813-5.x/tft.c **** 
  646:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_display_static_menu0(void){
  2418              	 .loc 1 646 0
@@ -3191,7 +3191,7 @@
  2565 013c 00000000 	 .word G_h_grid_lines
  2566 0140 00000000 	 .word G_v_grid_lines
  2567              	 .cfi_endproc
- 2568              	.LFE454:
+ 2568              	.LFE502:
  2570              	 .section .rodata
  2571              	 .align 2
  2572              	.LC9:
@@ -3205,7 +3205,7 @@
  2580              	 .thumb
  2581              	 .thumb_func
  2583              	TFT_display_static_menu1:
- 2584              	.LFB455:
+ 2584              	.LFB503:
  681:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_display_static_menu1(void){
  2585              	 .loc 1 681 0
  2586              	 .cfi_startproc
@@ -3341,7 +3341,7 @@
  2689 00c8 70000000 	 .word .LC9
  2690 00cc 74000000 	 .word .LC10
  2691              	 .cfi_endproc
- 2692              	.LFE455:
+ 2692              	.LFE503:
  2694              	 .section .rodata
  2695 0077 00       	 .align 2
  2696              	.LC11:
@@ -3382,7 +3382,7 @@
  2725              	 .thumb
  2726              	 .thumb_func
  2728              	TFT_display_menu0:
- 2729              	.LFB456:
+ 2729              	.LFB504:
  709:../Libraries/FT800-FT813-5.x/tft.c **** 
  710:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_display_menu0(void)
  711:../Libraries/FT800-FT813-5.x/tft.c **** {
@@ -3730,7 +3730,7 @@
  3023 0260 00000000 	 .word G_width
  3024 0264 00000000 	 .word G_height
  3025              	 .cfi_endproc
- 3026              	.LFE456:
+ 3026              	.LFE504:
  3028              	 .section .rodata
  3029 00b3 00       	 .align 2
  3030              	.LC20:
@@ -3744,7 +3744,7 @@
  3038              	 .thumb
  3039              	 .thumb_func
  3041              	TFT_display_menu1:
- 3042              	.LFB457:
+ 3042              	.LFB505:
  760:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_display_menu1(void)
  761:../Libraries/FT800-FT813-5.x/tft.c **** {
  3043              	 .loc 1 761 0
@@ -3880,7 +3880,7 @@
  3147 00c4 00000000 	 .word swipeDistance_X
  3148 00c8 00000000 	 .word swipeDistance_Y
  3149              	 .cfi_endproc
- 3150              	.LFE457:
+ 3150              	.LFE505:
  3152              	 .section .rodata
  3153 00bb 00       	 .align 2
  3154              	.LC22:
@@ -3908,7 +3908,7 @@
  3165              	 .thumb
  3166              	 .thumb_func
  3168              	TFT_touch_menu0:
- 3169              	.LFB458:
+ 3169              	.LFB506:
  788:../Libraries/FT800-FT813-5.x/tft.c **** 
  789:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDi
  3170              	 .loc 1 789 0
@@ -4109,7 +4109,7 @@
  3323 00e0 E8000000 	 .word .LC24
  3324 00e4 00000000 	 .word InputType
  3325              	 .cfi_endproc
- 3326              	.LFE458:
+ 3326              	.LFE506:
  3328              	 .section .rodata
  3329 00f6 0000     	 .align 2
  3330              	.LC25:
@@ -4124,7 +4124,7 @@
  3335              	 .thumb
  3336              	 .thumb_func
  3338              	TFT_touch_menu1:
- 3339              	.LFB459:
+ 3339              	.LFB507:
  832:../Libraries/FT800-FT813-5.x/tft.c **** void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDi
  3340              	 .loc 1 832 0
  3341              	 .cfi_startproc
@@ -4252,7 +4252,7 @@
  3420 005c F8000000 	 .word .LC25
  3421 0060 00000000 	 .word toggle_state_graphmode
  3422              	 .cfi_endproc
- 3423              	.LFE459:
+ 3423              	.LFE507:
  3425              	 .text
  3426              	.Letext0:
  3427              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"

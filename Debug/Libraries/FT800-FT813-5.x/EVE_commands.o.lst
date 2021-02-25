@@ -1482,7 +1482,7 @@
  248              	 .thumb
  249              	 .thumb_func
  251              	EVE_pdn_set:
- 252              	.LFB437:
+ 252              	.LFB485:
  253              	 .file 4 "../Libraries/FT800-FT813-5.x/EVE_target.h"
    1:../Libraries/FT800-FT813-5.x/EVE_target.h **** /*
    2:../Libraries/FT800-FT813-5.x/EVE_target.h **** @file    EVE_target.h
@@ -1713,13 +1713,13 @@
  273              	.L8:
  274 000c 00000000 	 .word IO_DIO_DIGOUT_PD_TFT
  275              	 .cfi_endproc
- 276              	.LFE437:
+ 276              	.LFE485:
  278              	 .section .text.EVE_pdn_clear,"ax",%progbits
  279              	 .align 2
  280              	 .thumb
  281              	 .thumb_func
  283              	EVE_pdn_clear:
- 284              	.LFB438:
+ 284              	.LFB486:
  208:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  209:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline void EVE_pdn_clear(void) {
  285              	 .loc 4 209 0
@@ -1746,13 +1746,13 @@
  304              	.L11:
  305 000c 00000000 	 .word IO_DIO_DIGOUT_PD_TFT
  306              	 .cfi_endproc
- 307              	.LFE438:
+ 307              	.LFE486:
  309              	 .section .text.EVE_cs_set,"ax",%progbits
  310              	 .align 2
  311              	 .thumb
  312              	 .thumb_func
  314              	EVE_cs_set:
- 315              	.LFB439:
+ 315              	.LFB487:
  212:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  213:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline void EVE_cs_set(void) {
  316              	 .loc 4 213 0
@@ -1779,13 +1779,13 @@
  335              	.L14:
  336 000c 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
  337              	 .cfi_endproc
- 338              	.LFE439:
+ 338              	.LFE487:
  340              	 .section .text.EVE_cs_clear,"ax",%progbits
  341              	 .align 2
  342              	 .thumb
  343              	 .thumb_func
  345              	EVE_cs_clear:
- 346              	.LFB440:
+ 346              	.LFB488:
  216:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  217:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline void EVE_cs_clear(void) {
  347              	 .loc 4 217 0
@@ -1812,13 +1812,13 @@
  366              	.L17:
  367 000c 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
  368              	 .cfi_endproc
- 369              	.LFE440:
+ 369              	.LFE488:
  371              	 .section .text.spi_transmit,"ax",%progbits
  372              	 .align 2
  373              	 .thumb
  374              	 .thumb_func
  376              	spi_transmit:
- 377              	.LFB441:
+ 377              	.LFB489:
  220:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  221:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline void spi_transmit(uint8_t data) {
  378              	 .loc 4 221 0
@@ -1880,13 +1880,13 @@
  430              	.L22:
  431 0034 00000000 	 .word SPI_MASTER_0
  432              	 .cfi_endproc
- 433              	.LFE441:
+ 433              	.LFE489:
  435              	 .section .text.spi_transmit_32,"ax",%progbits
  436              	 .align 2
  437              	 .thumb
  438              	 .thumb_func
  440              	spi_transmit_32:
- 441              	.LFB442:
+ 441              	.LFB490:
  226:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  227:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline void spi_transmit_32(uint32_t data) {
  442              	 .loc 4 227 0
@@ -1944,13 +1944,13 @@
  488              	 
  489 003a 80BD     	 pop {r7,pc}
  490              	 .cfi_endproc
- 491              	.LFE442:
+ 491              	.LFE490:
  493              	 .section .text.spi_transmit_burst,"ax",%progbits
  494              	 .align 2
  495              	 .thumb
  496              	 .thumb_func
  498              	spi_transmit_burst:
- 499              	.LFB443:
+ 499              	.LFB491:
  234:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  235:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			/* spi_transmit_burst() is only used for cmd-FIFO commands so it *always* has to transfer 4 byte
  236:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline void spi_transmit_burst(uint32_t data) {
@@ -1985,13 +1985,13 @@
  526              	 
  527 0012 80BD     	 pop {r7,pc}
  528              	 .cfi_endproc
- 529              	.LFE443:
+ 529              	.LFE491:
  531              	 .section .text.spi_receive,"ax",%progbits
  532              	 .align 2
  533              	 .thumb
  534              	 .thumb_func
  536              	spi_receive:
- 537              	.LFB444:
+ 537              	.LFB492:
  239:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  240:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline uint8_t spi_receive(uint8_t data) {
  538              	 .loc 4 240 0
@@ -2060,13 +2060,13 @@
  590 0034 00000000 	 .word ReadData
  591 0038 00000000 	 .word SPI_MASTER_0
  592              	 .cfi_endproc
- 593              	.LFE444:
+ 593              	.LFE492:
  595              	 .section .text.fetch_flash_byte,"ax",%progbits
  596              	 .align 2
  597              	 .thumb
  598              	 .thumb_func
  600              	fetch_flash_byte:
- 601              	.LFB445:
+ 601              	.LFB493:
  252:../Libraries/FT800-FT813-5.x/EVE_target.h **** 
  253:../Libraries/FT800-FT813-5.x/EVE_target.h **** 			static inline uint8_t fetch_flash_byte(const uint8_t *data) {
  602              	 .loc 4 253 0
@@ -2105,7 +2105,7 @@
  633              	 .cfi_def_cfa_offset 0
  634 0016 7047     	 bx lr
  635              	 .cfi_endproc
- 636              	.LFE445:
+ 636              	.LFE493:
  638              	 .global cmd_burst
  639              	 .section .bss.cmd_burst,"aw",%nobits
  642              	cmd_burst:
@@ -2116,7 +2116,7 @@
  647              	 .thumb
  648              	 .thumb_func
  650              	EVE_cmdWrite:
- 651              	.LFB446:
+ 651              	.LFB494:
  652              	 .file 5 "../Libraries/FT800-FT813-5.x/EVE_commands.c"
    1:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*
    2:../Libraries/FT800-FT813-5.x/EVE_commands.c **** @file    EVE_commands.c
@@ -2328,14 +2328,14 @@
  695              	 
  696 0032 80BD     	 pop {r7,pc}
  697              	 .cfi_endproc
- 698              	.LFE446:
+ 698              	.LFE494:
  700              	 .section .text.EVE_memRead8,"ax",%progbits
  701              	 .align 2
  702              	 .global EVE_memRead8
  703              	 .thumb
  704              	 .thumb_func
  706              	EVE_memRead8:
- 707              	.LFB447:
+ 707              	.LFB495:
  166:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  167:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  168:../Libraries/FT800-FT813-5.x/EVE_commands.c **** uint8_t EVE_memRead8(uint32_t ftAddress)
@@ -2408,14 +2408,14 @@
  763              	 
  764 004a 80BD     	 pop {r7,pc}
  765              	 .cfi_endproc
- 766              	.LFE447:
+ 766              	.LFE495:
  768              	 .section .text.EVE_memRead16,"ax",%progbits
  769              	 .align 2
  770              	 .global EVE_memRead16
  771              	 .thumb
  772              	 .thumb_func
  774              	EVE_memRead16:
- 775              	.LFB448:
+ 775              	.LFB496:
  180:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  181:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  182:../Libraries/FT800-FT813-5.x/EVE_commands.c **** uint16_t EVE_memRead16(uint32_t ftAddress)
@@ -2502,14 +2502,14 @@
  844              	 
  845 0062 80BD     	 pop {r7,pc}
  846              	 .cfi_endproc
- 847              	.LFE448:
+ 847              	.LFE496:
  849              	 .section .text.EVE_memRead32,"ax",%progbits
  850              	 .align 2
  851              	 .global EVE_memRead32
  852              	 .thumb
  853              	 .thumb_func
  855              	EVE_memRead32:
- 856              	.LFB449:
+ 856              	.LFB497:
  195:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  196:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  197:../Libraries/FT800-FT813-5.x/EVE_commands.c **** uint32_t EVE_memRead32(uint32_t ftAddress)
@@ -2612,14 +2612,14 @@
  939              	 
  940 007e 80BD     	 pop {r7,pc}
  941              	 .cfi_endproc
- 942              	.LFE449:
+ 942              	.LFE497:
  944              	 .section .text.EVE_memWrite8,"ax",%progbits
  945              	 .align 2
  946              	 .global EVE_memWrite8
  947              	 .thumb
  948              	 .thumb_func
  950              	EVE_memWrite8:
- 951              	.LFB450:
+ 951              	.LFB498:
  212:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  213:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  214:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_memWrite8(uint32_t ftAddress, uint8_t ftData8)
@@ -2686,14 +2686,14 @@
  1004              	 
  1005 0048 80BD     	 pop {r7,pc}
  1006              	 .cfi_endproc
- 1007              	.LFE450:
+ 1007              	.LFE498:
  1009 004a 00BF     	 .section .text.EVE_memWrite16,"ax",%progbits
  1010              	 .align 2
  1011              	 .global EVE_memWrite16
  1012              	 .thumb
  1013              	 .thumb_func
  1015              	EVE_memWrite16:
- 1016              	.LFB451:
+ 1016              	.LFB499:
  223:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  224:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  225:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_memWrite16(uint32_t ftAddress, uint16_t ftData16)
@@ -2769,14 +2769,14 @@
  1077              	 
  1078 0058 80BD     	 pop {r7,pc}
  1079              	 .cfi_endproc
- 1080              	.LFE451:
+ 1080              	.LFE499:
  1082 005a 00BF     	 .section .text.EVE_memWrite32,"ax",%progbits
  1083              	 .align 2
  1084              	 .global EVE_memWrite32
  1085              	 .thumb
  1086              	 .thumb_func
  1088              	EVE_memWrite32:
- 1089              	.LFB452:
+ 1089              	.LFB500:
  235:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  236:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  237:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_memWrite32(uint32_t ftAddress, uint32_t ftData32)
@@ -2864,14 +2864,14 @@
  1160              	 
  1161 006c 80BD     	 pop {r7,pc}
  1162              	 .cfi_endproc
- 1163              	.LFE452:
+ 1163              	.LFE500:
  1165 006e 00BF     	 .section .text.EVE_memWrite_flash_buffer,"ax",%progbits
  1166              	 .align 2
  1167              	 .global EVE_memWrite_flash_buffer
  1168              	 .thumb
  1169              	 .thumb_func
  1171              	EVE_memWrite_flash_buffer:
- 1172              	.LFB453:
+ 1172              	.LFB501:
  249:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  250:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  251:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
@@ -2976,14 +2976,14 @@
  1250              	 
  1251 0072 80BD     	 pop {r7,pc}
  1252              	 .cfi_endproc
- 1253              	.LFE453:
+ 1253              	.LFE501:
  1255              	 .section .text.EVE_memWrite_sram_buffer,"ax",%progbits
  1256              	 .align 2
  1257              	 .global EVE_memWrite_sram_buffer
  1258              	 .thumb
  1259              	 .thumb_func
  1261              	EVE_memWrite_sram_buffer:
- 1262              	.LFB454:
+ 1262              	.LFB502:
  271:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  272:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  273:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* helper function, write a block of memory from the SRAM of the host controller to EVE */
@@ -3085,7 +3085,7 @@
  1338              	 
  1339 006c 80BD     	 pop {r7,pc}
  1340              	 .cfi_endproc
- 1341              	.LFE454:
+ 1341              	.LFE502:
  1343 006e 00BF     	 .section .rodata
  1344              	 .align 2
  1345              	.LC0:
@@ -3100,7 +3100,7 @@
  1350              	 .thumb
  1351              	 .thumb_func
  1353              	EVE_busy:
- 1354              	.LFB455:
+ 1354              	.LFB503:
  292:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  293:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  294:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* Check if the graphics processor completed executing the current command list. */
@@ -3304,14 +3304,14 @@
  1490 00e8 78253000 	 .word 3155320
  1491 00ec 70203000 	 .word 3154032
  1492              	 .cfi_endproc
- 1493              	.LFE455:
+ 1493              	.LFE503:
  1495              	 .section .text.EVE_cmd_start,"ax",%progbits
  1496              	 .align 2
  1497              	 .global EVE_cmd_start
  1498              	 .thumb
  1499              	 .thumb_func
  1501              	EVE_cmd_start:
- 1502              	.LFB456:
+ 1502              	.LFB504:
  357:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  358:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  359:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* deprecated, with using REG_CMDB_WRITE commands will be automatically excecuted on the rising edg
@@ -3348,14 +3348,14 @@
  1523              	 .cfi_def_cfa_offset 0
  1524 000a 7047     	 bx lr
  1525              	 .cfi_endproc
- 1526              	.LFE456:
+ 1526              	.LFE504:
  1528              	 .section .text.EVE_cmd_execute,"ax",%progbits
  1529              	 .align 2
  1530              	 .global EVE_cmd_execute
  1531              	 .thumb
  1532              	 .thumb_func
  1534              	EVE_cmd_execute:
- 1535              	.LFB457:
+ 1535              	.LFB505:
  370:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  371:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  372:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* wait for the co-processor to complete the FIFO queue */
@@ -3386,14 +3386,14 @@
  1556              	 .loc 5 376 0 is_stmt 1
  1557 0010 80BD     	 pop {r7,pc}
  1558              	 .cfi_endproc
- 1559              	.LFE457:
+ 1559              	.LFE505:
  1561 0012 00BF     	 .section .text.EVE_begin_cmd,"ax",%progbits
  1562              	 .align 2
  1563              	 .global EVE_begin_cmd
  1564              	 .thumb
  1565              	 .thumb_func
  1567              	EVE_begin_cmd:
- 1568              	.LFB458:
+ 1568              	.LFB506:
  377:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  378:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  379:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
@@ -3470,14 +3470,14 @@
  1623              	.L59:
  1624 0044 78253000 	 .word 3155320
  1625              	 .cfi_endproc
- 1626              	.LFE458:
+ 1626              	.LFE506:
  1628              	 .section .text.spi_flash_write,"ax",%progbits
  1629              	 .align 2
  1630              	 .global spi_flash_write
  1631              	 .thumb
  1632              	 .thumb_func
  1634              	spi_flash_write:
- 1635              	.LFB459:
+ 1635              	.LFB507:
  396:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  397:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  398:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void spi_flash_write(const uint8_t *data, uint16_t len)
@@ -3591,14 +3591,14 @@
  1719              	 
  1720 0070 80BD     	 pop {r7,pc}
  1721              	 .cfi_endproc
- 1722              	.LFE459:
+ 1722              	.LFE507:
  1724 0072 00BF     	 .section .text.block_transfer,"ax",%progbits
  1725              	 .align 2
  1726              	 .global block_transfer
  1727              	 .thumb
  1728              	 .thumb_func
  1730              	block_transfer:
- 1731              	.LFB460:
+ 1731              	.LFB508:
  420:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  421:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  422:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void block_transfer(const uint8_t *data, uint32_t len)
@@ -3726,14 +3726,14 @@
  1829              	.L70:
  1830 0088 78253000 	 .word 3155320
  1831              	 .cfi_endproc
- 1832              	.LFE460:
+ 1832              	.LFE508:
  1834              	 .section .text.EVE_cmd_clearcache,"ax",%progbits
  1835              	 .align 2
  1836              	 .global EVE_cmd_clearcache
  1837              	 .thumb
  1838              	 .thumb_func
  1840              	EVE_cmd_clearcache:
- 1841              	.LFB461:
+ 1841              	.LFB509:
  446:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  447:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
  448:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*---- co-processor commands that are not used in displays lists, these are not to be used with bur
@@ -3958,14 +3958,14 @@
  1893              	 .loc 5 615 0 is_stmt 1
  1894 0050 80BD     	 pop {r7,pc}
  1895              	 .cfi_endproc
- 1896              	.LFE461:
+ 1896              	.LFE509:
  1898 0052 00BF     	 .section .text.EVE_cmd_flashattach,"ax",%progbits
  1899              	 .align 2
  1900              	 .global EVE_cmd_flashattach
  1901              	 .thumb
  1902              	 .thumb_func
  1904              	EVE_cmd_flashattach:
- 1905              	.LFB462:
+ 1905              	.LFB510:
  616:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  617:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  618:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4004,14 +4004,14 @@
  1931              	 .loc 5 625 0 is_stmt 1
  1932 001c 80BD     	 pop {r7,pc}
  1933              	 .cfi_endproc
- 1934              	.LFE462:
+ 1934              	.LFE510:
  1936 001e 00BF     	 .section .text.EVE_cmd_flashdetach,"ax",%progbits
  1937              	 .align 2
  1938              	 .global EVE_cmd_flashdetach
  1939              	 .thumb
  1940              	 .thumb_func
  1942              	EVE_cmd_flashdetach:
- 1943              	.LFB463:
+ 1943              	.LFB511:
  626:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  627:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  628:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4050,14 +4050,14 @@
  1969              	 .loc 5 635 0 is_stmt 1
  1970 001c 80BD     	 pop {r7,pc}
  1971              	 .cfi_endproc
- 1972              	.LFE463:
+ 1972              	.LFE511:
  1974 001e 00BF     	 .section .text.EVE_cmd_flasherase,"ax",%progbits
  1975              	 .align 2
  1976              	 .global EVE_cmd_flasherase
  1977              	 .thumb
  1978              	 .thumb_func
  1980              	EVE_cmd_flasherase:
- 1981              	.LFB464:
+ 1981              	.LFB512:
  636:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  637:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  638:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4096,14 +4096,14 @@
  2007              	 .loc 5 645 0 is_stmt 1
  2008 001c 80BD     	 pop {r7,pc}
  2009              	 .cfi_endproc
- 2010              	.LFE464:
+ 2010              	.LFE512:
  2012 001e 00BF     	 .section .text.EVE_cmd_flashfast,"ax",%progbits
  2013              	 .align 2
  2014              	 .global EVE_cmd_flashfast
  2015              	 .thumb
  2016              	 .thumb_func
  2018              	EVE_cmd_flashfast:
- 2019              	.LFB465:
+ 2019              	.LFB513:
  646:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  647:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  648:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4186,14 +4186,14 @@
  2082              	.L85:
  2083 0054 FC203000 	 .word 3154172
  2084              	 .cfi_endproc
- 2085              	.LFE465:
+ 2085              	.LFE513:
  2087              	 .section .text.EVE_cmd_flashspidesel,"ax",%progbits
  2088              	 .align 2
  2089              	 .global EVE_cmd_flashspidesel
  2090              	 .thumb
  2091              	 .thumb_func
  2093              	EVE_cmd_flashspidesel:
- 2094              	.LFB466:
+ 2094              	.LFB514:
  663:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  664:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  665:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4232,14 +4232,14 @@
  2120              	 .loc 5 672 0 is_stmt 1
  2121 001c 80BD     	 pop {r7,pc}
  2122              	 .cfi_endproc
- 2123              	.LFE466:
+ 2123              	.LFE514:
  2125 001e 00BF     	 .section .text.EVE_cmd_flashread,"ax",%progbits
  2126              	 .align 2
  2127              	 .global EVE_cmd_flashread
  2128              	 .thumb
  2129              	 .thumb_func
  2131              	EVE_cmd_flashread:
- 2132              	.LFB467:
+ 2132              	.LFB515:
  673:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  674:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  675:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4306,14 +4306,14 @@
  2180              	 
  2181 003a 80BD     	 pop {r7,pc}
  2182              	 .cfi_endproc
- 2183              	.LFE467:
+ 2183              	.LFE515:
  2185              	 .section .text.EVE_cmd_flashsource,"ax",%progbits
  2186              	 .align 2
  2187              	 .global EVE_cmd_flashsource
  2188              	 .thumb
  2189              	 .thumb_func
  2191              	EVE_cmd_flashsource:
- 2192              	.LFB468:
+ 2192              	.LFB516:
  689:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  690:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  691:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4366,14 +4366,14 @@
  2232              	 
  2233 002a 80BD     	 pop {r7,pc}
  2234              	 .cfi_endproc
- 2235              	.LFE468:
+ 2235              	.LFE516:
  2237              	 .section .text.EVE_cmd_flashspirx,"ax",%progbits
  2238              	 .align 2
  2239              	 .global EVE_cmd_flashspirx
  2240              	 .thumb
  2241              	 .thumb_func
  2243              	EVE_cmd_flashspirx:
- 2244              	.LFB469:
+ 2244              	.LFB517:
  699:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  700:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  701:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4433,14 +4433,14 @@
  2288              	 
  2289 0032 80BD     	 pop {r7,pc}
  2290              	 .cfi_endproc
- 2291              	.LFE469:
+ 2291              	.LFE517:
  2293              	 .section .text.EVE_cmd_flashspitx,"ax",%progbits
  2294              	 .align 2
  2295              	 .global EVE_cmd_flashspitx
  2296              	 .thumb
  2297              	 .thumb_func
  2299              	EVE_cmd_flashspitx:
- 2300              	.LFB470:
+ 2300              	.LFB518:
  712:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  713:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  714:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4492,14 +4492,14 @@
  2337              	 
  2338 0028 80BD     	 pop {r7,pc}
  2339              	 .cfi_endproc
- 2340              	.LFE470:
+ 2340              	.LFE518:
  2342 002a 00BF     	 .section .text.EVE_cmd_flashupdate,"ax",%progbits
  2343              	 .align 2
  2344              	 .global EVE_cmd_flashupdate
  2345              	 .thumb
  2346              	 .thumb_func
  2348              	EVE_cmd_flashupdate:
- 2349              	.LFB471:
+ 2349              	.LFB519:
  724:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  725:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  726:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4566,14 +4566,14 @@
  2397              	 
  2398 003a 80BD     	 pop {r7,pc}
  2399              	 .cfi_endproc
- 2400              	.LFE471:
+ 2400              	.LFE519:
  2402              	 .section .text.EVE_cmd_flashwrite,"ax",%progbits
  2403              	 .align 2
  2404              	 .global EVE_cmd_flashwrite
  2405              	 .thumb
  2406              	 .thumb_func
  2408              	EVE_cmd_flashwrite:
- 2409              	.LFB472:
+ 2409              	.LFB520:
  740:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  741:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  742:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4641,14 +4641,14 @@
  2455              	 
  2456 0036 80BD     	 pop {r7,pc}
  2457              	 .cfi_endproc
- 2458              	.LFE472:
+ 2458              	.LFE520:
  2460              	 .section .text.EVE_cmd_inflate2,"ax",%progbits
  2461              	 .align 2
  2462              	 .global EVE_cmd_inflate2
  2463              	 .thumb
  2464              	 .thumb_func
  2466              	EVE_cmd_inflate2:
- 2467              	.LFB473:
+ 2467              	.LFB521:
  759:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  760:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  761:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4720,14 +4720,14 @@
  2518              	 
  2519 003e 80BD     	 pop {r7,pc}
  2520              	 .cfi_endproc
- 2521              	.LFE473:
+ 2521              	.LFE521:
  2523              	 .section .text.EVE_cmd_getprops,"ax",%progbits
  2524              	 .align 2
  2525              	 .global EVE_cmd_getprops
  2526              	 .thumb
  2527              	 .thumb_func
  2529              	EVE_cmd_getprops:
- 2530              	.LFB474:
+ 2530              	.LFB522:
  777:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  778:../Libraries/FT800-FT813-5.x/EVE_commands.c **** #endif /* EVE_GEN > 2 */
  779:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
@@ -4869,14 +4869,14 @@
  2632              	.L107:
  2633 00a0 FC203000 	 .word 3154172
  2634              	 .cfi_endproc
- 2635              	.LFE474:
+ 2635              	.LFE522:
  2637              	 .section .text.EVE_cmd_getptr,"ax",%progbits
  2638              	 .align 2
  2639              	 .global EVE_cmd_getptr
  2640              	 .thumb
  2641              	 .thumb_func
  2643              	EVE_cmd_getptr:
- 2644              	.LFB475:
+ 2644              	.LFB523:
  814:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  815:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  816:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -4960,14 +4960,14 @@
  2707              	.L112:
  2708 0054 FC203000 	 .word 3154172
  2709              	 .cfi_endproc
- 2710              	.LFE475:
+ 2710              	.LFE523:
  2712              	 .section .text.EVE_cmd_inflate,"ax",%progbits
  2713              	 .align 2
  2714              	 .global EVE_cmd_inflate
  2715              	 .thumb
  2716              	 .thumb_func
  2718              	EVE_cmd_inflate:
- 2719              	.LFB476:
+ 2719              	.LFB524:
  832:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  833:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  834:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5026,14 +5026,14 @@
  2762              	 
  2763 0030 80BD     	 pop {r7,pc}
  2764              	 .cfi_endproc
- 2765              	.LFE476:
+ 2765              	.LFE524:
  2767 0032 00BF     	 .section .text.EVE_cmd_interrupt,"ax",%progbits
  2768              	 .align 2
  2769              	 .global EVE_cmd_interrupt
  2770              	 .thumb
  2771              	 .thumb_func
  2773              	EVE_cmd_interrupt:
- 2774              	.LFB477:
+ 2774              	.LFB525:
  845:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  846:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  847:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, does not support cmd-burst */
@@ -5077,14 +5077,14 @@
  2806              	 
  2807 001e 80BD     	 pop {r7,pc}
  2808              	 .cfi_endproc
- 2809              	.LFE477:
+ 2809              	.LFE525:
  2811              	 .section .text.EVE_cmd_loadimage,"ax",%progbits
  2812              	 .align 2
  2813              	 .global EVE_cmd_loadimage
  2814              	 .thumb
  2815              	 .thumb_func
  2817              	EVE_cmd_loadimage:
- 2818              	.LFB478:
+ 2818              	.LFB526:
  854:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  855:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  856:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5166,14 +5166,14 @@
  2875              	 
  2876 004c 80BD     	 pop {r7,pc}
  2877              	 .cfi_endproc
- 2878              	.LFE478:
+ 2878              	.LFE526:
  2880 004e 00BF     	 .section .text.EVE_cmd_mediafifo,"ax",%progbits
  2881              	 .align 2
  2882              	 .global EVE_cmd_mediafifo
  2883              	 .thumb
  2884              	 .thumb_func
  2886              	EVE_cmd_mediafifo:
- 2887              	.LFB479:
+ 2887              	.LFB527:
  876:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  877:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  878:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, does not support cmd-burst */
@@ -5222,14 +5222,14 @@
  2923              	 
  2924 0026 80BD     	 pop {r7,pc}
  2925              	 .cfi_endproc
- 2926              	.LFE479:
+ 2926              	.LFE527:
  2928              	 .section .text.EVE_cmd_memcpy,"ax",%progbits
  2929              	 .align 2
  2930              	 .global EVE_cmd_memcpy
  2931              	 .thumb
  2932              	 .thumb_func
  2934              	EVE_cmd_memcpy:
- 2935              	.LFB480:
+ 2935              	.LFB528:
  886:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  887:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  888:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5292,14 +5292,14 @@
  2983              	 
  2984 003a 80BD     	 pop {r7,pc}
  2985              	 .cfi_endproc
- 2986              	.LFE480:
+ 2986              	.LFE528:
  2988              	 .section .text.EVE_cmd_memcrc,"ax",%progbits
  2989              	 .align 2
  2990              	 .global EVE_cmd_memcrc
  2991              	 .thumb
  2992              	 .thumb_func
  2994              	EVE_cmd_memcrc:
- 2995              	.LFB481:
+ 2995              	.LFB529:
  898:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  899:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  900:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5392,14 +5392,14 @@
  3066              	.L125:
  3067 0064 FC203000 	 .word 3154172
  3068              	 .cfi_endproc
- 3069              	.LFE481:
+ 3069              	.LFE529:
  3071              	 .section .text.EVE_cmd_memset,"ax",%progbits
  3072              	 .align 2
  3073              	 .global EVE_cmd_memset
  3074              	 .thumb
  3075              	 .thumb_func
  3077              	EVE_cmd_memset:
- 3078              	.LFB482:
+ 3078              	.LFB530:
  917:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  918:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  919:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, does not support cmd-burst */
@@ -5455,14 +5455,14 @@
  3120              	 
  3121 0032 80BD     	 pop {r7,pc}
  3122              	 .cfi_endproc
- 3123              	.LFE482:
+ 3123              	.LFE530:
  3125              	 .section .text.EVE_cmd_memzero,"ax",%progbits
  3126              	 .align 2
  3127              	 .global EVE_cmd_memzero
  3128              	 .thumb
  3129              	 .thumb_func
  3131              	EVE_cmd_memzero:
- 3132              	.LFB483:
+ 3132              	.LFB531:
  928:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  929:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  930:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5542,14 +5542,14 @@
  3176              	 
  3177 0032 80BD     	 pop {r7,pc}
  3178              	 .cfi_endproc
- 3179              	.LFE483:
+ 3179              	.LFE531:
  3181              	 .section .text.EVE_cmd_playvideo,"ax",%progbits
  3182              	 .align 2
  3183              	 .global EVE_cmd_playvideo
  3184              	 .thumb
  3185              	 .thumb_func
  3187              	EVE_cmd_playvideo:
- 3188              	.LFB484:
+ 3188              	.LFB532:
  961:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  962:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  963:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command, doe
@@ -5627,14 +5627,14 @@
  3241              	 
  3242 0044 80BD     	 pop {r7,pc}
  3243              	 .cfi_endproc
- 3244              	.LFE484:
+ 3244              	.LFE532:
  3246 0046 00BF     	 .section .text.EVE_cmd_regread,"ax",%progbits
  3247              	 .align 2
  3248              	 .global EVE_cmd_regread
  3249              	 .thumb
  3250              	 .thumb_func
  3252              	EVE_cmd_regread:
- 3253              	.LFB485:
+ 3253              	.LFB533:
  983:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  984:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
  985:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5724,14 +5724,14 @@
  3320              	.L135:
  3321 005c FC203000 	 .word 3154172
  3322              	 .cfi_endproc
- 3323              	.LFE485:
+ 3323              	.LFE533:
  3325              	 .section .text.EVE_cmd_setrotate,"ax",%progbits
  3326              	 .align 2
  3327              	 .global EVE_cmd_setrotate
  3328              	 .thumb
  3329              	 .thumb_func
  3331              	EVE_cmd_setrotate:
- 3332              	.LFB486:
+ 3332              	.LFB534:
 1003:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1004:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1005:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5784,14 +5784,14 @@
  3372              	 
  3373 002a 80BD     	 pop {r7,pc}
  3374              	 .cfi_endproc
- 3375              	.LFE486:
+ 3375              	.LFE534:
  3377              	 .section .text.EVE_cmd_snapshot,"ax",%progbits
  3378              	 .align 2
  3379              	 .global EVE_cmd_snapshot
  3380              	 .thumb
  3381              	 .thumb_func
  3383              	EVE_cmd_snapshot:
- 3384              	.LFB487:
+ 3384              	.LFB535:
 1013:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1014:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1015:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5844,14 +5844,14 @@
  3424              	 
  3425 002a 80BD     	 pop {r7,pc}
  3426              	 .cfi_endproc
- 3427              	.LFE487:
+ 3427              	.LFE535:
  3429              	 .section .text.EVE_cmd_snapshot2,"ax",%progbits
  3430              	 .align 2
  3431              	 .global EVE_cmd_snapshot2
  3432              	 .thumb
  3433              	 .thumb_func
  3435              	EVE_cmd_snapshot2:
- 3436              	.LFB488:
+ 3436              	.LFB536:
 1023:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1024:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1025:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -5974,14 +5974,14 @@
  3534              	 
  3535 00a6 80BD     	 pop {r7,pc}
  3536              	 .cfi_endproc
- 3537              	.LFE488:
+ 3537              	.LFE536:
  3539              	 .section .text.EVE_cmd_track,"ax",%progbits
  3540              	 .align 2
  3541              	 .global EVE_cmd_track
  3542              	 .thumb
  3543              	 .thumb_func
  3545              	EVE_cmd_track:
- 3546              	.LFB489:
+ 3546              	.LFB537:
 1045:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1046:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1047:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -6124,14 +6124,14 @@
  3661              	 
  3662 00c8 90BD     	 pop {r4,r7,pc}
  3663              	 .cfi_endproc
- 3664              	.LFE489:
+ 3664              	.LFE537:
  3666 00ca 00BF     	 .section .text.EVE_cmd_videoframe,"ax",%progbits
  3667              	 .align 2
  3668              	 .global EVE_cmd_videoframe
  3669              	 .thumb
  3670              	 .thumb_func
  3672              	EVE_cmd_videoframe:
- 3673              	.LFB490:
+ 3673              	.LFB538:
 1070:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1071:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1072:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building, it includes executing the command and 
@@ -6189,14 +6189,14 @@
  3717              	 
  3718 0032 80BD     	 pop {r7,pc}
  3719              	 .cfi_endproc
- 3720              	.LFE490:
+ 3720              	.LFE538:
  3722              	 .section .text.EVE_init_flash,"ax",%progbits
  3723              	 .align 2
  3724              	 .global EVE_init_flash
  3725              	 .thumb
  3726              	 .thumb_func
  3728              	EVE_init_flash:
- 3729              	.LFB491:
+ 3729              	.LFB539:
 1081:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1082:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1083:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
@@ -6384,7 +6384,7 @@
  3852              	.L156:
  3853 0098 F0253000 	 .word 3155440
  3854              	 .cfi_endproc
- 3855              	.LFE491:
+ 3855              	.LFE539:
  3857              	 .section .rodata
  3858 002e 0000     	 .align 2
  3859              	.LC1:
@@ -6441,7 +6441,7 @@
  3882              	 .thumb
  3883              	 .thumb_func
  3885              	EVE_init:
- 3886              	.LFB492:
+ 3886              	.LFB540:
 1142:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1143:../Libraries/FT800-FT813-5.x/EVE_commands.c **** #endif /* EVE_GEN > 2 */
 1144:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
@@ -6983,14 +6983,14 @@
  4197 0268 70203000 	 .word 3154032
  4198 026c 20010000 	 .word .LC7
  4199              	 .cfi_endproc
- 4200              	.LFE492:
+ 4200              	.LFE540:
  4202              	 .section .text.EVE_start_cmd_burst,"ax",%progbits
  4203              	 .align 2
  4204              	 .global EVE_start_cmd_burst
  4205              	 .thumb
  4206              	 .thumb_func
  4208              	EVE_start_cmd_burst:
- 4209              	.LFB493:
+ 4209              	.LFB541:
 1367:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1368:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1369:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
@@ -7086,14 +7086,14 @@
  4265 0044 00000000 	 .word cmd_burst
  4266 0048 78253000 	 .word 3155320
  4267              	 .cfi_endproc
- 4268              	.LFE493:
+ 4268              	.LFE541:
  4270              	 .section .text.EVE_end_cmd_burst,"ax",%progbits
  4271              	 .align 2
  4272              	 .global EVE_end_cmd_burst
  4273              	 .thumb
  4274              	 .thumb_func
  4276              	EVE_end_cmd_burst:
- 4277              	.LFB494:
+ 4277              	.LFB542:
 1404:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1405:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1406:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_end_cmd_burst(void)
@@ -7131,14 +7131,14 @@
  4300              	.L173:
  4301 0010 00000000 	 .word cmd_burst
  4302              	 .cfi_endproc
- 4303              	.LFE494:
+ 4303              	.LFE542:
  4305              	 .section .text.EVE_start_command,"ax",%progbits
  4306              	 .align 2
  4307              	 .global EVE_start_command
  4308              	 .thumb
  4309              	 .thumb_func
  4311              	EVE_start_command:
- 4312              	.LFB495:
+ 4312              	.LFB543:
 1416:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1417:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1418:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* private function, begin a co-processor command, only used for non-burst commands */
@@ -7211,14 +7211,14 @@
  4367              	.L176:
  4368 0044 78253000 	 .word 3155320
  4369              	 .cfi_endproc
- 4370              	.LFE495:
+ 4370              	.LFE543:
  4372              	 .section .text.EVE_write_string,"ax",%progbits
  4373              	 .align 2
  4374              	 .global EVE_write_string
  4375              	 .thumb
  4376              	 .thumb_func
  4378              	EVE_write_string:
- 4379              	.LFB496:
+ 4379              	.LFB544:
 1431:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1432:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1433:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* write a string to co-processor memory in context of a command: no chip-select, just plain SPI-tr
@@ -7510,14 +7510,14 @@
  4588              	.L196:
  4589 0110 00000000 	 .word cmd_burst
  4590              	 .cfi_endproc
- 4591              	.LFE496:
+ 4591              	.LFE544:
  4593              	 .section .text.EVE_cmd_animdraw,"ax",%progbits
  4594              	 .align 2
  4595              	 .global EVE_cmd_animdraw
  4596              	 .thumb
  4597              	 .thumb_func
  4599              	EVE_cmd_animdraw:
- 4600              	.LFB497:
+ 4600              	.LFB545:
 1508:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1509:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1510:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
@@ -7730,14 +7730,14 @@
  4644              	.L200:
  4645 002c 00000000 	 .word cmd_burst
  4646              	 .cfi_endproc
- 4647              	.LFE497:
+ 4647              	.LFE545:
  4649              	 .section .text.EVE_cmd_animdraw_burst,"ax",%progbits
  4650              	 .align 2
  4651              	 .global EVE_cmd_animdraw_burst
  4652              	 .thumb
  4653              	 .thumb_func
  4655              	EVE_cmd_animdraw_burst:
- 4656              	.LFB498:
+ 4656              	.LFB546:
 1674:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1675:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1676:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animdraw_burst(int32_t ch)
@@ -7778,14 +7778,14 @@
  4687              	 
  4688 001c 80BD     	 pop {r7,pc}
  4689              	 .cfi_endproc
- 4690              	.LFE498:
+ 4690              	.LFE546:
  4692 001e 00BF     	 .section .text.EVE_cmd_animframe,"ax",%progbits
  4693              	 .align 2
  4694              	 .global EVE_cmd_animframe
  4695              	 .thumb
  4696              	 .thumb_func
  4698              	EVE_cmd_animframe:
- 4699              	.LFB499:
+ 4699              	.LFB547:
 1681:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1682:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1683:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animframe(int16_t x0, int16_t y0, uint32_t aoptr, uint32_t frame)
@@ -7881,14 +7881,14 @@
  4774              	.L205:
  4775 0070 00000000 	 .word cmd_burst
  4776              	 .cfi_endproc
- 4777              	.LFE499:
+ 4777              	.LFE547:
  4779              	 .section .text.EVE_cmd_animframe_burst,"ax",%progbits
  4780              	 .align 2
  4781              	 .global EVE_cmd_animframe_burst
  4782              	 .thumb
  4783              	 .thumb_func
  4785              	EVE_cmd_animframe_burst:
- 4786              	.LFB500:
+ 4786              	.LFB548:
 1699:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1700:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1701:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animframe_burst(int16_t x0, int16_t y0, uint32_t aoptr, uint32_t frame)
@@ -7945,14 +7945,14 @@
  4831              	 
  4832 003c 80BD     	 pop {r7,pc}
  4833              	 .cfi_endproc
- 4834              	.LFE500:
+ 4834              	.LFE548:
  4836 003e 00BF     	 .section .text.EVE_cmd_animstart,"ax",%progbits
  4837              	 .align 2
  4838              	 .global EVE_cmd_animstart
  4839              	 .thumb
  4840              	 .thumb_func
  4842              	EVE_cmd_animstart:
- 4843              	.LFB501:
+ 4843              	.LFB549:
 1708:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1709:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1710:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animstart(int32_t ch, uint32_t aoptr, uint32_t loop)
@@ -8021,14 +8021,14 @@
  4895              	.L210:
  4896 003c 00000000 	 .word cmd_burst
  4897              	 .cfi_endproc
- 4898              	.LFE501:
+ 4898              	.LFE549:
  4900              	 .section .text.EVE_cmd_animstart_burst,"ax",%progbits
  4901              	 .align 2
  4902              	 .global EVE_cmd_animstart_burst
  4903              	 .thumb
  4904              	 .thumb_func
  4906              	EVE_cmd_animstart_burst:
- 4907              	.LFB502:
+ 4907              	.LFB550:
 1722:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1723:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1724:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animstart_burst(int32_t ch, uint32_t aoptr, uint32_t loop)
@@ -8079,14 +8079,14 @@
  4946              	 
  4947 002c 80BD     	 pop {r7,pc}
  4948              	 .cfi_endproc
- 4949              	.LFE502:
+ 4949              	.LFE550:
  4951 002e 00BF     	 .section .text.EVE_cmd_animstop,"ax",%progbits
  4952              	 .align 2
  4953              	 .global EVE_cmd_animstop
  4954              	 .thumb
  4955              	 .thumb_func
  4957              	EVE_cmd_animstop:
- 4958              	.LFB503:
+ 4958              	.LFB551:
 1731:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1732:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1733:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animstop(int32_t ch)
@@ -8144,14 +8144,14 @@
  5002              	.L215:
  5003 002c 00000000 	 .word cmd_burst
  5004              	 .cfi_endproc
- 5005              	.LFE503:
+ 5005              	.LFE551:
  5007              	 .section .text.EVE_cmd_animstop_burst,"ax",%progbits
  5008              	 .align 2
  5009              	 .global EVE_cmd_animstop_burst
  5010              	 .thumb
  5011              	 .thumb_func
  5013              	EVE_cmd_animstop_burst:
- 5014              	.LFB504:
+ 5014              	.LFB552:
 1742:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1743:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1744:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animstop_burst(int32_t ch)
@@ -8192,14 +8192,14 @@
  5045              	 
  5046 001c 80BD     	 pop {r7,pc}
  5047              	 .cfi_endproc
- 5048              	.LFE504:
+ 5048              	.LFE552:
  5050 001e 00BF     	 .section .text.EVE_cmd_animxy,"ax",%progbits
  5051              	 .align 2
  5052              	 .global EVE_cmd_animxy
  5053              	 .thumb
  5054              	 .thumb_func
  5056              	EVE_cmd_animxy:
- 5057              	.LFB505:
+ 5057              	.LFB553:
 1749:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1750:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1751:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animxy(int32_t ch, int16_t x0, int16_t y0)
@@ -8291,14 +8291,14 @@
  5129              	.L220:
  5130 0068 00000000 	 .word cmd_burst
  5131              	 .cfi_endproc
- 5132              	.LFE505:
+ 5132              	.LFE553:
  5134              	 .section .text.EVE_cmd_animxy_burst,"ax",%progbits
  5135              	 .align 2
  5136              	 .global EVE_cmd_animxy_burst
  5137              	 .thumb
  5138              	 .thumb_func
  5140              	EVE_cmd_animxy_burst:
- 5141              	.LFB506:
+ 5141              	.LFB554:
 1766:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1767:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1768:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_animxy_burst(int32_t ch, int16_t x0, int16_t y0)
@@ -8351,14 +8351,14 @@
  5183              	 
  5184 0036 80BD     	 pop {r7,pc}
  5185              	 .cfi_endproc
- 5186              	.LFE506:
+ 5186              	.LFE554:
  5188              	 .section .text.EVE_cmd_appendf,"ax",%progbits
  5189              	 .align 2
  5190              	 .global EVE_cmd_appendf
  5191              	 .thumb
  5192              	 .thumb_func
  5194              	EVE_cmd_appendf:
- 5195              	.LFB507:
+ 5195              	.LFB555:
 1774:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1775:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1776:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_appendf(uint32_t ptr, uint32_t num)
@@ -8420,14 +8420,14 @@
  5242              	.L225:
  5243 0034 00000000 	 .word cmd_burst
  5244              	 .cfi_endproc
- 5245              	.LFE507:
+ 5245              	.LFE555:
  5247              	 .section .text.EVE_cmd_appendf_burst,"ax",%progbits
  5248              	 .align 2
  5249              	 .global EVE_cmd_appendf_burst
  5250              	 .thumb
  5251              	 .thumb_func
  5253              	EVE_cmd_appendf_burst:
- 5254              	.LFB508:
+ 5254              	.LFB556:
 1786:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1787:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1788:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_appendf_burst(uint32_t ptr, uint32_t num)
@@ -8472,14 +8472,14 @@
  5288              	 
  5289 0022 80BD     	 pop {r7,pc}
  5290              	 .cfi_endproc
- 5291              	.LFE508:
+ 5291              	.LFE556:
  5293              	 .section .text.EVE_cmd_bitmap_transform,"ax",%progbits
  5294              	 .align 2
  5295              	 .global EVE_cmd_bitmap_transform
  5296              	 .thumb
  5297              	 .thumb_func
  5299              	EVE_cmd_bitmap_transform:
- 5300              	.LFB509:
+ 5300              	.LFB557:
 1794:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1795:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1796:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
@@ -8644,14 +8644,14 @@
  5430 00cc 00000000 	 .word cmd_burst
  5431 00d0 FC203000 	 .word 3154172
  5432              	 .cfi_endproc
- 5433              	.LFE509:
+ 5433              	.LFE557:
  5435              	 .section .text.EVE_cmd_bitmap_transform_burst,"ax",%progbits
  5436              	 .align 2
  5437              	 .global EVE_cmd_bitmap_transform_burst
  5438              	 .thumb
  5439              	 .thumb_func
  5441              	EVE_cmd_bitmap_transform_burst:
- 5442              	.LFB510:
+ 5442              	.LFB558:
 1826:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1827:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1828:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* note: as this is meant for use in burst-mode display-list generation the result parameter is ign
@@ -8755,14 +8755,14 @@
  5523              	 
  5524 0080 80BD     	 pop {r7,pc}
  5525              	 .cfi_endproc
- 5526              	.LFE510:
+ 5526              	.LFE558:
  5528 0082 00BF     	 .section .text.EVE_cmd_fillwidth,"ax",%progbits
  5529              	 .align 2
  5530              	 .global EVE_cmd_fillwidth
  5531              	 .thumb
  5532              	 .thumb_func
  5534              	EVE_cmd_fillwidth:
- 5535              	.LFB511:
+ 5535              	.LFB559:
 1846:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1847:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1848:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_fillwidth(uint32_t s)
@@ -8819,14 +8819,14 @@
  5578              	.L237:
  5579 002c 00000000 	 .word cmd_burst
  5580              	 .cfi_endproc
- 5581              	.LFE511:
+ 5581              	.LFE559:
  5583              	 .section .text.EVE_cmd_fillwidth_burst,"ax",%progbits
  5584              	 .align 2
  5585              	 .global EVE_cmd_fillwidth_burst
  5586              	 .thumb
  5587              	 .thumb_func
  5589              	EVE_cmd_fillwidth_burst:
- 5590              	.LFB512:
+ 5590              	.LFB560:
 1857:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1858:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1859:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_fillwidth_burst(uint32_t s)
@@ -8866,14 +8866,14 @@
  5620              	 
  5621 001a 80BD     	 pop {r7,pc}
  5622              	 .cfi_endproc
- 5623              	.LFE512:
+ 5623              	.LFE560:
  5625              	 .section .text.EVE_cmd_gradienta,"ax",%progbits
  5626              	 .align 2
  5627              	 .global EVE_cmd_gradienta
  5628              	 .thumb
  5629              	 .thumb_func
  5631              	EVE_cmd_gradienta:
- 5632              	.LFB513:
+ 5632              	.LFB561:
 1864:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1865:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1866:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gradienta(int16_t x0, int16_t y0, uint32_t argb0, int16_t x1, int16_t y1, uint32_t arg
@@ -9002,14 +9002,14 @@
  5733              	.L242:
  5734 00a8 00000000 	 .word cmd_burst
  5735              	 .cfi_endproc
- 5736              	.LFE513:
+ 5736              	.LFE561:
  5738              	 .section .text.EVE_cmd_gradienta_burst,"ax",%progbits
  5739              	 .align 2
  5740              	 .global EVE_cmd_gradienta_burst
  5741              	 .thumb
  5742              	 .thumb_func
  5744              	EVE_cmd_gradienta_burst:
- 5745              	.LFB514:
+ 5745              	.LFB562:
 1889:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1890:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1891:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gradienta_burst(int16_t x0, int16_t y0, uint32_t argb0, int16_t x1, int16_t y1, uint32
@@ -9076,14 +9076,14 @@
  5799              	 
  5800 0052 80BD     	 pop {r7,pc}
  5801              	 .cfi_endproc
- 5802              	.LFE514:
+ 5802              	.LFE562:
  5804              	 .section .text.EVE_cmd_rotatearound,"ax",%progbits
  5805              	 .align 2
  5806              	 .global EVE_cmd_rotatearound
  5807              	 .thumb
  5808              	 .thumb_func
  5810              	EVE_cmd_rotatearound:
- 5811              	.LFB515:
+ 5811              	.LFB563:
 1899:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1900:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1901:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_rotatearound(int32_t x0, int32_t y0, int32_t angle, int32_t scale)
@@ -9159,14 +9159,14 @@
  5870              	.L247:
  5871 004c 00000000 	 .word cmd_burst
  5872              	 .cfi_endproc
- 5873              	.LFE515:
+ 5873              	.LFE563:
  5875              	 .section .text.EVE_cmd_rotatearound_burst,"ax",%progbits
  5876              	 .align 2
  5877              	 .global EVE_cmd_rotatearound_burst
  5878              	 .thumb
  5879              	 .thumb_func
  5881              	EVE_cmd_rotatearound_burst:
- 5882              	.LFB516:
+ 5882              	.LFB564:
 1913:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1914:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1915:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_rotatearound_burst(int32_t x0, int32_t y0, int32_t angle, int32_t scale)
@@ -9225,14 +9225,14 @@
  5928              	 
  5929 003a 80BD     	 pop {r7,pc}
  5930              	 .cfi_endproc
- 5931              	.LFE516:
+ 5931              	.LFE564:
  5933              	 .section .text.EVE_cmd_button_var,"ax",%progbits
  5934              	 .align 2
  5935              	 .global EVE_cmd_button_var
  5936              	 .thumb
  5937              	 .thumb_func
  5939              	EVE_cmd_button_var:
- 5940              	.LFB517:
+ 5940              	.LFB565:
 1923:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1924:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1925:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* as the name implies, "num_args" is the number of arguments passed to this function as variadic a
@@ -9444,14 +9444,14 @@
  6102              	.L255:
  6103 0110 00000000 	 .word cmd_burst
  6104              	 .cfi_endproc
- 6105              	.LFE517:
+ 6105              	.LFE565:
  6107              	 .section .text.EVE_cmd_button_var_burst,"ax",%progbits
  6108              	 .align 2
  6109              	 .global EVE_cmd_button_var_burst
  6110              	 .thumb
  6111              	 .thumb_func
  6113              	EVE_cmd_button_var_burst:
- 6114              	.LFB518:
+ 6114              	.LFB566:
 1968:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1969:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1970:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_button_var_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t font, uint16_
@@ -9576,14 +9576,14 @@
  6210              	 
  6211 0098 90BD     	 pop {r4,r7,pc}
  6212              	 .cfi_endproc
- 6213              	.LFE518:
+ 6213              	.LFE566:
  6215 009a 00BF     	 .section .text.EVE_cmd_text_var,"ax",%progbits
  6216              	 .align 2
  6217              	 .global EVE_cmd_text_var
  6218              	 .thumb
  6219              	 .thumb_func
  6221              	EVE_cmd_text_var:
- 6222              	.LFB519:
+ 6222              	.LFB567:
 1992:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1993:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 1994:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* as the name implies, "num_args" is the number of arguments passed to this function as variadic a
@@ -9765,14 +9765,14 @@
  6360              	.L266:
  6361 00dc 00000000 	 .word cmd_burst
  6362              	 .cfi_endproc
- 6363              	.LFE519:
+ 6363              	.LFE567:
  6365              	 .section .text.EVE_cmd_text_var_burst,"ax",%progbits
  6366              	 .align 2
  6367              	 .global EVE_cmd_text_var_burst
  6368              	 .thumb
  6369              	 .thumb_func
  6371              	EVE_cmd_text_var_burst:
- 6372              	.LFB520:
+ 6372              	.LFB568:
 2031:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2032:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2033:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_text_var_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, const char* tex
@@ -9891,14 +9891,14 @@
  6461              	 
  6462 0086 90BD     	 pop {r4,r7,pc}
  6463              	 .cfi_endproc
- 6464              	.LFE520:
+ 6464              	.LFE568:
  6466              	 .section .text.EVE_cmd_toggle_var,"ax",%progbits
  6467              	 .align 2
  6468              	 .global EVE_cmd_toggle_var
  6469              	 .thumb
  6470              	 .thumb_func
  6472              	EVE_cmd_toggle_var:
- 6473              	.LFB521:
+ 6473              	.LFB569:
 2056:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2057:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2058:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* as the name implies, "num_args" is the number of arguments passed to this function as variadic a
@@ -10110,14 +10110,14 @@
  6635              	.L277:
  6636 0110 00000000 	 .word cmd_burst
  6637              	 .cfi_endproc
- 6638              	.LFE521:
+ 6638              	.LFE569:
  6640              	 .section .text.EVE_cmd_toggle_var_burst,"ax",%progbits
  6641              	 .align 2
  6642              	 .global EVE_cmd_toggle_var_burst
  6643              	 .thumb
  6644              	 .thumb_func
  6646              	EVE_cmd_toggle_var_burst:
- 6647              	.LFB522:
+ 6647              	.LFB570:
 2101:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2102:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2103:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle_var_burst(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, u
@@ -10243,14 +10243,14 @@
  6743              	 
  6744 0096 90BD     	 pop {r4,r7,pc}
  6745              	 .cfi_endproc
- 6746              	.LFE522:
+ 6746              	.LFE570:
  6748              	 .section .text.EVE_cmd_dl,"ax",%progbits
  6749              	 .align 2
  6750              	 .global EVE_cmd_dl
  6751              	 .thumb
  6752              	 .thumb_func
  6754              	EVE_cmd_dl:
- 6755              	.LFB523:
+ 6755              	.LFB571:
 2126:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2127:../Libraries/FT800-FT813-5.x/EVE_commands.c **** #endif /* EVE_GEN > 2 */
 2128:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
@@ -10316,14 +10316,14 @@
  6795              	.L285:
  6796 0024 00000000 	 .word cmd_burst
  6797              	 .cfi_endproc
- 6798              	.LFE523:
+ 6798              	.LFE571:
  6800              	 .section .text.EVE_cmd_dl_burst,"ax",%progbits
  6801              	 .align 2
  6802              	 .global EVE_cmd_dl_burst
  6803              	 .thumb
  6804              	 .thumb_func
  6806              	EVE_cmd_dl_burst:
- 6807              	.LFB524:
+ 6807              	.LFB572:
 2149:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2150:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2151:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_dl_burst(uint32_t command)
@@ -10359,14 +10359,14 @@
  6834              	 
  6835 0012 80BD     	 pop {r7,pc}
  6836              	 .cfi_endproc
- 6837              	.LFE524:
+ 6837              	.LFE572:
  6839              	 .section .text.EVE_cmd_append,"ax",%progbits
  6840              	 .align 2
  6841              	 .global EVE_cmd_append
  6842              	 .thumb
  6843              	 .thumb_func
  6845              	EVE_cmd_append:
- 6846              	.LFB525:
+ 6846              	.LFB573:
 2155:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2156:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2157:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_append(uint32_t ptr, uint32_t num)
@@ -10428,14 +10428,14 @@
  6893              	.L290:
  6894 0034 00000000 	 .word cmd_burst
  6895              	 .cfi_endproc
- 6896              	.LFE525:
+ 6896              	.LFE573:
  6898              	 .section .text.EVE_cmd_append_burst,"ax",%progbits
  6899              	 .align 2
  6900              	 .global EVE_cmd_append_burst
  6901              	 .thumb
  6902              	 .thumb_func
  6904              	EVE_cmd_append_burst:
- 6905              	.LFB526:
+ 6905              	.LFB574:
 2167:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2168:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2169:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_append_burst(uint32_t ptr, uint32_t num)
@@ -10480,14 +10480,14 @@
  6939              	 
  6940 0022 80BD     	 pop {r7,pc}
  6941              	 .cfi_endproc
- 6942              	.LFE526:
+ 6942              	.LFE574:
  6944              	 .section .text.EVE_cmd_bgcolor,"ax",%progbits
  6945              	 .align 2
  6946              	 .global EVE_cmd_bgcolor
  6947              	 .thumb
  6948              	 .thumb_func
  6950              	EVE_cmd_bgcolor:
- 6951              	.LFB527:
+ 6951              	.LFB575:
 2175:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2176:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2177:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_bgcolor(uint32_t color)
@@ -10564,14 +10564,14 @@
  7011              	.L295:
  7012 004c 00000000 	 .word cmd_burst
  7013              	 .cfi_endproc
- 7014              	.LFE527:
+ 7014              	.LFE575:
  7016              	 .section .text.EVE_cmd_bgcolor_burst,"ax",%progbits
  7017              	 .align 2
  7018              	 .global EVE_cmd_bgcolor_burst
  7019              	 .thumb
  7020              	 .thumb_func
  7022              	EVE_cmd_bgcolor_burst:
- 7023              	.LFB528:
+ 7023              	.LFB576:
 2189:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2190:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2191:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_bgcolor_burst(uint32_t color)
@@ -10611,14 +10611,14 @@
  7053              	 
  7054 001a 80BD     	 pop {r7,pc}
  7055              	 .cfi_endproc
- 7056              	.LFE528:
+ 7056              	.LFE576:
  7058              	 .section .text.EVE_cmd_button,"ax",%progbits
  7059              	 .align 2
  7060              	 .global EVE_cmd_button
  7061              	 .thumb
  7062              	 .thumb_func
  7064              	EVE_cmd_button:
- 7065              	.LFB529:
+ 7065              	.LFB577:
 2196:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2197:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2198:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_button(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t font, uint16_t options,
@@ -10778,14 +10778,14 @@
  7192              	.L300:
  7193 00dc 00000000 	 .word cmd_burst
  7194              	 .cfi_endproc
- 7195              	.LFE529:
+ 7195              	.LFE577:
  7197              	 .section .text.EVE_cmd_button_burst,"ax",%progbits
  7198              	 .align 2
  7199              	 .global EVE_cmd_button_burst
  7200              	 .thumb
  7201              	 .thumb_func
  7203              	EVE_cmd_button_burst:
- 7204              	.LFB530:
+ 7204              	.LFB578:
 2226:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2227:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2228:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_button_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t font, uint16_t op
@@ -10861,14 +10861,14 @@
  7267              	 
  7268 0064 90BD     	 pop {r4,r7,pc}
  7269              	 .cfi_endproc
- 7270              	.LFE530:
+ 7270              	.LFE578:
  7272              	 .section .text.EVE_cmd_calibrate,"ax",%progbits
  7273              	 .align 2
  7274              	 .global EVE_cmd_calibrate
  7275              	 .thumb
  7276              	 .thumb_func
  7278              	EVE_cmd_calibrate:
- 7279              	.LFB531:
+ 7279              	.LFB579:
 2236:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2237:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2238:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_calibrate(void)
@@ -10914,14 +10914,14 @@
  7311              	.L305:
  7312 0024 00000000 	 .word cmd_burst
  7313              	 .cfi_endproc
- 7314              	.LFE531:
+ 7314              	.LFE579:
  7316              	 .section .text.EVE_cmd_clock,"ax",%progbits
  7317              	 .align 2
  7318              	 .global EVE_cmd_clock
  7319              	 .thumb
  7320              	 .thumb_func
  7322              	EVE_cmd_clock:
- 7323              	.LFB532:
+ 7323              	.LFB580:
 2247:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2248:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2249:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_clock(int16_t x0, int16_t y0, int16_t r0, uint16_t options, uint16_t hours, uint16_t m
@@ -11102,14 +11102,14 @@
  7471              	.L309:
  7472 0100 00000000 	 .word cmd_burst
  7473              	 .cfi_endproc
- 7474              	.LFE532:
+ 7474              	.LFE580:
  7476              	 .section .text.EVE_cmd_clock_burst,"ax",%progbits
  7477              	 .align 2
  7478              	 .global EVE_cmd_clock_burst
  7479              	 .thumb
  7480              	 .thumb_func
  7482              	EVE_cmd_clock_burst:
- 7483              	.LFB533:
+ 7483              	.LFB581:
 2277:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2278:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2279:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_clock_burst(int16_t x0, int16_t y0, int16_t r0, uint16_t options, uint16_t hours, uint
@@ -11189,14 +11189,14 @@
  7550              	 
  7551 0068 90BD     	 pop {r4,r7,pc}
  7552              	 .cfi_endproc
- 7553              	.LFE533:
+ 7553              	.LFE581:
  7555 006a 00BF     	 .section .text.EVE_cmd_dial,"ax",%progbits
  7556              	 .align 2
  7557              	 .global EVE_cmd_dial
  7558              	 .thumb
  7559              	 .thumb_func
  7561              	EVE_cmd_dial:
- 7562              	.LFB534:
+ 7562              	.LFB582:
 2287:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2288:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2289:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_dial(int16_t x0, int16_t y0, int16_t r0, uint16_t options, uint16_t val)
@@ -11343,14 +11343,14 @@
  7680              	.L314:
  7681 00c4 00000000 	 .word cmd_burst
  7682              	 .cfi_endproc
- 7683              	.LFE534:
+ 7683              	.LFE582:
  7685              	 .section .text.EVE_cmd_dial_burst,"ax",%progbits
  7686              	 .align 2
  7687              	 .global EVE_cmd_dial_burst
  7688              	 .thumb
  7689              	 .thumb_func
  7691              	EVE_cmd_dial_burst:
- 7692              	.LFB535:
+ 7692              	.LFB583:
 2313:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2314:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2315:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_dial_burst(int16_t x0, int16_t y0, int16_t r0, uint16_t options, uint16_t val)
@@ -11419,14 +11419,14 @@
  7749              	 
  7750 0054 90BD     	 pop {r4,r7,pc}
  7751              	 .cfi_endproc
- 7752              	.LFE535:
+ 7752              	.LFE583:
  7754 0056 00BF     	 .section .text.EVE_cmd_fgcolor,"ax",%progbits
  7755              	 .align 2
  7756              	 .global EVE_cmd_fgcolor
  7757              	 .thumb
  7758              	 .thumb_func
  7760              	EVE_cmd_fgcolor:
- 7761              	.LFB536:
+ 7761              	.LFB584:
 2322:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2323:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2324:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_fgcolor(uint32_t color)
@@ -11503,14 +11503,14 @@
  7821              	.L319:
  7822 004c 00000000 	 .word cmd_burst
  7823              	 .cfi_endproc
- 7824              	.LFE536:
+ 7824              	.LFE584:
  7826              	 .section .text.EVE_cmd_fgcolor_burst,"ax",%progbits
  7827              	 .align 2
  7828              	 .global EVE_cmd_fgcolor_burst
  7829              	 .thumb
  7830              	 .thumb_func
  7832              	EVE_cmd_fgcolor_burst:
- 7833              	.LFB537:
+ 7833              	.LFB585:
 2336:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2337:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2338:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_fgcolor_burst(uint32_t color)
@@ -11550,14 +11550,14 @@
  7863              	 
  7864 001a 80BD     	 pop {r7,pc}
  7865              	 .cfi_endproc
- 7866              	.LFE537:
+ 7866              	.LFE585:
  7868              	 .section .text.EVE_cmd_gauge,"ax",%progbits
  7869              	 .align 2
  7870              	 .global EVE_cmd_gauge
  7871              	 .thumb
  7872              	 .thumb_func
  7874              	EVE_cmd_gauge:
- 7875              	.LFB538:
+ 7875              	.LFB586:
 2343:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2344:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2345:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gauge(int16_t x0, int16_t y0, int16_t r0, uint16_t options, uint16_t major, uint16_t m
@@ -11739,14 +11739,14 @@
  8023              	.L324:
  8024 0100 00000000 	 .word cmd_burst
  8025              	 .cfi_endproc
- 8026              	.LFE538:
+ 8026              	.LFE586:
  8028              	 .section .text.EVE_cmd_gauge_burst,"ax",%progbits
  8029              	 .align 2
  8030              	 .global EVE_cmd_gauge_burst
  8031              	 .thumb
  8032              	 .thumb_func
  8034              	EVE_cmd_gauge_burst:
- 8035              	.LFB539:
+ 8035              	.LFB587:
 2374:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2375:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2376:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gauge_burst(int16_t x0, int16_t y0, int16_t r0, uint16_t options, uint16_t major, uint
@@ -11826,14 +11826,14 @@
  8102              	 
  8103 0068 90BD     	 pop {r4,r7,pc}
  8104              	 .cfi_endproc
- 8105              	.LFE539:
+ 8105              	.LFE587:
  8107 006a 00BF     	 .section .text.EVE_cmd_getmatrix,"ax",%progbits
  8108              	 .align 2
  8109              	 .global EVE_cmd_getmatrix
  8110              	 .thumb
  8111              	 .thumb_func
  8113              	EVE_cmd_getmatrix:
- 8114              	.LFB540:
+ 8114              	.LFB588:
 2384:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2385:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2386:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this function is meant to be called  with display-list building, but it waits for completion */
@@ -12056,14 +12056,14 @@
  8286 0128 00000000 	 .word cmd_burst
  8287 012c FC203000 	 .word 3154172
  8288              	 .cfi_endproc
- 8289              	.LFE540:
+ 8289              	.LFE588:
  8291              	 .section .text.EVE_cmd_gradcolor,"ax",%progbits
  8292              	 .align 2
  8293              	 .global EVE_cmd_gradcolor
  8294              	 .thumb
  8295              	 .thumb_func
  8297              	EVE_cmd_gradcolor:
- 8298              	.LFB541:
+ 8298              	.LFB589:
 2432:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2433:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2434:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gradcolor(uint32_t color)
@@ -12140,14 +12140,14 @@
  8358              	.L339:
  8359 004c 00000000 	 .word cmd_burst
  8360              	 .cfi_endproc
- 8361              	.LFE541:
+ 8361              	.LFE589:
  8363              	 .section .text.EVE_cmd_gradcolor_burst,"ax",%progbits
  8364              	 .align 2
  8365              	 .global EVE_cmd_gradcolor_burst
  8366              	 .thumb
  8367              	 .thumb_func
  8369              	EVE_cmd_gradcolor_burst:
- 8370              	.LFB542:
+ 8370              	.LFB590:
 2446:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2447:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2448:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gradcolor_burst(uint32_t color)
@@ -12187,14 +12187,14 @@
  8400              	 
  8401 001a 80BD     	 pop {r7,pc}
  8402              	 .cfi_endproc
- 8403              	.LFE542:
+ 8403              	.LFE590:
  8405              	 .section .text.EVE_cmd_gradient,"ax",%progbits
  8406              	 .align 2
  8407              	 .global EVE_cmd_gradient
  8408              	 .thumb
  8409              	 .thumb_func
  8411              	EVE_cmd_gradient:
- 8412              	.LFB543:
+ 8412              	.LFB591:
 2453:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2454:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2455:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gradient(int16_t x0, int16_t y0, uint32_t rgb0, int16_t x1, int16_t y1, uint32_t rgb1)
@@ -12363,14 +12363,14 @@
  8547              	.L344:
  8548 00ec 00000000 	 .word cmd_burst
  8549              	 .cfi_endproc
- 8550              	.LFE543:
+ 8550              	.LFE591:
  8552              	 .section .text.EVE_cmd_gradient_burst,"ax",%progbits
  8553              	 .align 2
  8554              	 .global EVE_cmd_gradient_burst
  8555              	 .thumb
  8556              	 .thumb_func
  8558              	EVE_cmd_gradient_burst:
- 8559              	.LFB544:
+ 8559              	.LFB592:
 2484:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2485:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2486:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_gradient_burst(int16_t x0, int16_t y0, uint32_t rgb0, int16_t x1, int16_t y1, uint32_t
@@ -12437,14 +12437,14 @@
  8613              	 
  8614 0052 80BD     	 pop {r7,pc}
  8615              	 .cfi_endproc
- 8616              	.LFE544:
+ 8616              	.LFE592:
  8618              	 .section .text.EVE_cmd_keys,"ax",%progbits
  8619              	 .align 2
  8620              	 .global EVE_cmd_keys
  8621              	 .thumb
  8622              	 .thumb_func
  8624              	EVE_cmd_keys:
- 8625              	.LFB545:
+ 8625              	.LFB593:
 2494:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2495:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2496:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_keys(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t font, uint16_t options, c
@@ -12601,14 +12601,14 @@
  8752              	.L349:
  8753 00dc 00000000 	 .word cmd_burst
  8754              	 .cfi_endproc
- 8755              	.LFE545:
+ 8755              	.LFE593:
  8757              	 .section .text.EVE_cmd_keys_burst,"ax",%progbits
  8758              	 .align 2
  8759              	 .global EVE_cmd_keys_burst
  8760              	 .thumb
  8761              	 .thumb_func
  8763              	EVE_cmd_keys_burst:
- 8764              	.LFB546:
+ 8764              	.LFB594:
 2521:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2522:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2523:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_keys_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t font, uint16_t opti
@@ -12685,14 +12685,14 @@
  8827              	 
  8828 0064 90BD     	 pop {r4,r7,pc}
  8829              	 .cfi_endproc
- 8830              	.LFE546:
+ 8830              	.LFE594:
  8832              	 .section .text.EVE_cmd_number,"ax",%progbits
  8833              	 .align 2
  8834              	 .global EVE_cmd_number
  8835              	 .thumb
  8836              	 .thumb_func
  8838              	EVE_cmd_number:
- 8839              	.LFB547:
+ 8839              	.LFB595:
 2532:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2533:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2534:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_number(int16_t x0, int16_t y0, int16_t font, uint16_t options, int32_t number)
@@ -12821,14 +12821,14 @@
  8943              	.L354:
  8944 00a8 00000000 	 .word cmd_burst
  8945              	 .cfi_endproc
- 8946              	.LFE547:
+ 8946              	.LFE595:
  8948              	 .section .text.EVE_cmd_number_burst,"ax",%progbits
  8949              	 .align 2
  8950              	 .global EVE_cmd_number_burst
  8951              	 .thumb
  8952              	 .thumb_func
  8954              	EVE_cmd_number_burst:
- 8955              	.LFB548:
+ 8955              	.LFB596:
 2554:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2555:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2556:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_number_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, int32_t number)
@@ -12897,14 +12897,14 @@
  9012              	 
  9013 0054 90BD     	 pop {r4,r7,pc}
  9014              	 .cfi_endproc
- 9015              	.LFE548:
+ 9015              	.LFE596:
  9017 0056 00BF     	 .section .text.EVE_cmd_progress,"ax",%progbits
  9018              	 .align 2
  9019              	 .global EVE_cmd_progress
  9020              	 .thumb
  9021              	 .thumb_func
  9023              	EVE_cmd_progress:
- 9024              	.LFB549:
+ 9024              	.LFB597:
 2563:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2564:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2565:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_progress(int16_t x0, int16_t y0, int16_t w0, int16_t h0, uint16_t options, uint16_t va
@@ -13080,14 +13080,14 @@
  9166              	.L359:
  9167 00f8 00000000 	 .word cmd_burst
  9168              	 .cfi_endproc
- 9169              	.LFE549:
+ 9169              	.LFE597:
  9171              	 .section .text.EVE_cmd_progress_burst,"ax",%progbits
  9172              	 .align 2
  9173              	 .global EVE_cmd_progress_burst
  9174              	 .thumb
  9175              	 .thumb_func
  9177              	EVE_cmd_progress_burst:
- 9178              	.LFB550:
+ 9178              	.LFB598:
 2594:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2595:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2596:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_progress_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, uint16_t options, uint1
@@ -13164,14 +13164,14 @@
  9242              	 
  9243 0064 90BD     	 pop {r4,r7,pc}
  9244              	 .cfi_endproc
- 9245              	.LFE550:
+ 9245              	.LFE598:
  9247 0066 00BF     	 .section .text.EVE_cmd_romfont,"ax",%progbits
  9248              	 .align 2
  9249              	 .global EVE_cmd_romfont
  9250              	 .thumb
  9251              	 .thumb_func
  9253              	EVE_cmd_romfont:
- 9254              	.LFB551:
+ 9254              	.LFB599:
 2604:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2605:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2606:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_romfont(uint32_t font, uint32_t romslot)
@@ -13270,14 +13270,14 @@
  9329              	.L364:
  9330 006c 00000000 	 .word cmd_burst
  9331              	 .cfi_endproc
- 9332              	.LFE551:
+ 9332              	.LFE599:
  9334              	 .section .text.EVE_cmd_romfont_burst,"ax",%progbits
  9335              	 .align 2
  9336              	 .global EVE_cmd_romfont_burst
  9337              	 .thumb
  9338              	 .thumb_func
  9340              	EVE_cmd_romfont_burst:
- 9341              	.LFB552:
+ 9341              	.LFB600:
 2625:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2626:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2627:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_romfont_burst(uint32_t font, uint32_t romslot)
@@ -13322,14 +13322,14 @@
  9375              	 
  9376 0022 80BD     	 pop {r7,pc}
  9377              	 .cfi_endproc
- 9378              	.LFE552:
+ 9378              	.LFE600:
  9380              	 .section .text.EVE_cmd_rotate,"ax",%progbits
  9381              	 .align 2
  9382              	 .global EVE_cmd_rotate
  9383              	 .thumb
  9384              	 .thumb_func
  9386              	EVE_cmd_rotate:
- 9387              	.LFB553:
+ 9387              	.LFB601:
 2633:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2634:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2635:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_rotate(int32_t angle)
@@ -13387,14 +13387,14 @@
  9431              	.L369:
  9432 002c 00000000 	 .word cmd_burst
  9433              	 .cfi_endproc
- 9434              	.LFE553:
+ 9434              	.LFE601:
  9436              	 .section .text.EVE_cmd_rotate_burst,"ax",%progbits
  9437              	 .align 2
  9438              	 .global EVE_cmd_rotate_burst
  9439              	 .thumb
  9440              	 .thumb_func
  9442              	EVE_cmd_rotate_burst:
- 9443              	.LFB554:
+ 9443              	.LFB602:
 2644:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2645:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2646:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_rotate_burst(int32_t angle)
@@ -13435,14 +13435,14 @@
  9474              	 
  9475 001c 80BD     	 pop {r7,pc}
  9476              	 .cfi_endproc
- 9477              	.LFE554:
+ 9477              	.LFE602:
  9479 001e 00BF     	 .section .text.EVE_cmd_scale,"ax",%progbits
  9480              	 .align 2
  9481              	 .global EVE_cmd_scale
  9482              	 .thumb
  9483              	 .thumb_func
  9485              	EVE_cmd_scale:
- 9486              	.LFB555:
+ 9486              	.LFB603:
 2651:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2652:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2653:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_scale(int32_t sx, int32_t sy)
@@ -13506,14 +13506,14 @@
  9535              	.L374:
  9536 0038 00000000 	 .word cmd_burst
  9537              	 .cfi_endproc
- 9538              	.LFE555:
+ 9538              	.LFE603:
  9540              	 .section .text.EVE_cmd_scale_burst,"ax",%progbits
  9541              	 .align 2
  9542              	 .global EVE_cmd_scale_burst
  9543              	 .thumb
  9544              	 .thumb_func
  9546              	EVE_cmd_scale_burst:
- 9547              	.LFB556:
+ 9547              	.LFB604:
 2663:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2664:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2665:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_scale_burst(int32_t sx, int32_t sy)
@@ -13560,14 +13560,14 @@
  9583              	 
  9584 0026 80BD     	 pop {r7,pc}
  9585              	 .cfi_endproc
- 9586              	.LFE556:
+ 9586              	.LFE604:
  9588              	 .section .text.EVE_cmd_scrollbar,"ax",%progbits
  9589              	 .align 2
  9590              	 .global EVE_cmd_scrollbar
  9591              	 .thumb
  9592              	 .thumb_func
  9594              	EVE_cmd_scrollbar:
- 9595              	.LFB557:
+ 9595              	.LFB605:
 2671:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2672:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2673:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_scrollbar(int16_t x0, int16_t y0, int16_t w0, int16_t h0, uint16_t options, uint16_t v
@@ -13749,14 +13749,14 @@
  9743              	.L379:
  9744 0104 00000000 	 .word cmd_burst
  9745              	 .cfi_endproc
- 9746              	.LFE557:
+ 9746              	.LFE605:
  9748              	 .section .text.EVE_cmd_scrollbar_burst,"ax",%progbits
  9749              	 .align 2
  9750              	 .global EVE_cmd_scrollbar_burst
  9751              	 .thumb
  9752              	 .thumb_func
  9754              	EVE_cmd_scrollbar_burst:
- 9755              	.LFB558:
+ 9755              	.LFB606:
 2702:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2703:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2704:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_scrollbar_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, uint16_t options, uint
@@ -13836,14 +13836,14 @@
  9822              	 
  9823 006a 90BD     	 pop {r4,r7,pc}
  9824              	 .cfi_endproc
- 9825              	.LFE558:
+ 9825              	.LFE606:
  9827              	 .section .text.EVE_cmd_setbase,"ax",%progbits
  9828              	 .align 2
  9829              	 .global EVE_cmd_setbase
  9830              	 .thumb
  9831              	 .thumb_func
  9833              	EVE_cmd_setbase:
- 9834              	.LFB559:
+ 9834              	.LFB607:
 2712:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2713:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2714:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setbase(uint32_t base)
@@ -13900,14 +13900,14 @@
  9877              	.L384:
  9878 002c 00000000 	 .word cmd_burst
  9879              	 .cfi_endproc
- 9880              	.LFE559:
+ 9880              	.LFE607:
  9882              	 .section .text.EVE_cmd_setbase_burst,"ax",%progbits
  9883              	 .align 2
  9884              	 .global EVE_cmd_setbase_burst
  9885              	 .thumb
  9886              	 .thumb_func
  9888              	EVE_cmd_setbase_burst:
- 9889              	.LFB560:
+ 9889              	.LFB608:
 2723:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2724:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2725:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setbase_burst(uint32_t base)
@@ -13947,14 +13947,14 @@
  9919              	 
  9920 001a 80BD     	 pop {r7,pc}
  9921              	 .cfi_endproc
- 9922              	.LFE560:
+ 9922              	.LFE608:
  9924              	 .section .text.EVE_cmd_setbitmap,"ax",%progbits
  9925              	 .align 2
  9926              	 .global EVE_cmd_setbitmap
  9927              	 .thumb
  9928              	 .thumb_func
  9930              	EVE_cmd_setbitmap:
- 9931              	.LFB561:
+ 9931              	.LFB609:
 2730:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2731:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2732:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setbitmap(uint32_t addr, uint16_t fmt, uint16_t width, uint16_t height)
@@ -14073,14 +14073,14 @@
  10025              	.L389:
  10026 0090 00000000 	 .word cmd_burst
  10027              	 .cfi_endproc
- 10028              	.LFE561:
+ 10028              	.LFE609:
  10030              	 .section .text.EVE_cmd_setbitmap_burst,"ax",%progbits
  10031              	 .align 2
  10032              	 .global EVE_cmd_setbitmap_burst
  10033              	 .thumb
  10034              	 .thumb_func
  10036              	EVE_cmd_setbitmap_burst:
- 10037              	.LFB562:
+ 10037              	.LFB610:
 2752:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2753:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2754:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setbitmap_burst(uint32_t addr, uint16_t fmt, uint16_t width, uint16_t height)
@@ -14142,14 +14142,14 @@
  10087              	 
  10088 0042 80BD     	 pop {r7,pc}
  10089              	 .cfi_endproc
- 10090              	.LFE562:
+ 10090              	.LFE610:
  10092              	 .section .text.EVE_cmd_setfont,"ax",%progbits
  10093              	 .align 2
  10094              	 .global EVE_cmd_setfont
  10095              	 .thumb
  10096              	 .thumb_func
  10098              	EVE_cmd_setfont:
- 10099              	.LFB563:
+ 10099              	.LFB611:
 2761:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2762:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2763:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setfont(uint32_t font, uint32_t ptr)
@@ -14211,14 +14211,14 @@
  10146              	.L394:
  10147 0034 00000000 	 .word cmd_burst
  10148              	 .cfi_endproc
- 10149              	.LFE563:
+ 10149              	.LFE611:
  10151              	 .section .text.EVE_cmd_setfont_burst,"ax",%progbits
  10152              	 .align 2
  10153              	 .global EVE_cmd_setfont_burst
  10154              	 .thumb
  10155              	 .thumb_func
  10157              	EVE_cmd_setfont_burst:
- 10158              	.LFB564:
+ 10158              	.LFB612:
 2773:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2774:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2775:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setfont_burst(uint32_t font, uint32_t ptr)
@@ -14263,14 +14263,14 @@
  10192              	 
  10193 0022 80BD     	 pop {r7,pc}
  10194              	 .cfi_endproc
- 10195              	.LFE564:
+ 10195              	.LFE612:
  10197              	 .section .text.EVE_cmd_setfont2,"ax",%progbits
  10198              	 .align 2
  10199              	 .global EVE_cmd_setfont2
  10200              	 .thumb
  10201              	 .thumb_func
  10203              	EVE_cmd_setfont2:
- 10204              	.LFB565:
+ 10204              	.LFB613:
 2781:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2782:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2783:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setfont2(uint32_t font, uint32_t ptr, uint32_t firstchar)
@@ -14337,14 +14337,14 @@
  10255              	.L399:
  10256 003c 00000000 	 .word cmd_burst
  10257              	 .cfi_endproc
- 10258              	.LFE565:
+ 10258              	.LFE613:
  10260              	 .section .text.EVE_cmd_setfont2_burst,"ax",%progbits
  10261              	 .align 2
  10262              	 .global EVE_cmd_setfont2_burst
  10263              	 .thumb
  10264              	 .thumb_func
  10266              	EVE_cmd_setfont2_burst:
- 10267              	.LFB566:
+ 10267              	.LFB614:
 2794:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2795:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2796:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setfont2_burst(uint32_t font, uint32_t ptr, uint32_t firstchar)
@@ -14394,14 +14394,14 @@
  10305              	 
  10306 002a 80BD     	 pop {r7,pc}
  10307              	 .cfi_endproc
- 10308              	.LFE566:
+ 10308              	.LFE614:
  10310              	 .section .text.EVE_cmd_setscratch,"ax",%progbits
  10311              	 .align 2
  10312              	 .global EVE_cmd_setscratch
  10313              	 .thumb
  10314              	 .thumb_func
  10316              	EVE_cmd_setscratch:
- 10317              	.LFB567:
+ 10317              	.LFB615:
 2803:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2804:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2805:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setscratch(uint32_t handle)
@@ -14458,14 +14458,14 @@
  10360              	.L404:
  10361 002c 00000000 	 .word cmd_burst
  10362              	 .cfi_endproc
- 10363              	.LFE567:
+ 10363              	.LFE615:
  10365              	 .section .text.EVE_cmd_setscratch_burst,"ax",%progbits
  10366              	 .align 2
  10367              	 .global EVE_cmd_setscratch_burst
  10368              	 .thumb
  10369              	 .thumb_func
  10371              	EVE_cmd_setscratch_burst:
- 10372              	.LFB568:
+ 10372              	.LFB616:
 2814:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2815:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2816:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_setscratch_burst(uint32_t handle)
@@ -14505,14 +14505,14 @@
  10402              	 
  10403 001a 80BD     	 pop {r7,pc}
  10404              	 .cfi_endproc
- 10405              	.LFE568:
+ 10405              	.LFE616:
  10407              	 .section .text.EVE_cmd_sketch,"ax",%progbits
  10408              	 .align 2
  10409              	 .global EVE_cmd_sketch
  10410              	 .thumb
  10411              	 .thumb_func
  10413              	EVE_cmd_sketch:
- 10414              	.LFB569:
+ 10414              	.LFB617:
 2821:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2822:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2823:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_sketch(int16_t x0, int16_t y0, uint16_t w0, uint16_t h0, uint32_t ptr, uint16_t format
@@ -14664,14 +14664,14 @@
  10535              	.L409:
  10536 00c8 00000000 	 .word cmd_burst
  10537              	 .cfi_endproc
- 10538              	.LFE569:
+ 10538              	.LFE617:
  10540              	 .section .text.EVE_cmd_sketch_burst,"ax",%progbits
  10541              	 .align 2
  10542              	 .global EVE_cmd_sketch_burst
  10543              	 .thumb
  10544              	 .thumb_func
  10546              	EVE_cmd_sketch_burst:
- 10547              	.LFB570:
+ 10547              	.LFB618:
 2849:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2850:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2851:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_sketch_burst(int16_t x0, int16_t y0, uint16_t w0, uint16_t h0, uint32_t ptr, uint16_t 
@@ -14744,14 +14744,14 @@
  10607              	 
  10608 0058 90BD     	 pop {r4,r7,pc}
  10609              	 .cfi_endproc
- 10610              	.LFE570:
+ 10610              	.LFE618:
  10612 005a 00BF     	 .section .text.EVE_cmd_slider,"ax",%progbits
  10613              	 .align 2
  10614              	 .global EVE_cmd_slider
  10615              	 .thumb
  10616              	 .thumb_func
  10618              	EVE_cmd_slider:
- 10619              	.LFB571:
+ 10619              	.LFB619:
 2859:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2860:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2861:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_slider(int16_t x0, int16_t y0, int16_t w0, int16_t h0, uint16_t options, uint16_t val,
@@ -14927,14 +14927,14 @@
  10761              	.L414:
  10762 00f8 00000000 	 .word cmd_burst
  10763              	 .cfi_endproc
- 10764              	.LFE571:
+ 10764              	.LFE619:
  10766              	 .section .text.EVE_cmd_slider_burst,"ax",%progbits
  10767              	 .align 2
  10768              	 .global EVE_cmd_slider_burst
  10769              	 .thumb
  10770              	 .thumb_func
  10772              	EVE_cmd_slider_burst:
- 10773              	.LFB572:
+ 10773              	.LFB620:
 2890:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2891:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2892:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_slider_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, uint16_t options, uint16_
@@ -15011,14 +15011,14 @@
  10837              	 
  10838 0064 90BD     	 pop {r4,r7,pc}
  10839              	 .cfi_endproc
- 10840              	.LFE572:
+ 10840              	.LFE620:
  10842 0066 00BF     	 .section .text.EVE_cmd_spinner,"ax",%progbits
  10843              	 .align 2
  10844              	 .global EVE_cmd_spinner
  10845              	 .thumb
  10846              	 .thumb_func
  10848              	EVE_cmd_spinner:
- 10849              	.LFB573:
+ 10849              	.LFB621:
 2900:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2901:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2902:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_spinner(int16_t x0, int16_t y0, uint16_t style, uint16_t scale)
@@ -15142,14 +15142,14 @@
  10949              	.L419:
  10950 00a0 00000000 	 .word cmd_burst
  10951              	 .cfi_endproc
- 10952              	.LFE573:
+ 10952              	.LFE621:
  10954              	 .section .text.EVE_cmd_spinner_burst,"ax",%progbits
  10955              	 .align 2
  10956              	 .global EVE_cmd_spinner_burst
  10957              	 .thumb
  10958              	 .thumb_func
  10960              	EVE_cmd_spinner_burst:
- 10961              	.LFB574:
+ 10961              	.LFB622:
 2921:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2922:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2923:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_spinner_burst(int16_t x0, int16_t y0, uint16_t style, uint16_t scale)
@@ -15213,14 +15213,14 @@
  11014              	 
  11015 004a 90BD     	 pop {r4,r7,pc}
  11016              	 .cfi_endproc
- 11017              	.LFE574:
+ 11017              	.LFE622:
  11019              	 .section .text.EVE_cmd_text,"ax",%progbits
  11020              	 .align 2
  11021              	 .global EVE_cmd_text
  11022              	 .thumb
  11023              	 .thumb_func
  11025              	EVE_cmd_text:
- 11026              	.LFB575:
+ 11026              	.LFB623:
 2929:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2930:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2931:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_text(int16_t x0, int16_t y0, int16_t font, uint16_t options, const char* text)
@@ -15348,14 +15348,14 @@
  11129              	.L424:
  11130 00a8 00000000 	 .word cmd_burst
  11131              	 .cfi_endproc
- 11132              	.LFE575:
+ 11132              	.LFE623:
  11134              	 .section .text.EVE_cmd_text_burst,"ax",%progbits
  11135              	 .align 2
  11136              	 .global EVE_cmd_text_burst
  11137              	 .thumb
  11138              	 .thumb_func
  11140              	EVE_cmd_text_burst:
- 11141              	.LFB576:
+ 11141              	.LFB624:
 2951:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2952:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2953:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_text_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, const char* text)
@@ -15423,7 +15423,7 @@
  11197              	 
  11198 0052 90BD     	 pop {r4,r7,pc}
  11199              	 .cfi_endproc
- 11200              	.LFE576:
+ 11200              	.LFE624:
  11202              	 .section .rodata
  11203 0132 0000     	 .align 2
  11204              	.LC8:
@@ -15435,7 +15435,7 @@
  11209              	 .thumb
  11210              	 .thumb_func
  11212              	EVE_cmd_double_burst:
- 11213              	.LFB577:
+ 11213              	.LFB625:
 2960:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2961:../Libraries/FT800-FT813-5.x/EVE_commands.c **** // custom functions by RS to print integers (signed!) to the screen - might be slow! -> if a better
 2962:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_double_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, double val)
@@ -15517,7 +15517,7 @@
  11280              	.L428:
  11281 0068 34010000 	 .word .LC8
  11282              	 .cfi_endproc
- 11283              	.LFE577:
+ 11283              	.LFE625:
  11285              	 .section .rodata
  11286 013a 0000     	 .align 2
  11287              	.LC9:
@@ -15528,7 +15528,7 @@
  11292              	 .thumb
  11293              	 .thumb_func
  11295              	EVE_cmd_int_burst:
- 11296              	.LFB578:
+ 11296              	.LFB626:
 2972:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_int_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, int32_t val)
 2973:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
  11297              	 .loc 5 2973 0
@@ -15608,14 +15608,14 @@
  11363              	.L431:
  11364 0068 3C010000 	 .word .LC9
  11365              	 .cfi_endproc
- 11366              	.LFE578:
+ 11366              	.LFE626:
  11368              	 .section .text.EVE_cmd_toggle,"ax",%progbits
  11369              	 .align 2
  11370              	 .global EVE_cmd_toggle
  11371              	 .thumb
  11372              	 .thumb_func
  11374              	EVE_cmd_toggle:
- 11375              	.LFB579:
+ 11375              	.LFB627:
 2982:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 2983:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint16_t st
 2984:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
@@ -15771,14 +15771,14 @@
  11502              	.L435:
  11503 00d8 00000000 	 .word cmd_burst
  11504              	 .cfi_endproc
- 11505              	.LFE579:
+ 11505              	.LFE627:
  11507              	 .section .text.EVE_cmd_toggle_burst,"ax",%progbits
  11508              	 .align 2
  11509              	 .global EVE_cmd_toggle_burst
  11510              	 .thumb
  11511              	 .thumb_func
  11513              	EVE_cmd_toggle_burst:
- 11514              	.LFB580:
+ 11514              	.LFB628:
 3008:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3009:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3010:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle_burst(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint1
@@ -15854,14 +15854,14 @@
  11577              	 
  11578 0062 90BD     	 pop {r4,r7,pc}
  11579              	 .cfi_endproc
- 11580              	.LFE580:
+ 11580              	.LFE628:
  11582              	 .section .text.EVE_cmd_translate,"ax",%progbits
  11583              	 .align 2
  11584              	 .global EVE_cmd_translate
  11585              	 .thumb
  11586              	 .thumb_func
  11588              	EVE_cmd_translate:
- 11589              	.LFB581:
+ 11589              	.LFB629:
 3018:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3019:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3020:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_translate(int32_t tx, int32_t ty)
@@ -15925,14 +15925,14 @@
  11638              	.L440:
  11639 0038 00000000 	 .word cmd_burst
  11640              	 .cfi_endproc
- 11641              	.LFE581:
+ 11641              	.LFE629:
  11643              	 .section .text.EVE_cmd_translate_burst,"ax",%progbits
  11644              	 .align 2
  11645              	 .global EVE_cmd_translate_burst
  11646              	 .thumb
  11647              	 .thumb_func
  11649              	EVE_cmd_translate_burst:
- 11650              	.LFB582:
+ 11650              	.LFB630:
 3030:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3031:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3032:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_translate_burst(int32_t tx, int32_t ty)
@@ -15979,14 +15979,14 @@
  11686              	 
  11687 0026 80BD     	 pop {r7,pc}
  11688              	 .cfi_endproc
- 11689              	.LFE582:
+ 11689              	.LFE630:
  11691              	 .section .text.EVE_color_rgb,"ax",%progbits
  11692              	 .align 2
  11693              	 .global EVE_color_rgb
  11694              	 .thumb
  11695              	 .thumb_func
  11697              	EVE_color_rgb:
- 11698              	.LFB583:
+ 11698              	.LFB631:
 3038:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3039:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3040:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_color_rgb(uint32_t color)
@@ -16041,14 +16041,14 @@
  11740              	.L445:
  11741 0028 00000000 	 .word cmd_burst
  11742              	 .cfi_endproc
- 11743              	.LFE583:
+ 11743              	.LFE631:
  11745              	 .section .text.EVE_color_rgb_burst,"ax",%progbits
  11746              	 .align 2
  11747              	 .global EVE_color_rgb_burst
  11748              	 .thumb
  11749              	 .thumb_func
  11751              	EVE_color_rgb_burst:
- 11752              	.LFB584:
+ 11752              	.LFB632:
 3048:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3049:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3050:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_color_rgb_burst(uint32_t color)
@@ -16086,7 +16086,7 @@
  11781              	 
  11782 0018 80BD     	 pop {r7,pc}
  11783              	 .cfi_endproc
- 11784              	.LFE584:
+ 11784              	.LFE632:
  11786              	 .global __aeabi_i2d
  11787              	 .global __aeabi_dmul
  11788              	 .global __aeabi_d2uiz
@@ -16105,7 +16105,7 @@
  11797              	 .thumb
  11798              	 .thumb_func
  11800              	EVE_calibrate_manual:
- 11801              	.LFB585:
+ 11801              	.LFB633:
 3054:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3055:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3056:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
@@ -16772,7 +16772,7 @@
  12354 04c8 60213000 	 .word 3154272
  12355 04cc 64213000 	 .word 3154276
  12356              	 .cfi_endproc
- 12357              	.LFE585:
+ 12357              	.LFE633:
  12359              	 .text
  12360              	.Letext0:
  12361              	 .file 6 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"

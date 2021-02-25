@@ -96,6 +96,11 @@ __WEAK DAVE_STATUS_t DAVE_Init(void)
   {
 	 /**  Initialization of TIMER APP instance TIMER_0 */
 	 init_status = (DAVE_STATUS_t)TIMER_Init(&TIMER_0); 
+   } 
+  if (init_status == DAVE_STATUS_SUCCESS)
+  {
+	 /**  Initialization of FATFS APP instance FATFS_0 */
+	 init_status = (DAVE_STATUS_t)FATFS_Init(&FATFS_0); 
    }  
   return init_status;
 } /**  End of function DAVE_Init */

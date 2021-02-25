@@ -24,9 +24,14 @@ Dave/Generated/CLOCK_XMC4 \
 Dave/Generated/CPU_CTRL_XMC4 \
 Dave/Generated \
 Dave/Generated/DIGITAL_IO \
+Dave/Generated/FATFS \
+Dave/Generated/FATFS/ff_Src \
 Dave/Generated/GLOBAL_ADC \
 Dave/Generated/GLOBAL_CCU4 \
+Dave/Generated/RTC \
+Dave/Generated/SDMMC_BLOCK \
 Dave/Generated/SPI_MASTER \
+Dave/Generated/SYSTIMER \
 Dave/Generated/TIMER \
 Libraries/FT800-FT813-5.x \
 Libraries/Newlib \

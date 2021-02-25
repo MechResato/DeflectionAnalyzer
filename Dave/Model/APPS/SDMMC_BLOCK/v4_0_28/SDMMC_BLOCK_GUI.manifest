@@ -1,0 +1,126 @@
+package Model.APPS.SDMMC_BLOCK.v4_0_28;
+
+// Import statements
+import ifx.davex.app.manifest.*
+
+abstract class SDMMC_BLOCK_GUI extends AppManifest {
+
+    /* IMPORTANT NOTE: This is an auto generated file, please do not edit manually. */
+    /* User modifications in the GUI editor will be updated here automatically.     */
+    /* Manually editing the contents of this file will corrupt the APP SDK project. */
+
+	/* Begin : UI variable section */
+	 public GTab gtab_sd_advanced_settings;
+	 public GTab gtab_spi_advanced_settings;
+	 public GTab gtab_interrupt_settings;
+	 public GInteger ginteger_delay_elements;
+	 public GCombo gcombo_sd_mode;
+	 public GCombo gcombo_data_bus_width;
+	 public GCombo gcombo_clock_polarity;
+	 public GCombo gcombo_led_pin_mode;
+	 public GCombo gcombo_led_pin_strength;
+	 public GCombo gcombo_sd_data_pins_mode;
+	 public GCombo gcombo_sd_data_pins_strength;
+	 public GCombo gcombo_sdwc_pin_mode;
+	 public GCombo gcombo_hysteresis_sdwc;
+	 public GCombo gcombo_sd_cmd_pin_mode;
+	 public GCombo gcombo_sd_cmd_pin_strength;
+	 public GCombo gcombo_sdcd_pin_mode;
+	 public GCombo gcombo_hysteresis_sdcd;
+	 public GCombo gcombo_sd_clk_pin_mode;
+	 public GCombo gcombo_sd_clk_pin_strength;
+	 public GCombo gcombo_rst_pin_mode;
+	 public GCombo gcombo_rst_pin_strength;
+	 public GCombo gcombo_bus_power_pin_mode;
+	 public GCombo gcombo_bus_power_pin_strength;
+	 public GFloat gfloat_desired_bus_speed;
+	 public GCheck gcheck_use_rtos;
+	 public GCheck gcheck_led;
+	 public GCheck gcheck_sdwc;
+	 public GCheck gcheck_sdcd;
+	 public GCheck gcheck_bus_power;
+	 public GCheck gcheck_rst;
+	 public GCheck gcheck_sdmmc_cmd_dat_delay;
+	 public GCheck gcheck_enable_dma_mode;
+	 public GCheck gcheck_enable_advanced_pin_config;
+	 public GLabel glabel_data_bus_width;
+	 public GLabel glabel_sd_data_pins_mode;
+	 public GLabel glabel_sd_data_pins_strength;
+	 public GLabel glabel_hysteresis_sdwc;
+	 public GLabel glabel_sd_cmd_pin_mode;
+	 public GLabel glabel_sd_cmd_pin_strength;
+	 public GLabel glabel_hysteresis_sdcd;
+	 public GLabel glabel_sd_clk_pin_mode;
+	 public GLabel glabel_sd_clk_pin_strength;
+	 public GGroup ggroup_dma_mode;
+	 public GGroup ggroup_led_pin_settings;
+	 public GGroup ggroup_sd_data_pins_settings;
+	 public GGroup ggroup_sdwc_pin_settings;
+	 public GGroup ggroup_sd_cmd_pin_settings;
+	 public GGroup ggroup_sdcd_pin_settings;
+	 public GGroup ggroup_sd_clk_pin_settings;
+	 public GGroup ggroup_rst_pin_settings;
+	 public GGroup ggroup_bus_power_pin_settings;
+	 public GInterruptPrio ginterruptprio_sd_host_controller;
+	 public GMessage gmessage_clock_settings;
+
+	 public SDMMC_BLOCK_GUI(DaveEnv daveEnv){
+
+	 gtab_sd_advanced_settings = GTab(widgetName:"gtab_sd_advanced_settings", text:"Advanced Settings", enabled:true, visible:true)
+	 gtab_spi_advanced_settings = GTab(widgetName:"gtab_spi_advanced_settings", text:"Advanced Settings", enabled:true, visible:true)
+	 gtab_interrupt_settings = GTab(widgetName:"gtab_interrupt_settings", text:"Interrupt Settings", enabled:true, visible:true)
+	 ginteger_delay_elements = GInteger(widgetName:"ginteger_delay_elements", value:8, minValue:1, maxValue:16, enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_mode = GCombo(widgetName:"gcombo_sd_mode", options:["SD Mode","SPI Mode"], value:"SPI Mode", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_data_bus_width = GCombo(widgetName:"gcombo_data_bus_width", options:["1-bit SD/MMC","4-bit SD/MMC","8-bit MMC"], value:"4-bit SD/MMC", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_clock_polarity = GCombo(widgetName:"gcombo_clock_polarity", options:["Inverted","Non-Inverted"], value:"Inverted", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_led_pin_mode = GCombo(widgetName:"gcombo_led_pin_mode", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_led_pin_strength = GCombo(widgetName:"gcombo_led_pin_strength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_data_pins_mode = GCombo(widgetName:"gcombo_sd_data_pins_mode", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_data_pins_strength = GCombo(widgetName:"gcombo_sd_data_pins_strength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sdwc_pin_mode = GCombo(widgetName:"gcombo_sdwc_pin_mode", options:["Tristate","Pull Up","Pull Down","Continuous Sampling Mode","Inverted Tristate","Inverted Pull Up","Inverted Pull Down","Inverted Continuous Sampling Mode"], value:"Tristate", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_hysteresis_sdwc = GCombo(widgetName:"gcombo_hysteresis_sdwc", options:["Standard","Large"], value:"Standard", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_cmd_pin_mode = GCombo(widgetName:"gcombo_sd_cmd_pin_mode", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_cmd_pin_strength = GCombo(widgetName:"gcombo_sd_cmd_pin_strength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sdcd_pin_mode = GCombo(widgetName:"gcombo_sdcd_pin_mode", options:["Tristate","Pull Up","Pull Down","Continuous Sampling Mode","Inverted Tristate","Inverted Pull Up","Inverted Pull Down","Inverted Continuous Sampling Mode"], value:"Tristate", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_hysteresis_sdcd = GCombo(widgetName:"gcombo_hysteresis_sdcd", options:["Standard","Large"], value:"Standard", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_clk_pin_mode = GCombo(widgetName:"gcombo_sd_clk_pin_mode", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sd_clk_pin_strength = GCombo(widgetName:"gcombo_sd_clk_pin_strength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_rst_pin_mode = GCombo(widgetName:"gcombo_rst_pin_mode", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_rst_pin_strength = GCombo(widgetName:"gcombo_rst_pin_strength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bus_power_pin_mode = GCombo(widgetName:"gcombo_bus_power_pin_mode", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bus_power_pin_strength = GCombo(widgetName:"gcombo_bus_power_pin_strength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gfloat_desired_bus_speed = GFloat(widgetName:"gfloat_desired_bus_speed", value:10000, minValue:0.1, maxValue:36000, enabled:true, visible:true, isMandatoryValue:false)
+	 gcheck_use_rtos = GCheck(widgetName:"gcheck_use_rtos", value:false, enabled:true, visible:true)
+	 gcheck_led = GCheck(widgetName:"gcheck_led", value:false, enabled:true, visible:true)
+	 gcheck_sdwc = GCheck(widgetName:"gcheck_sdwc", value:false, enabled:true, visible:true)
+	 gcheck_sdcd = GCheck(widgetName:"gcheck_sdcd", value:false, enabled:true, visible:true)
+	 gcheck_bus_power = GCheck(widgetName:"gcheck_bus_power", value:false, enabled:true, visible:true)
+	 gcheck_rst = GCheck(widgetName:"gcheck_rst", value:false, enabled:true, visible:true)
+	 gcheck_sdmmc_cmd_dat_delay = GCheck(widgetName:"gcheck_sdmmc_cmd_dat_delay", value:true, enabled:true, visible:true)
+	 gcheck_enable_dma_mode = GCheck(widgetName:"gcheck_enable_dma_mode", value:false, enabled:true, visible:true)
+	 gcheck_enable_advanced_pin_config = GCheck(widgetName:"gcheck_enable_advanced_pin_config", value:false, enabled:true, visible:true)
+	 glabel_data_bus_width = GLabel(widgetName:"glabel_data_bus_width", text:"Data bus width:", enabled:true, visible:true)
+	 glabel_sd_data_pins_mode = GLabel(widgetName:"glabel_sd_data_pins_mode", text:"Mode:", enabled:true, visible:true)
+	 glabel_sd_data_pins_strength = GLabel(widgetName:"glabel_sd_data_pins_strength", text:"Driver strength:", enabled:true, visible:true)
+	 glabel_hysteresis_sdwc = GLabel(widgetName:"glabel_hysteresis_sdwc", text:"Hysteresis:", enabled:true, visible:true)
+	 glabel_sd_cmd_pin_mode = GLabel(widgetName:"glabel_sd_cmd_pin_mode", text:"Mode:", enabled:true, visible:true)
+	 glabel_sd_cmd_pin_strength = GLabel(widgetName:"glabel_sd_cmd_pin_strength", text:"Driver strength:", enabled:true, visible:true)
+	 glabel_hysteresis_sdcd = GLabel(widgetName:"glabel_hysteresis_sdcd", text:"Hysteresis:", enabled:true, visible:true)
+	 glabel_sd_clk_pin_mode = GLabel(widgetName:"glabel_sd_clk_pin_mode", text:"Mode:", enabled:true, visible:true)
+	 glabel_sd_clk_pin_strength = GLabel(widgetName:"glabel_sd_clk_pin_strength", text:"Driver strength:", enabled:true, visible:true)
+	 ggroup_dma_mode = GGroup(widgetName:"ggroup_dma_mode", text:"DMA Mode", enabled:true, visible:true)
+	 ggroup_led_pin_settings = GGroup(widgetName:"ggroup_led_pin_settings", text:"LED", enabled:true, visible:true)
+	 ggroup_sd_data_pins_settings = GGroup(widgetName:"ggroup_sd_data_pins_settings", text:"Data x [x = 0...7]", enabled:true, visible:true)
+	 ggroup_sdwc_pin_settings = GGroup(widgetName:"ggroup_sdwc_pin_settings", text:"SDWC", enabled:true, visible:true)
+	 ggroup_sd_cmd_pin_settings = GGroup(widgetName:"ggroup_sd_cmd_pin_settings", text:"CMD", enabled:true, visible:true)
+	 ggroup_sdcd_pin_settings = GGroup(widgetName:"ggroup_sdcd_pin_settings", text:"SDCD", enabled:true, visible:true)
+	 ggroup_sd_clk_pin_settings = GGroup(widgetName:"ggroup_sd_clk_pin_settings", text:"CLK", enabled:true, visible:true)
+	 ggroup_rst_pin_settings = GGroup(widgetName:"ggroup_rst_pin_settings", text:"RST", enabled:true, visible:true)
+	 ggroup_bus_power_pin_settings = GGroup(widgetName:"ggroup_bus_power_pin_settings", text:"Bus Power", enabled:true, visible:true)
+	 ginterruptprio_sd_host_controller = GInterruptPrio(widgetName:"ginterruptprio_sd_host_controller", priorityValue:63, minPriority:0, maxPriority:63, subPriorityValue:0, minSubPriority:0, maxSubPriority:0, subPriorityVisible:true, enabled:true, visible:true)
+	 gmessage_clock_settings = GMessage(widgetName:"gmessage_clock_settings", text:"SDMMC Clock is not enabled in the \"Clock Selection Settings\" tab of CLOCK_XMC4 APP. Enable the same to continue.", isError:true, visible:true)
+
+
+	 }
+	/* End : UI variable section */
+}

@@ -1,0 +1,96 @@
+package Model.APPS.FATFS.v4_0_26;
+
+// Import statements
+import ifx.davex.app.manifest.*
+
+abstract class FATFS_GUI extends AppManifest {
+
+    /* IMPORTANT NOTE: This is an auto generated file, please do not edit manually. */
+    /* User modifications in the GUI editor will be updated here automatically.     */
+    /* Manually editing the contents of this file will corrupt the APP SDK project. */
+
+	/* Begin : UI variable section */
+	 public GInteger ginteger_timeout;
+	 public GInteger ginteger_filesharing;
+	 public GInteger ginteger_day;
+	 public GInteger ginteger_month;
+	 public GInteger ginteger_year;
+	 public GCombo gcombo_drv0;
+	 public GCombo gcombo_drv1;
+	 public GCombo gcombo_drv2;
+	 public GCombo gcombo_volumes;
+	 public GCombo gcombo_minlevel;
+	 public GCombo gcombo_stringfunc;
+	 public GCombo gcombo_codepage;
+	 public GCombo gcombo_relativepath;
+	 public GCombo gcombo_sectorsize;
+	 public GCombo gcombo_filesystem;
+	 public GCombo gcombo_wordaccess;
+	 public GCheck gcheck_rtos;
+	 public GCheck gcheck_stdlib;
+	 public GCheck gcheck_readonly;
+	 public GCheck gcheck_find;
+	 public GCheck gcheck_mkfs;
+	 public GCheck gcheck_fastseek;
+	 public GCheck gcheck_f_expand;
+	 public GCheck gcheck_f_chmod;
+	 public GCheck gcheck_vollabel;
+	 public GCheck gcheck_forward;
+	 public GCheck gcheck_trim;
+	 public GCheck gcheck_multipartition;
+	 public GCheck gcheck_tinymode;
+	 public GCheck gcheck_reentrancy;
+	 public GCheck gcheck_timestamp;
+	 public GLabel glabel_drv1;
+	 public GLabel glabel_drv2;
+	 public GLabel glabel_block0;
+	 public GLabel glabel_block1;
+	 public GLabel glabel_block2;
+	 public GGroup ggroup_stdlib;
+	 public GMessage gmessage_error;
+
+	 public FATFS_GUI(DaveEnv daveEnv){
+
+	 ginteger_timeout = GInteger(widgetName:"ginteger_timeout", value:1000, minValue:1, maxValue:5000, enabled:false, visible:true, isMandatoryValue:false)
+	 ginteger_filesharing = GInteger(widgetName:"ginteger_filesharing", value:1, minValue:0, maxValue:20, enabled:true, visible:true, isMandatoryValue:false)
+	 ginteger_day = GInteger(widgetName:"ginteger_day", value:1, minValue:1, maxValue:31, enabled:false, visible:true, isMandatoryValue:false)
+	 ginteger_month = GInteger(widgetName:"ginteger_month", value:1, minValue:1, maxValue:12, enabled:false, visible:true, isMandatoryValue:false)
+	 ginteger_year = GInteger(widgetName:"ginteger_year", value:1980, minValue:1980, maxValue:3000, enabled:false, visible:true, isMandatoryValue:false)
+	 gcombo_drv0 = GCombo(widgetName:"gcombo_drv0", options:["SDMMC(SD Mode)","SDMMC(SPI Mode)"], value:"SDMMC(SPI Mode)", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_drv1 = GCombo(widgetName:"gcombo_drv1", options:["SDMMC(SD Mode)","SDMMC(SPI Mode)"], value:"SDMMC(SPI Mode)", enabled:false, visible:true, isMandatoryValue:false)
+	 gcombo_drv2 = GCombo(widgetName:"gcombo_drv2", options:["SDMMC(SD Mode)","SDMMC(SPI Mode)"], value:"SDMMC(SPI Mode)", enabled:false, visible:true, isMandatoryValue:false)
+	 gcombo_volumes = GCombo(widgetName:"gcombo_volumes", options:["1","2","3"], value:"1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_minlevel = GCombo(widgetName:"gcombo_minlevel", options:["0","1","2","3"], value:"0", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_stringfunc = GCombo(widgetName:"gcombo_stringfunc", options:["Disabled","Enabled w/o LF->CRLF conversion","Enabled w/ LF->CRLF conversion"], value:"Enabled w/ LF->CRLF conversion", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_codepage = GCombo(widgetName:"gcombo_codepage", options:["U.S.","Arabic","Greek","KBL","Baltic","Latin 1","Latin 2","Cyrillic","Turkish","Portuguese","Icelandic","Hebrew","Canadian French","Arabic 2","Nordic","Russian","Greek 2","Japanese (DBCS)","Simplified Chinese (DBCS)","Korean (DBCS)","Traditional Chinese (DBCS)","Include all code pages above and configured by f_setcp()"], value:"Latin 1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_relativepath = GCombo(widgetName:"gcombo_relativepath", options:["Disabled","Enabled w/o f_getcwd()","Enabled w/ f_getcwd()"], value:"Enabled w/ f_getcwd()", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sectorsize = GCombo(widgetName:"gcombo_sectorsize", options:["512","1024","2048","4096"], value:"512", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filesystem = GCombo(widgetName:"gcombo_filesystem", options:["Free Cluster Count w/ last allocated cluster number","Full FAT Scan  w/ last allocated cluster number","Free Cluster Count w/o last allocated cluster number","Full FAT Scan  w/o last allocated cluster number"], value:"Free Cluster Count w/o last allocated cluster number", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_wordaccess = GCombo(widgetName:"gcombo_wordaccess", options:["Byte-by-Byte Access","Word Access"], value:"Byte-by-Byte Access", enabled:true, visible:true, isMandatoryValue:false)
+	 gcheck_rtos = GCheck(widgetName:"gcheck_rtos", value:false, enabled:true, visible:true)
+	 gcheck_stdlib = GCheck(widgetName:"gcheck_stdlib", value:false, enabled:true, visible:true)
+	 gcheck_readonly = GCheck(widgetName:"gcheck_readonly", value:false, enabled:true, visible:true)
+	 gcheck_find = GCheck(widgetName:"gcheck_find", value:false, enabled:true, visible:true)
+	 gcheck_mkfs = GCheck(widgetName:"gcheck_mkfs", value:false, enabled:true, visible:true)
+	 gcheck_fastseek = GCheck(widgetName:"gcheck_fastseek", value:false, enabled:true, visible:true)
+	 gcheck_f_expand = GCheck(widgetName:"gcheck_f_expand", value:false, enabled:true, visible:true)
+	 gcheck_f_chmod = GCheck(widgetName:"gcheck_f_chmod", value:false, enabled:true, visible:true)
+	 gcheck_vollabel = GCheck(widgetName:"gcheck_vollabel", value:false, enabled:true, visible:true)
+	 gcheck_forward = GCheck(widgetName:"gcheck_forward", value:false, enabled:true, visible:true)
+	 gcheck_trim = GCheck(widgetName:"gcheck_trim", value:false, enabled:true, visible:true)
+	 gcheck_multipartition = GCheck(widgetName:"gcheck_multipartition", value:false, enabled:true, visible:true)
+	 gcheck_tinymode = GCheck(widgetName:"gcheck_tinymode", value:false, enabled:true, visible:true)
+	 gcheck_reentrancy = GCheck(widgetName:"gcheck_reentrancy", value:false, enabled:false, visible:true)
+	 gcheck_timestamp = GCheck(widgetName:"gcheck_timestamp", value:true, enabled:true, visible:true)
+	 glabel_drv1 = GLabel(widgetName:"glabel_drv1", text:"#1", enabled:true, visible:true)
+	 glabel_drv2 = GLabel(widgetName:"glabel_drv2", text:"#2", enabled:true, visible:true)
+	 glabel_block0 = GLabel(widgetName:"glabel_block0", text:"n/a", enabled:false, visible:true)
+	 glabel_block1 = GLabel(widgetName:"glabel_block1", text:"n/a", enabled:false, visible:true)
+	 glabel_block2 = GLabel(widgetName:"glabel_block2", text:"n/a", enabled:false, visible:true)
+	 ggroup_stdlib = GGroup(widgetName:"ggroup_stdlib", text:"Standard C Library Configuration", enabled:true, visible:true)
+	 gmessage_error = GMessage(widgetName:"gmessage_error", text:"Put Error Message here", isError:true, visible:true)
+
+
+	 }
+	/* End : UI variable section */
+}

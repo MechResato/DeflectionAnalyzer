@@ -1,0 +1,2865 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "rtc.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .text.XMC_RTC_IsRunning,"ax",%progbits
+  20              	 .align 2
+  21              	 .thumb
+  22              	 .thumb_func
+  24              	XMC_RTC_IsRunning:
+  25              	.LFB176:
+  26              	 .file 1 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_rtc.h"
+   1:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+   2:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @file xmc_rtc.h
+   3:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @date 2016-05-19
+   4:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+   5:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @cond
+   6:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+   7:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMClib v2.1.24 - XMC Peripheral Driver Library 
+   8:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+   9:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Copyright (c) 2015-2019, Infineon Technologies AG
+  10:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * All rights reserved.                        
+  11:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                                             
+  12:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Redistribution and use in source and binary forms, with or without modification,are permitted pr
+  13:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * following conditions are met:   
+  14:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                                                                              
+  15:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Redistributions of source code must retain the above copyright notice, this list of conditions a
+  16:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * disclaimer.                        
+  17:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 
+  18:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Redistributions in binary form must reproduce the above copyright notice, this list of condition
+  19:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * disclaimer in the documentation and/or other materials provided with the distribution.          
+  20:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 
+  21:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Neither the name of the copyright holders nor the names of its contributors may be used to endor
+  22:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * products derived from this software without specific prior written permission.                  
+  23:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                                                                              
+  24:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR I
+  25:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTI
+  26:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, IN
+  27:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBS
+  28:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THE
+  29:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+  30:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                            
+  31:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                                                                              
+  32:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * To improve the quality of the software, users are encouraged to share modifications, enhancement
+  33:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Infineon Technologies AG dave@infineon.com).                                                    
+  34:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+  35:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  36:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Change History
+  37:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * --------------
+  38:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  39:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 2015-02-20:
+  40:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *     - Initial
+  41:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *      
+  42:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 2015-05-20:
+  43:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *     - Documentation updates <br>
+  44:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *     - In xmc1_rtc file XMC_RTC_Init function
+  45:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *       is modified by adding the RTC running condition check
+  46:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *   
+  47:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 2015-06-20:
+  48:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *     - Removed version macros and declaration of GetDriverVersion API
+  49:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  50:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 2016-05-19:
+  51:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *     - Added XMC_RTC_SetTimeStdFormat() and XMC_RTC_SetAlarmStdFormat()
+  52:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  53:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @endcond 
+  54:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  55:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+  56:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  57:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #ifndef XMC_RTC_H
+  58:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #define XMC_RTC_H
+  59:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  60:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**************************************************************************************************
+  61:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * HEADER FILES
+  62:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+  63:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  64:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #include <xmc_common.h>
+  65:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #include <time.h>
+  66:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  67:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+  68:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  69:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @addtogroup XMClib XMC Peripheral Library
+  70:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @{
+  71:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+  72:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  73:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+  74:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @addtogroup RTC
+  75:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @brief RTC driver for XMC microcontroller family.
+  76:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  77:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Real-time clock (RTC) is a clock that keeps track of the current time. Precise
+  78:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * real time keeping is with a 32.768 KHz external crystal clock or a 32.768 KHz
+  79:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * high precision internal clock. It provides a periodic time based interrupt and
+  80:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * a programmable alarm interrupt on time match. It also supports wakeup from
+  81:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * hibernate.
+  82:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+  83:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The RTC low level driver provides functions to configure and initialize the RTC
+  84:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * hardware peripheral. 
+  85:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 
+  86:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @{
+  87:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+  88:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  89:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**************************************************************************************************
+  90:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * MACROS
+  91:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+  92:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  93:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**************************************************************************************************
+  94:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * ENUMS
+  95:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+  96:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+  97:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+  98:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *  Status return values for RTC low level driver
+  99:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 100:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef enum XMC_RTC_STATUS
+ 101:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 102:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_STATUS_OK    = 0U, /**< Operation successful */
+ 103:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_STATUS_ERROR = 1U, /**< Operation unsuccessful */
+ 104:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_STATUS_BUSY  = 2U  /**< Busy with a previous request */
+ 105:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_STATUS_t;
+ 106:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 107:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 108:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Events which enables interrupt request generation
+ 109:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 110:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef enum XMC_RTC_EVENT
+ 111:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 112:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_PERIODIC_SECONDS = RTC_MSKSR_MPSE_Msk, /**< Mask value to enable an event on period
+ 113:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_PERIODIC_MINUTES = RTC_MSKSR_MPMI_Msk, /**< Mask value to enable an event on period
+ 114:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_PERIODIC_HOURS   = RTC_MSKSR_MPHO_Msk, /**< Mask value to enable an event on period
+ 115:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_PERIODIC_DAYS    = RTC_MSKSR_MPDA_Msk, /**< Mask value to enable an event on period
+ 116:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_PERIODIC_MONTHS  = RTC_MSKSR_MPMO_Msk, /**< Mask value to enable an event on period
+ 117:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_PERIODIC_YEARS   = RTC_MSKSR_MPYE_Msk, /**< Mask value to enable an event on period
+ 118:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_EVENT_ALARM            = RTC_MSKSR_MAI_Msk   /**< Mask value to enable an event on period
+ 119:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_EVENT_t;
+ 120:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 121:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 122:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *  Months used to program the date  
+ 123:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 124:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef enum XMC_RTC_MONTH
+ 125:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 126:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_JANUARY   = 0U, 
+ 127:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_FEBRUARY  = 1U,     
+ 128:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_MARCH     = 2U,         
+ 129:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_APRIL     = 3U,       
+ 130:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_MAY       = 4U,         
+ 131:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_JUNE      = 5U,         
+ 132:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_JULY      = 6U,           
+ 133:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_AUGUST    = 7U,         
+ 134:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_SEPTEMBER = 8U,    
+ 135:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_OCTOBER   = 9U,      
+ 136:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_NOVEMBER  = 10U,     
+ 137:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_MONTH_DECEMBER  = 11U     
+ 138:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_MONTH_t;
+ 139:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 140:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 141:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *  Week days used program the date 
+ 142:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 143:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef enum XMC_RTC_WEEKDAY
+ 144:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 145:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_SUNDAY    = 0U, 
+ 146:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_MONDAY    = 1U,      
+ 147:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_TUESDAY   = 2U,      
+ 148:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_WEDNESDAY = 3U,    
+ 149:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_THURSDAY  = 4U,     
+ 150:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_FRIDAY    = 5U,       
+ 151:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_WEEKDAY_SATURDAY  = 6U      
+ 152:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_WEEKDAY_t;
+ 153:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 154:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**************************************************************************************************
+ 155:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * DATA STRUCTURES
+ 156:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+ 157:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /*Anonymous structure/union guard start*/
+ 158:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #if defined(__CC_ARM)
+ 159:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   #pragma push
+ 160:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   #pragma anon_unions
+ 161:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #elif defined(__TASKING__)
+ 162:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   #pragma warning 586
+ 163:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #endif
+ 164:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 165:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 166:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 167:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Alarm time values of RTC  <br>
+ 168:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 169:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The structure presents a convenient way to set/obtain the 
+ 170:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * alarm time values for seconds, minutes, hours, days, month and year of RTC. 
+ 171:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The XMC_RTC_SetAlarm() and XMC_RTC_GetAlarm() can be
+ 172:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * used to populate the structure with the alarm time value of
+ 173:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * RTC 
+ 174:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 175:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef struct XMC_RTC_ALARM
+ 176:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 177:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   union
+ 178:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   {
+ 179:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  uint32_t raw0;
+ 180:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  struct
+ 181:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  {
+ 182:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t seconds  : 6; /**< Alarm seconds compare value (0-59: Above this causes this bitfield
+ 183:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 2; 
+ 184:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t minutes  : 6; /**< Alarm minutes compare value (0-59: Above this causes this bitfield
+ 185:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 2;
+ 186:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t hours    : 5; /**< Alarm hours compare value   (0-23: Above this causes this bitfield
+ 187:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 3;
+ 188:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t days     : 5; /**< Alarm days compare value (0-Actual days of month: Above this cause
+ 189:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 3;
+ 190:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  };
+ 191:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   };
+ 192:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 193:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   union
+ 194:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   {
+ 195:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****     uint32_t raw1;
+ 196:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  struct
+ 197:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  {
+ 198:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 8;
+ 199:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t month    : 4; /**< Alarm month compare value (0-11: Above this causes this bitfield t
+ 200:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 4;
+ 201:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t year     : 16; /**< Alarm year compare value */ 
+ 202:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  };
+ 203:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   };
+ 204:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_ALARM_t;
+ 205:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 206:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 207:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Time values of RTC  <br>
+ 208:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 209:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The structure presents a convenient way to set/obtain the 
+ 210:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * time values for seconds, minutes, hours, days, month and year of RTC. 
+ 211:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The XMC_RTC_SetTime() and XMC_RTC_GetTime() can be
+ 212:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * used to populate the structure with the time value of
+ 213:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * RTC 
+ 214:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 215:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef struct XMC_RTC_TIME
+ 216:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 217:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   union
+ 218:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   {
+ 219:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****     uint32_t raw0;
+ 220:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  struct
+ 221:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  {
+ 222:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t seconds  : 6; /**< Seconds time value (0-59: Above this causes this bitfield to be se
+ 223:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 2; 
+ 224:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t minutes  : 6; /**< Minutes time value (0-59: Above this causes this bitfield to be se
+ 225:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 2;
+ 226:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t hours    : 5; /**< Hours time value   (0-23: Above this causes this bitfield to be se
+ 227:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 3;
+ 228:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t days     : 5; /**< Days time value (0-Actual days of month: Above this causes this bi
+ 229:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t          : 3;
+ 230:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  };
+ 231:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   };
+ 232:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 233:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   union
+ 234:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   {
+ 235:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****     uint32_t raw1;
+ 236:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  struct
+ 237:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	  {
+ 238:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t daysofweek  : 3; /**< Days of week time value (0-6: Above this causes this bitfield t
+ 239:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t             : 5;
+ 240:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t month       : 4; /**< Month time value       (0-11: Above this causes this bitfield t
+ 241:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t             : 4;
+ 242:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	    uint32_t year        : 16; /**< Year time value */
+ 243:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 	 };
+ 244:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   };
+ 245:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_TIME_t;
+ 246:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /*Anonymous structure/union guard end*/
+ 247:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #if defined(__CC_ARM)
+ 248:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   #pragma pop
+ 249:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #elif defined(__TASKING__)
+ 250:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   #pragma warning restore
+ 251:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #endif
+ 252:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 253:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 254:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * RTC initialization with time, alarm and clock divider(prescaler) configurations <br>
+ 255:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 256:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The structure presents a convenient way to set/obtain the time and alarm configurations  
+ 257:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * for RTC. The XMC_RTC_Init() can be used to populate the structure with the time and alarm
+ 258:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * values of RTC.
+ 259:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */  
+ 260:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** typedef struct XMC_RTC_CONFIG
+ 261:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 262:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_TIME_t    time;
+ 263:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   XMC_RTC_ALARM_t   alarm;
+ 264:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   uint16_t          prescaler;
+ 265:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** } XMC_RTC_CONFIG_t;
+ 266:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 267:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /*******************************************************************************
+ 268:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * EXTENSIONS
+ 269:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *******************************************************************************/
+ 270:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 271:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #if UC_FAMILY == XMC1
+ 272:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #include "xmc1_rtc.h"
+ 273:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #endif
+ 274:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 275:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #if UC_FAMILY == XMC4
+ 276:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #include "xmc4_rtc.h"
+ 277:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #endif
+ 278:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 279:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /*******************************************************************************
+ 280:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * API PROTOTYPES
+ 281:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  **************************************************************************************************
+ 282:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 283:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #ifdef __cplusplus
+ 284:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** extern "C" {
+ 285:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** #endif
+ 286:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 287:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 288:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param config Constant pointer to a constant ::XMC_RTC_CONFIG_t structure containing the
+ 289:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *               time, alarm time and clock divider(prescaler) configuration. 
+ 290:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return XMC_RTC_STATUS_t Always returns XMC_RTC_STATUS_OK (It contains only register assignment 
+ 291:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 292:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 293:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Initialize the RTC peripheral <br>
+ 294:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 295:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par \if XMC4
+ 296:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function enables the hibernate domain for accessing RTC peripheral registers, configures 
+ 297:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * internal clock divider, time and alarm values by writing to the CTR.DIV, TIM0, TIM1, ATIM0 and
+ 298:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * ATIM1 registers.
+ 299:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 300:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 301:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \if XMC1
+ 302:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function ungates the peripheral clock for RTC, configures 
+ 303:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * internal clock divider, time and alarm values by writing to the CTR.DIV, TIM0, TIM1, ATIM0 and
+ 304:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * ATIM1 registers.
+ 305:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 306:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 307:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** XMC_RTC_STATUS_t XMC_RTC_Init(const XMC_RTC_CONFIG_t *const config);
+ 308:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 309:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /** 
+ 310:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 311:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 312:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description</b><br>
+ 313:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Enables RTC peripheral for programming its registers <br>
+ 314:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 315:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par \if XMC4
+ 316:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Enables the hibernate domain for accessing RTC peripheral registers.
+ 317:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 318:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 319:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \if XMC1
+ 320:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Ungates the peripheral clock.
+ 321:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 322:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 323:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 324:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Disable(), XMC_SCU_RESET_DeassertPeripheralReset()
+ 325:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 326:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_Enable(void);
+ 327:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 328:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /** 
+ 329:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 330:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 331:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description</b><br>
+ 332:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Disables RTC peripheral for programming its registers <br>
+ 333:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 334:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par \if XMC4
+ 335:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Empty function (Hibernate domain is not disabled).
+ 336:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 337:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 338:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \if XMC1
+ 339:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gates the peripheral clock.
+ 340:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 341:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 342:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 343:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Enable(), XMC_SCU_RESET_AssertPeripheralReset()
+ 344:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 345:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_Disable(void);
+ 346:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 347:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /** 
+ 348:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 349:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 350:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description</b><br>
+ 351:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Checks RTC peripheral is enabled for programming its registers <br>
+ 352:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 353:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par \if XMC4
+ 354:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Checks the hibernate domain is enabled or not.
+ 355:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 356:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 357:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \if XMC1
+ 358:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Checks peripheral clock is ungated or not.
+ 359:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \endif
+ 360:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 361:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 362:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Enable(), XMC_RTC_Disable(), XMC_SCU_RESET_DeassertPeripheralReset(),
+ 363:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_SCU_RESET_AssertPeripheralReset()
+ 364:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 365:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** bool XMC_RTC_IsEnabled(void);
+ 366:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  
+ 367:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 368:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 369:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 370:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description</b><br>
+ 371:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Enables RTC peripheral to start counting time <br>
+ 372:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 373:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 374:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function starts the RTC for counting time by setting 
+ 375:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * CTR.ENB bit. Before starting the RTC, it should not be in
+ 376:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * running mode and also hibernate domain should be enabled.
+ 377:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 378:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 379:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Enable(), XMC_RTC_Stop(), XMC_SCU_RESET_DeassertPeripheralReset()
+ 380:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */  
+ 381:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_Start(void);
+ 382:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 383:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 384:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 385:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 386:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description</b><br>
+ 387:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Disables RTC peripheral to start counting time <br>
+ 388:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 389:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 390:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function stops the RTC for counting time by resetting 
+ 391:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * CTR.ENB. Before stopping the RTC, hibernate domain should be enabled.
+ 392:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 393:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 394:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Enable(), XMC_RTC_Start(), XMC_SCU_RESET_AssertPeripheralReset()
+ 395:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */  
+ 396:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_Stop(void);
+ 397:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   
+ 398:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 399:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param prescaler Prescaler value to be set                 
+ 400:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 401:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 402:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 403:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Sets the RTC module prescaler value <br>
+ 404:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 405:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 406:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the CTR.DIV bitfield to configure the prescalar value. 
+ 407:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The default value for the prescalar with the 32.768kHz crystal (or the internal clock) 
+ 408:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * is 7FFFH for a time interval of 1 sec. Before setting the prescaler value RTC should be
+ 409:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * in stop mode and hibernate domain should be enabled.
+ 410:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 411:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 412:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Stop(), XMC_RTC_Enable(), XMC_RTC_GetPrescaler()
+ 413:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */   
+ 414:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_SetPrescaler(uint16_t prescaler);
+ 415:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 416:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 417:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 418:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 419:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 420:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gets the RTC module prescaler value <br>
+ 421:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 422:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 423:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function reads the CTR.DIV bitfield to get the prescalar value. The default value 
+ 424:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * for the prescalar with the 32.768kHz crystal (or the internal clock) is 7FFFH for a 
+ 425:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * time interval of 1 sec.
+ 426:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 427:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 428:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetPrescaler()
+ 429:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */   
+ 430:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** __STATIC_INLINE uint32_t XMC_RTC_GetPrescaler(void)
+ 431:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+ 432:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   return (uint32_t)(((uint32_t)RTC->CTR & (uint32_t)RTC_CTR_DIV_Msk) >> (uint32_t)RTC_CTR_DIV_Pos);
+ 433:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** }
+ 434:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 435:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 436:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param timeval Contstant pointer to a constant ::XMC_RTC_TIME_t structure containing the
+ 437:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                time parameters seconds, minutes, hours, days, daysofweek, month and year.     
+ 438:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 439:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 440:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 441:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Sets the RTC module time values <br>
+ 442:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 443:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 444:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the TIM0, TIM1 registers with time values.
+ 445:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The values can only be written when RTC is disabled.
+ 446:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * See the structure ::XMC_RTC_TIME_t for the valid range of time value parameters. <br>
+ 447:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 448:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 449:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_GetTime(), XMC_RTC_Stop() 
+ 450:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */    
+ 451:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_SetTime(const XMC_RTC_TIME_t *const timeval);
+ 452:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 453:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 454:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param time Pointer to a constant ::XMC_RTC_TIME_t structure containing the time parameters
+ 455:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *             seconds, minutes, hours, days, daysofweek, month and year. 
+ 456:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 457:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 458:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 459:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gets the RTC module time value <br>
+ 460:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 461:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 462:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function gets the time values from TIM0, TIM1 registers. 
+ 463:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * See the structure ::XMC_RTC_TIME_t for the valid range of time value parameters. <br>
+ 464:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 465:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 466:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetTime()
+ 467:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */    
+ 468:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_GetTime(XMC_RTC_TIME_t *const time);
+ 469:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 470:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 471:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param stdtime Pointer to a ::tm structure containing the time parameters seconds,
+ 472:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                minutes, hours, days, daysofweek, month, year(since 1900) and days in a   
+ 473:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                year in standard format.           
+ 474:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 475:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 476:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 477:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Sets the RTC module time value in standard format <br>
+ 478:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 479:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 480:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the time values from TIM0, TIM1 registers. 
+ 481:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 482:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 483:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetTime(), XMC_RTC_GetTime()
+ 484:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */     
+ 485:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_SetTimeStdFormat(const struct tm *const stdtime);
+ 486:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 487:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 488:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param stdtime Pointer to a constant ::tm structure containing the time parameters seconds,
+ 489:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                minutes, hours, days, daysofweek, month, year(since 1900) and days in a   
+ 490:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                year in standard format.           
+ 491:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 492:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 493:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 494:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gets the RTC module time value in standard format <br>
+ 495:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 496:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 497:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function gets the time values from TIM0, TIM1 registers. 
+ 498:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * See the structure ::XMC_RTC_TIME_t for the valid range of time value parameters. <br>
+ 499:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * For days the valid range is (1 - Actual days of month), year (since 1900) and 
+ 500:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * daysinyear (0 -365).
+ 501:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 502:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 503:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetTime(), XMC_RTC_GetTime()
+ 504:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */     
+ 505:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_GetTimeStdFormat(struct tm *const stdtime);
+ 506:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 507:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 508:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param alarm Constant pointer to a constant ::XMC_RTC_ALARM_t structure containing the
+ 509:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                alarm time parameters alarm seconds, alarm minutes, alarm hours, alarm days, 
+ 510:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                alarm daysofweek, alarm month and alarm year.           
+ 511:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 512:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 513:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 514:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Sets the RTC module alarm time value <br>
+ 515:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 516:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 517:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the ATIM0, ATIM1 registers with alarm time values. 
+ 518:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * See the structure ::XMC_RTC_ALARM_t for the valid range of alarm time value parameters. <br>
+ 519:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 520:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 521:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_GetAlarm()
+ 522:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */     
+ 523:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_SetAlarm(const XMC_RTC_ALARM_t *const alarm);
+ 524:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 525:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 526:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param alarm Pointer to a constant ::XMC_RTC_ALARM_t structure containing the
+ 527:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *             time parameters alarm seconds, alarm minutes, alarm hours, alarm days, 
+ 528:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *             alarm daysofweek, alarm month and alarm year.           
+ 529:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 530:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 531:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 532:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gets the RTC module alarm time value <br>
+ 533:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 534:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 535:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function gets the alarm time values from ATIM0, ATIM1 registers. 
+ 536:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * See the structure ::XMC_RTC_ALARM_t for the valid range of alarm time value parameters. <br>
+ 537:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 538:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 539:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetAlarm()
+ 540:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */    
+ 541:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_GetAlarm(XMC_RTC_ALARM_t *const alarm);
+ 542:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 543:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 544:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param stdtime Pointer to a ::tm structure containing the time parameters alarm seconds,
+ 545:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                alarm minutes, alarm hours, alarm days, alarm daysofweek, alarm month,  
+ 546:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                alarm year(since 1900) and alarm days in a year in standard format.           
+ 547:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 548:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 549:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 550:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Sets the RTC module alarm time value in standard format <br>
+ 551:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 552:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 553:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the alarm time values from ATIM0, ATIM1 registers. 
+ 554:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 555:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 556:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetAlarm(), XMC_RTC_GetAlarm()
+ 557:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */     
+ 558:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_SetAlarmStdFormat(const struct tm *const stdtime);
+ 559:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 560:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 561:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param stdtime Pointer to a constant ::tm structure containing the time parameters alarm seconds
+ 562:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                alarm minutes, alarm hours, alarm days, alarm daysofweek, alarm month,  
+ 563:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *                alarm year(since 1900) and alarm days in a year in standard format.           
+ 564:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 565:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 566:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 567:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gets the RTC module alarm time value in standard format <br>
+ 568:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 569:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 570:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function gets the alarm time values from ATIM0, ATIM1 registers. 
+ 571:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * See the structure ::XMC_RTC_ALARM_t for the valid range of alarm time value parameters. <br>
+ 572:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * For days the valid range is (1 - Actual days of month), year (since 1900) and 
+ 573:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * daysinyear (0 -365).
+ 574:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 575:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 576:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_SetAlarm(), XMC_RTC_GetAlarm()
+ 577:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */     
+ 578:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_GetAlarmStdFormat(struct tm *const stdtime);
+ 579:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 580:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 581:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param event A valid RTC event (::XMC_RTC_EVENT_t) or a valid combination of
+ 582:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *              logically OR'd events
+ 583:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 584:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 585:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 586:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Enable RTC periodic and alarm event(s) <br>
+ 587:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 588:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 589:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the bitfields of MSKSR register to enable interrupt generation 
+ 590:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * for requested RTC event(s). 
+ 591:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Setting the masking value for the event(s) containing in the ::XMC_RTC_EVENT_t leads 
+ 592:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * to a generation of the interrupt.
+ 593:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 594:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 595:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_DisableEvent()
+ 596:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 597:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_EnableEvent(const uint32_t event);
+ 598:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 599:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 600:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param event A valid RTC event (::XMC_RTC_EVENT_t) or a valid combination of
+ 601:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *              logically OR'd events
+ 602:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 603:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 604:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 605:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Disable RTC periodic and alarm event(s) <br>
+ 606:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 607:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 608:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function resets the bitfields of MSKSR register to disable interrupt generation 
+ 609:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * for requested RTC event(s). 
+ 610:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Resetting the masking value for the the event(s) containing in the ::XMC_RTC_EVENT_t blocks 
+ 611:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * the generation of the interrupt.
+ 612:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 
+ 613:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 614:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_EnableEvent()
+ 615:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 616:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_DisableEvent(const uint32_t event);
+ 617:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 618:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 619:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @param event A valid RTC event (::XMC_RTC_EVENT_t) or a valid combination of
+ 620:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *              logically OR'd events
+ 621:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 622:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 623:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 624:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Clears periodic and alarm event(s) status <br>
+ 625:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 626:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 627:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function sets the bitfields of CLRSR register to clear status bits in RAWSTAT and STSSR regi
+ 628:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Setting the value for the the RTC event(s) containing in the ::XMC_RTC_EVENT_t clears the 
+ 629:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * corresponding status bits in RAWSTAT and STSSR registers.
+ 630:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 
+ 631:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 632:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_GetEventStatus()
+ 633:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 634:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** void XMC_RTC_ClearEvent(const uint32_t event);
+ 635:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 636:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 637:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return None
+ 638:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 639:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 640:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Gets the RTC periodic and alarm event(s) status <br>
+ 641:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 642:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 643:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function reads the bitfields of STSSR register 
+ 644:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * to get the status of RTC events. 
+ 645:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Reading the value of the register STSSR gives the status of the event(s) containing in the ::XMC
+ 646:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * 
+ 647:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 648:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_ClearEvent()
+ 649:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */
+ 650:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** uint32_t XMC_RTC_GetEventStatus(void);
+ 651:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** 
+ 652:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** /**
+ 653:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * @return bool true if RTC is running
+ 654:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *              false if RTC is not running
+ 655:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 656:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Description: </b><br>
+ 657:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * Checks the running status of the RTC <br>
+ 658:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 659:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par
+ 660:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * The function reads the bitfield ENB of CTR register 
+ 661:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * to get the running status of RTC. 
+ 662:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  *
+ 663:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * \par<b>Related APIs:</b><br>
+ 664:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  * XMC_RTC_Start(), XMC_RTC_Stop()
+ 665:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****  */ 
+ 666:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** __STATIC_INLINE bool XMC_RTC_IsRunning(void)
+ 667:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** {
+  27              	 .loc 1 667 0
+  28              	 .cfi_startproc
+  29              	 
+  30              	 
+  31              	 
+  32 0000 80B4     	 push {r7}
+  33              	.LCFI0:
+  34              	 .cfi_def_cfa_offset 4
+  35              	 .cfi_offset 7,-4
+  36 0002 00AF     	 add r7,sp,#0
+  37              	.LCFI1:
+  38              	 .cfi_def_cfa_register 7
+ 668:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h ****   return (bool)(RTC->CTR & RTC_CTR_ENB_Msk);
+  39              	 .loc 1 668 0
+  40 0004 064B     	 ldr r3,.L3
+  41 0006 5B68     	 ldr r3,[r3,#4]
+  42 0008 03F00103 	 and r3,r3,#1
+  43 000c 002B     	 cmp r3,#0
+  44 000e 14BF     	 ite ne
+  45 0010 0123     	 movne r3,#1
+  46 0012 0023     	 moveq r3,#0
+  47 0014 DBB2     	 uxtb r3,r3
+ 669:C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc\xmc_rtc.h **** }
+  48              	 .loc 1 669 0
+  49 0016 1846     	 mov r0,r3
+  50 0018 BD46     	 mov sp,r7
+  51              	.LCFI2:
+  52              	 .cfi_def_cfa_register 13
+  53              	 
+  54 001a 5DF8047B 	 ldr r7,[sp],#4
+  55              	.LCFI3:
+  56              	 .cfi_restore 7
+  57              	 .cfi_def_cfa_offset 0
+  58 001e 7047     	 bx lr
+  59              	.L4:
+  60              	 .align 2
+  61              	.L3:
+  62 0020 004A0050 	 .word 1342196224
+  63              	 .cfi_endproc
+  64              	.LFE176:
+  66              	 .section .text.RTC_Start,"ax",%progbits
+  67              	 .align 2
+  68              	 .thumb
+  69              	 .thumb_func
+  71              	RTC_Start:
+  72              	.LFB177:
+  73              	 .file 2 "../Dave/Generated/RTC/rtc.h"
+   1:../Dave/Generated/RTC/rtc.h **** /**
+   2:../Dave/Generated/RTC/rtc.h ****  * @file rtc.h
+   3:../Dave/Generated/RTC/rtc.h ****  * @date 2016-07-15
+   4:../Dave/Generated/RTC/rtc.h ****  *
+   5:../Dave/Generated/RTC/rtc.h ****  * NOTE:
+   6:../Dave/Generated/RTC/rtc.h ****  * This file is generated by DAVE. Any manual modification done to this file will be lost when the 
+   7:../Dave/Generated/RTC/rtc.h ****  * regenerated.
+   8:../Dave/Generated/RTC/rtc.h ****  */
+   9:../Dave/Generated/RTC/rtc.h **** /**
+  10:../Dave/Generated/RTC/rtc.h ****  * @cond
+  11:../Dave/Generated/RTC/rtc.h ****  **************************************************************************************************
+  12:../Dave/Generated/RTC/rtc.h ****  * RTC v4.1.14 Facilitates to generate real time clock and alarm
+  13:../Dave/Generated/RTC/rtc.h ****  *
+  14:../Dave/Generated/RTC/rtc.h ****  * Copyright (c) 2015-2018, Infineon Technologies AG
+  15:../Dave/Generated/RTC/rtc.h ****  * All rights reserved.
+  16:../Dave/Generated/RTC/rtc.h ****  *
+  17:../Dave/Generated/RTC/rtc.h ****  * Redistribution and use in source and binary forms, with or without modification,are permitted pr
+  18:../Dave/Generated/RTC/rtc.h ****  * following conditions are met:
+  19:../Dave/Generated/RTC/rtc.h ****  *
+  20:../Dave/Generated/RTC/rtc.h ****  *   Redistributions of source code must retain the above copyright notice, this list of conditions
+  21:../Dave/Generated/RTC/rtc.h ****  *   disclaimer.
+  22:../Dave/Generated/RTC/rtc.h ****  *
+  23:../Dave/Generated/RTC/rtc.h ****  *   Redistributions in binary form must reproduce the above copyright notice, this list of conditi
+  24:../Dave/Generated/RTC/rtc.h ****  *   following disclaimer in the documentation and/or other materials provided with the distributio
+  25:../Dave/Generated/RTC/rtc.h ****  *
+  26:../Dave/Generated/RTC/rtc.h ****  *   Neither the name of the copyright holders nor the names of its contributors may be used to end
+  27:../Dave/Generated/RTC/rtc.h ****  *   products derived from this software without specific prior written permission.
+  28:../Dave/Generated/RTC/rtc.h ****  *
+  29:../Dave/Generated/RTC/rtc.h ****  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR I
+  30:../Dave/Generated/RTC/rtc.h ****  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTI
+  31:../Dave/Generated/RTC/rtc.h ****  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, IN
+  32:../Dave/Generated/RTC/rtc.h ****  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBS
+  33:../Dave/Generated/RTC/rtc.h ****  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THE
+  34:../Dave/Generated/RTC/rtc.h ****  * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+  35:../Dave/Generated/RTC/rtc.h ****  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  36:../Dave/Generated/RTC/rtc.h ****  *
+  37:../Dave/Generated/RTC/rtc.h ****  * To improve the quality of the software, users are encouraged to share modifications, enhancement
+  38:../Dave/Generated/RTC/rtc.h ****  * with Infineon Technologies AG (dave@infineon.com).
+  39:../Dave/Generated/RTC/rtc.h ****  **************************************************************************************************
+  40:../Dave/Generated/RTC/rtc.h ****  *
+  41:../Dave/Generated/RTC/rtc.h ****  * Change History
+  42:../Dave/Generated/RTC/rtc.h ****  * --------------
+  43:../Dave/Generated/RTC/rtc.h ****  *
+  44:../Dave/Generated/RTC/rtc.h ****  * 2015-02-16:
+  45:../Dave/Generated/RTC/rtc.h ****  *     - Initial version<br>
+  46:../Dave/Generated/RTC/rtc.h ****  *
+  47:../Dave/Generated/RTC/rtc.h ****  * 2015-05-18:
+  48:../Dave/Generated/RTC/rtc.h ****  *     - LLD version check added
+  49:../Dave/Generated/RTC/rtc.h ****  * 2016-07-15:
+  50:../Dave/Generated/RTC/rtc.h ****  *     - Added APIs to set and get time and alarm in standard time format.<br>
+  51:../Dave/Generated/RTC/rtc.h ****  * @endcond
+  52:../Dave/Generated/RTC/rtc.h ****  *
+  53:../Dave/Generated/RTC/rtc.h ****  */
+  54:../Dave/Generated/RTC/rtc.h **** 
+  55:../Dave/Generated/RTC/rtc.h **** #ifndef RTC_H
+  56:../Dave/Generated/RTC/rtc.h **** #define RTC_H
+  57:../Dave/Generated/RTC/rtc.h **** 
+  58:../Dave/Generated/RTC/rtc.h **** 
+  59:../Dave/Generated/RTC/rtc.h **** /**************************************************************************************************
+  60:../Dave/Generated/RTC/rtc.h ****  * HEADER FILES
+  61:../Dave/Generated/RTC/rtc.h ****  **************************************************************************************************
+  62:../Dave/Generated/RTC/rtc.h **** #include <xmc_scu.h>
+  63:../Dave/Generated/RTC/rtc.h **** #include <xmc_rtc.h>
+  64:../Dave/Generated/RTC/rtc.h **** #include "rtc_conf.h"
+  65:../Dave/Generated/RTC/rtc.h **** #include <DAVE_Common.h>
+  66:../Dave/Generated/RTC/rtc.h **** 
+  67:../Dave/Generated/RTC/rtc.h **** /**************************************************************************************************
+  68:../Dave/Generated/RTC/rtc.h ****  * MACROS
+  69:../Dave/Generated/RTC/rtc.h ****  **************************************************************************************************
+  70:../Dave/Generated/RTC/rtc.h **** #if (!((XMC_LIB_MAJOR_VERSION == 2U) && \
+  71:../Dave/Generated/RTC/rtc.h ****        (XMC_LIB_MINOR_VERSION >= 0U) && \
+  72:../Dave/Generated/RTC/rtc.h ****        (XMC_LIB_PATCH_VERSION >= 0U)))
+  73:../Dave/Generated/RTC/rtc.h **** #error "RTC APP requires XMC Peripheral Library v2.0.0 or higher"
+  74:../Dave/Generated/RTC/rtc.h **** #endif
+  75:../Dave/Generated/RTC/rtc.h **** 
+  76:../Dave/Generated/RTC/rtc.h **** /**************************************************************************************************
+  77:../Dave/Generated/RTC/rtc.h ****  * ENUMS
+  78:../Dave/Generated/RTC/rtc.h ****  **************************************************************************************************
+  79:../Dave/Generated/RTC/rtc.h **** /**
+  80:../Dave/Generated/RTC/rtc.h ****  * @ingroup RTC_enumerations
+  81:../Dave/Generated/RTC/rtc.h ****  * @{
+  82:../Dave/Generated/RTC/rtc.h ****  */
+  83:../Dave/Generated/RTC/rtc.h **** 
+  84:../Dave/Generated/RTC/rtc.h **** typedef enum RTC_STATUS
+  85:../Dave/Generated/RTC/rtc.h **** {
+  86:../Dave/Generated/RTC/rtc.h ****   RTC_STATUS_SUCCESS = 0U,    /**< APP initialization status success */
+  87:../Dave/Generated/RTC/rtc.h ****   RTC_STATUS_FAILURE = 1U     /**< APP initialization status failure */
+  88:../Dave/Generated/RTC/rtc.h **** } RTC_STATUS_t;
+  89:../Dave/Generated/RTC/rtc.h **** 
+  90:../Dave/Generated/RTC/rtc.h **** /**
+  91:../Dave/Generated/RTC/rtc.h ****  * This enumeration defines RTC Module Enable and Disable values.
+  92:../Dave/Generated/RTC/rtc.h ****  */
+  93:../Dave/Generated/RTC/rtc.h **** 
+  94:../Dave/Generated/RTC/rtc.h **** typedef enum RTC_START
+  95:../Dave/Generated/RTC/rtc.h **** {
+  96:../Dave/Generated/RTC/rtc.h ****   RTC_START_DISABLE = 0x0U, /**< Disable RTC start */
+  97:../Dave/Generated/RTC/rtc.h ****   RTC_START_ENABLE = 0x1U   /**< Enable RTC start */
+  98:../Dave/Generated/RTC/rtc.h **** } RTC_START_t;
+  99:../Dave/Generated/RTC/rtc.h **** 
+ 100:../Dave/Generated/RTC/rtc.h **** 
+ 101:../Dave/Generated/RTC/rtc.h **** /**
+ 102:../Dave/Generated/RTC/rtc.h ****  * This enumeration defines RTC Module Interrupt Related Events Enable and
+ 103:../Dave/Generated/RTC/rtc.h ****  * Disable values.
+ 104:../Dave/Generated/RTC/rtc.h ****  */
+ 105:../Dave/Generated/RTC/rtc.h **** 
+ 106:../Dave/Generated/RTC/rtc.h **** typedef enum RTC_INT
+ 107:../Dave/Generated/RTC/rtc.h **** {
+ 108:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_SEC_DISABLE = 0x0U,          /**< Timer Periodic Seconds Interrupt Disable */
+ 109:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_SEC_ENABLE = 0x1U,           /**< Timer Periodic Seconds Interrupt Enable */
+ 110:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_MIN_DISABLE = 0x0U,          /**< Timer Periodic Minutes Interrupt Disable */
+ 111:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_MIN_ENABLE = 0x1U,           /**< Timer Periodic Minutes Interrupt Enable */
+ 112:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_HOUR_DISABLE = 0x0U,         /**< Timer Periodic Hours Interrupt Disable */
+ 113:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_HOUR_ENABLE = 0x1U,          /**< Timer Periodic Hours Interrupt Enable */
+ 114:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_DAY_DISABLE = 0x0U,          /**< Timer Periodic Days Interrupt Disable */
+ 115:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_DAY_ENABLE = 0x1U,           /**< Timer Periodic Days Interrupt Enable */
+ 116:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_MONTH_DISABLE = 0x0U,        /**< Timer Periodic Month Interrupt Disable */
+ 117:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_MONTH_ENABLE = 0x1U,         /**< Timer Periodic Month Interrupt Enable */
+ 118:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_YEAR_DISABLE = 0x0U,         /**< Timer Periodic Years Interrupt Disable */
+ 119:../Dave/Generated/RTC/rtc.h ****   RTC_INT_PERIODIC_YEAR_ENABLE = 0x1U,          /**< Timer Periodic Years Interrupt Enable */
+ 120:../Dave/Generated/RTC/rtc.h ****   RTC_INT_ALARM_DISABLE = 0x0U,                 /**< Alarm Interrupt Disable */
+ 121:../Dave/Generated/RTC/rtc.h ****   RTC_INT_ALARM_ENABLE = 0x1U                   /**< Alarm Interrupt Enable */
+ 122:../Dave/Generated/RTC/rtc.h **** } RTC_INT_t;
+ 123:../Dave/Generated/RTC/rtc.h **** 
+ 124:../Dave/Generated/RTC/rtc.h **** /**************************************************************************************************
+ 125:../Dave/Generated/RTC/rtc.h **** * DATA STRUCTURES
+ 126:../Dave/Generated/RTC/rtc.h **** ***************************************************************************************************
+ 127:../Dave/Generated/RTC/rtc.h **** /**
+ 128:../Dave/Generated/RTC/rtc.h ****   * @ingroup RTC_datastructures
+ 129:../Dave/Generated/RTC/rtc.h ****   * @{
+ 130:../Dave/Generated/RTC/rtc.h ****   */
+ 131:../Dave/Generated/RTC/rtc.h **** 
+ 132:../Dave/Generated/RTC/rtc.h **** /**
+ 133:../Dave/Generated/RTC/rtc.h ****  * RTC APP Handle structure. Stores configured parameters in APP UI.
+ 134:../Dave/Generated/RTC/rtc.h ****  */
+ 135:../Dave/Generated/RTC/rtc.h **** 
+ 136:../Dave/Generated/RTC/rtc.h **** typedef struct RTC_CONFIG
+ 137:../Dave/Generated/RTC/rtc.h **** {
+ 138:../Dave/Generated/RTC/rtc.h ****  RTC_START_t start;                           /**< rtc start */
+ 139:../Dave/Generated/RTC/rtc.h **** 
+ 140:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t periodic_sec_intr;                 /**< periodic seconds interrupt */
+ 141:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t periodic_min_intr;                 /**< periodic minutes interrupt */
+ 142:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t periodic_hour_intr;                /**< periodic hours interrupt */
+ 143:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t periodic_day_intr;                 /**< periodic days interrupt */
+ 144:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t periodic_month_intr;               /**< periodic months interrupt */
+ 145:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t periodic_year_intr;                /**< periodic years interrupt */
+ 146:../Dave/Generated/RTC/rtc.h **** 
+ 147:../Dave/Generated/RTC/rtc.h ****  RTC_INT_t alarm_intr;                        /**< alarm interrupt */
+ 148:../Dave/Generated/RTC/rtc.h **** 
+ 149:../Dave/Generated/RTC/rtc.h **** #if ((UC_FAMILY == XMC4) && (RTC_INTERRUPT_ENABLED == 1))
+ 150:../Dave/Generated/RTC/rtc.h ****  GLOBAL_SCU_XMC4_EVENT_HANDLER_t pi_listener;            /**< periodic interrupt listener */
+ 151:../Dave/Generated/RTC/rtc.h ****  GLOBAL_SCU_XMC4_EVENT_HANDLER_t ai_listener;            /**< alarm interrupt listener */
+ 152:../Dave/Generated/RTC/rtc.h **** #endif
+ 153:../Dave/Generated/RTC/rtc.h **** 
+ 154:../Dave/Generated/RTC/rtc.h **** #if ((UC_FAMILY == XMC1) && (RTC_INTERRUPT_ENABLED == 1))
+ 155:../Dave/Generated/RTC/rtc.h ****  GLOBAL_SCU_XMC1_EVENT_HANDLER_t pi_listener;            /**< periodic interrupt listener */
+ 156:../Dave/Generated/RTC/rtc.h ****  GLOBAL_SCU_XMC1_EVENT_HANDLER_t ai_listener;            /**< alarm interrupt listener */
+ 157:../Dave/Generated/RTC/rtc.h **** #endif
+ 158:../Dave/Generated/RTC/rtc.h **** } RTC_CONFIG_t;
+ 159:../Dave/Generated/RTC/rtc.h **** 
+ 160:../Dave/Generated/RTC/rtc.h **** /**
+ 161:../Dave/Generated/RTC/rtc.h ****  * Runtime RTC handler.
+ 162:../Dave/Generated/RTC/rtc.h ****  */
+ 163:../Dave/Generated/RTC/rtc.h **** typedef struct RealTimeClock
+ 164:../Dave/Generated/RTC/rtc.h **** {
+ 165:../Dave/Generated/RTC/rtc.h ****   const XMC_RTC_CONFIG_t *const time_alarm_config; /** Pointer to RTC LLD configuration data */
+ 166:../Dave/Generated/RTC/rtc.h ****   const RTC_CONFIG_t *const config;                /** Pointer to configuration data */
+ 167:../Dave/Generated/RTC/rtc.h ****   bool initialized;                                /** status for initialized or not */
+ 168:../Dave/Generated/RTC/rtc.h **** } RTC_t;
+ 169:../Dave/Generated/RTC/rtc.h **** /**
+ 170:../Dave/Generated/RTC/rtc.h ****  *@}
+ 171:../Dave/Generated/RTC/rtc.h ****  */
+ 172:../Dave/Generated/RTC/rtc.h **** 
+ 173:../Dave/Generated/RTC/rtc.h **** #ifdef __cplusplus
+ 174:../Dave/Generated/RTC/rtc.h **** extern "C" {
+ 175:../Dave/Generated/RTC/rtc.h **** #endif
+ 176:../Dave/Generated/RTC/rtc.h **** /**************************************************************************************************
+ 177:../Dave/Generated/RTC/rtc.h ****  * API PROTOTYPES
+ 178:../Dave/Generated/RTC/rtc.h **** ***************************************************************************************************
+ 179:../Dave/Generated/RTC/rtc.h **** 
+ 180:../Dave/Generated/RTC/rtc.h **** /**
+ 181:../Dave/Generated/RTC/rtc.h ****  * @ingroup RTC_apidoc
+ 182:../Dave/Generated/RTC/rtc.h ****  * @{
+ 183:../Dave/Generated/RTC/rtc.h ****  */
+ 184:../Dave/Generated/RTC/rtc.h **** 
+ 185:../Dave/Generated/RTC/rtc.h **** /**
+ 186:../Dave/Generated/RTC/rtc.h ****  * @brief Get RTC APP version.
+ 187:../Dave/Generated/RTC/rtc.h ****  * @return @ref DAVE_APP_VERSION_t APP version information (major, minor and patch number)
+ 188:../Dave/Generated/RTC/rtc.h ****  *
+ 189:../Dave/Generated/RTC/rtc.h ****  * \par<b>Description: </b><br>
+ 190:../Dave/Generated/RTC/rtc.h ****  * The function can be used to check application software compatibility with a
+ 191:../Dave/Generated/RTC/rtc.h ****  * specific version of the APP.
+ 192:../Dave/Generated/RTC/rtc.h ****  *
+ 193:../Dave/Generated/RTC/rtc.h ****  * @code
+ 194:../Dave/Generated/RTC/rtc.h ****  *  #include <DAVE.h>
+ 195:../Dave/Generated/RTC/rtc.h ****  *  #include <DAVE_common.h>
+ 196:../Dave/Generated/RTC/rtc.h ****  *  int main(void)
+ 197:../Dave/Generated/RTC/rtc.h ****  *  {
+ 198:../Dave/Generated/RTC/rtc.h ****  *    DAVE_APP_VERSION_t version;
+ 199:../Dave/Generated/RTC/rtc.h ****  *    DAVE_Init();
+ 200:../Dave/Generated/RTC/rtc.h ****  *    version = RTC_GetAppVersion();
+ 201:../Dave/Generated/RTC/rtc.h ****  *    if(version.major != 4U)
+ 202:../Dave/Generated/RTC/rtc.h ****  *    {
+ 203:../Dave/Generated/RTC/rtc.h ****  *    }
+ 204:../Dave/Generated/RTC/rtc.h ****  *    return 0;
+ 205:../Dave/Generated/RTC/rtc.h ****  *  }
+ 206:../Dave/Generated/RTC/rtc.h ****  * @endcode<BR> </p>
+ 207:../Dave/Generated/RTC/rtc.h ****  */
+ 208:../Dave/Generated/RTC/rtc.h **** DAVE_APP_VERSION_t RTC_GetAppVersion(void);
+ 209:../Dave/Generated/RTC/rtc.h **** 
+ 210:../Dave/Generated/RTC/rtc.h **** 
+ 211:../Dave/Generated/RTC/rtc.h ****  /**
+ 212:../Dave/Generated/RTC/rtc.h ****  * @brief Initializes RTC module.
+ 213:../Dave/Generated/RTC/rtc.h ****  * @param handle Constant pointer to RTC structure of type @ref RTC_t
+ 214:../Dave/Generated/RTC/rtc.h ****  * @return @ref RTC_STATUS_t
+ 215:../Dave/Generated/RTC/rtc.h ****  *
+ 216:../Dave/Generated/RTC/rtc.h ****  * \par<b>Description:</b><br>
+ 217:../Dave/Generated/RTC/rtc.h ****  * Configures the RTC module registers as per settings updated in
+ 218:../Dave/Generated/RTC/rtc.h ****  * UI and enables the RTC module.
+ 219:../Dave/Generated/RTC/rtc.h ****  *
+ 220:../Dave/Generated/RTC/rtc.h ****  * <P ALIGN="LEFT"><B>Example:</B>
+ 221:../Dave/Generated/RTC/rtc.h ****  * Pre-requisite: Instantiate RTC APP and generate code before copying below code snippet.
+ 222:../Dave/Generated/RTC/rtc.h ****  * @code
+ 223:../Dave/Generated/RTC/rtc.h ****  *  #include <DAVE.h>
+ 224:../Dave/Generated/RTC/rtc.h ****  *  int main(void)
+ 225:../Dave/Generated/RTC/rtc.h ****  *  {
+ 226:../Dave/Generated/RTC/rtc.h ****  *    DAVE_Init(); // RTC_Init(&RTC_0) will be called within DAVE_Init()
+ 227:../Dave/Generated/RTC/rtc.h ****  *    // ... infinite loop ...
+ 228:../Dave/Generated/RTC/rtc.h ****  *    while(1)
+ 229:../Dave/Generated/RTC/rtc.h ****  *    {}
+ 230:../Dave/Generated/RTC/rtc.h ****  *  }
+ 231:../Dave/Generated/RTC/rtc.h ****  * @endcode<BR> </p> 
+ 232:../Dave/Generated/RTC/rtc.h ****  */
+ 233:../Dave/Generated/RTC/rtc.h **** RTC_STATUS_t RTC_Init(RTC_t *const handle);
+ 234:../Dave/Generated/RTC/rtc.h **** 
+ 235:../Dave/Generated/RTC/rtc.h **** /**
+ 236:../Dave/Generated/RTC/rtc.h ****  * @brief Returns the time in seconds since the epoch time(01/01/1970).
+ 237:../Dave/Generated/RTC/rtc.h ****  * @param time_value Pointer to structure of type @ref time_t
+ 238:../Dave/Generated/RTC/rtc.h ****  * @return @ref RTC_STATUS_t
+ 239:../Dave/Generated/RTC/rtc.h ****  *
+ 240:../Dave/Generated/RTC/rtc.h ****  * <P ALIGN="LEFT"><B>Example:</B>
+ 241:../Dave/Generated/RTC/rtc.h ****  * Pre-requisite: Instantiate RTC APP and generate code before copying below code snippet.
+ 242:../Dave/Generated/RTC/rtc.h ****  * @code 
+ 243:../Dave/Generated/RTC/rtc.h ****  * #include <DAVE.h>
+ 244:../Dave/Generated/RTC/rtc.h ****  * int main(void)
+ 245:../Dave/Generated/RTC/rtc.h ****  * {
+ 246:../Dave/Generated/RTC/rtc.h ****  *   RTC_STATUS_t status = RTC_STATUS_FAILURE;
+ 247:../Dave/Generated/RTC/rtc.h ****  *   time_t Time_Sec;
+ 248:../Dave/Generated/RTC/rtc.h ****  *   DAVE_Init();  // RTC_Init(&RTC_0) will be called within DAVE_Init()
+ 249:../Dave/Generated/RTC/rtc.h ****  *   status = RTC_Time(&Time_Sec);
+ 250:../Dave/Generated/RTC/rtc.h ****  *   if(status != RTC_STATUS_SUCCESS)
+ 251:../Dave/Generated/RTC/rtc.h ****  *   {
+ 252:../Dave/Generated/RTC/rtc.h ****  *	   //error
+ 253:../Dave/Generated/RTC/rtc.h ****  *   }
+ 254:../Dave/Generated/RTC/rtc.h ****  *   // ... infinite loop ...
+ 255:../Dave/Generated/RTC/rtc.h ****  *   while(1)
+ 256:../Dave/Generated/RTC/rtc.h ****  *   {}
+ 257:../Dave/Generated/RTC/rtc.h ****  * }
+ 258:../Dave/Generated/RTC/rtc.h ****  * @endcode<BR> </p> 
+ 259:../Dave/Generated/RTC/rtc.h ****  */
+ 260:../Dave/Generated/RTC/rtc.h **** RTC_STATUS_t RTC_Time(time_t* time_value) ;
+ 261:../Dave/Generated/RTC/rtc.h **** 
+ 262:../Dave/Generated/RTC/rtc.h **** /**
+ 263:../Dave/Generated/RTC/rtc.h ****  * @brief Starts the RTC running
+ 264:../Dave/Generated/RTC/rtc.h ****  * @return None
+ 265:../Dave/Generated/RTC/rtc.h ****  *
+ 266:../Dave/Generated/RTC/rtc.h ****  *\par<b>Description: </b><br>
+ 267:../Dave/Generated/RTC/rtc.h ****  * Before verifying this API it is required to deselect "Start after initialization" checbox in UI.
+ 268:../Dave/Generated/RTC/rtc.h ****  * Thereby this API shall be used to start the RTC module.
+ 269:../Dave/Generated/RTC/rtc.h ****  * <P ALIGN="LEFT"><B>Example:</B>
+ 270:../Dave/Generated/RTC/rtc.h ****  * Pre-requisite:
+ 271:../Dave/Generated/RTC/rtc.h ****  * 1. Instantiate RTC APP <br>
+ 272:../Dave/Generated/RTC/rtc.h ****  * 2. Unselect "Start after initialization checkbox in UI" <br>
+ 273:../Dave/Generated/RTC/rtc.h ****  * 3. Generate code before copying below code snippet. <br>
+ 274:../Dave/Generated/RTC/rtc.h ****  * @code
+ 275:../Dave/Generated/RTC/rtc.h ****  * #include <DAVE.h>
+ 276:../Dave/Generated/RTC/rtc.h ****  * int main(void)
+ 277:../Dave/Generated/RTC/rtc.h ****  * {
+ 278:../Dave/Generated/RTC/rtc.h ****  *   DAVE_Init();// RTC_Init(&RTC_0) will be called within DAVE_Init()
+ 279:../Dave/Generated/RTC/rtc.h ****  *   RTC_Stop();
+ 280:../Dave/Generated/RTC/rtc.h ****  *   if (XMC_RTC_IsRunning() == false)
+ 281:../Dave/Generated/RTC/rtc.h ****  *   {
+ 282:../Dave/Generated/RTC/rtc.h ****  *     RTC_Start();
+ 283:../Dave/Generated/RTC/rtc.h ****  *   }
+ 284:../Dave/Generated/RTC/rtc.h ****  *   // ... infinite loop ...
+ 285:../Dave/Generated/RTC/rtc.h ****  *   while(1)
+ 286:../Dave/Generated/RTC/rtc.h ****  *   {}
+ 287:../Dave/Generated/RTC/rtc.h ****  * }
+ 288:../Dave/Generated/RTC/rtc.h ****  * @endcode<BR> </p>
+ 289:../Dave/Generated/RTC/rtc.h ****  */
+ 290:../Dave/Generated/RTC/rtc.h **** __STATIC_INLINE void RTC_Start(void)
+ 291:../Dave/Generated/RTC/rtc.h **** {
+  74              	 .loc 2 291 0
+  75              	 .cfi_startproc
+  76              	 
+  77              	 
+  78 0000 80B5     	 push {r7,lr}
+  79              	.LCFI4:
+  80              	 .cfi_def_cfa_offset 8
+  81              	 .cfi_offset 7,-8
+  82              	 .cfi_offset 14,-4
+  83 0002 00AF     	 add r7,sp,#0
+  84              	.LCFI5:
+  85              	 .cfi_def_cfa_register 7
+ 292:../Dave/Generated/RTC/rtc.h **** 	XMC_RTC_Start();
+  86              	 .loc 2 292 0
+  87 0004 FFF7FEFF 	 bl XMC_RTC_Start
+ 293:../Dave/Generated/RTC/rtc.h **** }
+  88              	 .loc 2 293 0
+  89 0008 80BD     	 pop {r7,pc}
+  90              	 .cfi_endproc
+  91              	.LFE177:
+  93              	 .global RTC_DAYS_IN_MONTH
+  94 000a 00BF     	 .section .rodata.RTC_DAYS_IN_MONTH,"a",%progbits
+  95              	 .align 2
+  98              	RTC_DAYS_IN_MONTH:
+  99 0000 00000000 	 .word 0
+ 100 0004 1F000000 	 .word 31
+ 101 0008 1C000000 	 .word 28
+ 102 000c 1F000000 	 .word 31
+ 103 0010 1E000000 	 .word 30
+ 104 0014 1F000000 	 .word 31
+ 105 0018 1E000000 	 .word 30
+ 106 001c 1F000000 	 .word 31
+ 107 0020 1F000000 	 .word 31
+ 108 0024 1E000000 	 .word 30
+ 109 0028 1F000000 	 .word 31
+ 110 002c 1E000000 	 .word 30
+ 111 0030 1F000000 	 .word 31
+ 112              	 .section .text.RTC_GetAppVersion,"ax",%progbits
+ 113              	 .align 2
+ 114              	 .global RTC_GetAppVersion
+ 115              	 .thumb
+ 116              	 .thumb_func
+ 118              	RTC_GetAppVersion:
+ 119              	.LFB179:
+ 120              	 .file 3 "../Dave/Generated/RTC/rtc.c"
+   1:../Dave/Generated/RTC/rtc.c **** /**
+   2:../Dave/Generated/RTC/rtc.c ****  * @file rtc.c
+   3:../Dave/Generated/RTC/rtc.c ****  * @date 2016-07-15
+   4:../Dave/Generated/RTC/rtc.c ****  *
+   5:../Dave/Generated/RTC/rtc.c ****  * NOTE:
+   6:../Dave/Generated/RTC/rtc.c ****  * This file is generated by DAVE. Any manual modification done to this file will be lost when the 
+   7:../Dave/Generated/RTC/rtc.c ****  */
+   8:../Dave/Generated/RTC/rtc.c **** /**
+   9:../Dave/Generated/RTC/rtc.c ****  * @cond
+  10:../Dave/Generated/RTC/rtc.c ****  **************************************************************************************************
+  11:../Dave/Generated/RTC/rtc.c ****  * RTC v4.1.14 Facilitates to generate real time clock and alarm
+  12:../Dave/Generated/RTC/rtc.c ****  *
+  13:../Dave/Generated/RTC/rtc.c ****  * Copyright (c) 2015-2018, Infineon Technologies AG
+  14:../Dave/Generated/RTC/rtc.c ****  * All rights reserved.
+  15:../Dave/Generated/RTC/rtc.c ****  *
+  16:../Dave/Generated/RTC/rtc.c ****  * Redistribution and use in source and binary forms, with or without modification,are permitted pr
+  17:../Dave/Generated/RTC/rtc.c ****  * following conditions are met:
+  18:../Dave/Generated/RTC/rtc.c ****  *
+  19:../Dave/Generated/RTC/rtc.c ****  *   Redistributions of source code must retain the above copyright notice, this list of conditions
+  20:../Dave/Generated/RTC/rtc.c ****  *   disclaimer.
+  21:../Dave/Generated/RTC/rtc.c ****  *
+  22:../Dave/Generated/RTC/rtc.c ****  *   Redistributions in binary form must reproduce the above copyright notice, this list of conditi
+  23:../Dave/Generated/RTC/rtc.c ****  *   following disclaimer in the documentation and/or other materials provided with the distributio
+  24:../Dave/Generated/RTC/rtc.c ****  *
+  25:../Dave/Generated/RTC/rtc.c ****  *   Neither the name of the copyright holders nor the names of its contributors may be used to end
+  26:../Dave/Generated/RTC/rtc.c ****  *   products derived from this software without specific prior written permission.
+  27:../Dave/Generated/RTC/rtc.c ****  *
+  28:../Dave/Generated/RTC/rtc.c ****  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR I
+  29:../Dave/Generated/RTC/rtc.c ****  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTI
+  30:../Dave/Generated/RTC/rtc.c ****  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, IN
+  31:../Dave/Generated/RTC/rtc.c ****  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBS
+  32:../Dave/Generated/RTC/rtc.c ****  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THE
+  33:../Dave/Generated/RTC/rtc.c ****  * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+  34:../Dave/Generated/RTC/rtc.c ****  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  35:../Dave/Generated/RTC/rtc.c ****  *
+  36:../Dave/Generated/RTC/rtc.c ****  * To improve the quality of the software, users are encouraged to share modifications, enhancement
+  37:../Dave/Generated/RTC/rtc.c ****  * with Infineon Technologies AG (dave@infineon.com).
+  38:../Dave/Generated/RTC/rtc.c ****  **************************************************************************************************
+  39:../Dave/Generated/RTC/rtc.c ****  *
+  40:../Dave/Generated/RTC/rtc.c ****  * Change History
+  41:../Dave/Generated/RTC/rtc.c ****  * --------------
+  42:../Dave/Generated/RTC/rtc.c ****  *
+  43:../Dave/Generated/RTC/rtc.c ****  * 2015-02-16:
+  44:../Dave/Generated/RTC/rtc.c ****  *     - Initial version<br>
+  45:../Dave/Generated/RTC/rtc.c ****  *
+  46:../Dave/Generated/RTC/rtc.c ****  * 2015-05-18:
+  47:../Dave/Generated/RTC/rtc.c ****  *     - Modified SetTime,SetAlarmTime APIs <br>
+  48:../Dave/Generated/RTC/rtc.c ****  *
+  49:../Dave/Generated/RTC/rtc.c ****  * 2015-06-16:
+  50:../Dave/Generated/RTC/rtc.c ****  *     - GLOBAL_SCU enum elements are passed in GLOBAL_SCU_XMC4_RegisterCallback().<br>
+  51:../Dave/Generated/RTC/rtc.c ****  * 2015-11-18:
+  52:../Dave/Generated/RTC/rtc.c ****  *     - Updated the RTC_lConfigureInterrupts() to enable the NMI request for timer and alarm inter
+  53:../Dave/Generated/RTC/rtc.c ****  * 2016-07-15:
+  54:../Dave/Generated/RTC/rtc.c ****  *     - Added APIs to set and get time and alarm in standard time format.<br>
+  55:../Dave/Generated/RTC/rtc.c ****  * 2018-02-06:
+  56:../Dave/Generated/RTC/rtc.c ****  *     - Fixed missing initialization of time_val.daysofweek in function RTC_SetTime()
+  57:../Dave/Generated/RTC/rtc.c ****  * @endcond
+  58:../Dave/Generated/RTC/rtc.c ****  *
+  59:../Dave/Generated/RTC/rtc.c ****  */
+  60:../Dave/Generated/RTC/rtc.c **** 
+  61:../Dave/Generated/RTC/rtc.c **** /**
+  62:../Dave/Generated/RTC/rtc.c **** * @file rtc.c
+  63:../Dave/Generated/RTC/rtc.c **** *
+  64:../Dave/Generated/RTC/rtc.c **** *
+  65:../Dave/Generated/RTC/rtc.c **** * @brief  Real Time Clock APP Implementation Source File.
+  66:../Dave/Generated/RTC/rtc.c **** *
+  67:../Dave/Generated/RTC/rtc.c **** *
+  68:../Dave/Generated/RTC/rtc.c **** */
+  69:../Dave/Generated/RTC/rtc.c **** 
+  70:../Dave/Generated/RTC/rtc.c **** /**************************************************************************************************
+  71:../Dave/Generated/RTC/rtc.c ****  * HEADER FILES
+  72:../Dave/Generated/RTC/rtc.c ****  **************************************************************************************************
+  73:../Dave/Generated/RTC/rtc.c **** #include "rtc.h"
+  74:../Dave/Generated/RTC/rtc.c **** 
+  75:../Dave/Generated/RTC/rtc.c **** /**************************************************************************************************
+  76:../Dave/Generated/RTC/rtc.c ****  * MACROS
+  77:../Dave/Generated/RTC/rtc.c ****  **************************************************************************************************
+  78:../Dave/Generated/RTC/rtc.c **** /* Constant used for the number of days in an year */
+  79:../Dave/Generated/RTC/rtc.c **** #define RTC_DAYS_IN_AN_YEAR     (365U)
+  80:../Dave/Generated/RTC/rtc.c **** /* Constant used for the seconds in a day */
+  81:../Dave/Generated/RTC/rtc.c **** #define RTC_SECONDS_IN_A_DAY    (24U * 60U * 60U)
+  82:../Dave/Generated/RTC/rtc.c **** /* Constant used for the seconds in an hour */
+  83:../Dave/Generated/RTC/rtc.c **** #define RTC_SECONDS_IN_AN_HOUR  (60U * 60U)
+  84:../Dave/Generated/RTC/rtc.c **** /* Constant used for the seconds in a minute */
+  85:../Dave/Generated/RTC/rtc.c **** #define RTC_SECONDS_IN_A_MINUTE (60U)
+  86:../Dave/Generated/RTC/rtc.c **** /* Constant used for the epoch year */
+  87:../Dave/Generated/RTC/rtc.c **** #define RTC_EPOCH_YEAR          (1970U)
+  88:../Dave/Generated/RTC/rtc.c **** 
+  89:../Dave/Generated/RTC/rtc.c **** /**************************************************************************************************
+  90:../Dave/Generated/RTC/rtc.c ****  * LOCAL DATA
+  91:../Dave/Generated/RTC/rtc.c ****  **************************************************************************************************
+  92:../Dave/Generated/RTC/rtc.c **** /* Constant array used to store the number of days in each month */
+  93:../Dave/Generated/RTC/rtc.c **** const uint32_t RTC_DAYS_IN_MONTH[13] =
+  94:../Dave/Generated/RTC/rtc.c **** {
+  95:../Dave/Generated/RTC/rtc.c ****   /* Index from 1, hence skip 0*/
+  96:../Dave/Generated/RTC/rtc.c ****   0U,
+  97:../Dave/Generated/RTC/rtc.c ****   /*Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec*/
+  98:../Dave/Generated/RTC/rtc.c ****   31U, 28U, 31U, 30U, 31U, 30U, 31U, 31U, 30U, 31U, 30U, 31U
+  99:../Dave/Generated/RTC/rtc.c **** };
+ 100:../Dave/Generated/RTC/rtc.c **** 
+ 101:../Dave/Generated/RTC/rtc.c **** /**************************************************************************************************
+ 102:../Dave/Generated/RTC/rtc.c ****  * LOCAL ROUTINES
+ 103:../Dave/Generated/RTC/rtc.c ****  **************************************************************************************************
+ 104:../Dave/Generated/RTC/rtc.c **** uint8_t RTC_lleapyear(uint16_t year);
+ 105:../Dave/Generated/RTC/rtc.c **** bool RTC_lConfigureInterrupts(const RTC_t *const handler);
+ 106:../Dave/Generated/RTC/rtc.c **** XMC_RTC_STATUS_t RTC_lRegister_Callbacks(const RTC_t *const handler);
+ 107:../Dave/Generated/RTC/rtc.c **** 
+ 108:../Dave/Generated/RTC/rtc.c **** /**************************************************************************************************
+ 109:../Dave/Generated/RTC/rtc.c ****  * API IMPLEMENTATION
+ 110:../Dave/Generated/RTC/rtc.c **** ***************************************************************************************************
+ 111:../Dave/Generated/RTC/rtc.c **** /*
+ 112:../Dave/Generated/RTC/rtc.c ****  * API to retrieve the version of the RTC APP
+ 113:../Dave/Generated/RTC/rtc.c ****  */
+ 114:../Dave/Generated/RTC/rtc.c **** DAVE_APP_VERSION_t RTC_GetAppVersion(void)
+ 115:../Dave/Generated/RTC/rtc.c **** {
+ 121              	 .loc 3 115 0
+ 122              	 .cfi_startproc
+ 123              	 
+ 124              	 
+ 125              	 
+ 126 0000 80B4     	 push {r7}
+ 127              	.LCFI6:
+ 128              	 .cfi_def_cfa_offset 4
+ 129              	 .cfi_offset 7,-4
+ 130 0002 83B0     	 sub sp,sp,#12
+ 131              	.LCFI7:
+ 132              	 .cfi_def_cfa_offset 16
+ 133 0004 00AF     	 add r7,sp,#0
+ 134              	.LCFI8:
+ 135              	 .cfi_def_cfa_register 7
+ 116:../Dave/Generated/RTC/rtc.c ****   DAVE_APP_VERSION_t version;
+ 117:../Dave/Generated/RTC/rtc.c **** 
+ 118:../Dave/Generated/RTC/rtc.c ****   version.major = RTC_MAJOR_VERSION;
+ 136              	 .loc 3 118 0
+ 137 0006 0423     	 movs r3,#4
+ 138 0008 3B70     	 strb r3,[r7]
+ 119:../Dave/Generated/RTC/rtc.c ****   version.minor = RTC_MINOR_VERSION;
+ 139              	 .loc 3 119 0
+ 140 000a 0123     	 movs r3,#1
+ 141 000c 7B70     	 strb r3,[r7,#1]
+ 120:../Dave/Generated/RTC/rtc.c ****   version.patch = RTC_PATCH_VERSION;
+ 142              	 .loc 3 120 0
+ 143 000e 0E23     	 movs r3,#14
+ 144 0010 BB70     	 strb r3,[r7,#2]
+ 121:../Dave/Generated/RTC/rtc.c **** 
+ 122:../Dave/Generated/RTC/rtc.c ****   return (version);
+ 145              	 .loc 3 122 0
+ 146 0012 3B1D     	 adds r3,r7,#4
+ 147 0014 3A46     	 mov r2,r7
+ 148 0016 1268     	 ldr r2,[r2]
+ 149 0018 1146     	 mov r1,r2
+ 150 001a 1980     	 strh r1,[r3]
+ 151 001c 0233     	 adds r3,r3,#2
+ 152 001e 120C     	 lsrs r2,r2,#16
+ 153 0020 1A70     	 strb r2,[r3]
+ 154 0022 0023     	 movs r3,#0
+ 155 0024 3A79     	 ldrb r2,[r7,#4]
+ 156 0026 62F30703 	 bfi r3,r2,#0,#8
+ 157 002a 7A79     	 ldrb r2,[r7,#5]
+ 158 002c 62F30F23 	 bfi r3,r2,#8,#8
+ 159 0030 BA79     	 ldrb r2,[r7,#6]
+ 160 0032 62F31743 	 bfi r3,r2,#16,#8
+ 123:../Dave/Generated/RTC/rtc.c **** }
+ 161              	 .loc 3 123 0
+ 162 0036 1846     	 mov r0,r3
+ 163 0038 0C37     	 adds r7,r7,#12
+ 164              	.LCFI9:
+ 165              	 .cfi_def_cfa_offset 4
+ 166 003a BD46     	 mov sp,r7
+ 167              	.LCFI10:
+ 168              	 .cfi_def_cfa_register 13
+ 169              	 
+ 170 003c 5DF8047B 	 ldr r7,[sp],#4
+ 171              	.LCFI11:
+ 172              	 .cfi_restore 7
+ 173              	 .cfi_def_cfa_offset 0
+ 174 0040 7047     	 bx lr
+ 175              	 .cfi_endproc
+ 176              	.LFE179:
+ 178 0042 00BF     	 .section .text.RTC_Init,"ax",%progbits
+ 179              	 .align 2
+ 180              	 .global RTC_Init
+ 181              	 .thumb
+ 182              	 .thumb_func
+ 184              	RTC_Init:
+ 185              	.LFB180:
+ 124:../Dave/Generated/RTC/rtc.c **** 
+ 125:../Dave/Generated/RTC/rtc.c **** /*
+ 126:../Dave/Generated/RTC/rtc.c ****   Initialization function for the APP. Configures the registers
+ 127:../Dave/Generated/RTC/rtc.c ****   based on options selected in UI.
+ 128:../Dave/Generated/RTC/rtc.c **** */
+ 129:../Dave/Generated/RTC/rtc.c **** RTC_STATUS_t RTC_Init(RTC_t *const handler)
+ 130:../Dave/Generated/RTC/rtc.c **** {
+ 186              	 .loc 3 130 0
+ 187              	 .cfi_startproc
+ 188              	 
+ 189              	 
+ 190 0000 80B5     	 push {r7,lr}
+ 191              	.LCFI12:
+ 192              	 .cfi_def_cfa_offset 8
+ 193              	 .cfi_offset 7,-8
+ 194              	 .cfi_offset 14,-4
+ 195 0002 84B0     	 sub sp,sp,#16
+ 196              	.LCFI13:
+ 197              	 .cfi_def_cfa_offset 24
+ 198 0004 00AF     	 add r7,sp,#0
+ 199              	.LCFI14:
+ 200              	 .cfi_def_cfa_register 7
+ 201 0006 7860     	 str r0,[r7,#4]
+ 131:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_STATUS_t status;
+ 132:../Dave/Generated/RTC/rtc.c ****   RTC_STATUS_t rtc_initstatus;
+ 133:../Dave/Generated/RTC/rtc.c ****   bool interrupt_configured;
+ 134:../Dave/Generated/RTC/rtc.c **** 
+ 135:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_Init: NULL Handler", handler != NULL);
+ 136:../Dave/Generated/RTC/rtc.c **** 
+ 137:../Dave/Generated/RTC/rtc.c ****   status = XMC_RTC_STATUS_OK;
+ 202              	 .loc 3 137 0
+ 203 0008 0023     	 movs r3,#0
+ 204 000a FB73     	 strb r3,[r7,#15]
+ 138:../Dave/Generated/RTC/rtc.c ****   rtc_initstatus = RTC_STATUS_FAILURE;
+ 205              	 .loc 3 138 0
+ 206 000c 0123     	 movs r3,#1
+ 207 000e BB73     	 strb r3,[r7,#14]
+ 139:../Dave/Generated/RTC/rtc.c **** 
+ 140:../Dave/Generated/RTC/rtc.c **** #if (RTC_INTERRUPT_ENABLED == 1)
+ 141:../Dave/Generated/RTC/rtc.c **** #if (UC_FAMILY == XMC4)
+ 142:../Dave/Generated/RTC/rtc.c ****   rtc_initstatus = (RTC_STATUS_t)GLOBAL_SCU_XMC4_Init(GLOBAL_SCU_HANDLE);
+ 143:../Dave/Generated/RTC/rtc.c **** #else
+ 144:../Dave/Generated/RTC/rtc.c ****   rtc_initstatus = (RTC_STATUS_t)GLOBAL_SCU_XMC1_Init(GLOBAL_SCU_HANDLE);
+ 145:../Dave/Generated/RTC/rtc.c **** #endif
+ 146:../Dave/Generated/RTC/rtc.c ****   if (rtc_initstatus == RTC_STATUS_SUCCESS)
+ 147:../Dave/Generated/RTC/rtc.c ****   {
+ 148:../Dave/Generated/RTC/rtc.c **** #endif
+ 149:../Dave/Generated/RTC/rtc.c ****       if (handler->initialized == false)
+ 208              	 .loc 3 149 0
+ 209 0010 7B68     	 ldr r3,[r7,#4]
+ 210 0012 1B7A     	 ldrb r3,[r3,#8]
+ 211 0014 83F00103 	 eor r3,r3,#1
+ 212 0018 DBB2     	 uxtb r3,r3
+ 213 001a 002B     	 cmp r3,#0
+ 214 001c 29D0     	 beq .L9
+ 150:../Dave/Generated/RTC/rtc.c ****       {
+ 151:../Dave/Generated/RTC/rtc.c ****         /* Initialize the clock source and pre-scalar */
+ 152:../Dave/Generated/RTC/rtc.c ****         status = XMC_RTC_Init(handler->time_alarm_config);
+ 215              	 .loc 3 152 0
+ 216 001e 7B68     	 ldr r3,[r7,#4]
+ 217 0020 1B68     	 ldr r3,[r3]
+ 218 0022 1846     	 mov r0,r3
+ 219 0024 FFF7FEFF 	 bl XMC_RTC_Init
+ 220 0028 0346     	 mov r3,r0
+ 221 002a FB73     	 strb r3,[r7,#15]
+ 153:../Dave/Generated/RTC/rtc.c **** 
+ 154:../Dave/Generated/RTC/rtc.c ****         if (status == XMC_RTC_STATUS_OK)
+ 222              	 .loc 3 154 0
+ 223 002c FB7B     	 ldrb r3,[r7,#15]
+ 224 002e 002B     	 cmp r3,#0
+ 225 0030 1CD1     	 bne .L10
+ 155:../Dave/Generated/RTC/rtc.c ****         {
+ 156:../Dave/Generated/RTC/rtc.c ****           /* Configure periodic, alarm and hibernate periodic interrupts */
+ 157:../Dave/Generated/RTC/rtc.c ****           interrupt_configured = RTC_lConfigureInterrupts(handler);
+ 226              	 .loc 3 157 0
+ 227 0032 7868     	 ldr r0,[r7,#4]
+ 228 0034 FFF7FEFF 	 bl RTC_lConfigureInterrupts
+ 229 0038 0346     	 mov r3,r0
+ 230 003a 7B73     	 strb r3,[r7,#13]
+ 158:../Dave/Generated/RTC/rtc.c **** 
+ 159:../Dave/Generated/RTC/rtc.c ****           if (interrupt_configured == true)
+ 231              	 .loc 3 159 0
+ 232 003c 7B7B     	 ldrb r3,[r7,#13]
+ 233 003e 002B     	 cmp r3,#0
+ 234 0040 04D0     	 beq .L11
+ 160:../Dave/Generated/RTC/rtc.c ****           {
+ 161:../Dave/Generated/RTC/rtc.c ****             status = RTC_lRegister_Callbacks(handler);
+ 235              	 .loc 3 161 0
+ 236 0042 7868     	 ldr r0,[r7,#4]
+ 237 0044 FFF7FEFF 	 bl RTC_lRegister_Callbacks
+ 238 0048 0346     	 mov r3,r0
+ 239 004a FB73     	 strb r3,[r7,#15]
+ 240              	.L11:
+ 162:../Dave/Generated/RTC/rtc.c ****           }
+ 163:../Dave/Generated/RTC/rtc.c **** 
+ 164:../Dave/Generated/RTC/rtc.c ****           if (status == XMC_RTC_STATUS_OK)
+ 241              	 .loc 3 164 0
+ 242 004c FB7B     	 ldrb r3,[r7,#15]
+ 243 004e 002B     	 cmp r3,#0
+ 244 0050 11D1     	 bne .L15
+ 165:../Dave/Generated/RTC/rtc.c ****           {
+ 166:../Dave/Generated/RTC/rtc.c ****           	/* Check RTC start during init is set or not in UI */
+ 167:../Dave/Generated/RTC/rtc.c ****             if (handler->config->start == RTC_START_ENABLE)
+ 245              	 .loc 3 167 0
+ 246 0052 7B68     	 ldr r3,[r7,#4]
+ 247 0054 5B68     	 ldr r3,[r3,#4]
+ 248 0056 1B78     	 ldrb r3,[r3]
+ 249 0058 012B     	 cmp r3,#1
+ 250 005a 01D1     	 bne .L13
+ 168:../Dave/Generated/RTC/rtc.c ****             {
+ 169:../Dave/Generated/RTC/rtc.c ****               RTC_Start();
+ 251              	 .loc 3 169 0
+ 252 005c FFF7FEFF 	 bl RTC_Start
+ 253              	.L13:
+ 170:../Dave/Generated/RTC/rtc.c ****             }
+ 171:../Dave/Generated/RTC/rtc.c ****             handler->initialized = true;
+ 254              	 .loc 3 171 0
+ 255 0060 7B68     	 ldr r3,[r7,#4]
+ 256 0062 0122     	 movs r2,#1
+ 257 0064 1A72     	 strb r2,[r3,#8]
+ 172:../Dave/Generated/RTC/rtc.c ****             rtc_initstatus = RTC_STATUS_SUCCESS;
+ 258              	 .loc 3 172 0
+ 259 0066 0023     	 movs r3,#0
+ 260 0068 BB73     	 strb r3,[r7,#14]
+ 261 006a 04E0     	 b .L15
+ 262              	.L10:
+ 173:../Dave/Generated/RTC/rtc.c ****           }
+ 174:../Dave/Generated/RTC/rtc.c ****         }
+ 175:../Dave/Generated/RTC/rtc.c ****         else
+ 176:../Dave/Generated/RTC/rtc.c ****         {
+ 177:../Dave/Generated/RTC/rtc.c ****           rtc_initstatus = RTC_STATUS_FAILURE;
+ 263              	 .loc 3 177 0
+ 264 006c 0123     	 movs r3,#1
+ 265 006e BB73     	 strb r3,[r7,#14]
+ 266 0070 01E0     	 b .L15
+ 267              	.L9:
+ 178:../Dave/Generated/RTC/rtc.c ****         }
+ 179:../Dave/Generated/RTC/rtc.c ****       }
+ 180:../Dave/Generated/RTC/rtc.c ****       else
+ 181:../Dave/Generated/RTC/rtc.c ****       {
+ 182:../Dave/Generated/RTC/rtc.c ****         rtc_initstatus = RTC_STATUS_SUCCESS;
+ 268              	 .loc 3 182 0
+ 269 0072 0023     	 movs r3,#0
+ 270 0074 BB73     	 strb r3,[r7,#14]
+ 271              	.L15:
+ 183:../Dave/Generated/RTC/rtc.c ****       }
+ 184:../Dave/Generated/RTC/rtc.c **** #if (RTC_INTERRUPT_ENABLED == 1)
+ 185:../Dave/Generated/RTC/rtc.c ****    } /* end of if(rtc_initstatus == GLOBAL_SCU_XMC4_STATUS_OK) */
+ 186:../Dave/Generated/RTC/rtc.c **** #endif
+ 187:../Dave/Generated/RTC/rtc.c **** 
+ 188:../Dave/Generated/RTC/rtc.c ****   return (rtc_initstatus);
+ 272              	 .loc 3 188 0
+ 273 0076 BB7B     	 ldrb r3,[r7,#14]
+ 189:../Dave/Generated/RTC/rtc.c **** }
+ 274              	 .loc 3 189 0
+ 275 0078 1846     	 mov r0,r3
+ 276 007a 1037     	 adds r7,r7,#16
+ 277              	.LCFI15:
+ 278              	 .cfi_def_cfa_offset 8
+ 279 007c BD46     	 mov sp,r7
+ 280              	.LCFI16:
+ 281              	 .cfi_def_cfa_register 13
+ 282              	 
+ 283 007e 80BD     	 pop {r7,pc}
+ 284              	 .cfi_endproc
+ 285              	.LFE180:
+ 287              	 .section .text.RTC_lConfigureInterrupts,"ax",%progbits
+ 288              	 .align 2
+ 289              	 .global RTC_lConfigureInterrupts
+ 290              	 .thumb
+ 291              	 .thumb_func
+ 293              	RTC_lConfigureInterrupts:
+ 294              	.LFB181:
+ 190:../Dave/Generated/RTC/rtc.c **** /*
+ 191:../Dave/Generated/RTC/rtc.c ****  *  This function configures periodic and alarm interrupts
+ 192:../Dave/Generated/RTC/rtc.c ****  */
+ 193:../Dave/Generated/RTC/rtc.c **** bool RTC_lConfigureInterrupts(const RTC_t *const handler)
+ 194:../Dave/Generated/RTC/rtc.c **** {
+ 295              	 .loc 3 194 0
+ 296              	 .cfi_startproc
+ 297              	 
+ 298              	 
+ 299 0000 80B5     	 push {r7,lr}
+ 300              	.LCFI17:
+ 301              	 .cfi_def_cfa_offset 8
+ 302              	 .cfi_offset 7,-8
+ 303              	 .cfi_offset 14,-4
+ 304 0002 84B0     	 sub sp,sp,#16
+ 305              	.LCFI18:
+ 306              	 .cfi_def_cfa_offset 24
+ 307 0004 00AF     	 add r7,sp,#0
+ 308              	.LCFI19:
+ 309              	 .cfi_def_cfa_register 7
+ 310 0006 7860     	 str r0,[r7,#4]
+ 195:../Dave/Generated/RTC/rtc.c ****   uint32_t regval;
+ 196:../Dave/Generated/RTC/rtc.c ****   bool interrupt_configured = false;
+ 311              	 .loc 3 196 0
+ 312 0008 0023     	 movs r3,#0
+ 313 000a FB73     	 strb r3,[r7,#15]
+ 197:../Dave/Generated/RTC/rtc.c **** 
+ 198:../Dave/Generated/RTC/rtc.c ****   /* Enable periodic seconds, minutes, hours days, months and years interrupts */
+ 199:../Dave/Generated/RTC/rtc.c ****   regval = (((uint32_t)handler->config->periodic_sec_intr << RTC_MSKSR_MPSE_Pos)
+ 314              	 .loc 3 199 0
+ 315 000c 7B68     	 ldr r3,[r7,#4]
+ 316 000e 5B68     	 ldr r3,[r3,#4]
+ 317 0010 5B78     	 ldrb r3,[r3,#1]
+ 318 0012 1A46     	 mov r2,r3
+ 200:../Dave/Generated/RTC/rtc.c ****            | ((uint32_t)handler->config->periodic_min_intr << RTC_MSKSR_MPMI_Pos)
+ 319              	 .loc 3 200 0
+ 320 0014 7B68     	 ldr r3,[r7,#4]
+ 321 0016 5B68     	 ldr r3,[r3,#4]
+ 322 0018 9B78     	 ldrb r3,[r3,#2]
+ 323 001a 5B00     	 lsls r3,r3,#1
+ 324 001c 1A43     	 orrs r2,r2,r3
+ 201:../Dave/Generated/RTC/rtc.c ****            | ((uint32_t)handler->config->periodic_hour_intr << RTC_MSKSR_MPHO_Pos)
+ 325              	 .loc 3 201 0
+ 326 001e 7B68     	 ldr r3,[r7,#4]
+ 327 0020 5B68     	 ldr r3,[r3,#4]
+ 328 0022 DB78     	 ldrb r3,[r3,#3]
+ 329 0024 9B00     	 lsls r3,r3,#2
+ 330 0026 1A43     	 orrs r2,r2,r3
+ 202:../Dave/Generated/RTC/rtc.c ****            | ((uint32_t)handler->config->periodic_day_intr << RTC_MSKSR_MPDA_Pos)
+ 331              	 .loc 3 202 0
+ 332 0028 7B68     	 ldr r3,[r7,#4]
+ 333 002a 5B68     	 ldr r3,[r3,#4]
+ 334 002c 1B79     	 ldrb r3,[r3,#4]
+ 335 002e DB00     	 lsls r3,r3,#3
+ 336 0030 1A43     	 orrs r2,r2,r3
+ 203:../Dave/Generated/RTC/rtc.c ****            | ((uint32_t)handler->config->periodic_month_intr << RTC_MSKSR_MPMO_Pos)
+ 337              	 .loc 3 203 0
+ 338 0032 7B68     	 ldr r3,[r7,#4]
+ 339 0034 5B68     	 ldr r3,[r3,#4]
+ 340 0036 5B79     	 ldrb r3,[r3,#5]
+ 341 0038 5B01     	 lsls r3,r3,#5
+ 342 003a 1A43     	 orrs r2,r2,r3
+ 204:../Dave/Generated/RTC/rtc.c ****            | ((uint32_t)handler->config->periodic_year_intr << RTC_MSKSR_MPYE_Pos));
+ 343              	 .loc 3 204 0
+ 344 003c 7B68     	 ldr r3,[r7,#4]
+ 345 003e 5B68     	 ldr r3,[r3,#4]
+ 346 0040 9B79     	 ldrb r3,[r3,#6]
+ 347 0042 9B01     	 lsls r3,r3,#6
+ 199:../Dave/Generated/RTC/rtc.c ****            | ((uint32_t)handler->config->periodic_min_intr << RTC_MSKSR_MPMI_Pos)
+ 348              	 .loc 3 199 0
+ 349 0044 1343     	 orrs r3,r3,r2
+ 350 0046 BB60     	 str r3,[r7,#8]
+ 205:../Dave/Generated/RTC/rtc.c **** 
+ 206:../Dave/Generated/RTC/rtc.c ****   /* Enable RTC periodic interrupt in SCU when any of the periodic interrupts
+ 207:../Dave/Generated/RTC/rtc.c ****    * are enabled */
+ 208:../Dave/Generated/RTC/rtc.c ****   if (regval != 0U)
+ 351              	 .loc 3 208 0
+ 352 0048 BB68     	 ldr r3,[r7,#8]
+ 353 004a 002B     	 cmp r3,#0
+ 354 004c 04D0     	 beq .L18
+ 209:../Dave/Generated/RTC/rtc.c ****   {
+ 210:../Dave/Generated/RTC/rtc.c ****     XMC_RTC_EnableEvent(regval);
+ 355              	 .loc 3 210 0
+ 356 004e B868     	 ldr r0,[r7,#8]
+ 357 0050 FFF7FEFF 	 bl XMC_RTC_EnableEvent
+ 211:../Dave/Generated/RTC/rtc.c **** #if ((UC_FAMILY == XMC4) && (RTC_TIMER_EVENT_TRIG_TO_NMI == 1))
+ 212:../Dave/Generated/RTC/rtc.c **** 		XMC_SCU_INTERRUPT_EnableEvent((XMC_SCU_INTERRUPT_EVENT_t)XMC_SCU_NMIREQ_RTC_PI);
+ 213:../Dave/Generated/RTC/rtc.c **** 		XMC_SCU_INTERRUPT_EnableNmiRequest((uint32_t)XMC_SCU_NMIREQ_RTC_PI);
+ 214:../Dave/Generated/RTC/rtc.c **** #endif
+ 215:../Dave/Generated/RTC/rtc.c **** #if ((UC_FAMILY == XMC4) && (RTC_TIMER_EVENT_TRIG_TO_SCU == 1))
+ 216:../Dave/Generated/RTC/rtc.c **** 		GLOBAL_SCU_XMC4_EnableEvent((GLOBAL_SCU_XMC4_EVENT_t)GLOBAL_SCU_XMC4_EVENT_RTC_PERIODIC);
+ 217:../Dave/Generated/RTC/rtc.c **** #endif
+ 218:../Dave/Generated/RTC/rtc.c ****     interrupt_configured = true;
+ 358              	 .loc 3 218 0
+ 359 0054 0123     	 movs r3,#1
+ 360 0056 FB73     	 strb r3,[r7,#15]
+ 361              	.L18:
+ 219:../Dave/Generated/RTC/rtc.c ****   }
+ 220:../Dave/Generated/RTC/rtc.c **** 
+ 221:../Dave/Generated/RTC/rtc.c **** 
+ 222:../Dave/Generated/RTC/rtc.c **** 	if (handler->config->alarm_intr == RTC_INT_ALARM_ENABLE)
+ 362              	 .loc 3 222 0
+ 363 0058 7B68     	 ldr r3,[r7,#4]
+ 364 005a 5B68     	 ldr r3,[r3,#4]
+ 365 005c DB79     	 ldrb r3,[r3,#7]
+ 366 005e 012B     	 cmp r3,#1
+ 367 0060 05D1     	 bne .L19
+ 223:../Dave/Generated/RTC/rtc.c **** 	{
+ 224:../Dave/Generated/RTC/rtc.c **** 		XMC_RTC_EnableEvent((uint32_t)XMC_RTC_EVENT_ALARM);
+ 368              	 .loc 3 224 0
+ 369 0062 4FF48070 	 mov r0,#256
+ 370 0066 FFF7FEFF 	 bl XMC_RTC_EnableEvent
+ 225:../Dave/Generated/RTC/rtc.c **** #if ((UC_FAMILY == XMC4) && (RTC_ALARM_EVENT_TRIG_TO_NMI == 1))
+ 226:../Dave/Generated/RTC/rtc.c **** 		XMC_SCU_INTERRUPT_EnableEvent((XMC_SCU_INTERRUPT_EVENT_t)XMC_SCU_NMIREQ_RTC_AI);
+ 227:../Dave/Generated/RTC/rtc.c **** 		XMC_SCU_INTERRUPT_EnableNmiRequest((uint32_t)XMC_SCU_NMIREQ_RTC_AI);
+ 228:../Dave/Generated/RTC/rtc.c **** #endif
+ 229:../Dave/Generated/RTC/rtc.c **** #if ((UC_FAMILY == XMC4) && (RTC_ALARM_EVENT_TRIG_TO_SCU == 1))
+ 230:../Dave/Generated/RTC/rtc.c **** 		GLOBAL_SCU_XMC4_EnableEvent((GLOBAL_SCU_XMC4_EVENT_t)GLOBAL_SCU_XMC4_EVENT_RTC_ALARM);
+ 231:../Dave/Generated/RTC/rtc.c **** #endif
+ 232:../Dave/Generated/RTC/rtc.c **** 
+ 233:../Dave/Generated/RTC/rtc.c **** 		interrupt_configured = true;
+ 371              	 .loc 3 233 0
+ 372 006a 0123     	 movs r3,#1
+ 373 006c FB73     	 strb r3,[r7,#15]
+ 374              	.L19:
+ 234:../Dave/Generated/RTC/rtc.c **** 	}
+ 235:../Dave/Generated/RTC/rtc.c **** 
+ 236:../Dave/Generated/RTC/rtc.c **** 
+ 237:../Dave/Generated/RTC/rtc.c ****   return (interrupt_configured);
+ 375              	 .loc 3 237 0
+ 376 006e FB7B     	 ldrb r3,[r7,#15]
+ 238:../Dave/Generated/RTC/rtc.c **** }
+ 377              	 .loc 3 238 0
+ 378 0070 1846     	 mov r0,r3
+ 379 0072 1037     	 adds r7,r7,#16
+ 380              	.LCFI20:
+ 381              	 .cfi_def_cfa_offset 8
+ 382 0074 BD46     	 mov sp,r7
+ 383              	.LCFI21:
+ 384              	 .cfi_def_cfa_register 13
+ 385              	 
+ 386 0076 80BD     	 pop {r7,pc}
+ 387              	 .cfi_endproc
+ 388              	.LFE181:
+ 390              	 .section .text.RTC_lRegister_Callbacks,"ax",%progbits
+ 391              	 .align 2
+ 392              	 .global RTC_lRegister_Callbacks
+ 393              	 .thumb
+ 394              	 .thumb_func
+ 396              	RTC_lRegister_Callbacks:
+ 397              	.LFB182:
+ 239:../Dave/Generated/RTC/rtc.c **** 
+ 240:../Dave/Generated/RTC/rtc.c **** /*
+ 241:../Dave/Generated/RTC/rtc.c ****  *  Interface to register the RTC call backs
+ 242:../Dave/Generated/RTC/rtc.c ****  */
+ 243:../Dave/Generated/RTC/rtc.c **** XMC_RTC_STATUS_t RTC_lRegister_Callbacks(const RTC_t *const handler)
+ 244:../Dave/Generated/RTC/rtc.c **** {
+ 398              	 .loc 3 244 0
+ 399              	 .cfi_startproc
+ 400              	 
+ 401              	 
+ 402              	 
+ 403 0000 80B4     	 push {r7}
+ 404              	.LCFI22:
+ 405              	 .cfi_def_cfa_offset 4
+ 406              	 .cfi_offset 7,-4
+ 407 0002 85B0     	 sub sp,sp,#20
+ 408              	.LCFI23:
+ 409              	 .cfi_def_cfa_offset 24
+ 410 0004 00AF     	 add r7,sp,#0
+ 411              	.LCFI24:
+ 412              	 .cfi_def_cfa_register 7
+ 413 0006 7860     	 str r0,[r7,#4]
+ 245:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_STATUS_t pi_status;
+ 246:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_STATUS_t ai_status;
+ 247:../Dave/Generated/RTC/rtc.c **** 
+ 248:../Dave/Generated/RTC/rtc.c ****   pi_status = XMC_RTC_STATUS_OK;
+ 414              	 .loc 3 248 0
+ 415 0008 0023     	 movs r3,#0
+ 416 000a FB73     	 strb r3,[r7,#15]
+ 249:../Dave/Generated/RTC/rtc.c ****   ai_status = XMC_RTC_STATUS_OK;
+ 417              	 .loc 3 249 0
+ 418 000c 0023     	 movs r3,#0
+ 419 000e BB73     	 strb r3,[r7,#14]
+ 250:../Dave/Generated/RTC/rtc.c **** 
+ 251:../Dave/Generated/RTC/rtc.c **** #if (RTC_INTERRUPT_ENABLED == 1)
+ 252:../Dave/Generated/RTC/rtc.c ****   #if (UC_FAMILY == XMC4)
+ 253:../Dave/Generated/RTC/rtc.c ****     pi_status = (XMC_RTC_STATUS_t)GLOBAL_SCU_XMC4_RegisterCallback(
+ 254:../Dave/Generated/RTC/rtc.c ****     		(GLOBAL_SCU_XMC4_EVENT_t)GLOBAL_SCU_XMC4_EVENT_RTC_PERIODIC, handler->config->pi_listener);
+ 255:../Dave/Generated/RTC/rtc.c ****     if (handler->config->alarm_intr == RTC_INT_ALARM_ENABLE)
+ 256:../Dave/Generated/RTC/rtc.c ****     {
+ 257:../Dave/Generated/RTC/rtc.c ****       ai_status = (XMC_RTC_STATUS_t)GLOBAL_SCU_XMC4_RegisterCallback(
+ 258:../Dave/Generated/RTC/rtc.c ****       		(GLOBAL_SCU_XMC4_EVENT_t)GLOBAL_SCU_XMC4_EVENT_RTC_ALARM,handler->config->ai_listener);
+ 259:../Dave/Generated/RTC/rtc.c ****     }
+ 260:../Dave/Generated/RTC/rtc.c ****   #else
+ 261:../Dave/Generated/RTC/rtc.c ****     pi_status = (XMC_RTC_STATUS_t)GLOBAL_SCU_XMC1_RegisterCallback((GLOBAL_SCU_XMC1_EVENT_t)GLOBAL_
+ 262:../Dave/Generated/RTC/rtc.c ****                                                                    handler->config->pi_listener);
+ 263:../Dave/Generated/RTC/rtc.c **** 
+ 264:../Dave/Generated/RTC/rtc.c ****     if (handler->config->alarm_intr == RTC_INT_ALARM_ENABLE)
+ 265:../Dave/Generated/RTC/rtc.c ****     {
+ 266:../Dave/Generated/RTC/rtc.c ****       ai_status = (XMC_RTC_STATUS_t)GLOBAL_SCU_XMC1_RegisterCallback((GLOBAL_SCU_XMC1_EVENT_t)GLOBA
+ 267:../Dave/Generated/RTC/rtc.c ****                                                                      handler->config->ai_listener);
+ 268:../Dave/Generated/RTC/rtc.c ****     }
+ 269:../Dave/Generated/RTC/rtc.c ****   #endif
+ 270:../Dave/Generated/RTC/rtc.c **** #endif
+ 271:../Dave/Generated/RTC/rtc.c **** 
+ 272:../Dave/Generated/RTC/rtc.c ****   return (XMC_RTC_STATUS_t)((uint32_t)pi_status & (uint32_t)ai_status);
+ 420              	 .loc 3 272 0
+ 421 0010 FA7B     	 ldrb r2,[r7,#15]
+ 422 0012 BB7B     	 ldrb r3,[r7,#14]
+ 423 0014 1340     	 ands r3,r3,r2
+ 424 0016 DBB2     	 uxtb r3,r3
+ 273:../Dave/Generated/RTC/rtc.c **** }
+ 425              	 .loc 3 273 0
+ 426 0018 1846     	 mov r0,r3
+ 427 001a 1437     	 adds r7,r7,#20
+ 428              	.LCFI25:
+ 429              	 .cfi_def_cfa_offset 4
+ 430 001c BD46     	 mov sp,r7
+ 431              	.LCFI26:
+ 432              	 .cfi_def_cfa_register 13
+ 433              	 
+ 434 001e 5DF8047B 	 ldr r7,[sp],#4
+ 435              	.LCFI27:
+ 436              	 .cfi_restore 7
+ 437              	 .cfi_def_cfa_offset 0
+ 438 0022 7047     	 bx lr
+ 439              	 .cfi_endproc
+ 440              	.LFE182:
+ 442              	 .section .text.RTC_SetTime,"ax",%progbits
+ 443              	 .align 2
+ 444              	 .global RTC_SetTime
+ 445              	 .thumb
+ 446              	 .thumb_func
+ 448              	RTC_SetTime:
+ 449              	.LFB183:
+ 274:../Dave/Generated/RTC/rtc.c **** 
+ 275:../Dave/Generated/RTC/rtc.c **** /*
+ 276:../Dave/Generated/RTC/rtc.c ****  *  This function is used to set RTC time.
+ 277:../Dave/Generated/RTC/rtc.c ****  */
+ 278:../Dave/Generated/RTC/rtc.c **** RTC_STATUS_t RTC_SetTime(XMC_RTC_TIME_t *current_time)
+ 279:../Dave/Generated/RTC/rtc.c **** {
+ 450              	 .loc 3 279 0
+ 451              	 .cfi_startproc
+ 452              	 
+ 453              	 
+ 454 0000 80B5     	 push {r7,lr}
+ 455              	.LCFI28:
+ 456              	 .cfi_def_cfa_offset 8
+ 457              	 .cfi_offset 7,-8
+ 458              	 .cfi_offset 14,-4
+ 459 0002 86B0     	 sub sp,sp,#24
+ 460              	.LCFI29:
+ 461              	 .cfi_def_cfa_offset 32
+ 462 0004 00AF     	 add r7,sp,#0
+ 463              	.LCFI30:
+ 464              	 .cfi_def_cfa_register 7
+ 465 0006 7860     	 str r0,[r7,#4]
+ 280:../Dave/Generated/RTC/rtc.c ****   RTC_STATUS_t status = RTC_STATUS_SUCCESS;
+ 466              	 .loc 3 280 0
+ 467 0008 0023     	 movs r3,#0
+ 468 000a FB75     	 strb r3,[r7,#23]
+ 281:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_TIME_t time_val;
+ 282:../Dave/Generated/RTC/rtc.c **** 
+ 283:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_SetTime: NULL pointer", current_time != NULL);
+ 284:../Dave/Generated/RTC/rtc.c **** 
+ 285:../Dave/Generated/RTC/rtc.c ****   /* copy to local structure to keep data safe */
+ 286:../Dave/Generated/RTC/rtc.c ****   time_val.year = current_time->year;
+ 469              	 .loc 3 286 0
+ 470 000c 7B68     	 ldr r3,[r7,#4]
+ 471 000e DB88     	 ldrh r3,[r3,#6]
+ 472 0010 7B82     	 strh r3,[r7,#18]
+ 287:../Dave/Generated/RTC/rtc.c ****   time_val.month = current_time->month;
+ 473              	 .loc 3 287 0
+ 474 0012 7B68     	 ldr r3,[r7,#4]
+ 475 0014 5B79     	 ldrb r3,[r3,#5]
+ 476 0016 C3F30303 	 ubfx r3,r3,#0,#4
+ 477 001a DAB2     	 uxtb r2,r3
+ 478 001c 7B7C     	 ldrb r3,[r7,#17]
+ 479 001e 62F30303 	 bfi r3,r2,#0,#4
+ 480 0022 7B74     	 strb r3,[r7,#17]
+ 288:../Dave/Generated/RTC/rtc.c ****   time_val.days = current_time->days;
+ 481              	 .loc 3 288 0
+ 482 0024 7B68     	 ldr r3,[r7,#4]
+ 483 0026 DB78     	 ldrb r3,[r3,#3]
+ 484 0028 C3F30403 	 ubfx r3,r3,#0,#5
+ 485 002c DAB2     	 uxtb r2,r3
+ 486 002e FB7B     	 ldrb r3,[r7,#15]
+ 487 0030 62F30403 	 bfi r3,r2,#0,#5
+ 488 0034 FB73     	 strb r3,[r7,#15]
+ 289:../Dave/Generated/RTC/rtc.c ****   time_val.hours = current_time->hours;
+ 489              	 .loc 3 289 0
+ 490 0036 7B68     	 ldr r3,[r7,#4]
+ 491 0038 9B78     	 ldrb r3,[r3,#2]
+ 492 003a C3F30403 	 ubfx r3,r3,#0,#5
+ 493 003e DAB2     	 uxtb r2,r3
+ 494 0040 BB7B     	 ldrb r3,[r7,#14]
+ 495 0042 62F30403 	 bfi r3,r2,#0,#5
+ 496 0046 BB73     	 strb r3,[r7,#14]
+ 290:../Dave/Generated/RTC/rtc.c ****   time_val.minutes = current_time->minutes;
+ 497              	 .loc 3 290 0
+ 498 0048 7B68     	 ldr r3,[r7,#4]
+ 499 004a 5B78     	 ldrb r3,[r3,#1]
+ 500 004c C3F30503 	 ubfx r3,r3,#0,#6
+ 501 0050 DAB2     	 uxtb r2,r3
+ 502 0052 7B7B     	 ldrb r3,[r7,#13]
+ 503 0054 62F30503 	 bfi r3,r2,#0,#6
+ 504 0058 7B73     	 strb r3,[r7,#13]
+ 291:../Dave/Generated/RTC/rtc.c ****   time_val.seconds = current_time->seconds;
+ 505              	 .loc 3 291 0
+ 506 005a 7B68     	 ldr r3,[r7,#4]
+ 507 005c 1B78     	 ldrb r3,[r3]
+ 508 005e C3F30503 	 ubfx r3,r3,#0,#6
+ 509 0062 DAB2     	 uxtb r2,r3
+ 510 0064 3B7B     	 ldrb r3,[r7,#12]
+ 511 0066 62F30503 	 bfi r3,r2,#0,#6
+ 512 006a 3B73     	 strb r3,[r7,#12]
+ 292:../Dave/Generated/RTC/rtc.c ****   time_val.daysofweek = current_time->daysofweek;
+ 513              	 .loc 3 292 0
+ 514 006c 7B68     	 ldr r3,[r7,#4]
+ 515 006e 1B79     	 ldrb r3,[r3,#4]
+ 516 0070 C3F30203 	 ubfx r3,r3,#0,#3
+ 517 0074 DAB2     	 uxtb r2,r3
+ 518 0076 3B7C     	 ldrb r3,[r7,#16]
+ 519 0078 62F30203 	 bfi r3,r2,#0,#3
+ 520 007c 3B74     	 strb r3,[r7,#16]
+ 293:../Dave/Generated/RTC/rtc.c **** 
+ 294:../Dave/Generated/RTC/rtc.c ****   if ((time_val.days != 0U) && (time_val.month != 0U))
+ 521              	 .loc 3 294 0
+ 522 007e FB7B     	 ldrb r3,[r7,#15]
+ 523 0080 03F01F03 	 and r3,r3,#31
+ 524 0084 DBB2     	 uxtb r3,r3
+ 525 0086 002B     	 cmp r3,#0
+ 526 0088 25D0     	 beq .L24
+ 527              	 .loc 3 294 0 is_stmt 0 discriminator 1
+ 528 008a 7B7C     	 ldrb r3,[r7,#17]
+ 529 008c 03F00F03 	 and r3,r3,#15
+ 530 0090 DBB2     	 uxtb r3,r3
+ 531 0092 002B     	 cmp r3,#0
+ 532 0094 1FD0     	 beq .L24
+ 295:../Dave/Generated/RTC/rtc.c ****   {
+ 296:../Dave/Generated/RTC/rtc.c ****     time_val.days = time_val.days - 1U;
+ 533              	 .loc 3 296 0 is_stmt 1
+ 534 0096 FB7B     	 ldrb r3,[r7,#15]
+ 535 0098 C3F30403 	 ubfx r3,r3,#0,#5
+ 536 009c DBB2     	 uxtb r3,r3
+ 537 009e 013B     	 subs r3,r3,#1
+ 538 00a0 DBB2     	 uxtb r3,r3
+ 539 00a2 03F01F03 	 and r3,r3,#31
+ 540 00a6 DAB2     	 uxtb r2,r3
+ 541 00a8 FB7B     	 ldrb r3,[r7,#15]
+ 542 00aa 62F30403 	 bfi r3,r2,#0,#5
+ 543 00ae FB73     	 strb r3,[r7,#15]
+ 297:../Dave/Generated/RTC/rtc.c ****     time_val.month = time_val.month - 1U;
+ 544              	 .loc 3 297 0
+ 545 00b0 7B7C     	 ldrb r3,[r7,#17]
+ 546 00b2 C3F30303 	 ubfx r3,r3,#0,#4
+ 547 00b6 DBB2     	 uxtb r3,r3
+ 548 00b8 013B     	 subs r3,r3,#1
+ 549 00ba DBB2     	 uxtb r3,r3
+ 550 00bc 03F00F03 	 and r3,r3,#15
+ 551 00c0 DAB2     	 uxtb r2,r3
+ 552 00c2 7B7C     	 ldrb r3,[r7,#17]
+ 553 00c4 62F30303 	 bfi r3,r2,#0,#4
+ 554 00c8 7B74     	 strb r3,[r7,#17]
+ 298:../Dave/Generated/RTC/rtc.c **** 
+ 299:../Dave/Generated/RTC/rtc.c ****     XMC_RTC_SetTime(&time_val);
+ 555              	 .loc 3 299 0
+ 556 00ca 07F10C03 	 add r3,r7,#12
+ 557 00ce 1846     	 mov r0,r3
+ 558 00d0 FFF7FEFF 	 bl XMC_RTC_SetTime
+ 559 00d4 01E0     	 b .L25
+ 560              	.L24:
+ 300:../Dave/Generated/RTC/rtc.c ****   }
+ 301:../Dave/Generated/RTC/rtc.c ****   else
+ 302:../Dave/Generated/RTC/rtc.c ****   {
+ 303:../Dave/Generated/RTC/rtc.c ****     status = RTC_STATUS_FAILURE;
+ 561              	 .loc 3 303 0
+ 562 00d6 0123     	 movs r3,#1
+ 563 00d8 FB75     	 strb r3,[r7,#23]
+ 564              	.L25:
+ 304:../Dave/Generated/RTC/rtc.c ****   }
+ 305:../Dave/Generated/RTC/rtc.c **** 
+ 306:../Dave/Generated/RTC/rtc.c ****   return (status);
+ 565              	 .loc 3 306 0
+ 566 00da FB7D     	 ldrb r3,[r7,#23]
+ 307:../Dave/Generated/RTC/rtc.c **** }
+ 567              	 .loc 3 307 0
+ 568 00dc 1846     	 mov r0,r3
+ 569 00de 1837     	 adds r7,r7,#24
+ 570              	.LCFI31:
+ 571              	 .cfi_def_cfa_offset 8
+ 572 00e0 BD46     	 mov sp,r7
+ 573              	.LCFI32:
+ 574              	 .cfi_def_cfa_register 13
+ 575              	 
+ 576 00e2 80BD     	 pop {r7,pc}
+ 577              	 .cfi_endproc
+ 578              	.LFE183:
+ 580              	 .section .text.RTC_SetStdTime,"ax",%progbits
+ 581              	 .align 2
+ 582              	 .global RTC_SetStdTime
+ 583              	 .thumb
+ 584              	 .thumb_func
+ 586              	RTC_SetStdTime:
+ 587              	.LFB184:
+ 308:../Dave/Generated/RTC/rtc.c **** 
+ 309:../Dave/Generated/RTC/rtc.c **** /*
+ 310:../Dave/Generated/RTC/rtc.c ****  *  This function is used to set RTC time in standard format.
+ 311:../Dave/Generated/RTC/rtc.c ****  */
+ 312:../Dave/Generated/RTC/rtc.c **** RTC_STATUS_t RTC_SetStdTime(struct tm *stdtime)
+ 313:../Dave/Generated/RTC/rtc.c **** {
+ 588              	 .loc 3 313 0
+ 589              	 .cfi_startproc
+ 590              	 
+ 591              	 
+ 592 0000 80B5     	 push {r7,lr}
+ 593              	.LCFI33:
+ 594              	 .cfi_def_cfa_offset 8
+ 595              	 .cfi_offset 7,-8
+ 596              	 .cfi_offset 14,-4
+ 597 0002 84B0     	 sub sp,sp,#16
+ 598              	.LCFI34:
+ 599              	 .cfi_def_cfa_offset 24
+ 600 0004 00AF     	 add r7,sp,#0
+ 601              	.LCFI35:
+ 602              	 .cfi_def_cfa_register 7
+ 603 0006 7860     	 str r0,[r7,#4]
+ 314:../Dave/Generated/RTC/rtc.c ****   RTC_STATUS_t status = RTC_STATUS_SUCCESS;
+ 604              	 .loc 3 314 0
+ 605 0008 0023     	 movs r3,#0
+ 606 000a FB73     	 strb r3,[r7,#15]
+ 315:../Dave/Generated/RTC/rtc.c **** 
+ 316:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_SetStdTime: NULL pointer", stdtime != NULL);
+ 317:../Dave/Generated/RTC/rtc.c **** 
+ 318:../Dave/Generated/RTC/rtc.c ****   if (stdtime->tm_mday != 0U)
+ 607              	 .loc 3 318 0
+ 608 000c 7B68     	 ldr r3,[r7,#4]
+ 609 000e DB68     	 ldr r3,[r3,#12]
+ 610 0010 002B     	 cmp r3,#0
+ 611 0012 03D0     	 beq .L28
+ 319:../Dave/Generated/RTC/rtc.c ****   {
+ 320:../Dave/Generated/RTC/rtc.c ****     XMC_RTC_SetTimeStdFormat(stdtime);
+ 612              	 .loc 3 320 0
+ 613 0014 7868     	 ldr r0,[r7,#4]
+ 614 0016 FFF7FEFF 	 bl XMC_RTC_SetTimeStdFormat
+ 615 001a 01E0     	 b .L29
+ 616              	.L28:
+ 321:../Dave/Generated/RTC/rtc.c ****   }
+ 322:../Dave/Generated/RTC/rtc.c ****   else
+ 323:../Dave/Generated/RTC/rtc.c ****   {
+ 324:../Dave/Generated/RTC/rtc.c ****     status = RTC_STATUS_FAILURE;
+ 617              	 .loc 3 324 0
+ 618 001c 0123     	 movs r3,#1
+ 619 001e FB73     	 strb r3,[r7,#15]
+ 620              	.L29:
+ 325:../Dave/Generated/RTC/rtc.c ****   }
+ 326:../Dave/Generated/RTC/rtc.c **** 
+ 327:../Dave/Generated/RTC/rtc.c ****   return (status);
+ 621              	 .loc 3 327 0
+ 622 0020 FB7B     	 ldrb r3,[r7,#15]
+ 328:../Dave/Generated/RTC/rtc.c **** }
+ 623              	 .loc 3 328 0
+ 624 0022 1846     	 mov r0,r3
+ 625 0024 1037     	 adds r7,r7,#16
+ 626              	.LCFI36:
+ 627              	 .cfi_def_cfa_offset 8
+ 628 0026 BD46     	 mov sp,r7
+ 629              	.LCFI37:
+ 630              	 .cfi_def_cfa_register 13
+ 631              	 
+ 632 0028 80BD     	 pop {r7,pc}
+ 633              	 .cfi_endproc
+ 634              	.LFE184:
+ 636 002a 00BF     	 .section .text.RTC_GetTime,"ax",%progbits
+ 637              	 .align 2
+ 638              	 .global RTC_GetTime
+ 639              	 .thumb
+ 640              	 .thumb_func
+ 642              	RTC_GetTime:
+ 643              	.LFB185:
+ 329:../Dave/Generated/RTC/rtc.c **** /*
+ 330:../Dave/Generated/RTC/rtc.c ****  *  This function is used to get RTC time.
+ 331:../Dave/Generated/RTC/rtc.c ****  */
+ 332:../Dave/Generated/RTC/rtc.c **** void RTC_GetTime(XMC_RTC_TIME_t *current_time)
+ 333:../Dave/Generated/RTC/rtc.c **** {
+ 644              	 .loc 3 333 0
+ 645              	 .cfi_startproc
+ 646              	 
+ 647              	 
+ 648 0000 80B5     	 push {r7,lr}
+ 649              	.LCFI38:
+ 650              	 .cfi_def_cfa_offset 8
+ 651              	 .cfi_offset 7,-8
+ 652              	 .cfi_offset 14,-4
+ 653 0002 82B0     	 sub sp,sp,#8
+ 654              	.LCFI39:
+ 655              	 .cfi_def_cfa_offset 16
+ 656 0004 00AF     	 add r7,sp,#0
+ 657              	.LCFI40:
+ 658              	 .cfi_def_cfa_register 7
+ 659 0006 7860     	 str r0,[r7,#4]
+ 334:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_GetTime: NULL pointer", current_time != NULL);
+ 335:../Dave/Generated/RTC/rtc.c **** 
+ 336:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_GetTime(current_time);
+ 660              	 .loc 3 336 0
+ 661 0008 7868     	 ldr r0,[r7,#4]
+ 662 000a FFF7FEFF 	 bl XMC_RTC_GetTime
+ 337:../Dave/Generated/RTC/rtc.c **** 
+ 338:../Dave/Generated/RTC/rtc.c ****   current_time->days = current_time->days + 1U;
+ 663              	 .loc 3 338 0
+ 664 000e 7B68     	 ldr r3,[r7,#4]
+ 665 0010 DB78     	 ldrb r3,[r3,#3]
+ 666 0012 C3F30403 	 ubfx r3,r3,#0,#5
+ 667 0016 DBB2     	 uxtb r3,r3
+ 668 0018 0133     	 adds r3,r3,#1
+ 669 001a DBB2     	 uxtb r3,r3
+ 670 001c 03F01F03 	 and r3,r3,#31
+ 671 0020 D9B2     	 uxtb r1,r3
+ 672 0022 7A68     	 ldr r2,[r7,#4]
+ 673 0024 D378     	 ldrb r3,[r2,#3]
+ 674 0026 61F30403 	 bfi r3,r1,#0,#5
+ 675 002a D370     	 strb r3,[r2,#3]
+ 339:../Dave/Generated/RTC/rtc.c ****   current_time->month = current_time->month + 1U;
+ 676              	 .loc 3 339 0
+ 677 002c 7B68     	 ldr r3,[r7,#4]
+ 678 002e 5B79     	 ldrb r3,[r3,#5]
+ 679 0030 C3F30303 	 ubfx r3,r3,#0,#4
+ 680 0034 DBB2     	 uxtb r3,r3
+ 681 0036 0133     	 adds r3,r3,#1
+ 682 0038 DBB2     	 uxtb r3,r3
+ 683 003a 03F00F03 	 and r3,r3,#15
+ 684 003e D9B2     	 uxtb r1,r3
+ 685 0040 7A68     	 ldr r2,[r7,#4]
+ 686 0042 5379     	 ldrb r3,[r2,#5]
+ 687 0044 61F30303 	 bfi r3,r1,#0,#4
+ 688 0048 5371     	 strb r3,[r2,#5]
+ 340:../Dave/Generated/RTC/rtc.c **** }
+ 689              	 .loc 3 340 0
+ 690 004a 0837     	 adds r7,r7,#8
+ 691              	.LCFI41:
+ 692              	 .cfi_def_cfa_offset 8
+ 693 004c BD46     	 mov sp,r7
+ 694              	.LCFI42:
+ 695              	 .cfi_def_cfa_register 13
+ 696              	 
+ 697 004e 80BD     	 pop {r7,pc}
+ 698              	 .cfi_endproc
+ 699              	.LFE185:
+ 701              	 .section .text.RTC_GetStdTime,"ax",%progbits
+ 702              	 .align 2
+ 703              	 .global RTC_GetStdTime
+ 704              	 .thumb
+ 705              	 .thumb_func
+ 707              	RTC_GetStdTime:
+ 708              	.LFB186:
+ 341:../Dave/Generated/RTC/rtc.c **** 
+ 342:../Dave/Generated/RTC/rtc.c **** /*
+ 343:../Dave/Generated/RTC/rtc.c ****  *  This function is used to get RTC time in standard format.
+ 344:../Dave/Generated/RTC/rtc.c ****  */
+ 345:../Dave/Generated/RTC/rtc.c **** void RTC_GetStdTime(struct tm *stdtime)
+ 346:../Dave/Generated/RTC/rtc.c **** {
+ 709              	 .loc 3 346 0
+ 710              	 .cfi_startproc
+ 711              	 
+ 712              	 
+ 713 0000 80B5     	 push {r7,lr}
+ 714              	.LCFI43:
+ 715              	 .cfi_def_cfa_offset 8
+ 716              	 .cfi_offset 7,-8
+ 717              	 .cfi_offset 14,-4
+ 718 0002 82B0     	 sub sp,sp,#8
+ 719              	.LCFI44:
+ 720              	 .cfi_def_cfa_offset 16
+ 721 0004 00AF     	 add r7,sp,#0
+ 722              	.LCFI45:
+ 723              	 .cfi_def_cfa_register 7
+ 724 0006 7860     	 str r0,[r7,#4]
+ 347:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_GetStdTime: NULL pointer", stdtime != NULL);
+ 348:../Dave/Generated/RTC/rtc.c **** 
+ 349:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_GetTimeStdFormat(stdtime);
+ 725              	 .loc 3 349 0
+ 726 0008 7868     	 ldr r0,[r7,#4]
+ 727 000a FFF7FEFF 	 bl XMC_RTC_GetTimeStdFormat
+ 350:../Dave/Generated/RTC/rtc.c **** }
+ 728              	 .loc 3 350 0
+ 729 000e 0837     	 adds r7,r7,#8
+ 730              	.LCFI46:
+ 731              	 .cfi_def_cfa_offset 8
+ 732 0010 BD46     	 mov sp,r7
+ 733              	.LCFI47:
+ 734              	 .cfi_def_cfa_register 13
+ 735              	 
+ 736 0012 80BD     	 pop {r7,pc}
+ 737              	 .cfi_endproc
+ 738              	.LFE186:
+ 740              	 .section .text.RTC_SetAlarmTime,"ax",%progbits
+ 741              	 .align 2
+ 742              	 .global RTC_SetAlarmTime
+ 743              	 .thumb
+ 744              	 .thumb_func
+ 746              	RTC_SetAlarmTime:
+ 747              	.LFB187:
+ 351:../Dave/Generated/RTC/rtc.c **** 
+ 352:../Dave/Generated/RTC/rtc.c **** /*
+ 353:../Dave/Generated/RTC/rtc.c ****  *  This function is used to set Alarm time.
+ 354:../Dave/Generated/RTC/rtc.c ****  */
+ 355:../Dave/Generated/RTC/rtc.c **** RTC_STATUS_t RTC_SetAlarmTime(XMC_RTC_ALARM_t *alarm)
+ 356:../Dave/Generated/RTC/rtc.c **** {
+ 748              	 .loc 3 356 0
+ 749              	 .cfi_startproc
+ 750              	 
+ 751              	 
+ 752 0000 80B5     	 push {r7,lr}
+ 753              	.LCFI48:
+ 754              	 .cfi_def_cfa_offset 8
+ 755              	 .cfi_offset 7,-8
+ 756              	 .cfi_offset 14,-4
+ 757 0002 86B0     	 sub sp,sp,#24
+ 758              	.LCFI49:
+ 759              	 .cfi_def_cfa_offset 32
+ 760 0004 00AF     	 add r7,sp,#0
+ 761              	.LCFI50:
+ 762              	 .cfi_def_cfa_register 7
+ 763 0006 7860     	 str r0,[r7,#4]
+ 357:../Dave/Generated/RTC/rtc.c ****   RTC_STATUS_t status = RTC_STATUS_SUCCESS;
+ 764              	 .loc 3 357 0
+ 765 0008 0023     	 movs r3,#0
+ 766 000a FB75     	 strb r3,[r7,#23]
+ 358:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_ALARM_t alarm_val;
+ 359:../Dave/Generated/RTC/rtc.c **** 
+ 360:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_SetAlarmTime: NULL pointer", alarm != NULL);
+ 361:../Dave/Generated/RTC/rtc.c **** 
+ 362:../Dave/Generated/RTC/rtc.c ****   /* copy to local structure to keep data safe */
+ 363:../Dave/Generated/RTC/rtc.c ****   alarm_val.year = alarm->year;
+ 767              	 .loc 3 363 0
+ 768 000c 7B68     	 ldr r3,[r7,#4]
+ 769 000e DB88     	 ldrh r3,[r3,#6]
+ 770 0010 7B82     	 strh r3,[r7,#18]
+ 364:../Dave/Generated/RTC/rtc.c ****   alarm_val.month = alarm->month;
+ 771              	 .loc 3 364 0
+ 772 0012 7B68     	 ldr r3,[r7,#4]
+ 773 0014 5B79     	 ldrb r3,[r3,#5]
+ 774 0016 C3F30303 	 ubfx r3,r3,#0,#4
+ 775 001a DAB2     	 uxtb r2,r3
+ 776 001c 7B7C     	 ldrb r3,[r7,#17]
+ 777 001e 62F30303 	 bfi r3,r2,#0,#4
+ 778 0022 7B74     	 strb r3,[r7,#17]
+ 365:../Dave/Generated/RTC/rtc.c ****   alarm_val.days = alarm->days;
+ 779              	 .loc 3 365 0
+ 780 0024 7B68     	 ldr r3,[r7,#4]
+ 781 0026 DB78     	 ldrb r3,[r3,#3]
+ 782 0028 C3F30403 	 ubfx r3,r3,#0,#5
+ 783 002c DAB2     	 uxtb r2,r3
+ 784 002e FB7B     	 ldrb r3,[r7,#15]
+ 785 0030 62F30403 	 bfi r3,r2,#0,#5
+ 786 0034 FB73     	 strb r3,[r7,#15]
+ 366:../Dave/Generated/RTC/rtc.c ****   alarm_val.hours = alarm->hours;
+ 787              	 .loc 3 366 0
+ 788 0036 7B68     	 ldr r3,[r7,#4]
+ 789 0038 9B78     	 ldrb r3,[r3,#2]
+ 790 003a C3F30403 	 ubfx r3,r3,#0,#5
+ 791 003e DAB2     	 uxtb r2,r3
+ 792 0040 BB7B     	 ldrb r3,[r7,#14]
+ 793 0042 62F30403 	 bfi r3,r2,#0,#5
+ 794 0046 BB73     	 strb r3,[r7,#14]
+ 367:../Dave/Generated/RTC/rtc.c ****   alarm_val.minutes = alarm->minutes;
+ 795              	 .loc 3 367 0
+ 796 0048 7B68     	 ldr r3,[r7,#4]
+ 797 004a 5B78     	 ldrb r3,[r3,#1]
+ 798 004c C3F30503 	 ubfx r3,r3,#0,#6
+ 799 0050 DAB2     	 uxtb r2,r3
+ 800 0052 7B7B     	 ldrb r3,[r7,#13]
+ 801 0054 62F30503 	 bfi r3,r2,#0,#6
+ 802 0058 7B73     	 strb r3,[r7,#13]
+ 368:../Dave/Generated/RTC/rtc.c ****   alarm_val.seconds = alarm->seconds;
+ 803              	 .loc 3 368 0
+ 804 005a 7B68     	 ldr r3,[r7,#4]
+ 805 005c 1B78     	 ldrb r3,[r3]
+ 806 005e C3F30503 	 ubfx r3,r3,#0,#6
+ 807 0062 DAB2     	 uxtb r2,r3
+ 808 0064 3B7B     	 ldrb r3,[r7,#12]
+ 809 0066 62F30503 	 bfi r3,r2,#0,#6
+ 810 006a 3B73     	 strb r3,[r7,#12]
+ 369:../Dave/Generated/RTC/rtc.c **** 
+ 370:../Dave/Generated/RTC/rtc.c ****   if ((alarm_val.days != 0U) && (alarm_val.month != 0U))
+ 811              	 .loc 3 370 0
+ 812 006c FB7B     	 ldrb r3,[r7,#15]
+ 813 006e 03F01F03 	 and r3,r3,#31
+ 814 0072 DBB2     	 uxtb r3,r3
+ 815 0074 002B     	 cmp r3,#0
+ 816 0076 25D0     	 beq .L34
+ 817              	 .loc 3 370 0 is_stmt 0 discriminator 1
+ 818 0078 7B7C     	 ldrb r3,[r7,#17]
+ 819 007a 03F00F03 	 and r3,r3,#15
+ 820 007e DBB2     	 uxtb r3,r3
+ 821 0080 002B     	 cmp r3,#0
+ 822 0082 1FD0     	 beq .L34
+ 371:../Dave/Generated/RTC/rtc.c ****   {
+ 372:../Dave/Generated/RTC/rtc.c ****     alarm_val.days = alarm_val.days - 1U;
+ 823              	 .loc 3 372 0 is_stmt 1
+ 824 0084 FB7B     	 ldrb r3,[r7,#15]
+ 825 0086 C3F30403 	 ubfx r3,r3,#0,#5
+ 826 008a DBB2     	 uxtb r3,r3
+ 827 008c 013B     	 subs r3,r3,#1
+ 828 008e DBB2     	 uxtb r3,r3
+ 829 0090 03F01F03 	 and r3,r3,#31
+ 830 0094 DAB2     	 uxtb r2,r3
+ 831 0096 FB7B     	 ldrb r3,[r7,#15]
+ 832 0098 62F30403 	 bfi r3,r2,#0,#5
+ 833 009c FB73     	 strb r3,[r7,#15]
+ 373:../Dave/Generated/RTC/rtc.c ****     alarm_val.month = alarm_val.month - 1U;
+ 834              	 .loc 3 373 0
+ 835 009e 7B7C     	 ldrb r3,[r7,#17]
+ 836 00a0 C3F30303 	 ubfx r3,r3,#0,#4
+ 837 00a4 DBB2     	 uxtb r3,r3
+ 838 00a6 013B     	 subs r3,r3,#1
+ 839 00a8 DBB2     	 uxtb r3,r3
+ 840 00aa 03F00F03 	 and r3,r3,#15
+ 841 00ae DAB2     	 uxtb r2,r3
+ 842 00b0 7B7C     	 ldrb r3,[r7,#17]
+ 843 00b2 62F30303 	 bfi r3,r2,#0,#4
+ 844 00b6 7B74     	 strb r3,[r7,#17]
+ 374:../Dave/Generated/RTC/rtc.c **** 
+ 375:../Dave/Generated/RTC/rtc.c ****     XMC_RTC_SetAlarm(&alarm_val);
+ 845              	 .loc 3 375 0
+ 846 00b8 07F10C03 	 add r3,r7,#12
+ 847 00bc 1846     	 mov r0,r3
+ 848 00be FFF7FEFF 	 bl XMC_RTC_SetAlarm
+ 849 00c2 01E0     	 b .L35
+ 850              	.L34:
+ 376:../Dave/Generated/RTC/rtc.c ****   }
+ 377:../Dave/Generated/RTC/rtc.c ****   else
+ 378:../Dave/Generated/RTC/rtc.c ****   {
+ 379:../Dave/Generated/RTC/rtc.c ****     status = RTC_STATUS_FAILURE;
+ 851              	 .loc 3 379 0
+ 852 00c4 0123     	 movs r3,#1
+ 853 00c6 FB75     	 strb r3,[r7,#23]
+ 854              	.L35:
+ 380:../Dave/Generated/RTC/rtc.c ****   }
+ 381:../Dave/Generated/RTC/rtc.c **** 
+ 382:../Dave/Generated/RTC/rtc.c ****   return (status);
+ 855              	 .loc 3 382 0
+ 856 00c8 FB7D     	 ldrb r3,[r7,#23]
+ 383:../Dave/Generated/RTC/rtc.c **** }
+ 857              	 .loc 3 383 0
+ 858 00ca 1846     	 mov r0,r3
+ 859 00cc 1837     	 adds r7,r7,#24
+ 860              	.LCFI51:
+ 861              	 .cfi_def_cfa_offset 8
+ 862 00ce BD46     	 mov sp,r7
+ 863              	.LCFI52:
+ 864              	 .cfi_def_cfa_register 13
+ 865              	 
+ 866 00d0 80BD     	 pop {r7,pc}
+ 867              	 .cfi_endproc
+ 868              	.LFE187:
+ 870 00d2 00BF     	 .section .text.RTC_SetAlarmStdTime,"ax",%progbits
+ 871              	 .align 2
+ 872              	 .global RTC_SetAlarmStdTime
+ 873              	 .thumb
+ 874              	 .thumb_func
+ 876              	RTC_SetAlarmStdTime:
+ 877              	.LFB188:
+ 384:../Dave/Generated/RTC/rtc.c **** 
+ 385:../Dave/Generated/RTC/rtc.c **** /*
+ 386:../Dave/Generated/RTC/rtc.c ****  *  This function is used to set Alarm time in standard format.
+ 387:../Dave/Generated/RTC/rtc.c ****  */
+ 388:../Dave/Generated/RTC/rtc.c **** RTC_STATUS_t RTC_SetAlarmStdTime(struct tm *stdtime)
+ 389:../Dave/Generated/RTC/rtc.c **** {
+ 878              	 .loc 3 389 0
+ 879              	 .cfi_startproc
+ 880              	 
+ 881              	 
+ 882 0000 80B5     	 push {r7,lr}
+ 883              	.LCFI53:
+ 884              	 .cfi_def_cfa_offset 8
+ 885              	 .cfi_offset 7,-8
+ 886              	 .cfi_offset 14,-4
+ 887 0002 84B0     	 sub sp,sp,#16
+ 888              	.LCFI54:
+ 889              	 .cfi_def_cfa_offset 24
+ 890 0004 00AF     	 add r7,sp,#0
+ 891              	.LCFI55:
+ 892              	 .cfi_def_cfa_register 7
+ 893 0006 7860     	 str r0,[r7,#4]
+ 390:../Dave/Generated/RTC/rtc.c ****   RTC_STATUS_t status = RTC_STATUS_SUCCESS;
+ 894              	 .loc 3 390 0
+ 895 0008 0023     	 movs r3,#0
+ 896 000a FB73     	 strb r3,[r7,#15]
+ 391:../Dave/Generated/RTC/rtc.c **** 
+ 392:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_SetAlarmStdTime: NULL pointer", stdtime != NULL);
+ 393:../Dave/Generated/RTC/rtc.c **** 
+ 394:../Dave/Generated/RTC/rtc.c ****   if (stdtime->tm_mday != 0U)
+ 897              	 .loc 3 394 0
+ 898 000c 7B68     	 ldr r3,[r7,#4]
+ 899 000e DB68     	 ldr r3,[r3,#12]
+ 900 0010 002B     	 cmp r3,#0
+ 901 0012 03D0     	 beq .L38
+ 395:../Dave/Generated/RTC/rtc.c ****   {
+ 396:../Dave/Generated/RTC/rtc.c ****     XMC_RTC_SetAlarmStdFormat(stdtime);
+ 902              	 .loc 3 396 0
+ 903 0014 7868     	 ldr r0,[r7,#4]
+ 904 0016 FFF7FEFF 	 bl XMC_RTC_SetAlarmStdFormat
+ 905 001a 01E0     	 b .L39
+ 906              	.L38:
+ 397:../Dave/Generated/RTC/rtc.c ****   }
+ 398:../Dave/Generated/RTC/rtc.c ****   else
+ 399:../Dave/Generated/RTC/rtc.c ****   {
+ 400:../Dave/Generated/RTC/rtc.c ****     status = RTC_STATUS_FAILURE;
+ 907              	 .loc 3 400 0
+ 908 001c 0123     	 movs r3,#1
+ 909 001e FB73     	 strb r3,[r7,#15]
+ 910              	.L39:
+ 401:../Dave/Generated/RTC/rtc.c ****   }
+ 402:../Dave/Generated/RTC/rtc.c **** 
+ 403:../Dave/Generated/RTC/rtc.c ****   return (status);
+ 911              	 .loc 3 403 0
+ 912 0020 FB7B     	 ldrb r3,[r7,#15]
+ 404:../Dave/Generated/RTC/rtc.c **** }
+ 913              	 .loc 3 404 0
+ 914 0022 1846     	 mov r0,r3
+ 915 0024 1037     	 adds r7,r7,#16
+ 916              	.LCFI56:
+ 917              	 .cfi_def_cfa_offset 8
+ 918 0026 BD46     	 mov sp,r7
+ 919              	.LCFI57:
+ 920              	 .cfi_def_cfa_register 13
+ 921              	 
+ 922 0028 80BD     	 pop {r7,pc}
+ 923              	 .cfi_endproc
+ 924              	.LFE188:
+ 926 002a 00BF     	 .section .text.RTC_GetAlarmTime,"ax",%progbits
+ 927              	 .align 2
+ 928              	 .global RTC_GetAlarmTime
+ 929              	 .thumb
+ 930              	 .thumb_func
+ 932              	RTC_GetAlarmTime:
+ 933              	.LFB189:
+ 405:../Dave/Generated/RTC/rtc.c **** 
+ 406:../Dave/Generated/RTC/rtc.c **** /*
+ 407:../Dave/Generated/RTC/rtc.c ****  *  This function is used to get Alarm time from XMC.
+ 408:../Dave/Generated/RTC/rtc.c ****  *  And returns in standard time format.
+ 409:../Dave/Generated/RTC/rtc.c ****  */
+ 410:../Dave/Generated/RTC/rtc.c **** void RTC_GetAlarmTime(XMC_RTC_ALARM_t *alarm)
+ 411:../Dave/Generated/RTC/rtc.c **** {
+ 934              	 .loc 3 411 0
+ 935              	 .cfi_startproc
+ 936              	 
+ 937              	 
+ 938 0000 80B5     	 push {r7,lr}
+ 939              	.LCFI58:
+ 940              	 .cfi_def_cfa_offset 8
+ 941              	 .cfi_offset 7,-8
+ 942              	 .cfi_offset 14,-4
+ 943 0002 82B0     	 sub sp,sp,#8
+ 944              	.LCFI59:
+ 945              	 .cfi_def_cfa_offset 16
+ 946 0004 00AF     	 add r7,sp,#0
+ 947              	.LCFI60:
+ 948              	 .cfi_def_cfa_register 7
+ 949 0006 7860     	 str r0,[r7,#4]
+ 412:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_GetAlarmTime: NULL pointer", alarm != NULL);
+ 413:../Dave/Generated/RTC/rtc.c **** 
+ 414:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_GetAlarm(alarm);
+ 950              	 .loc 3 414 0
+ 951 0008 7868     	 ldr r0,[r7,#4]
+ 952 000a FFF7FEFF 	 bl XMC_RTC_GetAlarm
+ 415:../Dave/Generated/RTC/rtc.c **** 
+ 416:../Dave/Generated/RTC/rtc.c ****   alarm->days = alarm->days + 1U;
+ 953              	 .loc 3 416 0
+ 954 000e 7B68     	 ldr r3,[r7,#4]
+ 955 0010 DB78     	 ldrb r3,[r3,#3]
+ 956 0012 C3F30403 	 ubfx r3,r3,#0,#5
+ 957 0016 DBB2     	 uxtb r3,r3
+ 958 0018 0133     	 adds r3,r3,#1
+ 959 001a DBB2     	 uxtb r3,r3
+ 960 001c 03F01F03 	 and r3,r3,#31
+ 961 0020 D9B2     	 uxtb r1,r3
+ 962 0022 7A68     	 ldr r2,[r7,#4]
+ 963 0024 D378     	 ldrb r3,[r2,#3]
+ 964 0026 61F30403 	 bfi r3,r1,#0,#5
+ 965 002a D370     	 strb r3,[r2,#3]
+ 417:../Dave/Generated/RTC/rtc.c ****   alarm->month = alarm->month + 1U;
+ 966              	 .loc 3 417 0
+ 967 002c 7B68     	 ldr r3,[r7,#4]
+ 968 002e 5B79     	 ldrb r3,[r3,#5]
+ 969 0030 C3F30303 	 ubfx r3,r3,#0,#4
+ 970 0034 DBB2     	 uxtb r3,r3
+ 971 0036 0133     	 adds r3,r3,#1
+ 972 0038 DBB2     	 uxtb r3,r3
+ 973 003a 03F00F03 	 and r3,r3,#15
+ 974 003e D9B2     	 uxtb r1,r3
+ 975 0040 7A68     	 ldr r2,[r7,#4]
+ 976 0042 5379     	 ldrb r3,[r2,#5]
+ 977 0044 61F30303 	 bfi r3,r1,#0,#4
+ 978 0048 5371     	 strb r3,[r2,#5]
+ 418:../Dave/Generated/RTC/rtc.c **** }
+ 979              	 .loc 3 418 0
+ 980 004a 0837     	 adds r7,r7,#8
+ 981              	.LCFI61:
+ 982              	 .cfi_def_cfa_offset 8
+ 983 004c BD46     	 mov sp,r7
+ 984              	.LCFI62:
+ 985              	 .cfi_def_cfa_register 13
+ 986              	 
+ 987 004e 80BD     	 pop {r7,pc}
+ 988              	 .cfi_endproc
+ 989              	.LFE189:
+ 991              	 .section .text.RTC_GetAlarmStdTime,"ax",%progbits
+ 992              	 .align 2
+ 993              	 .global RTC_GetAlarmStdTime
+ 994              	 .thumb
+ 995              	 .thumb_func
+ 997              	RTC_GetAlarmStdTime:
+ 998              	.LFB190:
+ 419:../Dave/Generated/RTC/rtc.c **** 
+ 420:../Dave/Generated/RTC/rtc.c **** /*
+ 421:../Dave/Generated/RTC/rtc.c ****  *  This function is used to Get Alarm time in standard format.
+ 422:../Dave/Generated/RTC/rtc.c ****  */
+ 423:../Dave/Generated/RTC/rtc.c **** void RTC_GetAlarmStdTime(struct tm *stdtime)
+ 424:../Dave/Generated/RTC/rtc.c **** {
+ 999              	 .loc 3 424 0
+ 1000              	 .cfi_startproc
+ 1001              	 
+ 1002              	 
+ 1003 0000 80B5     	 push {r7,lr}
+ 1004              	.LCFI63:
+ 1005              	 .cfi_def_cfa_offset 8
+ 1006              	 .cfi_offset 7,-8
+ 1007              	 .cfi_offset 14,-4
+ 1008 0002 82B0     	 sub sp,sp,#8
+ 1009              	.LCFI64:
+ 1010              	 .cfi_def_cfa_offset 16
+ 1011 0004 00AF     	 add r7,sp,#0
+ 1012              	.LCFI65:
+ 1013              	 .cfi_def_cfa_register 7
+ 1014 0006 7860     	 str r0,[r7,#4]
+ 425:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_GetAlarmStdTime: NULL pointer", stdtime != NULL);
+ 426:../Dave/Generated/RTC/rtc.c **** 
+ 427:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_GetAlarmStdFormat(stdtime);
+ 1015              	 .loc 3 427 0
+ 1016 0008 7868     	 ldr r0,[r7,#4]
+ 1017 000a FFF7FEFF 	 bl XMC_RTC_GetAlarmStdFormat
+ 428:../Dave/Generated/RTC/rtc.c **** }
+ 1018              	 .loc 3 428 0
+ 1019 000e 0837     	 adds r7,r7,#8
+ 1020              	.LCFI66:
+ 1021              	 .cfi_def_cfa_offset 8
+ 1022 0010 BD46     	 mov sp,r7
+ 1023              	.LCFI67:
+ 1024              	 .cfi_def_cfa_register 13
+ 1025              	 
+ 1026 0012 80BD     	 pop {r7,pc}
+ 1027              	 .cfi_endproc
+ 1028              	.LFE190:
+ 1030              	 .section .text.RTC_GetFlagStatus,"ax",%progbits
+ 1031              	 .align 2
+ 1032              	 .global RTC_GetFlagStatus
+ 1033              	 .thumb
+ 1034              	 .thumb_func
+ 1036              	RTC_GetFlagStatus:
+ 1037              	.LFB191:
+ 429:../Dave/Generated/RTC/rtc.c **** 
+ 430:../Dave/Generated/RTC/rtc.c **** /*
+ 431:../Dave/Generated/RTC/rtc.c ****  *  This function is used to get event status.
+ 432:../Dave/Generated/RTC/rtc.c ****  */
+ 433:../Dave/Generated/RTC/rtc.c **** uint32_t RTC_GetFlagStatus(void)
+ 434:../Dave/Generated/RTC/rtc.c **** {
+ 1038              	 .loc 3 434 0
+ 1039              	 .cfi_startproc
+ 1040              	 
+ 1041              	 
+ 1042 0000 80B5     	 push {r7,lr}
+ 1043              	.LCFI68:
+ 1044              	 .cfi_def_cfa_offset 8
+ 1045              	 .cfi_offset 7,-8
+ 1046              	 .cfi_offset 14,-4
+ 1047 0002 82B0     	 sub sp,sp,#8
+ 1048              	.LCFI69:
+ 1049              	 .cfi_def_cfa_offset 16
+ 1050 0004 00AF     	 add r7,sp,#0
+ 1051              	.LCFI70:
+ 1052              	 .cfi_def_cfa_register 7
+ 435:../Dave/Generated/RTC/rtc.c ****   uint32_t event_status;
+ 436:../Dave/Generated/RTC/rtc.c **** 
+ 437:../Dave/Generated/RTC/rtc.c ****   event_status = XMC_RTC_GetEventStatus();
+ 1053              	 .loc 3 437 0
+ 1054 0006 FFF7FEFF 	 bl XMC_RTC_GetEventStatus
+ 1055 000a 7860     	 str r0,[r7,#4]
+ 438:../Dave/Generated/RTC/rtc.c **** 
+ 439:../Dave/Generated/RTC/rtc.c ****   return (event_status);
+ 1056              	 .loc 3 439 0
+ 1057 000c 7B68     	 ldr r3,[r7,#4]
+ 440:../Dave/Generated/RTC/rtc.c **** }
+ 1058              	 .loc 3 440 0
+ 1059 000e 1846     	 mov r0,r3
+ 1060 0010 0837     	 adds r7,r7,#8
+ 1061              	.LCFI71:
+ 1062              	 .cfi_def_cfa_offset 8
+ 1063 0012 BD46     	 mov sp,r7
+ 1064              	.LCFI72:
+ 1065              	 .cfi_def_cfa_register 13
+ 1066              	 
+ 1067 0014 80BD     	 pop {r7,pc}
+ 1068              	 .cfi_endproc
+ 1069              	.LFE191:
+ 1071 0016 00BF     	 .section .text.RTC_Time,"ax",%progbits
+ 1072              	 .align 2
+ 1073              	 .global RTC_Time
+ 1074              	 .thumb
+ 1075              	 .thumb_func
+ 1077              	RTC_Time:
+ 1078              	.LFB192:
+ 441:../Dave/Generated/RTC/rtc.c **** 
+ 442:../Dave/Generated/RTC/rtc.c **** /*
+ 443:../Dave/Generated/RTC/rtc.c ****  *  This function is to get the time in seconds calculated from Epoch time
+ 444:../Dave/Generated/RTC/rtc.c ****  *  (01/01/1970).
+ 445:../Dave/Generated/RTC/rtc.c ****  */
+ 446:../Dave/Generated/RTC/rtc.c **** RTC_STATUS_t RTC_Time(time_t* time_value)
+ 447:../Dave/Generated/RTC/rtc.c **** {
+ 1079              	 .loc 3 447 0
+ 1080              	 .cfi_startproc
+ 1081              	 
+ 1082              	 
+ 1083 0000 80B5     	 push {r7,lr}
+ 1084              	.LCFI73:
+ 1085              	 .cfi_def_cfa_offset 8
+ 1086              	 .cfi_offset 7,-8
+ 1087              	 .cfi_offset 14,-4
+ 1088 0002 8AB0     	 sub sp,sp,#40
+ 1089              	.LCFI74:
+ 1090              	 .cfi_def_cfa_offset 48
+ 1091 0004 00AF     	 add r7,sp,#0
+ 1092              	.LCFI75:
+ 1093              	 .cfi_def_cfa_register 7
+ 1094 0006 7860     	 str r0,[r7,#4]
+ 448:../Dave/Generated/RTC/rtc.c ****   uint32_t elapsedyear;
+ 449:../Dave/Generated/RTC/rtc.c ****   uint32_t elapsedmonth;
+ 450:../Dave/Generated/RTC/rtc.c ****   uint32_t elapseddays;
+ 451:../Dave/Generated/RTC/rtc.c ****   uint32_t elapsedseconds;
+ 452:../Dave/Generated/RTC/rtc.c **** 
+ 453:../Dave/Generated/RTC/rtc.c ****   RTC_STATUS_t status;
+ 454:../Dave/Generated/RTC/rtc.c ****   XMC_RTC_TIME_t curr_time;
+ 455:../Dave/Generated/RTC/rtc.c ****   
+ 456:../Dave/Generated/RTC/rtc.c ****   XMC_ASSERT("RTC_Time: NULL pointer", time_value != NULL);
+ 457:../Dave/Generated/RTC/rtc.c **** 
+ 458:../Dave/Generated/RTC/rtc.c ****   /*Check if RTC module is enabled and no NULL pointer*/
+ 459:../Dave/Generated/RTC/rtc.c ****   if (true == XMC_RTC_IsRunning())
+ 1095              	 .loc 3 459 0
+ 1096 0008 FFF7FEFF 	 bl XMC_RTC_IsRunning
+ 1097 000c 0346     	 mov r3,r0
+ 1098 000e 002B     	 cmp r3,#0
+ 1099 0010 7DD0     	 beq .L46
+ 460:../Dave/Generated/RTC/rtc.c ****   {
+ 461:../Dave/Generated/RTC/rtc.c ****     /* Read values from TIM0 and TIM1 registers */
+ 462:../Dave/Generated/RTC/rtc.c ****     XMC_RTC_GetTime(&curr_time);
+ 1100              	 .loc 3 462 0
+ 1101 0012 07F10C03 	 add r3,r7,#12
+ 1102 0016 1846     	 mov r0,r3
+ 1103 0018 FFF7FEFF 	 bl XMC_RTC_GetTime
+ 463:../Dave/Generated/RTC/rtc.c **** 
+ 464:../Dave/Generated/RTC/rtc.c ****     /*Count number of Days for Elapsed Years since Epoch*/
+ 465:../Dave/Generated/RTC/rtc.c ****     elapseddays = ((uint32_t)curr_time.year - RTC_EPOCH_YEAR) * RTC_DAYS_IN_AN_YEAR;
+ 1104              	 .loc 3 465 0
+ 1105 001c 7B8A     	 ldrh r3,[r7,#18]
+ 1106 001e 1A46     	 mov r2,r3
+ 1107 0020 40F26D13 	 movw r3,#365
+ 1108 0024 03FB02F3 	 mul r3,r3,r2
+ 1109 0028 A3F52F23 	 sub r3,r3,#716800
+ 1110 002c A3F6CA03 	 subw r3,r3,#2250
+ 1111 0030 FB61     	 str r3,[r7,#28]
+ 466:../Dave/Generated/RTC/rtc.c **** 
+ 467:../Dave/Generated/RTC/rtc.c ****     /* Add the number of days to be adjusted for leap years,
+ 468:../Dave/Generated/RTC/rtc.c ****        start from previous year and check backward */
+ 469:../Dave/Generated/RTC/rtc.c ****     for (elapsedyear = ((uint32_t)curr_time.year - 1U); elapsedyear>= (uint32_t)1970; elapsedyear--
+ 1112              	 .loc 3 469 0
+ 1113 0032 7B8A     	 ldrh r3,[r7,#18]
+ 1114 0034 013B     	 subs r3,r3,#1
+ 1115 0036 7B62     	 str r3,[r7,#36]
+ 1116 0038 0DE0     	 b .L47
+ 1117              	.L49:
+ 470:../Dave/Generated/RTC/rtc.c ****     {
+ 471:../Dave/Generated/RTC/rtc.c ****       if (RTC_lleapyear((uint16_t)elapsedyear))
+ 1118              	 .loc 3 471 0
+ 1119 003a 7B6A     	 ldr r3,[r7,#36]
+ 1120 003c 9BB2     	 uxth r3,r3
+ 1121 003e 1846     	 mov r0,r3
+ 1122 0040 FFF7FEFF 	 bl RTC_lleapyear
+ 1123 0044 0346     	 mov r3,r0
+ 1124 0046 002B     	 cmp r3,#0
+ 1125 0048 02D0     	 beq .L48
+ 472:../Dave/Generated/RTC/rtc.c ****       {
+ 473:../Dave/Generated/RTC/rtc.c ****         elapseddays++;
+ 1126              	 .loc 3 473 0
+ 1127 004a FB69     	 ldr r3,[r7,#28]
+ 1128 004c 0133     	 adds r3,r3,#1
+ 1129 004e FB61     	 str r3,[r7,#28]
+ 1130              	.L48:
+ 469:../Dave/Generated/RTC/rtc.c ****     {
+ 1131              	 .loc 3 469 0 discriminator 2
+ 1132 0050 7B6A     	 ldr r3,[r7,#36]
+ 1133 0052 013B     	 subs r3,r3,#1
+ 1134 0054 7B62     	 str r3,[r7,#36]
+ 1135              	.L47:
+ 469:../Dave/Generated/RTC/rtc.c ****     {
+ 1136              	 .loc 3 469 0 is_stmt 0 discriminator 1
+ 1137 0056 7B6A     	 ldr r3,[r7,#36]
+ 1138 0058 40F2B172 	 movw r2,#1969
+ 1139 005c 9342     	 cmp r3,r2
+ 1140 005e ECD8     	 bhi .L49
+ 474:../Dave/Generated/RTC/rtc.c ****       }
+ 475:../Dave/Generated/RTC/rtc.c ****     }
+ 476:../Dave/Generated/RTC/rtc.c ****     /*If current year is leap year add 1 only if March or later*/
+ 477:../Dave/Generated/RTC/rtc.c ****     if (RTC_lleapyear(curr_time.year))
+ 1141              	 .loc 3 477 0 is_stmt 1
+ 1142 0060 7B8A     	 ldrh r3,[r7,#18]
+ 1143 0062 1846     	 mov r0,r3
+ 1144 0064 FFF7FEFF 	 bl RTC_lleapyear
+ 1145 0068 0346     	 mov r3,r0
+ 1146 006a 002B     	 cmp r3,#0
+ 1147 006c 08D0     	 beq .L50
+ 478:../Dave/Generated/RTC/rtc.c ****     {
+ 479:../Dave/Generated/RTC/rtc.c ****       if(curr_time.month > 2U)
+ 1148              	 .loc 3 479 0
+ 1149 006e 7B7C     	 ldrb r3,[r7,#17]
+ 1150 0070 C3F30303 	 ubfx r3,r3,#0,#4
+ 1151 0074 DBB2     	 uxtb r3,r3
+ 1152 0076 022B     	 cmp r3,#2
+ 1153 0078 02D9     	 bls .L50
+ 480:../Dave/Generated/RTC/rtc.c ****       {
+ 481:../Dave/Generated/RTC/rtc.c ****         elapseddays++;
+ 1154              	 .loc 3 481 0
+ 1155 007a FB69     	 ldr r3,[r7,#28]
+ 1156 007c 0133     	 adds r3,r3,#1
+ 1157 007e FB61     	 str r3,[r7,#28]
+ 1158              	.L50:
+ 482:../Dave/Generated/RTC/rtc.c ****       }
+ 483:../Dave/Generated/RTC/rtc.c ****     }
+ 484:../Dave/Generated/RTC/rtc.c **** 
+ 485:../Dave/Generated/RTC/rtc.c ****     /*Add number of Days from Elapsed months from current year*/
+ 486:../Dave/Generated/RTC/rtc.c ****     for (elapsedmonth = (curr_time.month); elapsedmonth != 0U; elapsedmonth--)
+ 1159              	 .loc 3 486 0
+ 1160 0080 7B7C     	 ldrb r3,[r7,#17]
+ 1161 0082 C3F30303 	 ubfx r3,r3,#0,#4
+ 1162 0086 DBB2     	 uxtb r3,r3
+ 1163 0088 3B62     	 str r3,[r7,#32]
+ 1164 008a 09E0     	 b .L51
+ 1165              	.L52:
+ 487:../Dave/Generated/RTC/rtc.c ****     {
+ 488:../Dave/Generated/RTC/rtc.c ****       elapseddays += RTC_DAYS_IN_MONTH[elapsedmonth];
+ 1166              	 .loc 3 488 0 discriminator 3
+ 1167 008c 234A     	 ldr r2,.L55
+ 1168 008e 3B6A     	 ldr r3,[r7,#32]
+ 1169 0090 52F82330 	 ldr r3,[r2,r3,lsl#2]
+ 1170 0094 FA69     	 ldr r2,[r7,#28]
+ 1171 0096 1344     	 add r3,r3,r2
+ 1172 0098 FB61     	 str r3,[r7,#28]
+ 486:../Dave/Generated/RTC/rtc.c ****     {
+ 1173              	 .loc 3 486 0 discriminator 3
+ 1174 009a 3B6A     	 ldr r3,[r7,#32]
+ 1175 009c 013B     	 subs r3,r3,#1
+ 1176 009e 3B62     	 str r3,[r7,#32]
+ 1177              	.L51:
+ 486:../Dave/Generated/RTC/rtc.c ****     {
+ 1178              	 .loc 3 486 0 is_stmt 0 discriminator 1
+ 1179 00a0 3B6A     	 ldr r3,[r7,#32]
+ 1180 00a2 002B     	 cmp r3,#0
+ 1181 00a4 F2D1     	 bne .L52
+ 489:../Dave/Generated/RTC/rtc.c ****     }
+ 490:../Dave/Generated/RTC/rtc.c **** 
+ 491:../Dave/Generated/RTC/rtc.c ****     /*Add Elapsed days from current month*/
+ 492:../Dave/Generated/RTC/rtc.c ****     elapseddays += curr_time.days;
+ 1182              	 .loc 3 492 0 is_stmt 1
+ 1183 00a6 FB7B     	 ldrb r3,[r7,#15]
+ 1184 00a8 C3F30403 	 ubfx r3,r3,#0,#5
+ 1185 00ac DBB2     	 uxtb r3,r3
+ 1186 00ae 1A46     	 mov r2,r3
+ 1187 00b0 FB69     	 ldr r3,[r7,#28]
+ 1188 00b2 1344     	 add r3,r3,r2
+ 1189 00b4 FB61     	 str r3,[r7,#28]
+ 493:../Dave/Generated/RTC/rtc.c **** 
+ 494:../Dave/Generated/RTC/rtc.c ****     /*Accumulate the total seconds for ElapsedDays*/
+ 495:../Dave/Generated/RTC/rtc.c ****     elapsedseconds = (elapseddays * RTC_SECONDS_IN_A_DAY);
+ 1190              	 .loc 3 495 0
+ 1191 00b6 FB69     	 ldr r3,[r7,#28]
+ 1192 00b8 194A     	 ldr r2,.L55+4
+ 1193 00ba 02FB03F3 	 mul r3,r2,r3
+ 1194 00be 7B61     	 str r3,[r7,#20]
+ 496:../Dave/Generated/RTC/rtc.c **** 
+ 497:../Dave/Generated/RTC/rtc.c ****     /*Add seconds for current hour, minute and seconds*/
+ 498:../Dave/Generated/RTC/rtc.c ****     elapsedseconds += ((uint32_t)curr_time.hours * RTC_SECONDS_IN_AN_HOUR);
+ 1195              	 .loc 3 498 0
+ 1196 00c0 BB7B     	 ldrb r3,[r7,#14]
+ 1197 00c2 C3F30403 	 ubfx r3,r3,#0,#5
+ 1198 00c6 DBB2     	 uxtb r3,r3
+ 1199 00c8 1A46     	 mov r2,r3
+ 1200 00ca 4FF46163 	 mov r3,#3600
+ 1201 00ce 03FB02F3 	 mul r3,r3,r2
+ 1202 00d2 7A69     	 ldr r2,[r7,#20]
+ 1203 00d4 1344     	 add r3,r3,r2
+ 1204 00d6 7B61     	 str r3,[r7,#20]
+ 499:../Dave/Generated/RTC/rtc.c ****     elapsedseconds += ((uint32_t)curr_time.minutes * RTC_SECONDS_IN_A_MINUTE);
+ 1205              	 .loc 3 499 0
+ 1206 00d8 7B7B     	 ldrb r3,[r7,#13]
+ 1207 00da C3F30503 	 ubfx r3,r3,#0,#6
+ 1208 00de DBB2     	 uxtb r3,r3
+ 1209 00e0 1A46     	 mov r2,r3
+ 1210 00e2 1346     	 mov r3,r2
+ 1211 00e4 1B01     	 lsls r3,r3,#4
+ 1212 00e6 9B1A     	 subs r3,r3,r2
+ 1213 00e8 9B00     	 lsls r3,r3,#2
+ 1214 00ea 1A46     	 mov r2,r3
+ 1215 00ec 7B69     	 ldr r3,[r7,#20]
+ 1216 00ee 1344     	 add r3,r3,r2
+ 1217 00f0 7B61     	 str r3,[r7,#20]
+ 500:../Dave/Generated/RTC/rtc.c ****     elapsedseconds += (uint32_t)curr_time.seconds;
+ 1218              	 .loc 3 500 0
+ 1219 00f2 3B7B     	 ldrb r3,[r7,#12]
+ 1220 00f4 C3F30503 	 ubfx r3,r3,#0,#6
+ 1221 00f8 DBB2     	 uxtb r3,r3
+ 1222 00fa 1A46     	 mov r2,r3
+ 1223 00fc 7B69     	 ldr r3,[r7,#20]
+ 1224 00fe 1344     	 add r3,r3,r2
+ 1225 0100 7B61     	 str r3,[r7,#20]
+ 501:../Dave/Generated/RTC/rtc.c **** 
+ 502:../Dave/Generated/RTC/rtc.c ****     *time_value = (time_t)elapsedseconds;
+ 1226              	 .loc 3 502 0
+ 1227 0102 7A69     	 ldr r2,[r7,#20]
+ 1228 0104 7B68     	 ldr r3,[r7,#4]
+ 1229 0106 1A60     	 str r2,[r3]
+ 503:../Dave/Generated/RTC/rtc.c ****      status = RTC_STATUS_SUCCESS;
+ 1230              	 .loc 3 503 0
+ 1231 0108 0023     	 movs r3,#0
+ 1232 010a FB76     	 strb r3,[r7,#27]
+ 1233 010c 01E0     	 b .L53
+ 1234              	.L46:
+ 504:../Dave/Generated/RTC/rtc.c ****   }
+ 505:../Dave/Generated/RTC/rtc.c ****   else
+ 506:../Dave/Generated/RTC/rtc.c ****   {
+ 507:../Dave/Generated/RTC/rtc.c ****     status = RTC_STATUS_FAILURE;
+ 1235              	 .loc 3 507 0
+ 1236 010e 0123     	 movs r3,#1
+ 1237 0110 FB76     	 strb r3,[r7,#27]
+ 1238              	.L53:
+ 508:../Dave/Generated/RTC/rtc.c ****   }
+ 509:../Dave/Generated/RTC/rtc.c ****   return (status);
+ 1239              	 .loc 3 509 0
+ 1240 0112 FB7E     	 ldrb r3,[r7,#27]
+ 510:../Dave/Generated/RTC/rtc.c **** }
+ 1241              	 .loc 3 510 0
+ 1242 0114 1846     	 mov r0,r3
+ 1243 0116 2837     	 adds r7,r7,#40
+ 1244              	.LCFI76:
+ 1245              	 .cfi_def_cfa_offset 8
+ 1246 0118 BD46     	 mov sp,r7
+ 1247              	.LCFI77:
+ 1248              	 .cfi_def_cfa_register 13
+ 1249              	 
+ 1250 011a 80BD     	 pop {r7,pc}
+ 1251              	.L56:
+ 1252              	 .align 2
+ 1253              	.L55:
+ 1254 011c 00000000 	 .word RTC_DAYS_IN_MONTH
+ 1255 0120 80510100 	 .word 86400
+ 1256              	 .cfi_endproc
+ 1257              	.LFE192:
+ 1259              	 .section .text.RTC_lleapyear,"ax",%progbits
+ 1260              	 .align 2
+ 1261              	 .global RTC_lleapyear
+ 1262              	 .thumb
+ 1263              	 .thumb_func
+ 1265              	RTC_lleapyear:
+ 1266              	.LFB193:
+ 511:../Dave/Generated/RTC/rtc.c **** 	
+ 512:../Dave/Generated/RTC/rtc.c **** /* This function returns 1 if it is leap year otherwise 0.*/
+ 513:../Dave/Generated/RTC/rtc.c **** uint8_t RTC_lleapyear(uint16_t year)
+ 514:../Dave/Generated/RTC/rtc.c **** {
+ 1267              	 .loc 3 514 0
+ 1268              	 .cfi_startproc
+ 1269              	 
+ 1270              	 
+ 1271              	 
+ 1272 0000 80B4     	 push {r7}
+ 1273              	.LCFI78:
+ 1274              	 .cfi_def_cfa_offset 4
+ 1275              	 .cfi_offset 7,-4
+ 1276 0002 85B0     	 sub sp,sp,#20
+ 1277              	.LCFI79:
+ 1278              	 .cfi_def_cfa_offset 24
+ 1279 0004 00AF     	 add r7,sp,#0
+ 1280              	.LCFI80:
+ 1281              	 .cfi_def_cfa_register 7
+ 1282 0006 0346     	 mov r3,r0
+ 1283 0008 FB80     	 strh r3,[r7,#6]
+ 515:../Dave/Generated/RTC/rtc.c ****   uint8_t valid = 0U;
+ 1284              	 .loc 3 515 0
+ 1285 000a 0023     	 movs r3,#0
+ 1286 000c FB73     	 strb r3,[r7,#15]
+ 516:../Dave/Generated/RTC/rtc.c **** 
+ 517:../Dave/Generated/RTC/rtc.c ****   if ((((year) % 400U) == 0U) || ((((year) % 100U) != 0U) &&
+ 1287              	 .loc 3 517 0
+ 1288 000e FB88     	 ldrh r3,[r7,#6]
+ 1289 0010 134A     	 ldr r2,.L61
+ 1290 0012 A2FB0312 	 umull r1,r2,r2,r3
+ 1291 0016 D209     	 lsrs r2,r2,#7
+ 1292 0018 4FF4C871 	 mov r1,#400
+ 1293 001c 01FB02F2 	 mul r2,r1,r2
+ 1294 0020 9B1A     	 subs r3,r3,r2
+ 1295 0022 9BB2     	 uxth r3,r3
+ 1296 0024 002B     	 cmp r3,#0
+ 1297 0026 11D0     	 beq .L58
+ 1298              	 .loc 3 517 0 is_stmt 0 discriminator 1
+ 1299 0028 FB88     	 ldrh r3,[r7,#6]
+ 1300 002a 0D4A     	 ldr r2,.L61
+ 1301 002c A2FB0312 	 umull r1,r2,r2,r3
+ 1302 0030 5209     	 lsrs r2,r2,#5
+ 1303 0032 6421     	 movs r1,#100
+ 1304 0034 01FB02F2 	 mul r2,r1,r2
+ 1305 0038 9B1A     	 subs r3,r3,r2
+ 1306 003a 9BB2     	 uxth r3,r3
+ 1307 003c 002B     	 cmp r3,#0
+ 1308 003e 07D0     	 beq .L59
+ 518:../Dave/Generated/RTC/rtc.c ****        (((year) %4U) == 0U)))
+ 1309              	 .loc 3 518 0 is_stmt 1 discriminator 2
+ 1310 0040 FB88     	 ldrh r3,[r7,#6]
+ 1311 0042 03F00303 	 and r3,r3,#3
+ 1312 0046 9BB2     	 uxth r3,r3
+ 517:../Dave/Generated/RTC/rtc.c ****        (((year) %4U) == 0U)))
+ 1313              	 .loc 3 517 0 discriminator 2
+ 1314 0048 002B     	 cmp r3,#0
+ 1315 004a 01D1     	 bne .L59
+ 1316              	.L58:
+ 519:../Dave/Generated/RTC/rtc.c ****   {
+ 520:../Dave/Generated/RTC/rtc.c ****     valid = 1U;
+ 1317              	 .loc 3 520 0
+ 1318 004c 0123     	 movs r3,#1
+ 1319 004e FB73     	 strb r3,[r7,#15]
+ 1320              	.L59:
+ 521:../Dave/Generated/RTC/rtc.c ****   }
+ 522:../Dave/Generated/RTC/rtc.c ****   return (valid);
+ 1321              	 .loc 3 522 0
+ 1322 0050 FB7B     	 ldrb r3,[r7,#15]
+ 523:../Dave/Generated/RTC/rtc.c **** }
+ 1323              	 .loc 3 523 0
+ 1324 0052 1846     	 mov r0,r3
+ 1325 0054 1437     	 adds r7,r7,#20
+ 1326              	.LCFI81:
+ 1327              	 .cfi_def_cfa_offset 4
+ 1328 0056 BD46     	 mov sp,r7
+ 1329              	.LCFI82:
+ 1330              	 .cfi_def_cfa_register 13
+ 1331              	 
+ 1332 0058 5DF8047B 	 ldr r7,[sp],#4
+ 1333              	.LCFI83:
+ 1334              	 .cfi_restore 7
+ 1335              	 .cfi_def_cfa_offset 0
+ 1336 005c 7047     	 bx lr
+ 1337              	.L62:
+ 1338 005e 00BF     	 .align 2
+ 1339              	.L61:
+ 1340 0060 1F85EB51 	 .word 1374389535
+ 1341              	 .cfi_endproc
+ 1342              	.LFE193:
+ 1344              	 .text
+ 1345              	.Letext0:
+ 1346              	 .file 4 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1347              	 .file 5 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 1348              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
+ 1349              	 .file 7 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\sys\\types.h"
+ 1350              	 .file 8 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\time.h"
+ 1351              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE_Common.h"
+ 1352              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 1353              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 1354              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 rtc.c
+    {standard input}:20     .text.XMC_RTC_IsRunning:00000000 $t
+    {standard input}:24     .text.XMC_RTC_IsRunning:00000000 XMC_RTC_IsRunning
+    {standard input}:62     .text.XMC_RTC_IsRunning:00000020 $d
+    {standard input}:67     .text.RTC_Start:00000000 $t
+    {standard input}:71     .text.RTC_Start:00000000 RTC_Start
+    {standard input}:98     .rodata.RTC_DAYS_IN_MONTH:00000000 RTC_DAYS_IN_MONTH
+    {standard input}:95     .rodata.RTC_DAYS_IN_MONTH:00000000 $d
+    {standard input}:113    .text.RTC_GetAppVersion:00000000 $t
+    {standard input}:118    .text.RTC_GetAppVersion:00000000 RTC_GetAppVersion
+    {standard input}:179    .text.RTC_Init:00000000 $t
+    {standard input}:184    .text.RTC_Init:00000000 RTC_Init
+    {standard input}:293    .text.RTC_lConfigureInterrupts:00000000 RTC_lConfigureInterrupts
+    {standard input}:396    .text.RTC_lRegister_Callbacks:00000000 RTC_lRegister_Callbacks
+    {standard input}:288    .text.RTC_lConfigureInterrupts:00000000 $t
+    {standard input}:391    .text.RTC_lRegister_Callbacks:00000000 $t
+    {standard input}:443    .text.RTC_SetTime:00000000 $t
+    {standard input}:448    .text.RTC_SetTime:00000000 RTC_SetTime
+    {standard input}:581    .text.RTC_SetStdTime:00000000 $t
+    {standard input}:586    .text.RTC_SetStdTime:00000000 RTC_SetStdTime
+    {standard input}:637    .text.RTC_GetTime:00000000 $t
+    {standard input}:642    .text.RTC_GetTime:00000000 RTC_GetTime
+    {standard input}:702    .text.RTC_GetStdTime:00000000 $t
+    {standard input}:707    .text.RTC_GetStdTime:00000000 RTC_GetStdTime
+    {standard input}:741    .text.RTC_SetAlarmTime:00000000 $t
+    {standard input}:746    .text.RTC_SetAlarmTime:00000000 RTC_SetAlarmTime
+    {standard input}:871    .text.RTC_SetAlarmStdTime:00000000 $t
+    {standard input}:876    .text.RTC_SetAlarmStdTime:00000000 RTC_SetAlarmStdTime
+    {standard input}:927    .text.RTC_GetAlarmTime:00000000 $t
+    {standard input}:932    .text.RTC_GetAlarmTime:00000000 RTC_GetAlarmTime
+    {standard input}:992    .text.RTC_GetAlarmStdTime:00000000 $t
+    {standard input}:997    .text.RTC_GetAlarmStdTime:00000000 RTC_GetAlarmStdTime
+    {standard input}:1031   .text.RTC_GetFlagStatus:00000000 $t
+    {standard input}:1036   .text.RTC_GetFlagStatus:00000000 RTC_GetFlagStatus
+    {standard input}:1072   .text.RTC_Time:00000000 $t
+    {standard input}:1077   .text.RTC_Time:00000000 RTC_Time
+    {standard input}:1265   .text.RTC_lleapyear:00000000 RTC_lleapyear
+    {standard input}:1254   .text.RTC_Time:0000011c $d
+    {standard input}:1260   .text.RTC_lleapyear:00000000 $t
+    {standard input}:1340   .text.RTC_lleapyear:00000060 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+XMC_RTC_Start
+XMC_RTC_Init
+XMC_RTC_EnableEvent
+XMC_RTC_SetTime
+XMC_RTC_SetTimeStdFormat
+XMC_RTC_GetTime
+XMC_RTC_GetTimeStdFormat
+XMC_RTC_SetAlarm
+XMC_RTC_SetAlarmStdFormat
+XMC_RTC_GetAlarm
+XMC_RTC_GetAlarmStdFormat
+XMC_RTC_GetEventStatus

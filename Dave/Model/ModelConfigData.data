@@ -75,12 +75,35 @@
   <nodes xsi:type="ApplicationModel:AppNode">
     <resource xsi:type="ResourceModel:App" href="APPS/CPU_CTRL_XMC4/v4_0_16/CPU_CTRL_XMC4_0.app#/"/>
   </nodes>
+  <nodes xsi:type="ApplicationModel:AppNode">
+    <resource xsi:type="ResourceModel:App" href="APPS/RTC/v4_1_14/RTC_0.app#/"/>
+  </nodes>
+  <nodes xsi:type="ApplicationModel:AppNode">
+    <resource xsi:type="ResourceModel:App" href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#/"/>
+  </nodes>
+  <nodes xsi:type="ApplicationModel:AppNode">
+    <resource xsi:type="ResourceModel:App" href="APPS/FATFS/v4_0_26/FATFS_0.app#/"/>
+  </nodes>
+  <nodes xsi:type="ApplicationModel:AppNode">
+    <resource xsi:type="ResourceModel:App" href="APPS/SYSTIMER/v4_1_16/SYSTIMER_0.app#/"/>
+  </nodes>
+  <nodes xsi:type="ApplicationModel:PeripheralNode">
+    <resource xsi:type="ResourceModel:Peripheral" href="HW_RESOURCES/sdmmc/sdmmc_0.dd#/"/>
+  </nodes>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.1" target="//@nodes.0"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.16" target="//@nodes.0"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.17" target="//@nodes.16"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.21" target="//@nodes.0"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.22" target="//@nodes.21"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.17" target="//@nodes.24"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.25" target="//@nodes.0"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.27" target="//@nodes.25"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.27" target="//@nodes.26"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.26" target="//@nodes.24"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.26" target="//@nodes.28"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.26" target="//@nodes.0"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.28" target="//@nodes.0"/>
+  <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.28" target="//@nodes.24"/>
   <hwConnections href="APPS/CLOCK_XMC4/v4_0_22/CLOCK_XMC4_0.app#//@connections.0"/>
   <hwConnections href="APPS/CLOCK_XMC4/v4_0_22/CLOCK_XMC4_0.app#//@connections.5"/>
   <hwConnections href="APPS/CLOCK_XMC4/v4_0_22/CLOCK_XMC4_0.app#//@connections.6"/>
@@ -190,4 +213,41 @@
   <hwConnections href="APPS/CPU_CTRL_XMC4/v4_0_16/CPU_CTRL_XMC4_0.app#//@connections.20"/>
   <hwConnections href="APPS/ADC_MEASUREMENT/v4_1_22/ADC_MEASUREMENT_0.app#//@connections.52"/>
   <hwConnections href="APPS/TIMER/v4_1_10/TIMER_0.app#//@connections.2"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.19"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.20"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.21"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.22"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.23"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.24"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.25"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.26"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.27"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.28"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.29"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.30"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.31"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.32"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.33"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.34"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.35"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.36"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.37"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.38"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.39"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.40"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.41"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.42"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.43"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.44"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.45"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.46"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.47"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.48"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.2"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.0"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.1"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.9"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.3"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.10"/>
+  <hwConnections href="APPS/SDMMC_BLOCK/v4_0_28/SDMMC_BLOCK_0.app#//@connections.8"/>
 </ApplicationModel:ApplicationData>

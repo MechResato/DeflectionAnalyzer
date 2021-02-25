@@ -1,0 +1,381 @@
+package Model.APPS.FATFS.v4_0_26;
+
+/*
+ Copyright (c) 2015-2019, Infineon Technologies AG
+ All rights reserved.
+											
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ following conditions are met:
+																			 
+ Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ disclaimer.
+  
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ disclaimer in the documentation and/or other materials provided with the distribution.
+  
+ Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ products derived from this software without specific prior written permission.
+																			 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+																			 
+ To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes with
+ Infineon Technologies AG: dave@infineon.com. */
+ 
+ /*************** Revision History **********************************************
+  Version       Date        Description
+ 
+   4.0.1       19-Jan-2016   Initial version for DAVE v4 <br>
+   4.0.5       08-Feb-2016   Integrated version with SDMMC_BLOCK APP <br>
+   4.0.8       04-Apr-2016   Productized version with SDMMC_BLOCK APP <br>
+   4.0.10      21-Apr-2016   License info updated in help documentation <br>
+   4.0.12      20-Jul-2016   Obtain SDMMC_BLOCK APP instance name for used card volumes <br>
+   4.0.14      30-Aug-2016   Minimum Dave version supported by the APP is 4.2.8.<br>
+   4.0.16      08-Jun-2017   Update to FatFS R0.13.<br>           
+   4.0.18      10-Nov-2017   Update to FatFS R0.13a.<br>           
+   4.0.20      20-Jul-2018   Update to FatFS R0.13b.<br>           
+   4.0.22      08-Oct-2018   Update to FatFS R0.13b_p3.<br>           
+   4.0.24      12-Nov-2018   Update to FatFS R0.13c.<br>
+                             Fixed compilation issues when C standard IO library stubs are enabled<br>
+   4.0.26      08-Jul-2019   Update to FatFS R0.13c_p4.<br>
+                             Update ffsystem.c to use FreeRTOS and CMSIS RTOS APIv2
+ *******************************************************************************/
+// Import statements
+import ifx.davex.app.manifest.*
+
+class  FATFS extends FATFS_GUI {
+
+	 /* Note  : Following APP properties are mandatory and important */
+	 
+	 /* Begin : APP property section */
+	
+	/**
+	 * APP version
+	 * Format: a string with three digit separated by a dot.
+	 */
+	def version            = '4.0.26'
+	
+	/**
+	 * APP categories declaration.
+	 * It is list of strings. Subcategories are separated by slash.
+	 * No limits on number of categories and subcategories depth.
+	 */
+	def categoriesDescription = ["General Purpose/File System"]
+
+	/**
+	 * Minimum DAVE version required for this APP.
+	 *
+	 * It is string with three digit separated by a dot.
+	 */
+	def minDaveVersion           = '4.2.8'
+	
+	/**
+	 * Keywords used by search feature in APPs selection view
+	 *
+	 * It is a list of string.
+	 */
+	def keywords      = ["File System",
+						 "FAT",
+						 "FATFS",
+						 "SDMMC",
+						 "Multimedia Card",
+						 "all"
+						]
+	
+	/**
+	 * softwareIDs is used to declare which devices are compatible with this APP.
+	 * It is a map with key a string containing a pattern that shall match the SW id of
+	 * the device and as value the minimal version of the APP.
+	 */
+	
+	/**
+	 * Any step of XMC4500F144 and XMC4400F144
+	 * Any step of XMC4400F100 and XMC4400F64
+	 * Any step, any variant and any packages of XMC1300
+	 */
+	def softwareIDs       = [
+		"XMC4.8.*.*.*":"1.0.0",
+		"XMC4.7.*.*.*":"1.0.0",
+		"XMC4.5.*.*.*":"1.0.0",
+		"XMC4.3.*.*.*":"1.0.0",
+		"XMC4.4.*.*.*":"1.0.0",
+		"XMC4.2.*.*.*":"1.0.0",
+		"XMC4.1.*.*.*":"1.0.0",
+		"XMC1.1.*.*.*":"1.0.0",
+		"XMC1.2.*.*.*":"1.0.0",
+		"XMC1.3.*.*.*":"1.0.0",
+		"XMC1.4.*.*.*":"1.0.0"]
+	
+	/**
+	 * Singleton property:
+	 * When it is true the APP can be instantiated only once.
+	 */
+	def singleton     = true
+
+
+	/**
+	 * initProvider property
+	 * It shall be true to add a call to <AppName>_Init()
+	 */
+	def initProvider  = true
+	
+	/**
+	 * Deprecated APP
+	 * Set it to true to indicate that the APP shall be not used for new projects.
+	 */
+	def deprecated    = false
+	
+	/**
+	 * Sharable property.
+	 * It shall be true to allows multiple APPs to require the same instance of this APP.
+	 */
+	def sharable      = true
+
+	/**
+	 *  APP function description.
+	 */
+	def description = "This APP provides the FAT file system implementation \nbased on FatFs library (www.elm-chan.org) \nwhich is a generic FAT file system module for small embedded systems."
+	
+	/* End   : APP property section */
+	
+	/* Begin : User APP property section */
+	MRequiredApp appres_rtos
+	MRequiredApp appres_rtc
+	MRequiredApp appres_sdmmc_sd0
+	MRequiredApp appres_sdmmc_sd1
+	MRequiredApp appres_sdmmc_sd2
+	
+	
+	/* End   : User APP property section */
+
+	/* APP Constructor */
+	public FATFS(DaveEnv daveEnv) {
+	
+	String family = daveEnv.project.selectedDevice.deviceId.family
+	String series = daveEnv.project.selectedDevice.deviceId.series
+	
+		
+		appres_rtc = MRequiredApp("RTC", "RTC", RSHARABLE,"4.0.2", MF({(gcheck_timestamp.value==true)},Boolean))
+		
+		gcombo_drv0.options = MF({
+								   List l = ['SDMMC(SD Mode)','SDMMC(SPI Mode)'];
+								   
+								   if((family+series == "XMC48") || (family+series == "XMC47") ||
+									  (family+series == "XMC45") || (family+series == "XMC43"))
+								   {
+									   if((gcombo_drv0.enabled == true) &&
+										 (((gcombo_drv1.value == "SDMMC(SD Mode)") && (gcombo_drv1.visible == true)) ||
+										  ((gcombo_drv2.value == "SDMMC(SD Mode)") && (gcombo_drv2.visible == true))))
+									   {
+										   l.clear()
+										   l.add('SDMMC(SPI Mode)')
+									   }
+									   else if(gcombo_drv0.enabled == true)
+									   {
+										   l.clear()
+										   l.add('SDMMC(SD Mode)')
+										   l.add('SDMMC(SPI Mode)')
+									   }
+								   }
+								   else
+								   {
+									   l.remove('SDMMC(SD Mode)')
+								   }
+								 return l; },List)
+								   
+				
+		glabel_drv1.visible = MF({(gcombo_volumes.value == "2")||(gcombo_volumes.value == "3")},Boolean)
+		gcombo_drv1.visible = MF({(gcombo_volumes.value == "2")||(gcombo_volumes.value == "3")},Boolean)
+		gcombo_drv1.enabled = MF({(gcombo_volumes.value == "2")||(gcombo_volumes.value == "3")},Boolean)
+		glabel_block1.visible = MF({(gcombo_volumes.value == "2")||(gcombo_volumes.value == "3")},Boolean)
+		
+		gcombo_drv1.options = MF({
+									List l =['SDMMC(SD Mode)','SDMMC(SPI Mode)'];
+									if((family+series == "XMC48") || (family+series == "XMC47") ||
+									   (family+series == "XMC45") || (family+series == "XMC43"))
+									{
+										if((gcombo_drv1.enabled == true) &&
+										   (((gcombo_drv0.value == "SDMMC(SD Mode)") && (gcombo_drv0.visible == true)) ||
+											((gcombo_drv2.value == "SDMMC(SD Mode)") && (gcombo_drv2.visible == true))))
+										{
+											l.clear()
+											l.add('SDMMC(SPI Mode)')
+										}
+										else if(gcombo_drv1.enabled == true)
+										{
+											l.clear()
+											l.add('SDMMC(SD Mode)')
+											l.add('SDMMC(SPI Mode)')
+										}
+									}
+									else
+									{
+											l.remove('SDMMC(SD Mode)')
+									}
+								   return l; },List)
+
+		glabel_drv2.visible = MF({(gcombo_volumes.value == "3")},Boolean)
+		gcombo_drv2.visible = MF({(gcombo_volumes.value == "3")},Boolean)
+		gcombo_drv2.enabled = MF({(gcombo_volumes.value == "3")},Boolean)
+		glabel_block2.visible = MF({(gcombo_volumes.value == "3")},Boolean)
+		
+		gcombo_drv2.options = MF({
+									List l =['SDMMC(SD Mode)','SDMMC(SPI Mode)'];
+									if((family+series == "XMC48") || (family+series == "XMC47") ||
+									   (family+series == "XMC45") || (family+series == "XMC43"))
+									{
+										if((gcombo_drv2.enabled == true) &&
+										   (((gcombo_drv0.value == "SDMMC(SD Mode)") && (gcombo_drv0.visible == true)) ||
+											((gcombo_drv1.value == "SDMMC(SD Mode)") && (gcombo_drv1.visible == true))))
+										{
+											l.clear()
+											l.add('SDMMC(SPI Mode)')
+										}
+										else if(gcombo_drv2.enabled == true)
+										{
+											l.clear()
+											l.add('SDMMC(SD Mode)')
+											l.add('SDMMC(SPI Mode)')
+										}
+									}
+									else
+									{
+											l.remove('SDMMC(SD Mode)')
+									}
+								   return l; },List)
+		Map mode_select = [
+							'SDMMC(SD Mode)'  : 'SD Mode',
+							'SDMMC(SPI Mode)' : 'SPI Mode'
+						  ]
+		
+		appres_sdmmc_sd0 = MRequiredApp("SDMMC_BLOCK", "SDMMC_BLOCK0",RNOTSHARABLE,"4.0.8")
+		appres_sdmmc_sd0.setVal(["gcombo_sd_mode", "value"], MF({mode_select[gcombo_drv0.value]}, String))
+		
+		appres_sdmmc_sd0.setVal(["gcheck_use_rtos", "value"],MF({gcheck_rtos.value},Boolean))
+		
+		appres_sdmmc_sd1 = MRequiredApp("SDMMC_BLOCK", "SDMMC_BLOCK1",RNOTSHARABLE,"4.0.8",
+										 MF({((gcombo_volumes.value.toInteger() > 1) &&
+											  (mode_select[gcombo_drv1.value]))},Boolean))
+		appres_sdmmc_sd1.setVal(["gcombo_sd_mode", "value"], MF({mode_select[gcombo_drv1.value]}, String))
+		appres_sdmmc_sd1.setVal(["gcheck_use_rtos", "value"],MF({gcheck_rtos.value},Boolean))
+		
+		appres_sdmmc_sd2 = MRequiredApp("SDMMC_BLOCK", "SDMMC_BLOCK2",RNOTSHARABLE,"4.0.8",
+										 MF({((gcombo_volumes.value.toInteger() > 2) &&
+											  (mode_select[gcombo_drv1.value]))},Boolean))
+		appres_sdmmc_sd2.setVal(["gcombo_sd_mode", "value"], MF({mode_select[gcombo_drv2.value]}, String))
+		appres_sdmmc_sd2.setVal(["gcheck_use_rtos", "value"],MF({gcheck_rtos.value},Boolean))
+
+		// -	Gcheck “Use Dynamic Time Stamp (RTC)”
+		// o	Will disable Gstrings “Day”, “Month”, “Year” of “Fixed Timestamp Configuration” if checked
+		ginteger_day.enabled = MF({(gcheck_timestamp.value == false)},Boolean)
+		ginteger_month.enabled = MF({(gcheck_timestamp.value == false)},Boolean)
+		ginteger_year.enabled = MF({(gcheck_timestamp.value == false)},Boolean)
+		
+		// -	GCheck “Enable Re-entrancy Feature”
+		// o	Disabled if Gcheck “Use RTOS” form Gtab “General Settings” Is not checked
+		gcheck_reentrancy.value = MF({(gcheck_rtos.value == true)},Boolean)
+		
+		// -	Gint “Timeout Configuration [ticks]”
+		// o	Only enabled if GCheck “Enable Re-entrancy Feature” is checked
+		ginteger_timeout.enabled = MF({(gcheck_rtos.value == true)},Boolean)
+		
+		/* compute the max value for the Day */
+		 ginteger_day.maxValue = MF({
+										if(ginteger_month.value == 2)
+										{
+											if(ginteger_year.value % 4 == 0)
+											{
+												29
+											}
+											else
+											{
+												28
+											}
+										}
+										else if((ginteger_month.value == 1) || (ginteger_month.value == 3) ||
+												(ginteger_month.value == 5) || (ginteger_month.value == 7) ||
+												(ginteger_month.value == 8) || (ginteger_month.value == 10)||
+												(ginteger_month.value == 12))
+										{
+												31
+										}
+										else
+										{
+												30
+										}
+									},Integer)
+		 /*
+		  -	GMessage
+		  o	Check if configuration is valid. By default not visible. On violation of any rule below it gets visible and isError property is true.
+			 In addition error messages are displayed explaining root cause of configuration failure.
+		  o	Rules:
+			 1.	“Enable Read-only mode” == true -> “File Sharing Configuration” ==  0
+			 2.	“Enable MKFS Function” == true -> “Enable Read-only Mode” == true
+			 3.	“Enable Multi-partition Feature” == true  -> “Enable MKFS Function” == true
+			 4.	“Enable Forward Function” == true -> “Enable Tiny Mode” == true
+		  */
+		 gmessage_error.visible =  MF({
+									  if(
+										 ((gcheck_readonly.value == true) && (ginteger_filesharing.value > 0))   ||
+										 ((gcheck_mkfs.value == true) && (gcheck_readonly.value == true))       ||
+										 ((gcheck_multipartition.value == true) && (gcheck_mkfs.value == false)) ||
+										 ((gcheck_forward.value == true) && (gcheck_tinymode.value == false))
+										)
+										{
+										 true
+									   }
+									   else
+									   {
+										 false
+									   }
+									  },Boolean)
+
+		 gmessage_error.text = MF({
+									  if((gcheck_readonly.value == true) && (ginteger_filesharing.value > 0))
+									   {
+									   "Enabling Read-only Mode requires File Sharing Configuration value to be set to 0"
+									  }
+									  else if((gcheck_mkfs.value == true) && (gcheck_readonly.value == true))
+									  {
+									   "Enabling MKFS Function requires Read-only Mode to be disabled"
+									  }
+									  else if((gcheck_multipartition.value == true) && (gcheck_mkfs.value == false))
+									  {
+										"Enabling Multi Partition Feature requires MKFS Function to be enabled"
+									  }
+									  else if((gcheck_forward.value == true) && (gcheck_tinymode.value == false))
+									  {
+										"Enabling Forward Function requires Tiny Mode to be enabled"
+									  }
+									  else
+									  {
+										  ""
+									  }
+								  },String)
+								  
+		glabel_block0.text=MF({appres_sdmmc_sd0.getInstanceLabel()},String) 
+		glabel_block1.text=MF({appres_sdmmc_sd1.getInstanceLabel()},String)
+		glabel_block2.text=MF({appres_sdmmc_sd2.getInstanceLabel()},String)								  
+	}
+	
+	// File Generation
+	def generateFiles(){
+		copy("ff_Src", "ff_Src")
+		copy("fatfs.c", "fatfs.c")
+		copy("fatfs.h", "fatfs.h")
+		copy("sltha.c", "sltha.c")
+		copy("sltha.h", "sltha.h")
+		generate("fatfs_confh.tmpl", "fatfs_conf.h")
+		generate("fatfs_confc.tmpl", "fatfs_conf.c")
+		generate("fatfs_externh.tmpl", "fatfs_extern.h")
+	}
+	
+	/**
+	 * Add main code here
+	 */
+}
