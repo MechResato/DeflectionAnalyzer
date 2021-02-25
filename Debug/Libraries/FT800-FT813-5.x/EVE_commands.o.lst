@@ -15424,1185 +15424,1369 @@
  11198 0052 90BD     	 pop {r4,r7,pc}
  11199              	 .cfi_endproc
  11200              	.LFE576:
- 11202              	 .section .text.EVE_cmd_toggle,"ax",%progbits
- 11203              	 .align 2
- 11204              	 .global EVE_cmd_toggle
- 11205              	 .thumb
- 11206              	 .thumb_func
- 11208              	EVE_cmd_toggle:
- 11209              	.LFB577:
+ 11202              	 .section .rodata
+ 11203 0132 0000     	 .align 2
+ 11204              	.LC8:
+ 11205 0134 252E316C 	 .ascii "%.1lf\000"
+ 11205      6600
+ 11206              	 .section .text.EVE_cmd_double_burst,"ax",%progbits
+ 11207              	 .align 2
+ 11208              	 .global EVE_cmd_double_burst
+ 11209              	 .thumb
+ 11210              	 .thumb_func
+ 11212              	EVE_cmd_double_burst:
+ 11213              	.LFB577:
 2960:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2961:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2962:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint16_t st
+2961:../Libraries/FT800-FT813-5.x/EVE_commands.c **** // custom functions by RS to print integers (signed!) to the screen - might be slow! -> if a better
+2962:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_double_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, double val)
 2963:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11210              	 .loc 5 2963 0
- 11211              	 .cfi_startproc
- 11212              	 
- 11213              	 
- 11214 0000 90B5     	 push {r4,r7,lr}
- 11215              	.LCFI692:
- 11216              	 .cfi_def_cfa_offset 12
- 11217              	 .cfi_offset 4,-12
- 11218              	 .cfi_offset 7,-8
- 11219              	 .cfi_offset 14,-4
- 11220 0002 83B0     	 sub sp,sp,#12
- 11221              	.LCFI693:
- 11222              	 .cfi_def_cfa_offset 24
- 11223 0004 00AF     	 add r7,sp,#0
- 11224              	.LCFI694:
- 11225              	 .cfi_def_cfa_register 7
- 11226 0006 0446     	 mov r4,r0
- 11227 0008 0846     	 mov r0,r1
- 11228 000a 1146     	 mov r1,r2
- 11229 000c 1A46     	 mov r2,r3
- 11230 000e 2346     	 mov r3,r4
- 11231 0010 FB80     	 strh r3,[r7,#6]
- 11232 0012 0346     	 mov r3,r0
- 11233 0014 BB80     	 strh r3,[r7,#4]
- 11234 0016 0B46     	 mov r3,r1
- 11235 0018 7B80     	 strh r3,[r7,#2]
- 11236 001a 1346     	 mov r3,r2
- 11237 001c 3B80     	 strh r3,[r7]
-2964:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	if(!cmd_burst)
- 11238              	 .loc 5 2964 0
- 11239 001e 2E4B     	 ldr r3,.L429
- 11240 0020 1B78     	 ldrb r3,[r3]
- 11241 0022 DBB2     	 uxtb r3,r3
- 11242 0024 002B     	 cmp r3,#0
- 11243 0026 54D1     	 bne .L427
-2965:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
-2966:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_start_command(CMD_TOGGLE);
- 11244              	 .loc 5 2966 0
- 11245 0028 6FF0ED00 	 mvn r0,#237
- 11246 002c FFF7FEFF 	 bl EVE_start_command
-2967:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2968:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(x0));
- 11247              	 .loc 5 2968 0
- 11248 0030 FB88     	 ldrh r3,[r7,#6]
- 11249 0032 DBB2     	 uxtb r3,r3
- 11250 0034 1846     	 mov r0,r3
- 11251 0036 FFF7FEFF 	 bl spi_transmit
-2969:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(x0 >> 8));
- 11252              	 .loc 5 2969 0
- 11253 003a B7F90630 	 ldrsh r3,[r7,#6]
- 11254 003e 1B12     	 asrs r3,r3,#8
- 11255 0040 9BB2     	 uxth r3,r3
- 11256 0042 DBB2     	 uxtb r3,r3
- 11257 0044 1846     	 mov r0,r3
- 11258 0046 FFF7FEFF 	 bl spi_transmit
-2970:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(y0));
- 11259              	 .loc 5 2970 0
- 11260 004a BB88     	 ldrh r3,[r7,#4]
- 11261 004c DBB2     	 uxtb r3,r3
- 11262 004e 1846     	 mov r0,r3
- 11263 0050 FFF7FEFF 	 bl spi_transmit
-2971:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(y0 >> 8));
- 11264              	 .loc 5 2971 0
- 11265 0054 B7F90430 	 ldrsh r3,[r7,#4]
- 11266 0058 1B12     	 asrs r3,r3,#8
- 11267 005a 9BB2     	 uxth r3,r3
- 11268 005c DBB2     	 uxtb r3,r3
- 11269 005e 1846     	 mov r0,r3
- 11270 0060 FFF7FEFF 	 bl spi_transmit
-2972:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2973:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(w0));
- 11271              	 .loc 5 2973 0
- 11272 0064 7B88     	 ldrh r3,[r7,#2]
- 11273 0066 DBB2     	 uxtb r3,r3
- 11274 0068 1846     	 mov r0,r3
- 11275 006a FFF7FEFF 	 bl spi_transmit
-2974:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(w0 >> 8));
- 11276              	 .loc 5 2974 0
- 11277 006e B7F90230 	 ldrsh r3,[r7,#2]
- 11278 0072 1B12     	 asrs r3,r3,#8
- 11279 0074 9BB2     	 uxth r3,r3
- 11280 0076 DBB2     	 uxtb r3,r3
- 11281 0078 1846     	 mov r0,r3
- 11282 007a FFF7FEFF 	 bl spi_transmit
-2975:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(font));
- 11283              	 .loc 5 2975 0
- 11284 007e 3B88     	 ldrh r3,[r7]
- 11285 0080 DBB2     	 uxtb r3,r3
- 11286 0082 1846     	 mov r0,r3
- 11287 0084 FFF7FEFF 	 bl spi_transmit
-2976:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(font >> 8));
- 11288              	 .loc 5 2976 0
- 11289 0088 B7F90030 	 ldrsh r3,[r7]
- 11290 008c 1B12     	 asrs r3,r3,#8
- 11291 008e 9BB2     	 uxth r3,r3
- 11292 0090 DBB2     	 uxtb r3,r3
- 11293 0092 1846     	 mov r0,r3
- 11294 0094 FFF7FEFF 	 bl spi_transmit
-2977:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2978:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(options));
- 11295              	 .loc 5 2978 0
- 11296 0098 3B8B     	 ldrh r3,[r7,#24]
- 11297 009a DBB2     	 uxtb r3,r3
- 11298 009c 1846     	 mov r0,r3
- 11299 009e FFF7FEFF 	 bl spi_transmit
-2979:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(options >> 8));
- 11300              	 .loc 5 2979 0
- 11301 00a2 3B8B     	 ldrh r3,[r7,#24]
- 11302 00a4 1B0A     	 lsrs r3,r3,#8
- 11303 00a6 9BB2     	 uxth r3,r3
- 11304 00a8 DBB2     	 uxtb r3,r3
- 11305 00aa 1846     	 mov r0,r3
- 11306 00ac FFF7FEFF 	 bl spi_transmit
-2980:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(state));
- 11307              	 .loc 5 2980 0
- 11308 00b0 BB8B     	 ldrh r3,[r7,#28]
- 11309 00b2 DBB2     	 uxtb r3,r3
- 11310 00b4 1846     	 mov r0,r3
- 11311 00b6 FFF7FEFF 	 bl spi_transmit
-2981:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(state >> 8));
- 11312              	 .loc 5 2981 0
- 11313 00ba BB8B     	 ldrh r3,[r7,#28]
- 11314 00bc 1B0A     	 lsrs r3,r3,#8
- 11315 00be 9BB2     	 uxth r3,r3
- 11316 00c0 DBB2     	 uxtb r3,r3
- 11317 00c2 1846     	 mov r0,r3
- 11318 00c4 FFF7FEFF 	 bl spi_transmit
-2982:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2983:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_write_string(text);
- 11319              	 .loc 5 2983 0
- 11320 00c8 386A     	 ldr r0,[r7,#32]
- 11321 00ca FFF7FEFF 	 bl EVE_write_string
-2984:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cs_clear();
- 11322              	 .loc 5 2984 0
- 11323 00ce FFF7FEFF 	 bl EVE_cs_clear
- 11324              	.L427:
-2985:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
-2986:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 11325              	 .loc 5 2986 0
- 11326 00d2 0C37     	 adds r7,r7,#12
- 11327              	.LCFI695:
- 11328              	 .cfi_def_cfa_offset 12
- 11329 00d4 BD46     	 mov sp,r7
- 11330              	.LCFI696:
- 11331              	 .cfi_def_cfa_register 13
- 11332              	 
- 11333 00d6 90BD     	 pop {r4,r7,pc}
- 11334              	.L430:
- 11335              	 .align 2
- 11336              	.L429:
- 11337 00d8 00000000 	 .word cmd_burst
- 11338              	 .cfi_endproc
- 11339              	.LFE577:
- 11341              	 .section .text.EVE_cmd_toggle_burst,"ax",%progbits
- 11342              	 .align 2
- 11343              	 .global EVE_cmd_toggle_burst
- 11344              	 .thumb
- 11345              	 .thumb_func
- 11347              	EVE_cmd_toggle_burst:
- 11348              	.LFB578:
-2987:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2988:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2989:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle_burst(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint1
-2990:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11349              	 .loc 5 2990 0
- 11350              	 .cfi_startproc
- 11351              	 
- 11352              	 
- 11353 0000 90B5     	 push {r4,r7,lr}
- 11354              	.LCFI697:
+ 11214              	 .loc 5 2963 0
+ 11215              	 .cfi_startproc
+ 11216              	 
+ 11217              	 
+ 11218 0000 90B5     	 push {r4,r7,lr}
+ 11219              	.LCFI692:
+ 11220              	 .cfi_def_cfa_offset 12
+ 11221              	 .cfi_offset 4,-12
+ 11222              	 .cfi_offset 7,-8
+ 11223              	 .cfi_offset 14,-4
+ 11224 0002 8BB0     	 sub sp,sp,#44
+ 11225              	.LCFI693:
+ 11226              	 .cfi_def_cfa_offset 56
+ 11227 0004 00AF     	 add r7,sp,#0
+ 11228              	.LCFI694:
+ 11229              	 .cfi_def_cfa_register 7
+ 11230 0006 0446     	 mov r4,r0
+ 11231 0008 0846     	 mov r0,r1
+ 11232 000a 1146     	 mov r1,r2
+ 11233 000c 1A46     	 mov r2,r3
+ 11234 000e 2346     	 mov r3,r4
+ 11235 0010 FB80     	 strh r3,[r7,#6]
+ 11236 0012 0346     	 mov r3,r0
+ 11237 0014 BB80     	 strh r3,[r7,#4]
+ 11238 0016 0B46     	 mov r3,r1
+ 11239 0018 7B80     	 strh r3,[r7,#2]
+ 11240 001a 1346     	 mov r3,r2
+ 11241 001c 3B80     	 strh r3,[r7]
+2964:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	char buffer[32]; // buffer for double to string conversion
+2965:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	sprintf(buffer, "%.1lf", val); // double to string conversion
+ 11242              	 .loc 5 2965 0
+ 11243 001e 07F10803 	 add r3,r7,#8
+ 11244 0022 1846     	 mov r0,r3
+ 11245 0024 1049     	 ldr r1,.L428
+ 11246 0026 D7E90E23 	 ldrd r2,[r7,#56]
+ 11247 002a FFF7FEFF 	 bl sprintf
+2966:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+2967:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(CMD_TEXT);
+ 11248              	 .loc 5 2967 0
+ 11249 002e 6FF0F300 	 mvn r0,#243
+ 11250 0032 FFF7FEFF 	 bl spi_transmit_burst
+2968:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
+ 11251              	 .loc 5 2968 0
+ 11252 0036 B7F90620 	 ldrsh r2,[r7,#6]
+ 11253 003a B7F90430 	 ldrsh r3,[r7,#4]
+ 11254 003e 1B04     	 lsls r3,r3,#16
+ 11255 0040 1344     	 add r3,r3,r2
+ 11256 0042 1846     	 mov r0,r3
+ 11257 0044 FFF7FEFF 	 bl spi_transmit_burst
+2969:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) font + ((uint32_t) options << 16));
+ 11258              	 .loc 5 2969 0
+ 11259 0048 B7F90220 	 ldrsh r2,[r7,#2]
+ 11260 004c 3B88     	 ldrh r3,[r7]
+ 11261 004e 1B04     	 lsls r3,r3,#16
+ 11262 0050 1344     	 add r3,r3,r2
+ 11263 0052 1846     	 mov r0,r3
+ 11264 0054 FFF7FEFF 	 bl spi_transmit_burst
+2970:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_write_string(buffer);
+ 11265              	 .loc 5 2970 0
+ 11266 0058 07F10803 	 add r3,r7,#8
+ 11267 005c 1846     	 mov r0,r3
+ 11268 005e FFF7FEFF 	 bl EVE_write_string
+2971:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11269              	 .loc 5 2971 0
+ 11270 0062 2C37     	 adds r7,r7,#44
+ 11271              	.LCFI695:
+ 11272              	 .cfi_def_cfa_offset 12
+ 11273 0064 BD46     	 mov sp,r7
+ 11274              	.LCFI696:
+ 11275              	 .cfi_def_cfa_register 13
+ 11276              	 
+ 11277 0066 90BD     	 pop {r4,r7,pc}
+ 11278              	.L429:
+ 11279              	 .align 2
+ 11280              	.L428:
+ 11281 0068 34010000 	 .word .LC8
+ 11282              	 .cfi_endproc
+ 11283              	.LFE577:
+ 11285              	 .section .rodata
+ 11286 013a 0000     	 .align 2
+ 11287              	.LC9:
+ 11288 013c 256C6400 	 .ascii "%ld\000"
+ 11289              	 .section .text.EVE_cmd_int_burst,"ax",%progbits
+ 11290              	 .align 2
+ 11291              	 .global EVE_cmd_int_burst
+ 11292              	 .thumb
+ 11293              	 .thumb_func
+ 11295              	EVE_cmd_int_burst:
+ 11296              	.LFB578:
+2972:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_int_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, int32_t val)
+2973:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11297              	 .loc 5 2973 0
+ 11298              	 .cfi_startproc
+ 11299              	 
+ 11300              	 
+ 11301 0000 90B5     	 push {r4,r7,lr}
+ 11302              	.LCFI697:
+ 11303              	 .cfi_def_cfa_offset 12
+ 11304              	 .cfi_offset 4,-12
+ 11305              	 .cfi_offset 7,-8
+ 11306              	 .cfi_offset 14,-4
+ 11307 0002 8BB0     	 sub sp,sp,#44
+ 11308              	.LCFI698:
+ 11309              	 .cfi_def_cfa_offset 56
+ 11310 0004 00AF     	 add r7,sp,#0
+ 11311              	.LCFI699:
+ 11312              	 .cfi_def_cfa_register 7
+ 11313 0006 0446     	 mov r4,r0
+ 11314 0008 0846     	 mov r0,r1
+ 11315 000a 1146     	 mov r1,r2
+ 11316 000c 1A46     	 mov r2,r3
+ 11317 000e 2346     	 mov r3,r4
+ 11318 0010 FB80     	 strh r3,[r7,#6]
+ 11319 0012 0346     	 mov r3,r0
+ 11320 0014 BB80     	 strh r3,[r7,#4]
+ 11321 0016 0B46     	 mov r3,r1
+ 11322 0018 7B80     	 strh r3,[r7,#2]
+ 11323 001a 1346     	 mov r3,r2
+ 11324 001c 3B80     	 strh r3,[r7]
+2974:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	char buffer[32]; // buffer for integer to string conversion
+2975:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	sprintf(buffer, "%ld", val); // integer to string conversion
+ 11325              	 .loc 5 2975 0
+ 11326 001e 07F10803 	 add r3,r7,#8
+ 11327 0022 1846     	 mov r0,r3
+ 11328 0024 1049     	 ldr r1,.L431
+ 11329 0026 BA6B     	 ldr r2,[r7,#56]
+ 11330 0028 FFF7FEFF 	 bl sprintf
+2976:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+2977:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(CMD_TEXT);
+ 11331              	 .loc 5 2977 0
+ 11332 002c 6FF0F300 	 mvn r0,#243
+ 11333 0030 FFF7FEFF 	 bl spi_transmit_burst
+2978:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
+ 11334              	 .loc 5 2978 0
+ 11335 0034 B7F90620 	 ldrsh r2,[r7,#6]
+ 11336 0038 B7F90430 	 ldrsh r3,[r7,#4]
+ 11337 003c 1B04     	 lsls r3,r3,#16
+ 11338 003e 1344     	 add r3,r3,r2
+ 11339 0040 1846     	 mov r0,r3
+ 11340 0042 FFF7FEFF 	 bl spi_transmit_burst
+2979:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) font + ((uint32_t) options << 16));
+ 11341              	 .loc 5 2979 0
+ 11342 0046 B7F90220 	 ldrsh r2,[r7,#2]
+ 11343 004a 3B88     	 ldrh r3,[r7]
+ 11344 004c 1B04     	 lsls r3,r3,#16
+ 11345 004e 1344     	 add r3,r3,r2
+ 11346 0050 1846     	 mov r0,r3
+ 11347 0052 FFF7FEFF 	 bl spi_transmit_burst
+2980:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_write_string(buffer);
+ 11348              	 .loc 5 2980 0
+ 11349 0056 07F10803 	 add r3,r7,#8
+ 11350 005a 1846     	 mov r0,r3
+ 11351 005c FFF7FEFF 	 bl EVE_write_string
+2981:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11352              	 .loc 5 2981 0
+ 11353 0060 2C37     	 adds r7,r7,#44
+ 11354              	.LCFI700:
  11355              	 .cfi_def_cfa_offset 12
- 11356              	 .cfi_offset 4,-12
- 11357              	 .cfi_offset 7,-8
- 11358              	 .cfi_offset 14,-4
- 11359 0002 83B0     	 sub sp,sp,#12
- 11360              	.LCFI698:
- 11361              	 .cfi_def_cfa_offset 24
- 11362 0004 00AF     	 add r7,sp,#0
- 11363              	.LCFI699:
- 11364              	 .cfi_def_cfa_register 7
- 11365 0006 0446     	 mov r4,r0
- 11366 0008 0846     	 mov r0,r1
- 11367 000a 1146     	 mov r1,r2
- 11368 000c 1A46     	 mov r2,r3
- 11369 000e 2346     	 mov r3,r4
- 11370 0010 FB80     	 strh r3,[r7,#6]
- 11371 0012 0346     	 mov r3,r0
- 11372 0014 BB80     	 strh r3,[r7,#4]
- 11373 0016 0B46     	 mov r3,r1
- 11374 0018 7B80     	 strh r3,[r7,#2]
- 11375 001a 1346     	 mov r3,r2
- 11376 001c 3B80     	 strh r3,[r7]
-2991:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(CMD_TOGGLE);
- 11377              	 .loc 5 2991 0
- 11378 001e 6FF0ED00 	 mvn r0,#237
- 11379 0022 FFF7FEFF 	 bl spi_transmit_burst
-2992:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
- 11380              	 .loc 5 2992 0
- 11381 0026 B7F90620 	 ldrsh r2,[r7,#6]
- 11382 002a B7F90430 	 ldrsh r3,[r7,#4]
- 11383 002e 1B04     	 lsls r3,r3,#16
- 11384 0030 1344     	 add r3,r3,r2
- 11385 0032 1846     	 mov r0,r3
- 11386 0034 FFF7FEFF 	 bl spi_transmit_burst
-2993:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) w0 + ((uint32_t) font << 16));
- 11387              	 .loc 5 2993 0
- 11388 0038 B7F90220 	 ldrsh r2,[r7,#2]
- 11389 003c B7F90030 	 ldrsh r3,[r7]
- 11390 0040 1B04     	 lsls r3,r3,#16
- 11391 0042 1344     	 add r3,r3,r2
- 11392 0044 1846     	 mov r0,r3
- 11393 0046 FFF7FEFF 	 bl spi_transmit_burst
-2994:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) options + ((uint32_t) state << 16));
- 11394              	 .loc 5 2994 0
- 11395 004a 3A8B     	 ldrh r2,[r7,#24]
- 11396 004c BB8B     	 ldrh r3,[r7,#28]
- 11397 004e 1B04     	 lsls r3,r3,#16
- 11398 0050 1344     	 add r3,r3,r2
- 11399 0052 1846     	 mov r0,r3
- 11400 0054 FFF7FEFF 	 bl spi_transmit_burst
-2995:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_write_string(text);
- 11401              	 .loc 5 2995 0
- 11402 0058 386A     	 ldr r0,[r7,#32]
- 11403 005a FFF7FEFF 	 bl EVE_write_string
-2996:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 11404              	 .loc 5 2996 0
- 11405 005e 0C37     	 adds r7,r7,#12
- 11406              	.LCFI700:
- 11407              	 .cfi_def_cfa_offset 12
- 11408 0060 BD46     	 mov sp,r7
- 11409              	.LCFI701:
- 11410              	 .cfi_def_cfa_register 13
- 11411              	 
- 11412 0062 90BD     	 pop {r4,r7,pc}
- 11413              	 .cfi_endproc
- 11414              	.LFE578:
- 11416              	 .section .text.EVE_cmd_translate,"ax",%progbits
- 11417              	 .align 2
- 11418              	 .global EVE_cmd_translate
- 11419              	 .thumb
- 11420              	 .thumb_func
- 11422              	EVE_cmd_translate:
- 11423              	.LFB579:
-2997:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+ 11356 0062 BD46     	 mov sp,r7
+ 11357              	.LCFI701:
+ 11358              	 .cfi_def_cfa_register 13
+ 11359              	 
+ 11360 0064 90BD     	 pop {r4,r7,pc}
+ 11361              	.L432:
+ 11362 0066 00BF     	 .align 2
+ 11363              	.L431:
+ 11364 0068 3C010000 	 .word .LC9
+ 11365              	 .cfi_endproc
+ 11366              	.LFE578:
+ 11368              	 .section .text.EVE_cmd_toggle,"ax",%progbits
+ 11369              	 .align 2
+ 11370              	 .global EVE_cmd_toggle
+ 11371              	 .thumb
+ 11372              	 .thumb_func
+ 11374              	EVE_cmd_toggle:
+ 11375              	.LFB579:
+2982:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+2983:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint16_t st
+2984:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11376              	 .loc 5 2984 0
+ 11377              	 .cfi_startproc
+ 11378              	 
+ 11379              	 
+ 11380 0000 90B5     	 push {r4,r7,lr}
+ 11381              	.LCFI702:
+ 11382              	 .cfi_def_cfa_offset 12
+ 11383              	 .cfi_offset 4,-12
+ 11384              	 .cfi_offset 7,-8
+ 11385              	 .cfi_offset 14,-4
+ 11386 0002 83B0     	 sub sp,sp,#12
+ 11387              	.LCFI703:
+ 11388              	 .cfi_def_cfa_offset 24
+ 11389 0004 00AF     	 add r7,sp,#0
+ 11390              	.LCFI704:
+ 11391              	 .cfi_def_cfa_register 7
+ 11392 0006 0446     	 mov r4,r0
+ 11393 0008 0846     	 mov r0,r1
+ 11394 000a 1146     	 mov r1,r2
+ 11395 000c 1A46     	 mov r2,r3
+ 11396 000e 2346     	 mov r3,r4
+ 11397 0010 FB80     	 strh r3,[r7,#6]
+ 11398 0012 0346     	 mov r3,r0
+ 11399 0014 BB80     	 strh r3,[r7,#4]
+ 11400 0016 0B46     	 mov r3,r1
+ 11401 0018 7B80     	 strh r3,[r7,#2]
+ 11402 001a 1346     	 mov r3,r2
+ 11403 001c 3B80     	 strh r3,[r7]
+2985:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	if(!cmd_burst)
+ 11404              	 .loc 5 2985 0
+ 11405 001e 2E4B     	 ldr r3,.L435
+ 11406 0020 1B78     	 ldrb r3,[r3]
+ 11407 0022 DBB2     	 uxtb r3,r3
+ 11408 0024 002B     	 cmp r3,#0
+ 11409 0026 54D1     	 bne .L433
+2986:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
+2987:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_start_command(CMD_TOGGLE);
+ 11410              	 .loc 5 2987 0
+ 11411 0028 6FF0ED00 	 mvn r0,#237
+ 11412 002c FFF7FEFF 	 bl EVE_start_command
+2988:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+2989:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(x0));
+ 11413              	 .loc 5 2989 0
+ 11414 0030 FB88     	 ldrh r3,[r7,#6]
+ 11415 0032 DBB2     	 uxtb r3,r3
+ 11416 0034 1846     	 mov r0,r3
+ 11417 0036 FFF7FEFF 	 bl spi_transmit
+2990:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(x0 >> 8));
+ 11418              	 .loc 5 2990 0
+ 11419 003a B7F90630 	 ldrsh r3,[r7,#6]
+ 11420 003e 1B12     	 asrs r3,r3,#8
+ 11421 0040 9BB2     	 uxth r3,r3
+ 11422 0042 DBB2     	 uxtb r3,r3
+ 11423 0044 1846     	 mov r0,r3
+ 11424 0046 FFF7FEFF 	 bl spi_transmit
+2991:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(y0));
+ 11425              	 .loc 5 2991 0
+ 11426 004a BB88     	 ldrh r3,[r7,#4]
+ 11427 004c DBB2     	 uxtb r3,r3
+ 11428 004e 1846     	 mov r0,r3
+ 11429 0050 FFF7FEFF 	 bl spi_transmit
+2992:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(y0 >> 8));
+ 11430              	 .loc 5 2992 0
+ 11431 0054 B7F90430 	 ldrsh r3,[r7,#4]
+ 11432 0058 1B12     	 asrs r3,r3,#8
+ 11433 005a 9BB2     	 uxth r3,r3
+ 11434 005c DBB2     	 uxtb r3,r3
+ 11435 005e 1846     	 mov r0,r3
+ 11436 0060 FFF7FEFF 	 bl spi_transmit
+2993:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+2994:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(w0));
+ 11437              	 .loc 5 2994 0
+ 11438 0064 7B88     	 ldrh r3,[r7,#2]
+ 11439 0066 DBB2     	 uxtb r3,r3
+ 11440 0068 1846     	 mov r0,r3
+ 11441 006a FFF7FEFF 	 bl spi_transmit
+2995:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(w0 >> 8));
+ 11442              	 .loc 5 2995 0
+ 11443 006e B7F90230 	 ldrsh r3,[r7,#2]
+ 11444 0072 1B12     	 asrs r3,r3,#8
+ 11445 0074 9BB2     	 uxth r3,r3
+ 11446 0076 DBB2     	 uxtb r3,r3
+ 11447 0078 1846     	 mov r0,r3
+ 11448 007a FFF7FEFF 	 bl spi_transmit
+2996:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(font));
+ 11449              	 .loc 5 2996 0
+ 11450 007e 3B88     	 ldrh r3,[r7]
+ 11451 0080 DBB2     	 uxtb r3,r3
+ 11452 0082 1846     	 mov r0,r3
+ 11453 0084 FFF7FEFF 	 bl spi_transmit
+2997:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(font >> 8));
+ 11454              	 .loc 5 2997 0
+ 11455 0088 B7F90030 	 ldrsh r3,[r7]
+ 11456 008c 1B12     	 asrs r3,r3,#8
+ 11457 008e 9BB2     	 uxth r3,r3
+ 11458 0090 DBB2     	 uxtb r3,r3
+ 11459 0092 1846     	 mov r0,r3
+ 11460 0094 FFF7FEFF 	 bl spi_transmit
 2998:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-2999:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_translate(int32_t tx, int32_t ty)
-3000:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11424              	 .loc 5 3000 0
- 11425              	 .cfi_startproc
- 11426              	 
- 11427              	 
- 11428 0000 80B5     	 push {r7,lr}
- 11429              	.LCFI702:
- 11430              	 .cfi_def_cfa_offset 8
- 11431              	 .cfi_offset 7,-8
- 11432              	 .cfi_offset 14,-4
- 11433 0002 82B0     	 sub sp,sp,#8
- 11434              	.LCFI703:
- 11435              	 .cfi_def_cfa_offset 16
- 11436 0004 00AF     	 add r7,sp,#0
- 11437              	.LCFI704:
- 11438              	 .cfi_def_cfa_register 7
- 11439 0006 7860     	 str r0,[r7,#4]
- 11440 0008 3960     	 str r1,[r7]
-3001:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	if(!cmd_burst)
- 11441              	 .loc 5 3001 0
- 11442 000a 0B4B     	 ldr r3,.L434
- 11443 000c 1B78     	 ldrb r3,[r3]
- 11444 000e DBB2     	 uxtb r3,r3
- 11445 0010 002B     	 cmp r3,#0
- 11446 0012 0DD1     	 bne .L432
-3002:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
-3003:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_start_command(CMD_TRANSLATE);
- 11447              	 .loc 5 3003 0
- 11448 0014 6FF0D800 	 mvn r0,#216
- 11449 0018 FFF7FEFF 	 bl EVE_start_command
-3004:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit_32(tx);
- 11450              	 .loc 5 3004 0
- 11451 001c 7B68     	 ldr r3,[r7,#4]
- 11452 001e 1846     	 mov r0,r3
- 11453 0020 FFF7FEFF 	 bl spi_transmit_32
-3005:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit_32(ty);
- 11454              	 .loc 5 3005 0
- 11455 0024 3B68     	 ldr r3,[r7]
- 11456 0026 1846     	 mov r0,r3
- 11457 0028 FFF7FEFF 	 bl spi_transmit_32
-3006:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cs_clear();
- 11458              	 .loc 5 3006 0
- 11459 002c FFF7FEFF 	 bl EVE_cs_clear
- 11460              	.L432:
-3007:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
-3008:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 11461              	 .loc 5 3008 0
- 11462 0030 0837     	 adds r7,r7,#8
- 11463              	.LCFI705:
- 11464              	 .cfi_def_cfa_offset 8
- 11465 0032 BD46     	 mov sp,r7
- 11466              	.LCFI706:
- 11467              	 .cfi_def_cfa_register 13
- 11468              	 
- 11469 0034 80BD     	 pop {r7,pc}
- 11470              	.L435:
- 11471 0036 00BF     	 .align 2
- 11472              	.L434:
- 11473 0038 00000000 	 .word cmd_burst
- 11474              	 .cfi_endproc
- 11475              	.LFE579:
- 11477              	 .section .text.EVE_cmd_translate_burst,"ax",%progbits
- 11478              	 .align 2
- 11479              	 .global EVE_cmd_translate_burst
- 11480              	 .thumb
- 11481              	 .thumb_func
- 11483              	EVE_cmd_translate_burst:
- 11484              	.LFB580:
+2999:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(options));
+ 11461              	 .loc 5 2999 0
+ 11462 0098 3B8B     	 ldrh r3,[r7,#24]
+ 11463 009a DBB2     	 uxtb r3,r3
+ 11464 009c 1846     	 mov r0,r3
+ 11465 009e FFF7FEFF 	 bl spi_transmit
+3000:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(options >> 8));
+ 11466              	 .loc 5 3000 0
+ 11467 00a2 3B8B     	 ldrh r3,[r7,#24]
+ 11468 00a4 1B0A     	 lsrs r3,r3,#8
+ 11469 00a6 9BB2     	 uxth r3,r3
+ 11470 00a8 DBB2     	 uxtb r3,r3
+ 11471 00aa 1846     	 mov r0,r3
+ 11472 00ac FFF7FEFF 	 bl spi_transmit
+3001:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(state));
+ 11473              	 .loc 5 3001 0
+ 11474 00b0 BB8B     	 ldrh r3,[r7,#28]
+ 11475 00b2 DBB2     	 uxtb r3,r3
+ 11476 00b4 1846     	 mov r0,r3
+ 11477 00b6 FFF7FEFF 	 bl spi_transmit
+3002:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit((uint8_t)(state >> 8));
+ 11478              	 .loc 5 3002 0
+ 11479 00ba BB8B     	 ldrh r3,[r7,#28]
+ 11480 00bc 1B0A     	 lsrs r3,r3,#8
+ 11481 00be 9BB2     	 uxth r3,r3
+ 11482 00c0 DBB2     	 uxtb r3,r3
+ 11483 00c2 1846     	 mov r0,r3
+ 11484 00c4 FFF7FEFF 	 bl spi_transmit
+3003:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3004:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_write_string(text);
+ 11485              	 .loc 5 3004 0
+ 11486 00c8 386A     	 ldr r0,[r7,#32]
+ 11487 00ca FFF7FEFF 	 bl EVE_write_string
+3005:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cs_clear();
+ 11488              	 .loc 5 3005 0
+ 11489 00ce FFF7FEFF 	 bl EVE_cs_clear
+ 11490              	.L433:
+3006:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
+3007:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11491              	 .loc 5 3007 0
+ 11492 00d2 0C37     	 adds r7,r7,#12
+ 11493              	.LCFI705:
+ 11494              	 .cfi_def_cfa_offset 12
+ 11495 00d4 BD46     	 mov sp,r7
+ 11496              	.LCFI706:
+ 11497              	 .cfi_def_cfa_register 13
+ 11498              	 
+ 11499 00d6 90BD     	 pop {r4,r7,pc}
+ 11500              	.L436:
+ 11501              	 .align 2
+ 11502              	.L435:
+ 11503 00d8 00000000 	 .word cmd_burst
+ 11504              	 .cfi_endproc
+ 11505              	.LFE579:
+ 11507              	 .section .text.EVE_cmd_toggle_burst,"ax",%progbits
+ 11508              	 .align 2
+ 11509              	 .global EVE_cmd_toggle_burst
+ 11510              	 .thumb
+ 11511              	 .thumb_func
+ 11513              	EVE_cmd_toggle_burst:
+ 11514              	.LFB580:
+3008:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3009:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3010:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3011:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_translate_burst(int32_t tx, int32_t ty)
-3012:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11485              	 .loc 5 3012 0
- 11486              	 .cfi_startproc
- 11487              	 
- 11488              	 
- 11489 0000 80B5     	 push {r7,lr}
- 11490              	.LCFI707:
- 11491              	 .cfi_def_cfa_offset 8
- 11492              	 .cfi_offset 7,-8
- 11493              	 .cfi_offset 14,-4
- 11494 0002 82B0     	 sub sp,sp,#8
- 11495              	.LCFI708:
- 11496              	 .cfi_def_cfa_offset 16
- 11497 0004 00AF     	 add r7,sp,#0
- 11498              	.LCFI709:
- 11499              	 .cfi_def_cfa_register 7
- 11500 0006 7860     	 str r0,[r7,#4]
- 11501 0008 3960     	 str r1,[r7]
-3013:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(CMD_TRANSLATE);
- 11502              	 .loc 5 3013 0
- 11503 000a 6FF0D800 	 mvn r0,#216
- 11504 000e FFF7FEFF 	 bl spi_transmit_burst
-3014:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(tx);
- 11505              	 .loc 5 3014 0
- 11506 0012 7B68     	 ldr r3,[r7,#4]
- 11507 0014 1846     	 mov r0,r3
- 11508 0016 FFF7FEFF 	 bl spi_transmit_burst
-3015:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(ty);
- 11509              	 .loc 5 3015 0
- 11510 001a 3B68     	 ldr r3,[r7]
- 11511 001c 1846     	 mov r0,r3
- 11512 001e FFF7FEFF 	 bl spi_transmit_burst
-3016:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 11513              	 .loc 5 3016 0
- 11514 0022 0837     	 adds r7,r7,#8
- 11515              	.LCFI710:
- 11516              	 .cfi_def_cfa_offset 8
- 11517 0024 BD46     	 mov sp,r7
- 11518              	.LCFI711:
- 11519              	 .cfi_def_cfa_register 13
- 11520              	 
- 11521 0026 80BD     	 pop {r7,pc}
- 11522              	 .cfi_endproc
- 11523              	.LFE580:
- 11525              	 .section .text.EVE_color_rgb,"ax",%progbits
- 11526              	 .align 2
- 11527              	 .global EVE_color_rgb
- 11528              	 .thumb
- 11529              	 .thumb_func
- 11531              	EVE_color_rgb:
- 11532              	.LFB581:
-3017:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3010:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_toggle_burst(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint1
+3011:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11515              	 .loc 5 3011 0
+ 11516              	 .cfi_startproc
+ 11517              	 
+ 11518              	 
+ 11519 0000 90B5     	 push {r4,r7,lr}
+ 11520              	.LCFI707:
+ 11521              	 .cfi_def_cfa_offset 12
+ 11522              	 .cfi_offset 4,-12
+ 11523              	 .cfi_offset 7,-8
+ 11524              	 .cfi_offset 14,-4
+ 11525 0002 83B0     	 sub sp,sp,#12
+ 11526              	.LCFI708:
+ 11527              	 .cfi_def_cfa_offset 24
+ 11528 0004 00AF     	 add r7,sp,#0
+ 11529              	.LCFI709:
+ 11530              	 .cfi_def_cfa_register 7
+ 11531 0006 0446     	 mov r4,r0
+ 11532 0008 0846     	 mov r0,r1
+ 11533 000a 1146     	 mov r1,r2
+ 11534 000c 1A46     	 mov r2,r3
+ 11535 000e 2346     	 mov r3,r4
+ 11536 0010 FB80     	 strh r3,[r7,#6]
+ 11537 0012 0346     	 mov r3,r0
+ 11538 0014 BB80     	 strh r3,[r7,#4]
+ 11539 0016 0B46     	 mov r3,r1
+ 11540 0018 7B80     	 strh r3,[r7,#2]
+ 11541 001a 1346     	 mov r3,r2
+ 11542 001c 3B80     	 strh r3,[r7]
+3012:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(CMD_TOGGLE);
+ 11543              	 .loc 5 3012 0
+ 11544 001e 6FF0ED00 	 mvn r0,#237
+ 11545 0022 FFF7FEFF 	 bl spi_transmit_burst
+3013:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
+ 11546              	 .loc 5 3013 0
+ 11547 0026 B7F90620 	 ldrsh r2,[r7,#6]
+ 11548 002a B7F90430 	 ldrsh r3,[r7,#4]
+ 11549 002e 1B04     	 lsls r3,r3,#16
+ 11550 0030 1344     	 add r3,r3,r2
+ 11551 0032 1846     	 mov r0,r3
+ 11552 0034 FFF7FEFF 	 bl spi_transmit_burst
+3014:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) w0 + ((uint32_t) font << 16));
+ 11553              	 .loc 5 3014 0
+ 11554 0038 B7F90220 	 ldrsh r2,[r7,#2]
+ 11555 003c B7F90030 	 ldrsh r3,[r7]
+ 11556 0040 1B04     	 lsls r3,r3,#16
+ 11557 0042 1344     	 add r3,r3,r2
+ 11558 0044 1846     	 mov r0,r3
+ 11559 0046 FFF7FEFF 	 bl spi_transmit_burst
+3015:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst((uint32_t) options + ((uint32_t) state << 16));
+ 11560              	 .loc 5 3015 0
+ 11561 004a 3A8B     	 ldrh r2,[r7,#24]
+ 11562 004c BB8B     	 ldrh r3,[r7,#28]
+ 11563 004e 1B04     	 lsls r3,r3,#16
+ 11564 0050 1344     	 add r3,r3,r2
+ 11565 0052 1846     	 mov r0,r3
+ 11566 0054 FFF7FEFF 	 bl spi_transmit_burst
+3016:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_write_string(text);
+ 11567              	 .loc 5 3016 0
+ 11568 0058 386A     	 ldr r0,[r7,#32]
+ 11569 005a FFF7FEFF 	 bl EVE_write_string
+3017:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11570              	 .loc 5 3017 0
+ 11571 005e 0C37     	 adds r7,r7,#12
+ 11572              	.LCFI710:
+ 11573              	 .cfi_def_cfa_offset 12
+ 11574 0060 BD46     	 mov sp,r7
+ 11575              	.LCFI711:
+ 11576              	 .cfi_def_cfa_register 13
+ 11577              	 
+ 11578 0062 90BD     	 pop {r4,r7,pc}
+ 11579              	 .cfi_endproc
+ 11580              	.LFE580:
+ 11582              	 .section .text.EVE_cmd_translate,"ax",%progbits
+ 11583              	 .align 2
+ 11584              	 .global EVE_cmd_translate
+ 11585              	 .thumb
+ 11586              	 .thumb_func
+ 11588              	EVE_cmd_translate:
+ 11589              	.LFB581:
 3018:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3019:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_color_rgb(uint32_t color)
-3020:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11533              	 .loc 5 3020 0
- 11534              	 .cfi_startproc
- 11535              	 
- 11536              	 
- 11537 0000 80B5     	 push {r7,lr}
- 11538              	.LCFI712:
- 11539              	 .cfi_def_cfa_offset 8
- 11540              	 .cfi_offset 7,-8
- 11541              	 .cfi_offset 14,-4
- 11542 0002 82B0     	 sub sp,sp,#8
- 11543              	.LCFI713:
- 11544              	 .cfi_def_cfa_offset 16
- 11545 0004 00AF     	 add r7,sp,#0
- 11546              	.LCFI714:
- 11547              	 .cfi_def_cfa_register 7
- 11548 0006 7860     	 str r0,[r7,#4]
-3021:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	if(!cmd_burst)
- 11549              	 .loc 5 3021 0
- 11550 0008 074B     	 ldr r3,.L439
- 11551 000a 1B78     	 ldrb r3,[r3]
- 11552 000c DBB2     	 uxtb r3,r3
- 11553 000e 002B     	 cmp r3,#0
- 11554 0010 07D1     	 bne .L437
-3022:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
-3023:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_start_command(DL_COLOR_RGB | color);
- 11555              	 .loc 5 3023 0
- 11556 0012 7B68     	 ldr r3,[r7,#4]
- 11557 0014 43F08063 	 orr r3,r3,#67108864
- 11558 0018 1846     	 mov r0,r3
- 11559 001a FFF7FEFF 	 bl EVE_start_command
-3024:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cs_clear();
- 11560              	 .loc 5 3024 0
- 11561 001e FFF7FEFF 	 bl EVE_cs_clear
- 11562              	.L437:
-3025:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
-3026:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 11563              	 .loc 5 3026 0
- 11564 0022 0837     	 adds r7,r7,#8
- 11565              	.LCFI715:
- 11566              	 .cfi_def_cfa_offset 8
- 11567 0024 BD46     	 mov sp,r7
- 11568              	.LCFI716:
- 11569              	 .cfi_def_cfa_register 13
- 11570              	 
- 11571 0026 80BD     	 pop {r7,pc}
- 11572              	.L440:
- 11573              	 .align 2
- 11574              	.L439:
- 11575 0028 00000000 	 .word cmd_burst
- 11576              	 .cfi_endproc
- 11577              	.LFE581:
- 11579              	 .section .text.EVE_color_rgb_burst,"ax",%progbits
- 11580              	 .align 2
- 11581              	 .global EVE_color_rgb_burst
- 11582              	 .thumb
- 11583              	 .thumb_func
- 11585              	EVE_color_rgb_burst:
- 11586              	.LFB582:
-3027:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3028:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3029:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_color_rgb_burst(uint32_t color)
-3030:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11587              	 .loc 5 3030 0
- 11588              	 .cfi_startproc
- 11589              	 
- 11590              	 
- 11591 0000 80B5     	 push {r7,lr}
- 11592              	.LCFI717:
- 11593              	 .cfi_def_cfa_offset 8
- 11594              	 .cfi_offset 7,-8
- 11595              	 .cfi_offset 14,-4
- 11596 0002 82B0     	 sub sp,sp,#8
- 11597              	.LCFI718:
- 11598              	 .cfi_def_cfa_offset 16
- 11599 0004 00AF     	 add r7,sp,#0
- 11600              	.LCFI719:
- 11601              	 .cfi_def_cfa_register 7
- 11602 0006 7860     	 str r0,[r7,#4]
-3031:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(DL_COLOR_RGB | color);
- 11603              	 .loc 5 3031 0
- 11604 0008 7B68     	 ldr r3,[r7,#4]
- 11605 000a 43F08063 	 orr r3,r3,#67108864
- 11606 000e 1846     	 mov r0,r3
- 11607 0010 FFF7FEFF 	 bl spi_transmit_burst
-3032:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 11608              	 .loc 5 3032 0
- 11609 0014 0837     	 adds r7,r7,#8
- 11610              	.LCFI720:
- 11611              	 .cfi_def_cfa_offset 8
- 11612 0016 BD46     	 mov sp,r7
- 11613              	.LCFI721:
- 11614              	 .cfi_def_cfa_register 13
- 11615              	 
- 11616 0018 80BD     	 pop {r7,pc}
- 11617              	 .cfi_endproc
- 11618              	.LFE582:
- 11620              	 .global __aeabi_i2d
- 11621              	 .global __aeabi_dmul
- 11622              	 .global __aeabi_d2uiz
- 11623 001a 00BF     	 .section .rodata
- 11624 0132 0000     	 .align 2
- 11625              	.LC8:
- 11626 0134 506C6561 	 .ascii "Please tap on the dot.\000"
- 11626      73652074 
- 11626      6170206F 
- 11626      6E207468 
- 11626      6520646F 
- 11627              	 .global __aeabi_ldivmod
- 11628 014b 00       	 .section .text.EVE_calibrate_manual,"ax",%progbits
- 11629              	 .align 2
- 11630              	 .global EVE_calibrate_manual
- 11631              	 .thumb
- 11632              	 .thumb_func
- 11634              	EVE_calibrate_manual:
- 11635              	.LFB583:
-3033:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3034:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3035:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
-3036:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------- special purpose functions ------------------- ------------------------------------------
-3037:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
+3019:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3020:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_translate(int32_t tx, int32_t ty)
+3021:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11590              	 .loc 5 3021 0
+ 11591              	 .cfi_startproc
+ 11592              	 
+ 11593              	 
+ 11594 0000 80B5     	 push {r7,lr}
+ 11595              	.LCFI712:
+ 11596              	 .cfi_def_cfa_offset 8
+ 11597              	 .cfi_offset 7,-8
+ 11598              	 .cfi_offset 14,-4
+ 11599 0002 82B0     	 sub sp,sp,#8
+ 11600              	.LCFI713:
+ 11601              	 .cfi_def_cfa_offset 16
+ 11602 0004 00AF     	 add r7,sp,#0
+ 11603              	.LCFI714:
+ 11604              	 .cfi_def_cfa_register 7
+ 11605 0006 7860     	 str r0,[r7,#4]
+ 11606 0008 3960     	 str r1,[r7]
+3022:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	if(!cmd_burst)
+ 11607              	 .loc 5 3022 0
+ 11608 000a 0B4B     	 ldr r3,.L440
+ 11609 000c 1B78     	 ldrb r3,[r3]
+ 11610 000e DBB2     	 uxtb r3,r3
+ 11611 0010 002B     	 cmp r3,#0
+ 11612 0012 0DD1     	 bne .L438
+3023:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
+3024:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_start_command(CMD_TRANSLATE);
+ 11613              	 .loc 5 3024 0
+ 11614 0014 6FF0D800 	 mvn r0,#216
+ 11615 0018 FFF7FEFF 	 bl EVE_start_command
+3025:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit_32(tx);
+ 11616              	 .loc 5 3025 0
+ 11617 001c 7B68     	 ldr r3,[r7,#4]
+ 11618 001e 1846     	 mov r0,r3
+ 11619 0020 FFF7FEFF 	 bl spi_transmit_32
+3026:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		spi_transmit_32(ty);
+ 11620              	 .loc 5 3026 0
+ 11621 0024 3B68     	 ldr r3,[r7]
+ 11622 0026 1846     	 mov r0,r3
+ 11623 0028 FFF7FEFF 	 bl spi_transmit_32
+3027:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cs_clear();
+ 11624              	 .loc 5 3027 0
+ 11625 002c FFF7FEFF 	 bl EVE_cs_clear
+ 11626              	.L438:
+3028:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
+3029:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11627              	 .loc 5 3029 0
+ 11628 0030 0837     	 adds r7,r7,#8
+ 11629              	.LCFI715:
+ 11630              	 .cfi_def_cfa_offset 8
+ 11631 0032 BD46     	 mov sp,r7
+ 11632              	.LCFI716:
+ 11633              	 .cfi_def_cfa_register 13
+ 11634              	 
+ 11635 0034 80BD     	 pop {r7,pc}
+ 11636              	.L441:
+ 11637 0036 00BF     	 .align 2
+ 11638              	.L440:
+ 11639 0038 00000000 	 .word cmd_burst
+ 11640              	 .cfi_endproc
+ 11641              	.LFE581:
+ 11643              	 .section .text.EVE_cmd_translate_burst,"ax",%progbits
+ 11644              	 .align 2
+ 11645              	 .global EVE_cmd_translate_burst
+ 11646              	 .thumb
+ 11647              	 .thumb_func
+ 11649              	EVE_cmd_translate_burst:
+ 11650              	.LFB582:
+3030:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3031:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3032:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_cmd_translate_burst(int32_t tx, int32_t ty)
+3033:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11651              	 .loc 5 3033 0
+ 11652              	 .cfi_startproc
+ 11653              	 
+ 11654              	 
+ 11655 0000 80B5     	 push {r7,lr}
+ 11656              	.LCFI717:
+ 11657              	 .cfi_def_cfa_offset 8
+ 11658              	 .cfi_offset 7,-8
+ 11659              	 .cfi_offset 14,-4
+ 11660 0002 82B0     	 sub sp,sp,#8
+ 11661              	.LCFI718:
+ 11662              	 .cfi_def_cfa_offset 16
+ 11663 0004 00AF     	 add r7,sp,#0
+ 11664              	.LCFI719:
+ 11665              	 .cfi_def_cfa_register 7
+ 11666 0006 7860     	 str r0,[r7,#4]
+ 11667 0008 3960     	 str r1,[r7]
+3034:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(CMD_TRANSLATE);
+ 11668              	 .loc 5 3034 0
+ 11669 000a 6FF0D800 	 mvn r0,#216
+ 11670 000e FFF7FEFF 	 bl spi_transmit_burst
+3035:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(tx);
+ 11671              	 .loc 5 3035 0
+ 11672 0012 7B68     	 ldr r3,[r7,#4]
+ 11673 0014 1846     	 mov r0,r3
+ 11674 0016 FFF7FEFF 	 bl spi_transmit_burst
+3036:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(ty);
+ 11675              	 .loc 5 3036 0
+ 11676 001a 3B68     	 ldr r3,[r7]
+ 11677 001c 1846     	 mov r0,r3
+ 11678 001e FFF7FEFF 	 bl spi_transmit_burst
+3037:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11679              	 .loc 5 3037 0
+ 11680 0022 0837     	 adds r7,r7,#8
+ 11681              	.LCFI720:
+ 11682              	 .cfi_def_cfa_offset 8
+ 11683 0024 BD46     	 mov sp,r7
+ 11684              	.LCFI721:
+ 11685              	 .cfi_def_cfa_register 13
+ 11686              	 
+ 11687 0026 80BD     	 pop {r7,pc}
+ 11688              	 .cfi_endproc
+ 11689              	.LFE582:
+ 11691              	 .section .text.EVE_color_rgb,"ax",%progbits
+ 11692              	 .align 2
+ 11693              	 .global EVE_color_rgb
+ 11694              	 .thumb
+ 11695              	 .thumb_func
+ 11697              	EVE_color_rgb:
+ 11698              	.LFB583:
 3038:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
 3039:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3040:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building */
-3041:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this function displays an interactive calibration screen, calculates the calibration values and 
-3042:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* writes the new values to the touch matrix registers of EVE */
-3043:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* unlike the built-in cmd_calibrate() of EVE this also works with displays that are cut down from 
-3044:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* the height is needed as parameter as EVE_VSIZE for the EVE2-38 is 272 but the visible size is on
-3045:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* so the call would be EVE_calibrate_manual(116); for the EVE2-38A and EVE2-38G while for most oth
-3046:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* using EVE_calibrate_manual(EVE_VSIZE) would work - but for normal displays the built-in cmd_cali
-3047:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this code was taken from the MatrixOrbital EVE2-Library on Github, adapted and modified */
-3048:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_calibrate_manual(uint16_t height)
-3049:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
- 11636              	 .loc 5 3049 0
- 11637              	 .cfi_startproc
- 11638              	 
- 11639              	 
- 11640 0000 2DE9B04F 	 push {r4,r5,r7,r8,r9,r10,fp,lr}
- 11641              	.LCFI722:
- 11642              	 .cfi_def_cfa_offset 32
- 11643              	 .cfi_offset 4,-32
- 11644              	 .cfi_offset 5,-28
- 11645              	 .cfi_offset 7,-24
- 11646              	 .cfi_offset 8,-20
- 11647              	 .cfi_offset 9,-16
- 11648              	 .cfi_offset 10,-12
- 11649              	 .cfi_offset 11,-8
- 11650              	 .cfi_offset 14,-4
- 11651 0004 A2B0     	 sub sp,sp,#136
- 11652              	.LCFI723:
- 11653              	 .cfi_def_cfa_offset 168
- 11654 0006 02AF     	 add r7,sp,#8
- 11655              	.LCFI724:
- 11656              	 .cfi_def_cfa 7,160
- 11657 0008 0346     	 mov r3,r0
- 11658 000a FB83     	 strh r3,[r7,#30]
-3050:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint32_t displayX[3], displayY[3];
-3051:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint32_t touchX[3], touchY[3];
-3052:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint32_t touchValue;
-3053:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	int32_t tmp, k;
-3054:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	int32_t TransMatrix[6];
-3055:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint8_t count = 0;
- 11659              	 .loc 5 3055 0
- 11660 000c 0023     	 movs r3,#0
- 11661 000e 87F87F30 	 strb r3,[r7,#127]
-3056:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	char num[2];
-3057:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint8_t touch_lock = 1;
- 11662              	 .loc 5 3057 0
- 11663 0012 0123     	 movs r3,#1
- 11664 0014 87F87E30 	 strb r3,[r7,#126]
-3058:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3059:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	/* these values determine where your calibration points will be drawn on your display */
-3060:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayX[0] = (EVE_HSIZE * 0.15);
- 11665              	 .loc 5 3060 0
- 11666 0018 4823     	 movs r3,#72
- 11667 001a 7B66     	 str r3,[r7,#100]
-3061:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayY[0] = (height * 0.15);
- 11668              	 .loc 5 3061 0
- 11669 001c FB8B     	 ldrh r3,[r7,#30]
- 11670 001e 1846     	 mov r0,r3
- 11671 0020 FFF7FEFF 	 bl __aeabi_i2d
- 11672 0024 0246     	 mov r2,r0
- 11673 0026 0B46     	 mov r3,r1
- 11674 0028 1046     	 mov r0,r2
- 11675 002a 1946     	 mov r1,r3
- 11676 002c 72A3     	 adr r3,.L450+24
- 11677 002e D3E90023 	 ldrd r2,[r3]
- 11678 0032 FFF7FEFF 	 bl __aeabi_dmul
- 11679 0036 0246     	 mov r2,r0
- 11680 0038 0B46     	 mov r3,r1
- 11681 003a 1046     	 mov r0,r2
- 11682 003c 1946     	 mov r1,r3
- 11683 003e FFF7FEFF 	 bl __aeabi_d2uiz
- 11684 0042 0346     	 mov r3,r0
- 11685 0044 BB65     	 str r3,[r7,#88]
-3062:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3063:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayX[1] = (EVE_HSIZE * 0.85);
- 11686              	 .loc 5 3063 0
- 11687 0046 4FF4CC73 	 mov r3,#408
- 11688 004a BB66     	 str r3,[r7,#104]
-3064:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayY[1] = (height / 2);
- 11689              	 .loc 5 3064 0
- 11690 004c FB8B     	 ldrh r3,[r7,#30]
- 11691 004e 5B08     	 lsrs r3,r3,#1
- 11692 0050 9BB2     	 uxth r3,r3
- 11693 0052 FB65     	 str r3,[r7,#92]
-3065:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3066:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayX[2] = (EVE_HSIZE / 2);
- 11694              	 .loc 5 3066 0
- 11695 0054 F023     	 movs r3,#240
- 11696 0056 FB66     	 str r3,[r7,#108]
-3067:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayY[2] = (height * 0.85);
- 11697              	 .loc 5 3067 0
- 11698 0058 FB8B     	 ldrh r3,[r7,#30]
- 11699 005a 1846     	 mov r0,r3
- 11700 005c FFF7FEFF 	 bl __aeabi_i2d
- 11701 0060 0246     	 mov r2,r0
- 11702 0062 0B46     	 mov r3,r1
- 11703 0064 1046     	 mov r0,r2
- 11704 0066 1946     	 mov r1,r3
- 11705 0068 65A3     	 adr r3,.L450+32
- 11706 006a D3E90023 	 ldrd r2,[r3]
- 11707 006e FFF7FEFF 	 bl __aeabi_dmul
- 11708 0072 0246     	 mov r2,r0
- 11709 0074 0B46     	 mov r3,r1
- 11710 0076 1046     	 mov r0,r2
- 11711 0078 1946     	 mov r1,r3
- 11712 007a FFF7FEFF 	 bl __aeabi_d2uiz
- 11713 007e 0346     	 mov r3,r0
- 11714 0080 3B66     	 str r3,[r7,#96]
-3068:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3069:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	while (count < 3)
- 11715              	 .loc 5 3069 0
- 11716 0082 C1E0     	 b .L443
- 11717              	.L449:
-3070:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
-3071:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(CMD_DLSTART);
- 11718              	 .loc 5 3071 0
- 11719 0084 6FF0FF00 	 mvn r0,#255
- 11720 0088 FFF7FEFF 	 bl EVE_cmd_dl
-3072:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_CLEAR_RGB | 0x000000);
- 11721              	 .loc 5 3072 0
- 11722 008c 4FF00070 	 mov r0,#33554432
- 11723 0090 FFF7FEFF 	 bl EVE_cmd_dl
-3073:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
- 11724              	 .loc 5 3073 0
- 11725 0094 5248     	 ldr r0,.L450
- 11726 0096 FFF7FEFF 	 bl EVE_cmd_dl
-3074:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3075:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		/* draw Calibration Point on screen */
-3076:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_COLOR_RGB | 0x0000ff);
- 11727              	 .loc 5 3076 0
- 11728 009a 5248     	 ldr r0,.L450+4
- 11729 009c FFF7FEFF 	 bl EVE_cmd_dl
-3077:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(POINT_SIZE(20*16));
- 11730              	 .loc 5 3077 0
- 11731 00a0 5148     	 ldr r0,.L450+8
- 11732 00a2 FFF7FEFF 	 bl EVE_cmd_dl
-3078:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl((DL_BEGIN | EVE_POINTS));
- 11733              	 .loc 5 3078 0
- 11734 00a6 5148     	 ldr r0,.L450+12
- 11735 00a8 FFF7FEFF 	 bl EVE_cmd_dl
-3079:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(VERTEX2F((uint32_t)(displayX[count]) * 16, (uint32_t)((displayY[count])) * 16));
- 11736              	 .loc 5 3079 0
- 11737 00ac 97F87F30 	 ldrb r3,[r7,#127]
- 11738 00b0 9B00     	 lsls r3,r3,#2
- 11739 00b2 07F18002 	 add r2,r7,#128
- 11740 00b6 1344     	 add r3,r3,r2
- 11741 00b8 53F81C3C 	 ldr r3,[r3,#-28]
- 11742 00bc 1A01     	 lsls r2,r3,#4
- 11743 00be 47F6F073 	 movw r3,#32752
- 11744 00c2 1340     	 ands r3,r3,r2
- 11745 00c4 D903     	 lsls r1,r3,#15
- 11746 00c6 97F87F30 	 ldrb r3,[r7,#127]
- 11747 00ca 9B00     	 lsls r3,r3,#2
- 11748 00cc 07F18002 	 add r2,r7,#128
- 11749 00d0 1344     	 add r3,r3,r2
- 11750 00d2 53F8283C 	 ldr r3,[r3,#-40]
- 11751 00d6 1A01     	 lsls r2,r3,#4
- 11752 00d8 47F6F073 	 movw r3,#32752
- 11753 00dc 1340     	 ands r3,r3,r2
- 11754 00de 0B43     	 orrs r3,r3,r1
- 11755 00e0 43F08043 	 orr r3,r3,#1073741824
- 11756 00e4 1846     	 mov r0,r3
- 11757 00e6 FFF7FEFF 	 bl EVE_cmd_dl
-3080:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_END);
- 11758              	 .loc 5 3080 0
- 11759 00ea 4FF00450 	 mov r0,#553648128
- 11760 00ee FFF7FEFF 	 bl EVE_cmd_dl
-3081:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_COLOR_RGB | 0xffffff);
- 11761              	 .loc 5 3081 0
- 11762 00f2 6FF07B40 	 mvn r0,#-83886080
- 11763 00f6 FFF7FEFF 	 bl EVE_cmd_dl
-3082:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_text((EVE_HSIZE/2), 50, 27, EVE_OPT_CENTER, "Please tap on the dot.");
- 11764              	 .loc 5 3082 0
- 11765 00fa 3D4B     	 ldr r3,.L450+16
- 11766 00fc 0093     	 str r3,[sp]
- 11767 00fe F020     	 movs r0,#240
- 11768 0100 3221     	 movs r1,#50
- 11769 0102 1B22     	 movs r2,#27
- 11770 0104 4FF4C063 	 mov r3,#1536
- 11771 0108 FFF7FEFF 	 bl EVE_cmd_text
-3083:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		num[0] = count + 0x31; num[1] = 0; /* null terminated string of one character */
- 11772              	 .loc 5 3083 0
- 11773 010c 97F87F30 	 ldrb r3,[r7,#127]
- 11774 0110 3133     	 adds r3,r3,#49
- 11775 0112 DBB2     	 uxtb r3,r3
- 11776 0114 87F82430 	 strb r3,[r7,#36]
- 11777 0118 0023     	 movs r3,#0
- 11778 011a 87F82530 	 strb r3,[r7,#37]
-3084:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_text(displayX[count], displayY[count], 27, EVE_OPT_CENTER, num);
- 11779              	 .loc 5 3084 0
- 11780 011e 97F87F30 	 ldrb r3,[r7,#127]
- 11781 0122 9B00     	 lsls r3,r3,#2
- 11782 0124 07F18002 	 add r2,r7,#128
- 11783 0128 1344     	 add r3,r3,r2
- 11784 012a 53F81C3C 	 ldr r3,[r3,#-28]
- 11785 012e 9AB2     	 uxth r2,r3
- 11786 0130 97F87F30 	 ldrb r3,[r7,#127]
- 11787 0134 9B00     	 lsls r3,r3,#2
- 11788 0136 07F18001 	 add r1,r7,#128
- 11789 013a 0B44     	 add r3,r3,r1
- 11790 013c 53F8283C 	 ldr r3,[r3,#-40]
- 11791 0140 9BB2     	 uxth r3,r3
- 11792 0142 11B2     	 sxth r1,r2
- 11793 0144 1AB2     	 sxth r2,r3
- 11794 0146 07F12403 	 add r3,r7,#36
- 11795 014a 0093     	 str r3,[sp]
- 11796 014c 0846     	 mov r0,r1
- 11797 014e 1146     	 mov r1,r2
- 11798 0150 1B22     	 movs r2,#27
- 11799 0152 4FF4C063 	 mov r3,#1536
- 11800 0156 FFF7FEFF 	 bl EVE_cmd_text
-3085:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3086:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_DISPLAY);
- 11801              	 .loc 5 3086 0
- 11802 015a 0020     	 movs r0,#0
- 11803 015c FFF7FEFF 	 bl EVE_cmd_dl
-3087:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(CMD_SWAP);
- 11804              	 .loc 5 3087 0
- 11805 0160 6FF0FE00 	 mvn r0,#254
- 11806 0164 FFF7FEFF 	 bl EVE_cmd_dl
-3088:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		while (EVE_busy());
- 11807              	 .loc 5 3088 0
- 11808 0168 00BF     	 nop
- 11809              	.L444:
- 11810              	 .loc 5 3088 0 is_stmt 0 discriminator 1
- 11811 016a FFF7FEFF 	 bl EVE_busy
- 11812 016e 0346     	 mov r3,r0
- 11813 0170 002B     	 cmp r3,#0
- 11814 0172 FAD1     	 bne .L444
- 11815              	.L448:
+3040:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_color_rgb(uint32_t color)
+3041:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11699              	 .loc 5 3041 0
+ 11700              	 .cfi_startproc
+ 11701              	 
+ 11702              	 
+ 11703 0000 80B5     	 push {r7,lr}
+ 11704              	.LCFI722:
+ 11705              	 .cfi_def_cfa_offset 8
+ 11706              	 .cfi_offset 7,-8
+ 11707              	 .cfi_offset 14,-4
+ 11708 0002 82B0     	 sub sp,sp,#8
+ 11709              	.LCFI723:
+ 11710              	 .cfi_def_cfa_offset 16
+ 11711 0004 00AF     	 add r7,sp,#0
+ 11712              	.LCFI724:
+ 11713              	 .cfi_def_cfa_register 7
+ 11714 0006 7860     	 str r0,[r7,#4]
+3042:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	if(!cmd_burst)
+ 11715              	 .loc 5 3042 0
+ 11716 0008 074B     	 ldr r3,.L445
+ 11717 000a 1B78     	 ldrb r3,[r3]
+ 11718 000c DBB2     	 uxtb r3,r3
+ 11719 000e 002B     	 cmp r3,#0
+ 11720 0010 07D1     	 bne .L443
+3043:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
+3044:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_start_command(DL_COLOR_RGB | color);
+ 11721              	 .loc 5 3044 0
+ 11722 0012 7B68     	 ldr r3,[r7,#4]
+ 11723 0014 43F08063 	 orr r3,r3,#67108864
+ 11724 0018 1846     	 mov r0,r3
+ 11725 001a FFF7FEFF 	 bl EVE_start_command
+3045:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cs_clear();
+ 11726              	 .loc 5 3045 0
+ 11727 001e FFF7FEFF 	 bl EVE_cs_clear
+ 11728              	.L443:
+3046:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
+3047:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11729              	 .loc 5 3047 0
+ 11730 0022 0837     	 adds r7,r7,#8
+ 11731              	.LCFI725:
+ 11732              	 .cfi_def_cfa_offset 8
+ 11733 0024 BD46     	 mov sp,r7
+ 11734              	.LCFI726:
+ 11735              	 .cfi_def_cfa_register 13
+ 11736              	 
+ 11737 0026 80BD     	 pop {r7,pc}
+ 11738              	.L446:
+ 11739              	 .align 2
+ 11740              	.L445:
+ 11741 0028 00000000 	 .word cmd_burst
+ 11742              	 .cfi_endproc
+ 11743              	.LFE583:
+ 11745              	 .section .text.EVE_color_rgb_burst,"ax",%progbits
+ 11746              	 .align 2
+ 11747              	 .global EVE_color_rgb_burst
+ 11748              	 .thumb
+ 11749              	 .thumb_func
+ 11751              	EVE_color_rgb_burst:
+ 11752              	.LFB584:
+3048:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3049:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3050:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_color_rgb_burst(uint32_t color)
+3051:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11753              	 .loc 5 3051 0
+ 11754              	 .cfi_startproc
+ 11755              	 
+ 11756              	 
+ 11757 0000 80B5     	 push {r7,lr}
+ 11758              	.LCFI727:
+ 11759              	 .cfi_def_cfa_offset 8
+ 11760              	 .cfi_offset 7,-8
+ 11761              	 .cfi_offset 14,-4
+ 11762 0002 82B0     	 sub sp,sp,#8
+ 11763              	.LCFI728:
+ 11764              	 .cfi_def_cfa_offset 16
+ 11765 0004 00AF     	 add r7,sp,#0
+ 11766              	.LCFI729:
+ 11767              	 .cfi_def_cfa_register 7
+ 11768 0006 7860     	 str r0,[r7,#4]
+3052:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	spi_transmit_burst(DL_COLOR_RGB | color);
+ 11769              	 .loc 5 3052 0
+ 11770 0008 7B68     	 ldr r3,[r7,#4]
+ 11771 000a 43F08063 	 orr r3,r3,#67108864
+ 11772 000e 1846     	 mov r0,r3
+ 11773 0010 FFF7FEFF 	 bl spi_transmit_burst
+3053:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 11774              	 .loc 5 3053 0
+ 11775 0014 0837     	 adds r7,r7,#8
+ 11776              	.LCFI730:
+ 11777              	 .cfi_def_cfa_offset 8
+ 11778 0016 BD46     	 mov sp,r7
+ 11779              	.LCFI731:
+ 11780              	 .cfi_def_cfa_register 13
+ 11781              	 
+ 11782 0018 80BD     	 pop {r7,pc}
+ 11783              	 .cfi_endproc
+ 11784              	.LFE584:
+ 11786              	 .global __aeabi_i2d
+ 11787              	 .global __aeabi_dmul
+ 11788              	 .global __aeabi_d2uiz
+ 11789 001a 00BF     	 .section .rodata
+ 11790              	 .align 2
+ 11791              	.LC10:
+ 11792 0140 506C6561 	 .ascii "Please tap on the dot.\000"
+ 11792      73652074 
+ 11792      6170206F 
+ 11792      6E207468 
+ 11792      6520646F 
+ 11793              	 .global __aeabi_ldivmod
+ 11794 0157 00       	 .section .text.EVE_calibrate_manual,"ax",%progbits
+ 11795              	 .align 2
+ 11796              	 .global EVE_calibrate_manual
+ 11797              	 .thumb
+ 11798              	 .thumb_func
+ 11800              	EVE_calibrate_manual:
+ 11801              	.LFB585:
+3054:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3055:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3056:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
+3057:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------- special purpose functions ------------------- ------------------------------------------
+3058:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /*-------------------------------------------------------------------------------------------------
+3059:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3060:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3061:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this is meant to be called outside display-list building */
+3062:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this function displays an interactive calibration screen, calculates the calibration values and 
+3063:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* writes the new values to the touch matrix registers of EVE */
+3064:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* unlike the built-in cmd_calibrate() of EVE this also works with displays that are cut down from 
+3065:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* the height is needed as parameter as EVE_VSIZE for the EVE2-38 is 272 but the visible size is on
+3066:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* so the call would be EVE_calibrate_manual(116); for the EVE2-38A and EVE2-38G while for most oth
+3067:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* using EVE_calibrate_manual(EVE_VSIZE) would work - but for normal displays the built-in cmd_cali
+3068:../Libraries/FT800-FT813-5.x/EVE_commands.c **** /* this code was taken from the MatrixOrbital EVE2-Library on Github, adapted and modified */
+3069:../Libraries/FT800-FT813-5.x/EVE_commands.c **** void EVE_calibrate_manual(uint16_t height)
+3070:../Libraries/FT800-FT813-5.x/EVE_commands.c **** {
+ 11802              	 .loc 5 3070 0
+ 11803              	 .cfi_startproc
+ 11804              	 
+ 11805              	 
+ 11806 0000 2DE9B04F 	 push {r4,r5,r7,r8,r9,r10,fp,lr}
+ 11807              	.LCFI732:
+ 11808              	 .cfi_def_cfa_offset 32
+ 11809              	 .cfi_offset 4,-32
+ 11810              	 .cfi_offset 5,-28
+ 11811              	 .cfi_offset 7,-24
+ 11812              	 .cfi_offset 8,-20
+ 11813              	 .cfi_offset 9,-16
+ 11814              	 .cfi_offset 10,-12
+ 11815              	 .cfi_offset 11,-8
+ 11816              	 .cfi_offset 14,-4
+ 11817 0004 A2B0     	 sub sp,sp,#136
+ 11818              	.LCFI733:
+ 11819              	 .cfi_def_cfa_offset 168
+ 11820 0006 02AF     	 add r7,sp,#8
+ 11821              	.LCFI734:
+ 11822              	 .cfi_def_cfa 7,160
+ 11823 0008 0346     	 mov r3,r0
+ 11824 000a FB83     	 strh r3,[r7,#30]
+3071:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint32_t displayX[3], displayY[3];
+3072:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint32_t touchX[3], touchY[3];
+3073:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint32_t touchValue;
+3074:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	int32_t tmp, k;
+3075:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	int32_t TransMatrix[6];
+3076:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint8_t count = 0;
+ 11825              	 .loc 5 3076 0
+ 11826 000c 0023     	 movs r3,#0
+ 11827 000e 87F87F30 	 strb r3,[r7,#127]
+3077:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	char num[2];
+3078:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	uint8_t touch_lock = 1;
+ 11828              	 .loc 5 3078 0
+ 11829 0012 0123     	 movs r3,#1
+ 11830 0014 87F87E30 	 strb r3,[r7,#126]
+3079:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3080:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	/* these values determine where your calibration points will be drawn on your display */
+3081:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayX[0] = (EVE_HSIZE * 0.15);
+ 11831              	 .loc 5 3081 0
+ 11832 0018 4823     	 movs r3,#72
+ 11833 001a 7B66     	 str r3,[r7,#100]
+3082:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayY[0] = (height * 0.15);
+ 11834              	 .loc 5 3082 0
+ 11835 001c FB8B     	 ldrh r3,[r7,#30]
+ 11836 001e 1846     	 mov r0,r3
+ 11837 0020 FFF7FEFF 	 bl __aeabi_i2d
+ 11838 0024 0246     	 mov r2,r0
+ 11839 0026 0B46     	 mov r3,r1
+ 11840 0028 1046     	 mov r0,r2
+ 11841 002a 1946     	 mov r1,r3
+ 11842 002c 72A3     	 adr r3,.L456+24
+ 11843 002e D3E90023 	 ldrd r2,[r3]
+ 11844 0032 FFF7FEFF 	 bl __aeabi_dmul
+ 11845 0036 0246     	 mov r2,r0
+ 11846 0038 0B46     	 mov r3,r1
+ 11847 003a 1046     	 mov r0,r2
+ 11848 003c 1946     	 mov r1,r3
+ 11849 003e FFF7FEFF 	 bl __aeabi_d2uiz
+ 11850 0042 0346     	 mov r3,r0
+ 11851 0044 BB65     	 str r3,[r7,#88]
+3083:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3084:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayX[1] = (EVE_HSIZE * 0.85);
+ 11852              	 .loc 5 3084 0
+ 11853 0046 4FF4CC73 	 mov r3,#408
+ 11854 004a BB66     	 str r3,[r7,#104]
+3085:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayY[1] = (height / 2);
+ 11855              	 .loc 5 3085 0
+ 11856 004c FB8B     	 ldrh r3,[r7,#30]
+ 11857 004e 5B08     	 lsrs r3,r3,#1
+ 11858 0050 9BB2     	 uxth r3,r3
+ 11859 0052 FB65     	 str r3,[r7,#92]
+3086:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3087:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayX[2] = (EVE_HSIZE / 2);
+ 11860              	 .loc 5 3087 0
+ 11861 0054 F023     	 movs r3,#240
+ 11862 0056 FB66     	 str r3,[r7,#108]
+3088:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	displayY[2] = (height * 0.85);
+ 11863              	 .loc 5 3088 0
+ 11864 0058 FB8B     	 ldrh r3,[r7,#30]
+ 11865 005a 1846     	 mov r0,r3
+ 11866 005c FFF7FEFF 	 bl __aeabi_i2d
+ 11867 0060 0246     	 mov r2,r0
+ 11868 0062 0B46     	 mov r3,r1
+ 11869 0064 1046     	 mov r0,r2
+ 11870 0066 1946     	 mov r1,r3
+ 11871 0068 65A3     	 adr r3,.L456+32
+ 11872 006a D3E90023 	 ldrd r2,[r3]
+ 11873 006e FFF7FEFF 	 bl __aeabi_dmul
+ 11874 0072 0246     	 mov r2,r0
+ 11875 0074 0B46     	 mov r3,r1
+ 11876 0076 1046     	 mov r0,r2
+ 11877 0078 1946     	 mov r1,r3
+ 11878 007a FFF7FEFF 	 bl __aeabi_d2uiz
+ 11879 007e 0346     	 mov r3,r0
+ 11880 0080 3B66     	 str r3,[r7,#96]
 3089:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3090:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		while(1)
-3091:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		{
-3092:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			touchValue = EVE_memRead32(REG_TOUCH_DIRECT_XY); /* read for any new touch tag inputs */
- 11816              	 .loc 5 3092 0 is_stmt 1
- 11817 0174 1F48     	 ldr r0,.L450+20
- 11818 0176 FFF7FEFF 	 bl EVE_memRead32
- 11819 017a B867     	 str r0,[r7,#120]
-3093:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3094:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			if(touch_lock)
- 11820              	 .loc 5 3094 0
- 11821 017c 97F87E30 	 ldrb r3,[r7,#126]
- 11822 0180 002B     	 cmp r3,#0
- 11823 0182 06D0     	 beq .L445
-3095:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			{
-3096:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				if(touchValue & 0x80000000) /* check if we have no touch */
- 11824              	 .loc 5 3096 0
- 11825 0184 BB6F     	 ldr r3,[r7,#120]
- 11826 0186 002B     	 cmp r3,#0
- 11827 0188 26DA     	 bge .L447
-3097:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				{
-3098:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touch_lock = 0;
- 11828              	 .loc 5 3098 0
- 11829 018a 0023     	 movs r3,#0
- 11830 018c 87F87E30 	 strb r3,[r7,#126]
- 11831 0190 F0E7     	 b .L448
- 11832              	.L445:
-3099:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				}
-3100:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			}
-3101:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			else
-3102:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			{
-3103:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				if (!(touchValue & 0x80000000)) /* check if a touch is detected */
- 11833              	 .loc 5 3103 0
- 11834 0192 BB6F     	 ldr r3,[r7,#120]
- 11835 0194 002B     	 cmp r3,#0
- 11836 0196 1FDB     	 blt .L447
-3104:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				{
-3105:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touchX[count] = (touchValue>>16) & 0x03FF; /* raw Touchscreen Y coordinate */
- 11837              	 .loc 5 3105 0
- 11838 0198 97F87F10 	 ldrb r1,[r7,#127]
- 11839 019c BB6F     	 ldr r3,[r7,#120]
- 11840 019e 1B0C     	 lsrs r3,r3,#16
- 11841 01a0 C3F30902 	 ubfx r2,r3,#0,#10
- 11842 01a4 8B00     	 lsls r3,r1,#2
- 11843 01a6 07F18001 	 add r1,r7,#128
- 11844 01aa 0B44     	 add r3,r3,r1
- 11845 01ac 43F8342C 	 str r2,[r3,#-52]
-3106:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touchY[count] = touchValue & 0x03FF; /* raw Touchscreen Y coordinate */
- 11846              	 .loc 5 3106 0
- 11847 01b0 97F87F20 	 ldrb r2,[r7,#127]
- 11848 01b4 BB6F     	 ldr r3,[r7,#120]
- 11849 01b6 C3F30901 	 ubfx r1,r3,#0,#10
- 11850 01ba 9300     	 lsls r3,r2,#2
- 11851 01bc 07F18002 	 add r2,r7,#128
- 11852 01c0 1344     	 add r3,r3,r2
- 11853 01c2 43F8401C 	 str r1,[r3,#-64]
-3107:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touch_lock = 1;
- 11854              	 .loc 5 3107 0
- 11855 01c6 0123     	 movs r3,#1
- 11856 01c8 87F87E30 	 strb r3,[r7,#126]
-3108:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					count++;
- 11857              	 .loc 5 3108 0
- 11858 01cc 97F87F30 	 ldrb r3,[r7,#127]
- 11859 01d0 0133     	 adds r3,r3,#1
- 11860 01d2 87F87F30 	 strb r3,[r7,#127]
-3109:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					break; /* leave while(1) */
- 11861              	 .loc 5 3109 0
- 11862 01d6 17E0     	 b .L443
- 11863              	.L447:
-3110:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				}
-3111:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			}
-3112:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		}
- 11864              	 .loc 5 3112 0 discriminator 1
- 11865 01d8 CCE7     	 b .L448
- 11866              	.L451:
- 11867 01da 00BFAFF3 	 .align 3
- 11867      0080
- 11868              	.L450:
- 11869 01e0 07000026 	 .word 637534215
- 11870 01e4 FF000004 	 .word 67109119
- 11871 01e8 4001000D 	 .word 218104128
- 11872 01ec 0200001F 	 .word 520093698
- 11873 01f0 34010000 	 .word .LC8
- 11874 01f4 8C213000 	 .word 3154316
- 11875 01f8 33333333 	 .word 858993459
- 11876 01fc 3333C33F 	 .word 1069757235
- 11877 0200 33333333 	 .word 858993459
- 11878 0204 3333EB3F 	 .word 1072378675
- 11879              	.L443:
-3069:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
- 11880              	 .loc 5 3069 0
- 11881 0208 97F87F30 	 ldrb r3,[r7,#127]
- 11882 020c 022B     	 cmp r3,#2
- 11883 020e 7FF639AF 	 bls .L449
-3113:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
+3090:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	while (count < 3)
+ 11881              	 .loc 5 3090 0
+ 11882 0082 C1E0     	 b .L449
+ 11883              	.L455:
+3091:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
+3092:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(CMD_DLSTART);
+ 11884              	 .loc 5 3092 0
+ 11885 0084 6FF0FF00 	 mvn r0,#255
+ 11886 0088 FFF7FEFF 	 bl EVE_cmd_dl
+3093:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_CLEAR_RGB | 0x000000);
+ 11887              	 .loc 5 3093 0
+ 11888 008c 4FF00070 	 mov r0,#33554432
+ 11889 0090 FFF7FEFF 	 bl EVE_cmd_dl
+3094:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
+ 11890              	 .loc 5 3094 0
+ 11891 0094 5248     	 ldr r0,.L456
+ 11892 0096 FFF7FEFF 	 bl EVE_cmd_dl
+3095:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3096:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		/* draw Calibration Point on screen */
+3097:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_COLOR_RGB | 0x0000ff);
+ 11893              	 .loc 5 3097 0
+ 11894 009a 5248     	 ldr r0,.L456+4
+ 11895 009c FFF7FEFF 	 bl EVE_cmd_dl
+3098:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(POINT_SIZE(20*16));
+ 11896              	 .loc 5 3098 0
+ 11897 00a0 5148     	 ldr r0,.L456+8
+ 11898 00a2 FFF7FEFF 	 bl EVE_cmd_dl
+3099:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl((DL_BEGIN | EVE_POINTS));
+ 11899              	 .loc 5 3099 0
+ 11900 00a6 5148     	 ldr r0,.L456+12
+ 11901 00a8 FFF7FEFF 	 bl EVE_cmd_dl
+3100:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(VERTEX2F((uint32_t)(displayX[count]) * 16, (uint32_t)((displayY[count])) * 16));
+ 11902              	 .loc 5 3100 0
+ 11903 00ac 97F87F30 	 ldrb r3,[r7,#127]
+ 11904 00b0 9B00     	 lsls r3,r3,#2
+ 11905 00b2 07F18002 	 add r2,r7,#128
+ 11906 00b6 1344     	 add r3,r3,r2
+ 11907 00b8 53F81C3C 	 ldr r3,[r3,#-28]
+ 11908 00bc 1A01     	 lsls r2,r3,#4
+ 11909 00be 47F6F073 	 movw r3,#32752
+ 11910 00c2 1340     	 ands r3,r3,r2
+ 11911 00c4 D903     	 lsls r1,r3,#15
+ 11912 00c6 97F87F30 	 ldrb r3,[r7,#127]
+ 11913 00ca 9B00     	 lsls r3,r3,#2
+ 11914 00cc 07F18002 	 add r2,r7,#128
+ 11915 00d0 1344     	 add r3,r3,r2
+ 11916 00d2 53F8283C 	 ldr r3,[r3,#-40]
+ 11917 00d6 1A01     	 lsls r2,r3,#4
+ 11918 00d8 47F6F073 	 movw r3,#32752
+ 11919 00dc 1340     	 ands r3,r3,r2
+ 11920 00de 0B43     	 orrs r3,r3,r1
+ 11921 00e0 43F08043 	 orr r3,r3,#1073741824
+ 11922 00e4 1846     	 mov r0,r3
+ 11923 00e6 FFF7FEFF 	 bl EVE_cmd_dl
+3101:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_END);
+ 11924              	 .loc 5 3101 0
+ 11925 00ea 4FF00450 	 mov r0,#553648128
+ 11926 00ee FFF7FEFF 	 bl EVE_cmd_dl
+3102:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_COLOR_RGB | 0xffffff);
+ 11927              	 .loc 5 3102 0
+ 11928 00f2 6FF07B40 	 mvn r0,#-83886080
+ 11929 00f6 FFF7FEFF 	 bl EVE_cmd_dl
+3103:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_text((EVE_HSIZE/2), 50, 27, EVE_OPT_CENTER, "Please tap on the dot.");
+ 11930              	 .loc 5 3103 0
+ 11931 00fa 3D4B     	 ldr r3,.L456+16
+ 11932 00fc 0093     	 str r3,[sp]
+ 11933 00fe F020     	 movs r0,#240
+ 11934 0100 3221     	 movs r1,#50
+ 11935 0102 1B22     	 movs r2,#27
+ 11936 0104 4FF4C063 	 mov r3,#1536
+ 11937 0108 FFF7FEFF 	 bl EVE_cmd_text
+3104:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		num[0] = count + 0x31; num[1] = 0; /* null terminated string of one character */
+ 11938              	 .loc 5 3104 0
+ 11939 010c 97F87F30 	 ldrb r3,[r7,#127]
+ 11940 0110 3133     	 adds r3,r3,#49
+ 11941 0112 DBB2     	 uxtb r3,r3
+ 11942 0114 87F82430 	 strb r3,[r7,#36]
+ 11943 0118 0023     	 movs r3,#0
+ 11944 011a 87F82530 	 strb r3,[r7,#37]
+3105:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_text(displayX[count], displayY[count], 27, EVE_OPT_CENTER, num);
+ 11945              	 .loc 5 3105 0
+ 11946 011e 97F87F30 	 ldrb r3,[r7,#127]
+ 11947 0122 9B00     	 lsls r3,r3,#2
+ 11948 0124 07F18002 	 add r2,r7,#128
+ 11949 0128 1344     	 add r3,r3,r2
+ 11950 012a 53F81C3C 	 ldr r3,[r3,#-28]
+ 11951 012e 9AB2     	 uxth r2,r3
+ 11952 0130 97F87F30 	 ldrb r3,[r7,#127]
+ 11953 0134 9B00     	 lsls r3,r3,#2
+ 11954 0136 07F18001 	 add r1,r7,#128
+ 11955 013a 0B44     	 add r3,r3,r1
+ 11956 013c 53F8283C 	 ldr r3,[r3,#-40]
+ 11957 0140 9BB2     	 uxth r3,r3
+ 11958 0142 11B2     	 sxth r1,r2
+ 11959 0144 1AB2     	 sxth r2,r3
+ 11960 0146 07F12403 	 add r3,r7,#36
+ 11961 014a 0093     	 str r3,[sp]
+ 11962 014c 0846     	 mov r0,r1
+ 11963 014e 1146     	 mov r1,r2
+ 11964 0150 1B22     	 movs r2,#27
+ 11965 0152 4FF4C063 	 mov r3,#1536
+ 11966 0156 FFF7FEFF 	 bl EVE_cmd_text
+3106:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3107:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(DL_DISPLAY);
+ 11967              	 .loc 5 3107 0
+ 11968 015a 0020     	 movs r0,#0
+ 11969 015c FFF7FEFF 	 bl EVE_cmd_dl
+3108:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		EVE_cmd_dl(CMD_SWAP);
+ 11970              	 .loc 5 3108 0
+ 11971 0160 6FF0FE00 	 mvn r0,#254
+ 11972 0164 FFF7FEFF 	 bl EVE_cmd_dl
+3109:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		while (EVE_busy());
+ 11973              	 .loc 5 3109 0
+ 11974 0168 00BF     	 nop
+ 11975              	.L450:
+ 11976              	 .loc 5 3109 0 is_stmt 0 discriminator 1
+ 11977 016a FFF7FEFF 	 bl EVE_busy
+ 11978 016e 0346     	 mov r3,r0
+ 11979 0170 002B     	 cmp r3,#0
+ 11980 0172 FAD1     	 bne .L450
+ 11981              	.L454:
+3110:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3111:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		while(1)
+3112:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		{
+3113:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			touchValue = EVE_memRead32(REG_TOUCH_DIRECT_XY); /* read for any new touch tag inputs */
+ 11982              	 .loc 5 3113 0 is_stmt 1
+ 11983 0174 1F48     	 ldr r0,.L456+20
+ 11984 0176 FFF7FEFF 	 bl EVE_memRead32
+ 11985 017a B867     	 str r0,[r7,#120]
 3114:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3115:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	k = ((touchX[0] - touchX[2])*(touchY[1] - touchY[2])) - ((touchX[1] - touchX[2])*(touchY[0] - touc
- 11884              	 .loc 5 3115 0
- 11885 0212 FA6C     	 ldr r2,[r7,#76]
- 11886 0214 7B6D     	 ldr r3,[r7,#84]
- 11887 0216 D11A     	 subs r1,r2,r3
- 11888 0218 7A6C     	 ldr r2,[r7,#68]
- 11889 021a BB6C     	 ldr r3,[r7,#72]
- 11890 021c D31A     	 subs r3,r2,r3
- 11891 021e 03FB01F0 	 mul r0,r3,r1
- 11892 0222 3A6D     	 ldr r2,[r7,#80]
- 11893 0224 7B6D     	 ldr r3,[r7,#84]
- 11894 0226 D11A     	 subs r1,r2,r3
- 11895 0228 3A6C     	 ldr r2,[r7,#64]
- 11896 022a BB6C     	 ldr r3,[r7,#72]
- 11897 022c D31A     	 subs r3,r2,r3
- 11898 022e 03FB01F3 	 mul r3,r3,r1
- 11899 0232 C31A     	 subs r3,r0,r3
- 11900 0234 7B67     	 str r3,[r7,#116]
-3116:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3117:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((displayX[0] - displayX[2]) * (touchY[1] - touchY[2])) - ((displayX[1] - displayX[2])*(tou
- 11901              	 .loc 5 3117 0
- 11902 0236 7A6E     	 ldr r2,[r7,#100]
- 11903 0238 FB6E     	 ldr r3,[r7,#108]
- 11904 023a D11A     	 subs r1,r2,r3
- 11905 023c 7A6C     	 ldr r2,[r7,#68]
- 11906 023e BB6C     	 ldr r3,[r7,#72]
- 11907 0240 D31A     	 subs r3,r2,r3
- 11908 0242 03FB01F0 	 mul r0,r3,r1
- 11909 0246 BA6E     	 ldr r2,[r7,#104]
- 11910 0248 FB6E     	 ldr r3,[r7,#108]
- 11911 024a D11A     	 subs r1,r2,r3
- 11912 024c 3A6C     	 ldr r2,[r7,#64]
- 11913 024e BB6C     	 ldr r3,[r7,#72]
- 11914 0250 D31A     	 subs r3,r2,r3
- 11915 0252 03FB01F3 	 mul r3,r3,r1
- 11916 0256 C31A     	 subs r3,r0,r3
- 11917 0258 3B67     	 str r3,[r7,#112]
-3118:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[0] = ((int64_t)tmp << 16) / k;
- 11918              	 .loc 5 3118 0
- 11919 025a 3B6F     	 ldr r3,[r7,#112]
- 11920 025c 1A46     	 mov r2,r3
- 11921 025e 4FEAE273 	 asr r3,r2,#31
- 11922 0262 1D04     	 lsls r5,r3,#16
- 11923 0264 45EA1245 	 orr r5,r5,r2,lsr#16
- 11924 0268 1404     	 lsls r4,r2,#16
- 11925 026a 7B6F     	 ldr r3,[r7,#116]
- 11926 026c 1A46     	 mov r2,r3
- 11927 026e 4FEAE273 	 asr r3,r2,#31
- 11928 0272 2046     	 mov r0,r4
- 11929 0274 2946     	 mov r1,r5
- 11930 0276 FFF7FEFF 	 bl __aeabi_ldivmod
- 11931 027a 0246     	 mov r2,r0
- 11932 027c 0B46     	 mov r3,r1
- 11933 027e 1346     	 mov r3,r2
- 11934 0280 BB62     	 str r3,[r7,#40]
-3119:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3120:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((touchX[0] - touchX[2]) * (displayX[1] - displayX[2])) - ((displayX[0] - displayX[2])*(tou
- 11935              	 .loc 5 3120 0
- 11936 0282 FA6C     	 ldr r2,[r7,#76]
- 11937 0284 7B6D     	 ldr r3,[r7,#84]
- 11938 0286 D31A     	 subs r3,r2,r3
- 11939 0288 B96E     	 ldr r1,[r7,#104]
- 11940 028a FA6E     	 ldr r2,[r7,#108]
- 11941 028c 8A1A     	 subs r2,r1,r2
- 11942 028e 02FB03F1 	 mul r1,r2,r3
- 11943 0292 7A6E     	 ldr r2,[r7,#100]
- 11944 0294 FB6E     	 ldr r3,[r7,#108]
- 11945 0296 D21A     	 subs r2,r2,r3
- 11946 0298 386D     	 ldr r0,[r7,#80]
- 11947 029a 7B6D     	 ldr r3,[r7,#84]
- 11948 029c C31A     	 subs r3,r0,r3
- 11949 029e 03FB02F3 	 mul r3,r3,r2
- 11950 02a2 CB1A     	 subs r3,r1,r3
- 11951 02a4 3B67     	 str r3,[r7,#112]
-3121:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[1] = ((int64_t)tmp << 16) / k;
- 11952              	 .loc 5 3121 0
- 11953 02a6 3B6F     	 ldr r3,[r7,#112]
- 11954 02a8 1A46     	 mov r2,r3
- 11955 02aa 4FEAE273 	 asr r3,r2,#31
- 11956 02ae 1904     	 lsls r1,r3,#16
- 11957 02b0 7961     	 str r1,[r7,#20]
- 11958 02b2 7969     	 ldr r1,[r7,#20]
- 11959 02b4 41EA1241 	 orr r1,r1,r2,lsr#16
- 11960 02b8 7961     	 str r1,[r7,#20]
- 11961 02ba 1304     	 lsls r3,r2,#16
- 11962 02bc 3B61     	 str r3,[r7,#16]
- 11963 02be 7B6F     	 ldr r3,[r7,#116]
- 11964 02c0 1A46     	 mov r2,r3
- 11965 02c2 4FEAE273 	 asr r3,r2,#31
- 11966 02c6 D7E90401 	 ldrd r0,[r7,#16]
- 11967 02ca FFF7FEFF 	 bl __aeabi_ldivmod
- 11968 02ce 0246     	 mov r2,r0
- 11969 02d0 0B46     	 mov r3,r1
- 11970 02d2 1346     	 mov r3,r2
- 11971 02d4 FB62     	 str r3,[r7,#44]
-3122:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3123:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = ((touchY[0] * (((touchX[2] * displayX[1]) - (touchX[1] * displayX[2])))) + (touchY[1] * (((t
- 11972              	 .loc 5 3123 0
- 11973 02d6 3B6C     	 ldr r3,[r7,#64]
- 11974 02d8 7A6D     	 ldr r2,[r7,#84]
- 11975 02da B96E     	 ldr r1,[r7,#104]
- 11976 02dc 01FB02F1 	 mul r1,r1,r2
- 11977 02e0 3A6D     	 ldr r2,[r7,#80]
- 11978 02e2 F86E     	 ldr r0,[r7,#108]
- 11979 02e4 00FB02F2 	 mul r2,r0,r2
- 11980 02e8 8A1A     	 subs r2,r1,r2
- 11981 02ea 02FB03F2 	 mul r2,r2,r3
- 11982 02ee 7B6C     	 ldr r3,[r7,#68]
- 11983 02f0 F96C     	 ldr r1,[r7,#76]
- 11984 02f2 F86E     	 ldr r0,[r7,#108]
- 11985 02f4 00FB01F0 	 mul r0,r0,r1
- 11986 02f8 796D     	 ldr r1,[r7,#84]
- 11987 02fa 7C6E     	 ldr r4,[r7,#100]
- 11988 02fc 04FB01F1 	 mul r1,r4,r1
- 11989 0300 411A     	 subs r1,r0,r1
- 11990 0302 01FB03F3 	 mul r3,r1,r3
- 11991 0306 1A44     	 add r2,r2,r3
- 11992 0308 BB6C     	 ldr r3,[r7,#72]
- 11993 030a 396D     	 ldr r1,[r7,#80]
- 11994 030c 786E     	 ldr r0,[r7,#100]
- 11995 030e 00FB01F0 	 mul r0,r0,r1
- 11996 0312 F96C     	 ldr r1,[r7,#76]
- 11997 0314 BC6E     	 ldr r4,[r7,#104]
- 11998 0316 04FB01F1 	 mul r1,r4,r1
- 11999 031a 411A     	 subs r1,r0,r1
- 12000 031c 01FB03F3 	 mul r3,r1,r3
- 12001 0320 1344     	 add r3,r3,r2
- 12002 0322 3B67     	 str r3,[r7,#112]
-3124:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[2] = ((int64_t)tmp << 16) / k;
- 12003              	 .loc 5 3124 0
- 12004 0324 3B6F     	 ldr r3,[r7,#112]
- 12005 0326 1A46     	 mov r2,r3
- 12006 0328 4FEAE273 	 asr r3,r2,#31
- 12007 032c 1904     	 lsls r1,r3,#16
- 12008 032e F960     	 str r1,[r7,#12]
- 12009 0330 F968     	 ldr r1,[r7,#12]
- 12010 0332 41EA1241 	 orr r1,r1,r2,lsr#16
- 12011 0336 F960     	 str r1,[r7,#12]
- 12012 0338 1304     	 lsls r3,r2,#16
- 12013 033a BB60     	 str r3,[r7,#8]
- 12014 033c 7B6F     	 ldr r3,[r7,#116]
- 12015 033e 1A46     	 mov r2,r3
- 12016 0340 4FEAE273 	 asr r3,r2,#31
- 12017 0344 D7E90201 	 ldrd r0,[r7,#8]
- 12018 0348 FFF7FEFF 	 bl __aeabi_ldivmod
- 12019 034c 0246     	 mov r2,r0
- 12020 034e 0B46     	 mov r3,r1
- 12021 0350 1346     	 mov r3,r2
- 12022 0352 3B63     	 str r3,[r7,#48]
-3125:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3126:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((displayY[0] - displayY[2]) * (touchY[1] - touchY[2])) - ((displayY[1] - displayY[2])*(tou
- 12023              	 .loc 5 3126 0
- 12024 0354 BA6D     	 ldr r2,[r7,#88]
- 12025 0356 3B6E     	 ldr r3,[r7,#96]
- 12026 0358 D31A     	 subs r3,r2,r3
- 12027 035a 796C     	 ldr r1,[r7,#68]
- 12028 035c BA6C     	 ldr r2,[r7,#72]
- 12029 035e 8A1A     	 subs r2,r1,r2
- 12030 0360 02FB03F2 	 mul r2,r2,r3
- 12031 0364 F96D     	 ldr r1,[r7,#92]
- 12032 0366 3B6E     	 ldr r3,[r7,#96]
- 12033 0368 CB1A     	 subs r3,r1,r3
- 12034 036a 386C     	 ldr r0,[r7,#64]
- 12035 036c B96C     	 ldr r1,[r7,#72]
- 12036 036e 411A     	 subs r1,r0,r1
- 12037 0370 01FB03F3 	 mul r3,r1,r3
- 12038 0374 D31A     	 subs r3,r2,r3
- 12039 0376 3B67     	 str r3,[r7,#112]
-3127:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[3] = ((int64_t)tmp << 16) / k;
- 12040              	 .loc 5 3127 0
- 12041 0378 3B6F     	 ldr r3,[r7,#112]
- 12042 037a 1A46     	 mov r2,r3
- 12043 037c 4FEAE273 	 asr r3,r2,#31
- 12044 0380 1904     	 lsls r1,r3,#16
- 12045 0382 7960     	 str r1,[r7,#4]
- 12046 0384 7968     	 ldr r1,[r7,#4]
- 12047 0386 41EA1241 	 orr r1,r1,r2,lsr#16
- 12048 038a 7960     	 str r1,[r7,#4]
- 12049 038c 1304     	 lsls r3,r2,#16
- 12050 038e 3B60     	 str r3,[r7]
- 12051 0390 7B6F     	 ldr r3,[r7,#116]
- 12052 0392 1A46     	 mov r2,r3
- 12053 0394 4FEAE273 	 asr r3,r2,#31
- 12054 0398 D7E90001 	 ldrd r0,[r7]
- 12055 039c FFF7FEFF 	 bl __aeabi_ldivmod
- 12056 03a0 0246     	 mov r2,r0
- 12057 03a2 0B46     	 mov r3,r1
- 12058 03a4 1346     	 mov r3,r2
- 12059 03a6 7B63     	 str r3,[r7,#52]
-3128:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3129:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((touchX[0] - touchX[2]) * (displayY[1] - displayY[2])) - ((displayY[0] - displayY[2])*(tou
- 12060              	 .loc 5 3129 0
- 12061 03a8 FA6C     	 ldr r2,[r7,#76]
- 12062 03aa 7B6D     	 ldr r3,[r7,#84]
- 12063 03ac D31A     	 subs r3,r2,r3
- 12064 03ae F96D     	 ldr r1,[r7,#92]
- 12065 03b0 3A6E     	 ldr r2,[r7,#96]
- 12066 03b2 8A1A     	 subs r2,r1,r2
- 12067 03b4 02FB03F2 	 mul r2,r2,r3
- 12068 03b8 B96D     	 ldr r1,[r7,#88]
- 12069 03ba 3B6E     	 ldr r3,[r7,#96]
- 12070 03bc CB1A     	 subs r3,r1,r3
- 12071 03be 386D     	 ldr r0,[r7,#80]
- 12072 03c0 796D     	 ldr r1,[r7,#84]
- 12073 03c2 411A     	 subs r1,r0,r1
- 12074 03c4 01FB03F3 	 mul r3,r1,r3
- 12075 03c8 D31A     	 subs r3,r2,r3
- 12076 03ca 3B67     	 str r3,[r7,#112]
-3130:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[4] = ((int64_t)tmp << 16) / k;
- 12077              	 .loc 5 3130 0
- 12078 03cc 3B6F     	 ldr r3,[r7,#112]
- 12079 03ce 1A46     	 mov r2,r3
- 12080 03d0 4FEAE273 	 asr r3,r2,#31
- 12081 03d4 4FEA034B 	 lsl fp,r3,#16
- 12082 03d8 4BEA124B 	 orr fp,fp,r2,lsr#16
- 12083 03dc 4FEA024A 	 lsl r10,r2,#16
- 12084 03e0 7B6F     	 ldr r3,[r7,#116]
- 12085 03e2 1A46     	 mov r2,r3
- 12086 03e4 4FEAE273 	 asr r3,r2,#31
- 12087 03e8 5046     	 mov r0,r10
- 12088 03ea 5946     	 mov r1,fp
- 12089 03ec FFF7FEFF 	 bl __aeabi_ldivmod
- 12090 03f0 0246     	 mov r2,r0
- 12091 03f2 0B46     	 mov r3,r1
- 12092 03f4 1346     	 mov r3,r2
- 12093 03f6 BB63     	 str r3,[r7,#56]
-3131:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3132:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = ((touchY[0] * (((touchX[2] * displayY[1]) - (touchX[1] * displayY[2])))) + (touchY[1] * (((t
- 12094              	 .loc 5 3132 0
- 12095 03f8 3B6C     	 ldr r3,[r7,#64]
- 12096 03fa 7A6D     	 ldr r2,[r7,#84]
- 12097 03fc F96D     	 ldr r1,[r7,#92]
- 12098 03fe 01FB02F1 	 mul r1,r1,r2
- 12099 0402 3A6D     	 ldr r2,[r7,#80]
- 12100 0404 386E     	 ldr r0,[r7,#96]
- 12101 0406 00FB02F2 	 mul r2,r0,r2
- 12102 040a 8A1A     	 subs r2,r1,r2
- 12103 040c 02FB03F2 	 mul r2,r2,r3
- 12104 0410 7B6C     	 ldr r3,[r7,#68]
- 12105 0412 F96C     	 ldr r1,[r7,#76]
- 12106 0414 386E     	 ldr r0,[r7,#96]
- 12107 0416 00FB01F0 	 mul r0,r0,r1
- 12108 041a 796D     	 ldr r1,[r7,#84]
- 12109 041c BC6D     	 ldr r4,[r7,#88]
- 12110 041e 04FB01F1 	 mul r1,r4,r1
- 12111 0422 411A     	 subs r1,r0,r1
- 12112 0424 01FB03F3 	 mul r3,r1,r3
- 12113 0428 1A44     	 add r2,r2,r3
- 12114 042a BB6C     	 ldr r3,[r7,#72]
- 12115 042c 396D     	 ldr r1,[r7,#80]
- 12116 042e B86D     	 ldr r0,[r7,#88]
- 12117 0430 00FB01F0 	 mul r0,r0,r1
- 12118 0434 F96C     	 ldr r1,[r7,#76]
- 12119 0436 FC6D     	 ldr r4,[r7,#92]
- 12120 0438 04FB01F1 	 mul r1,r4,r1
- 12121 043c 411A     	 subs r1,r0,r1
- 12122 043e 01FB03F3 	 mul r3,r1,r3
- 12123 0442 1344     	 add r3,r3,r2
- 12124 0444 3B67     	 str r3,[r7,#112]
-3133:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[5] = ((int64_t)tmp << 16) / k;
- 12125              	 .loc 5 3133 0
- 12126 0446 3B6F     	 ldr r3,[r7,#112]
- 12127 0448 1A46     	 mov r2,r3
- 12128 044a 4FEAE273 	 asr r3,r2,#31
- 12129 044e 4FEA0349 	 lsl r9,r3,#16
- 12130 0452 49EA1249 	 orr r9,r9,r2,lsr#16
- 12131 0456 4FEA0248 	 lsl r8,r2,#16
- 12132 045a 7B6F     	 ldr r3,[r7,#116]
- 12133 045c 1A46     	 mov r2,r3
- 12134 045e 4FEAE273 	 asr r3,r2,#31
- 12135 0462 4046     	 mov r0,r8
- 12136 0464 4946     	 mov r1,r9
- 12137 0466 FFF7FEFF 	 bl __aeabi_ldivmod
- 12138 046a 0246     	 mov r2,r0
- 12139 046c 0B46     	 mov r3,r1
- 12140 046e 1346     	 mov r3,r2
- 12141 0470 FB63     	 str r3,[r7,#60]
-3134:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
-3135:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, TransMatrix[0]);
- 12142              	 .loc 5 3135 0
- 12143 0472 BB6A     	 ldr r3,[r7,#40]
- 12144 0474 1048     	 ldr r0,.L452
- 12145 0476 1946     	 mov r1,r3
- 12146 0478 FFF7FEFF 	 bl EVE_memWrite32
-3136:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, TransMatrix[1]);
- 12147              	 .loc 5 3136 0
- 12148 047c FB6A     	 ldr r3,[r7,#44]
- 12149 047e 0F48     	 ldr r0,.L452+4
- 12150 0480 1946     	 mov r1,r3
- 12151 0482 FFF7FEFF 	 bl EVE_memWrite32
-3137:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, TransMatrix[2]);
- 12152              	 .loc 5 3137 0
- 12153 0486 3B6B     	 ldr r3,[r7,#48]
- 12154 0488 0D48     	 ldr r0,.L452+8
- 12155 048a 1946     	 mov r1,r3
- 12156 048c FFF7FEFF 	 bl EVE_memWrite32
-3138:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, TransMatrix[3]);
- 12157              	 .loc 5 3138 0
- 12158 0490 7B6B     	 ldr r3,[r7,#52]
- 12159 0492 0C48     	 ldr r0,.L452+12
- 12160 0494 1946     	 mov r1,r3
- 12161 0496 FFF7FEFF 	 bl EVE_memWrite32
-3139:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, TransMatrix[4]);
- 12162              	 .loc 5 3139 0
- 12163 049a BB6B     	 ldr r3,[r7,#56]
- 12164 049c 0A48     	 ldr r0,.L452+16
- 12165 049e 1946     	 mov r1,r3
- 12166 04a0 FFF7FEFF 	 bl EVE_memWrite32
-3140:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, TransMatrix[5]);
- 12167              	 .loc 5 3140 0
- 12168 04a4 FB6B     	 ldr r3,[r7,#60]
- 12169 04a6 0948     	 ldr r0,.L452+20
- 12170 04a8 1946     	 mov r1,r3
- 12171 04aa FFF7FEFF 	 bl EVE_memWrite32
-3141:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
- 12172              	 .loc 5 3141 0
- 12173 04ae 8037     	 adds r7,r7,#128
- 12174              	.LCFI725:
- 12175              	 .cfi_def_cfa_offset 32
- 12176 04b0 BD46     	 mov sp,r7
- 12177              	.LCFI726:
- 12178              	 .cfi_def_cfa_register 13
- 12179              	 
- 12180 04b2 BDE8B08F 	 pop {r4,r5,r7,r8,r9,r10,fp,pc}
- 12181              	.L453:
- 12182 04b6 00BF     	 .align 2
- 12183              	.L452:
- 12184 04b8 50213000 	 .word 3154256
- 12185 04bc 54213000 	 .word 3154260
- 12186 04c0 58213000 	 .word 3154264
- 12187 04c4 5C213000 	 .word 3154268
- 12188 04c8 60213000 	 .word 3154272
- 12189 04cc 64213000 	 .word 3154276
- 12190              	 .cfi_endproc
- 12191              	.LFE583:
- 12193              	 .text
- 12194              	.Letext0:
- 12195              	 .file 6 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 12196              	 .file 7 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 12197              	 .file 8 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\lib\\gcc\\arm-none-eabi\\4.9.3\\include\\stdarg.h"
- 12198              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
- 12199              	 .file 10 "<built-in>"
- 12200              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 12201              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master.h"
- 12202              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 12203              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
- 12204              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
- 12205              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master_extern.h"
- 12206              	 .file 17 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+3115:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			if(touch_lock)
+ 11986              	 .loc 5 3115 0
+ 11987 017c 97F87E30 	 ldrb r3,[r7,#126]
+ 11988 0180 002B     	 cmp r3,#0
+ 11989 0182 06D0     	 beq .L451
+3116:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			{
+3117:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				if(touchValue & 0x80000000) /* check if we have no touch */
+ 11990              	 .loc 5 3117 0
+ 11991 0184 BB6F     	 ldr r3,[r7,#120]
+ 11992 0186 002B     	 cmp r3,#0
+ 11993 0188 26DA     	 bge .L453
+3118:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				{
+3119:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touch_lock = 0;
+ 11994              	 .loc 5 3119 0
+ 11995 018a 0023     	 movs r3,#0
+ 11996 018c 87F87E30 	 strb r3,[r7,#126]
+ 11997 0190 F0E7     	 b .L454
+ 11998              	.L451:
+3120:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				}
+3121:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			}
+3122:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			else
+3123:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			{
+3124:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				if (!(touchValue & 0x80000000)) /* check if a touch is detected */
+ 11999              	 .loc 5 3124 0
+ 12000 0192 BB6F     	 ldr r3,[r7,#120]
+ 12001 0194 002B     	 cmp r3,#0
+ 12002 0196 1FDB     	 blt .L453
+3125:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				{
+3126:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touchX[count] = (touchValue>>16) & 0x03FF; /* raw Touchscreen Y coordinate */
+ 12003              	 .loc 5 3126 0
+ 12004 0198 97F87F10 	 ldrb r1,[r7,#127]
+ 12005 019c BB6F     	 ldr r3,[r7,#120]
+ 12006 019e 1B0C     	 lsrs r3,r3,#16
+ 12007 01a0 C3F30902 	 ubfx r2,r3,#0,#10
+ 12008 01a4 8B00     	 lsls r3,r1,#2
+ 12009 01a6 07F18001 	 add r1,r7,#128
+ 12010 01aa 0B44     	 add r3,r3,r1
+ 12011 01ac 43F8342C 	 str r2,[r3,#-52]
+3127:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touchY[count] = touchValue & 0x03FF; /* raw Touchscreen Y coordinate */
+ 12012              	 .loc 5 3127 0
+ 12013 01b0 97F87F20 	 ldrb r2,[r7,#127]
+ 12014 01b4 BB6F     	 ldr r3,[r7,#120]
+ 12015 01b6 C3F30901 	 ubfx r1,r3,#0,#10
+ 12016 01ba 9300     	 lsls r3,r2,#2
+ 12017 01bc 07F18002 	 add r2,r7,#128
+ 12018 01c0 1344     	 add r3,r3,r2
+ 12019 01c2 43F8401C 	 str r1,[r3,#-64]
+3128:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					touch_lock = 1;
+ 12020              	 .loc 5 3128 0
+ 12021 01c6 0123     	 movs r3,#1
+ 12022 01c8 87F87E30 	 strb r3,[r7,#126]
+3129:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					count++;
+ 12023              	 .loc 5 3129 0
+ 12024 01cc 97F87F30 	 ldrb r3,[r7,#127]
+ 12025 01d0 0133     	 adds r3,r3,#1
+ 12026 01d2 87F87F30 	 strb r3,[r7,#127]
+3130:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 					break; /* leave while(1) */
+ 12027              	 .loc 5 3130 0
+ 12028 01d6 17E0     	 b .L449
+ 12029              	.L453:
+3131:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 				}
+3132:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 			}
+3133:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 		}
+ 12030              	 .loc 5 3133 0 discriminator 1
+ 12031 01d8 CCE7     	 b .L454
+ 12032              	.L457:
+ 12033 01da 00BFAFF3 	 .align 3
+ 12033      0080
+ 12034              	.L456:
+ 12035 01e0 07000026 	 .word 637534215
+ 12036 01e4 FF000004 	 .word 67109119
+ 12037 01e8 4001000D 	 .word 218104128
+ 12038 01ec 0200001F 	 .word 520093698
+ 12039 01f0 40010000 	 .word .LC10
+ 12040 01f4 8C213000 	 .word 3154316
+ 12041 01f8 33333333 	 .word 858993459
+ 12042 01fc 3333C33F 	 .word 1069757235
+ 12043 0200 33333333 	 .word 858993459
+ 12044 0204 3333EB3F 	 .word 1072378675
+ 12045              	.L449:
+3090:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	{
+ 12046              	 .loc 5 3090 0
+ 12047 0208 97F87F30 	 ldrb r3,[r7,#127]
+ 12048 020c 022B     	 cmp r3,#2
+ 12049 020e 7FF639AF 	 bls .L455
+3134:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	}
+3135:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3136:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	k = ((touchX[0] - touchX[2])*(touchY[1] - touchY[2])) - ((touchX[1] - touchX[2])*(touchY[0] - touc
+ 12050              	 .loc 5 3136 0
+ 12051 0212 FA6C     	 ldr r2,[r7,#76]
+ 12052 0214 7B6D     	 ldr r3,[r7,#84]
+ 12053 0216 D11A     	 subs r1,r2,r3
+ 12054 0218 7A6C     	 ldr r2,[r7,#68]
+ 12055 021a BB6C     	 ldr r3,[r7,#72]
+ 12056 021c D31A     	 subs r3,r2,r3
+ 12057 021e 03FB01F0 	 mul r0,r3,r1
+ 12058 0222 3A6D     	 ldr r2,[r7,#80]
+ 12059 0224 7B6D     	 ldr r3,[r7,#84]
+ 12060 0226 D11A     	 subs r1,r2,r3
+ 12061 0228 3A6C     	 ldr r2,[r7,#64]
+ 12062 022a BB6C     	 ldr r3,[r7,#72]
+ 12063 022c D31A     	 subs r3,r2,r3
+ 12064 022e 03FB01F3 	 mul r3,r3,r1
+ 12065 0232 C31A     	 subs r3,r0,r3
+ 12066 0234 7B67     	 str r3,[r7,#116]
+3137:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3138:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((displayX[0] - displayX[2]) * (touchY[1] - touchY[2])) - ((displayX[1] - displayX[2])*(tou
+ 12067              	 .loc 5 3138 0
+ 12068 0236 7A6E     	 ldr r2,[r7,#100]
+ 12069 0238 FB6E     	 ldr r3,[r7,#108]
+ 12070 023a D11A     	 subs r1,r2,r3
+ 12071 023c 7A6C     	 ldr r2,[r7,#68]
+ 12072 023e BB6C     	 ldr r3,[r7,#72]
+ 12073 0240 D31A     	 subs r3,r2,r3
+ 12074 0242 03FB01F0 	 mul r0,r3,r1
+ 12075 0246 BA6E     	 ldr r2,[r7,#104]
+ 12076 0248 FB6E     	 ldr r3,[r7,#108]
+ 12077 024a D11A     	 subs r1,r2,r3
+ 12078 024c 3A6C     	 ldr r2,[r7,#64]
+ 12079 024e BB6C     	 ldr r3,[r7,#72]
+ 12080 0250 D31A     	 subs r3,r2,r3
+ 12081 0252 03FB01F3 	 mul r3,r3,r1
+ 12082 0256 C31A     	 subs r3,r0,r3
+ 12083 0258 3B67     	 str r3,[r7,#112]
+3139:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[0] = ((int64_t)tmp << 16) / k;
+ 12084              	 .loc 5 3139 0
+ 12085 025a 3B6F     	 ldr r3,[r7,#112]
+ 12086 025c 1A46     	 mov r2,r3
+ 12087 025e 4FEAE273 	 asr r3,r2,#31
+ 12088 0262 1D04     	 lsls r5,r3,#16
+ 12089 0264 45EA1245 	 orr r5,r5,r2,lsr#16
+ 12090 0268 1404     	 lsls r4,r2,#16
+ 12091 026a 7B6F     	 ldr r3,[r7,#116]
+ 12092 026c 1A46     	 mov r2,r3
+ 12093 026e 4FEAE273 	 asr r3,r2,#31
+ 12094 0272 2046     	 mov r0,r4
+ 12095 0274 2946     	 mov r1,r5
+ 12096 0276 FFF7FEFF 	 bl __aeabi_ldivmod
+ 12097 027a 0246     	 mov r2,r0
+ 12098 027c 0B46     	 mov r3,r1
+ 12099 027e 1346     	 mov r3,r2
+ 12100 0280 BB62     	 str r3,[r7,#40]
+3140:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3141:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((touchX[0] - touchX[2]) * (displayX[1] - displayX[2])) - ((displayX[0] - displayX[2])*(tou
+ 12101              	 .loc 5 3141 0
+ 12102 0282 FA6C     	 ldr r2,[r7,#76]
+ 12103 0284 7B6D     	 ldr r3,[r7,#84]
+ 12104 0286 D31A     	 subs r3,r2,r3
+ 12105 0288 B96E     	 ldr r1,[r7,#104]
+ 12106 028a FA6E     	 ldr r2,[r7,#108]
+ 12107 028c 8A1A     	 subs r2,r1,r2
+ 12108 028e 02FB03F1 	 mul r1,r2,r3
+ 12109 0292 7A6E     	 ldr r2,[r7,#100]
+ 12110 0294 FB6E     	 ldr r3,[r7,#108]
+ 12111 0296 D21A     	 subs r2,r2,r3
+ 12112 0298 386D     	 ldr r0,[r7,#80]
+ 12113 029a 7B6D     	 ldr r3,[r7,#84]
+ 12114 029c C31A     	 subs r3,r0,r3
+ 12115 029e 03FB02F3 	 mul r3,r3,r2
+ 12116 02a2 CB1A     	 subs r3,r1,r3
+ 12117 02a4 3B67     	 str r3,[r7,#112]
+3142:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[1] = ((int64_t)tmp << 16) / k;
+ 12118              	 .loc 5 3142 0
+ 12119 02a6 3B6F     	 ldr r3,[r7,#112]
+ 12120 02a8 1A46     	 mov r2,r3
+ 12121 02aa 4FEAE273 	 asr r3,r2,#31
+ 12122 02ae 1904     	 lsls r1,r3,#16
+ 12123 02b0 7961     	 str r1,[r7,#20]
+ 12124 02b2 7969     	 ldr r1,[r7,#20]
+ 12125 02b4 41EA1241 	 orr r1,r1,r2,lsr#16
+ 12126 02b8 7961     	 str r1,[r7,#20]
+ 12127 02ba 1304     	 lsls r3,r2,#16
+ 12128 02bc 3B61     	 str r3,[r7,#16]
+ 12129 02be 7B6F     	 ldr r3,[r7,#116]
+ 12130 02c0 1A46     	 mov r2,r3
+ 12131 02c2 4FEAE273 	 asr r3,r2,#31
+ 12132 02c6 D7E90401 	 ldrd r0,[r7,#16]
+ 12133 02ca FFF7FEFF 	 bl __aeabi_ldivmod
+ 12134 02ce 0246     	 mov r2,r0
+ 12135 02d0 0B46     	 mov r3,r1
+ 12136 02d2 1346     	 mov r3,r2
+ 12137 02d4 FB62     	 str r3,[r7,#44]
+3143:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3144:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = ((touchY[0] * (((touchX[2] * displayX[1]) - (touchX[1] * displayX[2])))) + (touchY[1] * (((t
+ 12138              	 .loc 5 3144 0
+ 12139 02d6 3B6C     	 ldr r3,[r7,#64]
+ 12140 02d8 7A6D     	 ldr r2,[r7,#84]
+ 12141 02da B96E     	 ldr r1,[r7,#104]
+ 12142 02dc 01FB02F1 	 mul r1,r1,r2
+ 12143 02e0 3A6D     	 ldr r2,[r7,#80]
+ 12144 02e2 F86E     	 ldr r0,[r7,#108]
+ 12145 02e4 00FB02F2 	 mul r2,r0,r2
+ 12146 02e8 8A1A     	 subs r2,r1,r2
+ 12147 02ea 02FB03F2 	 mul r2,r2,r3
+ 12148 02ee 7B6C     	 ldr r3,[r7,#68]
+ 12149 02f0 F96C     	 ldr r1,[r7,#76]
+ 12150 02f2 F86E     	 ldr r0,[r7,#108]
+ 12151 02f4 00FB01F0 	 mul r0,r0,r1
+ 12152 02f8 796D     	 ldr r1,[r7,#84]
+ 12153 02fa 7C6E     	 ldr r4,[r7,#100]
+ 12154 02fc 04FB01F1 	 mul r1,r4,r1
+ 12155 0300 411A     	 subs r1,r0,r1
+ 12156 0302 01FB03F3 	 mul r3,r1,r3
+ 12157 0306 1A44     	 add r2,r2,r3
+ 12158 0308 BB6C     	 ldr r3,[r7,#72]
+ 12159 030a 396D     	 ldr r1,[r7,#80]
+ 12160 030c 786E     	 ldr r0,[r7,#100]
+ 12161 030e 00FB01F0 	 mul r0,r0,r1
+ 12162 0312 F96C     	 ldr r1,[r7,#76]
+ 12163 0314 BC6E     	 ldr r4,[r7,#104]
+ 12164 0316 04FB01F1 	 mul r1,r4,r1
+ 12165 031a 411A     	 subs r1,r0,r1
+ 12166 031c 01FB03F3 	 mul r3,r1,r3
+ 12167 0320 1344     	 add r3,r3,r2
+ 12168 0322 3B67     	 str r3,[r7,#112]
+3145:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[2] = ((int64_t)tmp << 16) / k;
+ 12169              	 .loc 5 3145 0
+ 12170 0324 3B6F     	 ldr r3,[r7,#112]
+ 12171 0326 1A46     	 mov r2,r3
+ 12172 0328 4FEAE273 	 asr r3,r2,#31
+ 12173 032c 1904     	 lsls r1,r3,#16
+ 12174 032e F960     	 str r1,[r7,#12]
+ 12175 0330 F968     	 ldr r1,[r7,#12]
+ 12176 0332 41EA1241 	 orr r1,r1,r2,lsr#16
+ 12177 0336 F960     	 str r1,[r7,#12]
+ 12178 0338 1304     	 lsls r3,r2,#16
+ 12179 033a BB60     	 str r3,[r7,#8]
+ 12180 033c 7B6F     	 ldr r3,[r7,#116]
+ 12181 033e 1A46     	 mov r2,r3
+ 12182 0340 4FEAE273 	 asr r3,r2,#31
+ 12183 0344 D7E90201 	 ldrd r0,[r7,#8]
+ 12184 0348 FFF7FEFF 	 bl __aeabi_ldivmod
+ 12185 034c 0246     	 mov r2,r0
+ 12186 034e 0B46     	 mov r3,r1
+ 12187 0350 1346     	 mov r3,r2
+ 12188 0352 3B63     	 str r3,[r7,#48]
+3146:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3147:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((displayY[0] - displayY[2]) * (touchY[1] - touchY[2])) - ((displayY[1] - displayY[2])*(tou
+ 12189              	 .loc 5 3147 0
+ 12190 0354 BA6D     	 ldr r2,[r7,#88]
+ 12191 0356 3B6E     	 ldr r3,[r7,#96]
+ 12192 0358 D31A     	 subs r3,r2,r3
+ 12193 035a 796C     	 ldr r1,[r7,#68]
+ 12194 035c BA6C     	 ldr r2,[r7,#72]
+ 12195 035e 8A1A     	 subs r2,r1,r2
+ 12196 0360 02FB03F2 	 mul r2,r2,r3
+ 12197 0364 F96D     	 ldr r1,[r7,#92]
+ 12198 0366 3B6E     	 ldr r3,[r7,#96]
+ 12199 0368 CB1A     	 subs r3,r1,r3
+ 12200 036a 386C     	 ldr r0,[r7,#64]
+ 12201 036c B96C     	 ldr r1,[r7,#72]
+ 12202 036e 411A     	 subs r1,r0,r1
+ 12203 0370 01FB03F3 	 mul r3,r1,r3
+ 12204 0374 D31A     	 subs r3,r2,r3
+ 12205 0376 3B67     	 str r3,[r7,#112]
+3148:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[3] = ((int64_t)tmp << 16) / k;
+ 12206              	 .loc 5 3148 0
+ 12207 0378 3B6F     	 ldr r3,[r7,#112]
+ 12208 037a 1A46     	 mov r2,r3
+ 12209 037c 4FEAE273 	 asr r3,r2,#31
+ 12210 0380 1904     	 lsls r1,r3,#16
+ 12211 0382 7960     	 str r1,[r7,#4]
+ 12212 0384 7968     	 ldr r1,[r7,#4]
+ 12213 0386 41EA1241 	 orr r1,r1,r2,lsr#16
+ 12214 038a 7960     	 str r1,[r7,#4]
+ 12215 038c 1304     	 lsls r3,r2,#16
+ 12216 038e 3B60     	 str r3,[r7]
+ 12217 0390 7B6F     	 ldr r3,[r7,#116]
+ 12218 0392 1A46     	 mov r2,r3
+ 12219 0394 4FEAE273 	 asr r3,r2,#31
+ 12220 0398 D7E90001 	 ldrd r0,[r7]
+ 12221 039c FFF7FEFF 	 bl __aeabi_ldivmod
+ 12222 03a0 0246     	 mov r2,r0
+ 12223 03a2 0B46     	 mov r3,r1
+ 12224 03a4 1346     	 mov r3,r2
+ 12225 03a6 7B63     	 str r3,[r7,#52]
+3149:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3150:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = (((touchX[0] - touchX[2]) * (displayY[1] - displayY[2])) - ((displayY[0] - displayY[2])*(tou
+ 12226              	 .loc 5 3150 0
+ 12227 03a8 FA6C     	 ldr r2,[r7,#76]
+ 12228 03aa 7B6D     	 ldr r3,[r7,#84]
+ 12229 03ac D31A     	 subs r3,r2,r3
+ 12230 03ae F96D     	 ldr r1,[r7,#92]
+ 12231 03b0 3A6E     	 ldr r2,[r7,#96]
+ 12232 03b2 8A1A     	 subs r2,r1,r2
+ 12233 03b4 02FB03F2 	 mul r2,r2,r3
+ 12234 03b8 B96D     	 ldr r1,[r7,#88]
+ 12235 03ba 3B6E     	 ldr r3,[r7,#96]
+ 12236 03bc CB1A     	 subs r3,r1,r3
+ 12237 03be 386D     	 ldr r0,[r7,#80]
+ 12238 03c0 796D     	 ldr r1,[r7,#84]
+ 12239 03c2 411A     	 subs r1,r0,r1
+ 12240 03c4 01FB03F3 	 mul r3,r1,r3
+ 12241 03c8 D31A     	 subs r3,r2,r3
+ 12242 03ca 3B67     	 str r3,[r7,#112]
+3151:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[4] = ((int64_t)tmp << 16) / k;
+ 12243              	 .loc 5 3151 0
+ 12244 03cc 3B6F     	 ldr r3,[r7,#112]
+ 12245 03ce 1A46     	 mov r2,r3
+ 12246 03d0 4FEAE273 	 asr r3,r2,#31
+ 12247 03d4 4FEA034B 	 lsl fp,r3,#16
+ 12248 03d8 4BEA124B 	 orr fp,fp,r2,lsr#16
+ 12249 03dc 4FEA024A 	 lsl r10,r2,#16
+ 12250 03e0 7B6F     	 ldr r3,[r7,#116]
+ 12251 03e2 1A46     	 mov r2,r3
+ 12252 03e4 4FEAE273 	 asr r3,r2,#31
+ 12253 03e8 5046     	 mov r0,r10
+ 12254 03ea 5946     	 mov r1,fp
+ 12255 03ec FFF7FEFF 	 bl __aeabi_ldivmod
+ 12256 03f0 0246     	 mov r2,r0
+ 12257 03f2 0B46     	 mov r3,r1
+ 12258 03f4 1346     	 mov r3,r2
+ 12259 03f6 BB63     	 str r3,[r7,#56]
+3152:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3153:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	tmp = ((touchY[0] * (((touchX[2] * displayY[1]) - (touchX[1] * displayY[2])))) + (touchY[1] * (((t
+ 12260              	 .loc 5 3153 0
+ 12261 03f8 3B6C     	 ldr r3,[r7,#64]
+ 12262 03fa 7A6D     	 ldr r2,[r7,#84]
+ 12263 03fc F96D     	 ldr r1,[r7,#92]
+ 12264 03fe 01FB02F1 	 mul r1,r1,r2
+ 12265 0402 3A6D     	 ldr r2,[r7,#80]
+ 12266 0404 386E     	 ldr r0,[r7,#96]
+ 12267 0406 00FB02F2 	 mul r2,r0,r2
+ 12268 040a 8A1A     	 subs r2,r1,r2
+ 12269 040c 02FB03F2 	 mul r2,r2,r3
+ 12270 0410 7B6C     	 ldr r3,[r7,#68]
+ 12271 0412 F96C     	 ldr r1,[r7,#76]
+ 12272 0414 386E     	 ldr r0,[r7,#96]
+ 12273 0416 00FB01F0 	 mul r0,r0,r1
+ 12274 041a 796D     	 ldr r1,[r7,#84]
+ 12275 041c BC6D     	 ldr r4,[r7,#88]
+ 12276 041e 04FB01F1 	 mul r1,r4,r1
+ 12277 0422 411A     	 subs r1,r0,r1
+ 12278 0424 01FB03F3 	 mul r3,r1,r3
+ 12279 0428 1A44     	 add r2,r2,r3
+ 12280 042a BB6C     	 ldr r3,[r7,#72]
+ 12281 042c 396D     	 ldr r1,[r7,#80]
+ 12282 042e B86D     	 ldr r0,[r7,#88]
+ 12283 0430 00FB01F0 	 mul r0,r0,r1
+ 12284 0434 F96C     	 ldr r1,[r7,#76]
+ 12285 0436 FC6D     	 ldr r4,[r7,#92]
+ 12286 0438 04FB01F1 	 mul r1,r4,r1
+ 12287 043c 411A     	 subs r1,r0,r1
+ 12288 043e 01FB03F3 	 mul r3,r1,r3
+ 12289 0442 1344     	 add r3,r3,r2
+ 12290 0444 3B67     	 str r3,[r7,#112]
+3154:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	TransMatrix[5] = ((int64_t)tmp << 16) / k;
+ 12291              	 .loc 5 3154 0
+ 12292 0446 3B6F     	 ldr r3,[r7,#112]
+ 12293 0448 1A46     	 mov r2,r3
+ 12294 044a 4FEAE273 	 asr r3,r2,#31
+ 12295 044e 4FEA0349 	 lsl r9,r3,#16
+ 12296 0452 49EA1249 	 orr r9,r9,r2,lsr#16
+ 12297 0456 4FEA0248 	 lsl r8,r2,#16
+ 12298 045a 7B6F     	 ldr r3,[r7,#116]
+ 12299 045c 1A46     	 mov r2,r3
+ 12300 045e 4FEAE273 	 asr r3,r2,#31
+ 12301 0462 4046     	 mov r0,r8
+ 12302 0464 4946     	 mov r1,r9
+ 12303 0466 FFF7FEFF 	 bl __aeabi_ldivmod
+ 12304 046a 0246     	 mov r2,r0
+ 12305 046c 0B46     	 mov r3,r1
+ 12306 046e 1346     	 mov r3,r2
+ 12307 0470 FB63     	 str r3,[r7,#60]
+3155:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 
+3156:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, TransMatrix[0]);
+ 12308              	 .loc 5 3156 0
+ 12309 0472 BB6A     	 ldr r3,[r7,#40]
+ 12310 0474 1048     	 ldr r0,.L458
+ 12311 0476 1946     	 mov r1,r3
+ 12312 0478 FFF7FEFF 	 bl EVE_memWrite32
+3157:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_B, TransMatrix[1]);
+ 12313              	 .loc 5 3157 0
+ 12314 047c FB6A     	 ldr r3,[r7,#44]
+ 12315 047e 0F48     	 ldr r0,.L458+4
+ 12316 0480 1946     	 mov r1,r3
+ 12317 0482 FFF7FEFF 	 bl EVE_memWrite32
+3158:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_C, TransMatrix[2]);
+ 12318              	 .loc 5 3158 0
+ 12319 0486 3B6B     	 ldr r3,[r7,#48]
+ 12320 0488 0D48     	 ldr r0,.L458+8
+ 12321 048a 1946     	 mov r1,r3
+ 12322 048c FFF7FEFF 	 bl EVE_memWrite32
+3159:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, TransMatrix[3]);
+ 12323              	 .loc 5 3159 0
+ 12324 0490 7B6B     	 ldr r3,[r7,#52]
+ 12325 0492 0C48     	 ldr r0,.L458+12
+ 12326 0494 1946     	 mov r1,r3
+ 12327 0496 FFF7FEFF 	 bl EVE_memWrite32
+3160:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, TransMatrix[4]);
+ 12328              	 .loc 5 3160 0
+ 12329 049a BB6B     	 ldr r3,[r7,#56]
+ 12330 049c 0A48     	 ldr r0,.L458+16
+ 12331 049e 1946     	 mov r1,r3
+ 12332 04a0 FFF7FEFF 	 bl EVE_memWrite32
+3161:../Libraries/FT800-FT813-5.x/EVE_commands.c **** 	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, TransMatrix[5]);
+ 12333              	 .loc 5 3161 0
+ 12334 04a4 FB6B     	 ldr r3,[r7,#60]
+ 12335 04a6 0948     	 ldr r0,.L458+20
+ 12336 04a8 1946     	 mov r1,r3
+ 12337 04aa FFF7FEFF 	 bl EVE_memWrite32
+3162:../Libraries/FT800-FT813-5.x/EVE_commands.c **** }
+ 12338              	 .loc 5 3162 0
+ 12339 04ae 8037     	 adds r7,r7,#128
+ 12340              	.LCFI735:
+ 12341              	 .cfi_def_cfa_offset 32
+ 12342 04b0 BD46     	 mov sp,r7
+ 12343              	.LCFI736:
+ 12344              	 .cfi_def_cfa_register 13
+ 12345              	 
+ 12346 04b2 BDE8B08F 	 pop {r4,r5,r7,r8,r9,r10,fp,pc}
+ 12347              	.L459:
+ 12348 04b6 00BF     	 .align 2
+ 12349              	.L458:
+ 12350 04b8 50213000 	 .word 3154256
+ 12351 04bc 54213000 	 .word 3154260
+ 12352 04c0 58213000 	 .word 3154264
+ 12353 04c4 5C213000 	 .word 3154268
+ 12354 04c8 60213000 	 .word 3154272
+ 12355 04cc 64213000 	 .word 3154276
+ 12356              	 .cfi_endproc
+ 12357              	.LFE585:
+ 12359              	 .text
+ 12360              	.Letext0:
+ 12361              	 .file 6 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 12362              	 .file 7 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 12363              	 .file 8 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\lib\\gcc\\arm-none-eabi\\4.9.3\\include\\stdarg.h"
+ 12364              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 12365              	 .file 10 "<built-in>"
+ 12366              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 12367              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master.h"
+ 12368              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 12369              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 12370              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 12371              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master_extern.h"
+ 12372              	 .file 17 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 EVE_commands.c
     {standard input}:20     .text.XMC_GPIO_SetOutputHigh:00000000 $t
@@ -16960,26 +17144,32 @@ DEFINED SYMBOLS
     {standard input}:11130  .text.EVE_cmd_text:000000a8 $d
     {standard input}:11135  .text.EVE_cmd_text_burst:00000000 $t
     {standard input}:11140  .text.EVE_cmd_text_burst:00000000 EVE_cmd_text_burst
-    {standard input}:11203  .text.EVE_cmd_toggle:00000000 $t
-    {standard input}:11208  .text.EVE_cmd_toggle:00000000 EVE_cmd_toggle
-    {standard input}:11337  .text.EVE_cmd_toggle:000000d8 $d
-    {standard input}:11342  .text.EVE_cmd_toggle_burst:00000000 $t
-    {standard input}:11347  .text.EVE_cmd_toggle_burst:00000000 EVE_cmd_toggle_burst
-    {standard input}:11417  .text.EVE_cmd_translate:00000000 $t
-    {standard input}:11422  .text.EVE_cmd_translate:00000000 EVE_cmd_translate
-    {standard input}:11473  .text.EVE_cmd_translate:00000038 $d
-    {standard input}:11478  .text.EVE_cmd_translate_burst:00000000 $t
-    {standard input}:11483  .text.EVE_cmd_translate_burst:00000000 EVE_cmd_translate_burst
-    {standard input}:11526  .text.EVE_color_rgb:00000000 $t
-    {standard input}:11531  .text.EVE_color_rgb:00000000 EVE_color_rgb
-    {standard input}:11575  .text.EVE_color_rgb:00000028 $d
-    {standard input}:11580  .text.EVE_color_rgb_burst:00000000 $t
-    {standard input}:11585  .text.EVE_color_rgb_burst:00000000 EVE_color_rgb_burst
-    {standard input}:11629  .text.EVE_calibrate_manual:00000000 $t
-    {standard input}:11634  .text.EVE_calibrate_manual:00000000 EVE_calibrate_manual
-    {standard input}:11869  .text.EVE_calibrate_manual:000001e0 $d
-    {standard input}:11881  .text.EVE_calibrate_manual:00000208 $t
-    {standard input}:12184  .text.EVE_calibrate_manual:000004b8 $d
+    {standard input}:11207  .text.EVE_cmd_double_burst:00000000 $t
+    {standard input}:11212  .text.EVE_cmd_double_burst:00000000 EVE_cmd_double_burst
+    {standard input}:11281  .text.EVE_cmd_double_burst:00000068 $d
+    {standard input}:11290  .text.EVE_cmd_int_burst:00000000 $t
+    {standard input}:11295  .text.EVE_cmd_int_burst:00000000 EVE_cmd_int_burst
+    {standard input}:11364  .text.EVE_cmd_int_burst:00000068 $d
+    {standard input}:11369  .text.EVE_cmd_toggle:00000000 $t
+    {standard input}:11374  .text.EVE_cmd_toggle:00000000 EVE_cmd_toggle
+    {standard input}:11503  .text.EVE_cmd_toggle:000000d8 $d
+    {standard input}:11508  .text.EVE_cmd_toggle_burst:00000000 $t
+    {standard input}:11513  .text.EVE_cmd_toggle_burst:00000000 EVE_cmd_toggle_burst
+    {standard input}:11583  .text.EVE_cmd_translate:00000000 $t
+    {standard input}:11588  .text.EVE_cmd_translate:00000000 EVE_cmd_translate
+    {standard input}:11639  .text.EVE_cmd_translate:00000038 $d
+    {standard input}:11644  .text.EVE_cmd_translate_burst:00000000 $t
+    {standard input}:11649  .text.EVE_cmd_translate_burst:00000000 EVE_cmd_translate_burst
+    {standard input}:11692  .text.EVE_color_rgb:00000000 $t
+    {standard input}:11697  .text.EVE_color_rgb:00000000 EVE_color_rgb
+    {standard input}:11741  .text.EVE_color_rgb:00000028 $d
+    {standard input}:11746  .text.EVE_color_rgb_burst:00000000 $t
+    {standard input}:11751  .text.EVE_color_rgb_burst:00000000 EVE_color_rgb_burst
+    {standard input}:11795  .text.EVE_calibrate_manual:00000000 $t
+    {standard input}:11800  .text.EVE_calibrate_manual:00000000 EVE_calibrate_manual
+    {standard input}:12035  .text.EVE_calibrate_manual:000001e0 $d
+    {standard input}:12047  .text.EVE_calibrate_manual:00000208 $t
+    {standard input}:12350  .text.EVE_calibrate_manual:000004b8 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
@@ -16991,6 +17181,7 @@ SPI_MASTER_Receive
 puts
 delay_ms
 printf
+sprintf
 __aeabi_i2d
 __aeabi_dmul
 __aeabi_d2uiz

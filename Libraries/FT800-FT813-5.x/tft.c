@@ -94,9 +94,9 @@ void TFT_display_menu0(void);
 void TFT_display_menu1(void);
 void (*TFT_display_cur_Menu__fptr_arr[])(void) = {&TFT_display_menu0, &TFT_display_menu1};
 
-void TFT_touch_menu0(uint8_t);
-void TFT_touch_menu1(uint8_t);
-void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t) = {&TFT_touch_menu0, &TFT_touch_menu1};
+void TFT_touch_menu0(uint8_t, uint8_t, uint8_t*, int32_t*, int32_t*);
+void TFT_touch_menu1(uint8_t, uint8_t, uint8_t*, int32_t*, int32_t*);
+void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {&TFT_touch_menu0, &TFT_touch_menu1};
 
 void TFT_display_static_menu0(void);
 void TFT_display_static_menu1(void);
@@ -399,94 +399,6 @@ void touch_calibrate(void) {
 #endif
 }
 
-void TFT_display_init_screen(void)
-{
-
-	if(tft_active != 0)
-	{
-		EVE_cmd_inflate(MEM_LOGO, logo_init, sizeof(logo_init)); /* load logo into gfx-memory and de-compress it */
-
-		EVE_start_cmd_burst(); /* start writing to the cmd-fifo as one stream of bytes, only sending the address once */
-
-		EVE_cmd_dl_burst(CMD_DLSTART); /* start the display list */
-		//EVE_cmd_dl_burst(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
-		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
-		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the previous prevent artifacts between lists, Attributes are the color, stencil and tag buffers */
-		EVE_cmd_dl_burst(TAG(0));
-
-		EVE_cmd_setbitmap_burst(MEM_LOGO, EVE_ARGB1555, 308, 250);
-		EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
-		EVE_cmd_dl_burst(VERTEX2F(86*16, 11*16));  //105*16
-		EVE_cmd_dl_burst(DL_END);
-
-
-		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
-		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
-
-		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
-	}
-}
-//
-//void initStaticGraphBackground(void)
-//{
-//	// Static portion of display-handling, meant to be called once at startup. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
-//	EVE_cmd_dl(CMD_DLSTART); // Start a new display list (resets REG_CMD_DL to 0)
-//
-//	/// Main settings
-//	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-//	EVE_cmd_bgcolor(MAIN_BGCOLOR); /* light grey */
-//	EVE_cmd_dl(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
-//	// Main Rectangle
-//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BGCOLOR);
-//	EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
-//	EVE_cmd_dl(VERTEX2F(0, 0));
-//	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
-//	EVE_cmd_dl(DL_END);
-//
-//	/// Draw Banner and divider line on top
-//	// Banner
-//	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-//	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
-//	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-//	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-//	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-//	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-//	EVE_cmd_dl(DL_END);
-//	// Divider
-//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-//	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
-//	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-//	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-//	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-//	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-//	EVE_cmd_dl(DL_END);
-//
-//	// Add the static text
-//	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
-//	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
-//	#if defined (EVE_DMA)
-//		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
-//	#endif
-//	EVE_cmd_text(360, 10, 26, 0, "DL-size:");
-//	EVE_cmd_text(360, 25, 26, 0, "Sensor:");
-//
-//	/// Write the static part of the Graph to the display list
-//	TFT_GraphStatic(0, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
-//
-//	// Wait for Display to be finished
-//	while (EVE_busy());
-//
-//	// Get size of the current display list
-//	num_dl_static = EVE_memRead16(REG_CMD_DL); // REG_CMD_DL = Command display list offset
-//
-//	// Copy "num_dl_static" bytes from pointer "EVE_RAM_DL" to pointer "MEM_DL_STATIC"
-//	EVE_cmd_memcpy(MEM_DL_STATIC, EVE_RAM_DL, num_dl_static);
-//	while (EVE_busy());
-//
-//	//EVE_cmd_track(0, 0, EVE_HSIZE, EVE_VSIZE, 1);
-//}
-
 uint8_t TFT_init(void)
 {
 	/// Initializes EVE (or checks if its already initialized). Only at first sucessful EVE_init() the tft is set active, backlight is set to medium brightness, the pre-elaborated touch calibration is loaded and the static Background is initiated. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
@@ -522,6 +434,33 @@ uint8_t TFT_init(void)
 	}
 }
 
+void TFT_display_init_screen(void)
+{
+	/// Display logo over full screen
+	if(tft_active != 0)
+	{
+		EVE_cmd_inflate(MEM_LOGO, logo_init, sizeof(logo_init)); /* load logo into gfx-memory and de-compress it */
+
+		EVE_start_cmd_burst(); /* start writing to the cmd-fifo as one stream of bytes, only sending the address once */
+
+		EVE_cmd_dl_burst(CMD_DLSTART); /* start the display list */
+		//EVE_cmd_dl_burst(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
+		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
+		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the previous prevent artifacts between lists, Attributes are the color, stencil and tag buffers */
+		EVE_cmd_dl_burst(TAG(0));
+
+		EVE_cmd_setbitmap_burst(MEM_LOGO, EVE_ARGB1555, 308, 250);
+		EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
+		EVE_cmd_dl_burst(VERTEX2F(86*16, 11*16));  //105*16
+		EVE_cmd_dl_burst(DL_END);
+
+
+		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
+		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
+
+		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
+	}
+}
 
 
 
@@ -650,13 +589,12 @@ void TFT_touch(void)
 			break;
 		default:
 			// Execute current menu specific code
-			(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag);
+			(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
 			break;
 	}
 
 	//printf("%d %d %d %d-%d\n", swipeInProgress, (int)swipeDetect, TFT_cur_Menu, swipeInitialTouch_X, X);
 }
-
 
 void TFT_display(void)
 {
@@ -841,12 +779,14 @@ void TFT_display_menu1(void)
 
 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
 
-	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
-	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+	EVE_cmd_int_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
+	EVE_cmd_int_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
+	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
 }
 
-void TFT_touch_menu0(uint8_t tag){
+void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	// Determine which tag was touched
 	switch(tag)
 	{
@@ -889,7 +829,7 @@ void TFT_touch_menu0(uint8_t tag){
 			break;
 	}
 }
-void TFT_touch_menu1(uint8_t tag){
+void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	// Determine which tag was touched
 	switch(tag)
 	{

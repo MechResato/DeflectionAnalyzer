@@ -302,6 +302,8 @@ void EVE_cmd_spinner(int16_t x0, int16_t y0, uint16_t style, uint16_t scale);
 void EVE_cmd_spinner_burst(int16_t x0, int16_t y0, uint16_t style, uint16_t scale);
 void EVE_cmd_text(int16_t x0, int16_t y0, int16_t font, uint16_t options, const char* text);
 void EVE_cmd_text_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, const char* text);
+void EVE_cmd_double_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, double val); // custom functions by RS to print integers (signed!) to the screen - might be slow! -> if a better solution is found this can be deleted
+void EVE_cmd_int_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, int32_t val); // custom functions by RS to print integers (signed!) to the screen - might be slow! -> if a better solution is found this can be deleted
 void EVE_cmd_toggle(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint16_t state, const char* text);
 void EVE_cmd_toggle_burst(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint16_t state, const char* text);
 void EVE_cmd_translate(int32_t tx, int32_t ty);

@@ -2958,6 +2958,27 @@ void EVE_cmd_text_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, 
 	EVE_write_string(text);
 }
 
+// custom functions by RS to print integers (signed!) to the screen - might be slow! -> if a better solution is found this can be deleted
+void EVE_cmd_double_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, double val)
+{
+	char buffer[32]; // buffer for double to string conversion
+	sprintf(buffer, "%.1lf", val); // double to string conversion
+
+	spi_transmit_burst(CMD_TEXT);
+	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
+	spi_transmit_burst((uint32_t) font + ((uint32_t) options << 16));
+	EVE_write_string(buffer);
+}
+void EVE_cmd_int_burst(int16_t x0, int16_t y0, int16_t font, uint16_t options, int32_t val)
+{
+	char buffer[32]; // buffer for integer to string conversion
+	sprintf(buffer, "%ld", val); // integer to string conversion
+
+	spi_transmit_burst(CMD_TEXT);
+	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
+	spi_transmit_burst((uint32_t) font + ((uint32_t) options << 16));
+	EVE_write_string(buffer);
+}
 
 void EVE_cmd_toggle(int16_t x0, int16_t y0, int16_t w0, int16_t font, uint16_t options, uint16_t state, const char* text)
 {
