@@ -8,7 +8,7 @@
 
 @section History
 2.0 (adapted from Rudolph Riedel base version 1.13 - below changes are from RS 2020/21)
-- Added color scheme, adaptable banner, dynamic graph implementation (TFT_GraphStatic & TFT_GraphData), a display init wit which addas the static part of a graph to static DL (initStaticGraphBackground), a display init to show a bitmap (TFT_display_init_screen),
+- Added color scheme, adaptable banner, dynamic graph implementation (TFT_GraphStatic & TFT_GraphData), a display init which adds the static part of a graph to static DL (initStaticGraphBackground), a display init to show a bitmap (TFT_display_init_screen), ...
 - Adapted TFT_init to only do the most necessary thins for init (no static DL creation! you need to call one afterwards before using TFT_display!)
 
 // See https://brtchip.com/eve-toolchains/ for helpful Tools

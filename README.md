@@ -89,12 +89,15 @@
 
 ### Motivation
 
+The currently here growing project acts as a storage for a theses. It is still under construction (estimated finalization May 2021).
 * []()
 * []()
 * []()
 
 ### Hardware
-
+* [Microcontroller Board: Infineon XMC4700 Relax Kit](https://www.infineon.com/cms/de/product/evaluation-boards/kit_xmc47_relax_v1/)
+* [Display: Riverdi RiTFT-43-CAP-UX](https://riverdi.com/product/ritft43capux/)
+* [Mainboard: Custom]()
 
 <!-- GETTING STARTED -->
 ## Getting Started
