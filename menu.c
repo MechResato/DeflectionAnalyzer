@@ -54,7 +54,11 @@ uint16_t toggle_state_dimmer = 0;
 uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by the TFT_display() menu specific functions
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
 
-
+void TFT_display_get_values(void){
+	// Get size of last display list to be printed on screen (section "Debug Values")
+	display_list_size = EVE_memRead16(REG_CMD_DL);
+	tracker = EVE_memRead32(REG_TRACKER);
+}
 
 void TFT_display_static_menu0(void){
 	/// Draw Banner and divider line on top
@@ -117,7 +121,7 @@ void TFT_display_static_menu1(void){
 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
 	EVE_cmd_text(360, 10, 26, 0, "X:");
 	EVE_cmd_text(360, 25, 26, 0, "Y:");
-
+	printf("TFT_display_static_menu1\n");
 }
 
 void TFT_display_menu0(void)
@@ -174,11 +178,6 @@ void TFT_display_menu1(void)
 {
 	/// Test menu
 
-	// Get size of last display list to be printed on screen (section "Debug Values")
-	display_list_size = EVE_memRead16(REG_CMD_DL);
-	tracker = EVE_memRead32(REG_TRACKER);
-
-
 	/////////////// Display BUTTONS and Toggles
 	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
 	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
@@ -202,6 +201,8 @@ void TFT_display_menu1(void)
 	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
 	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
+
+	printf("TFT_display_menu1\n");
 }
 
 void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -289,5 +290,5 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 	//		swipeDetect = None;
 	//}
 
-
+	printf("TFT_touch_menu1\n");
 }

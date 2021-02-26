@@ -36,6 +36,8 @@
 #define WHITE	0xffffffUL
 #define BLACK	0x000000UL
 
+void TFT_display_get_values(void);
+
 void TFT_display_menu0(void);
 void TFT_display_menu1(void);
 

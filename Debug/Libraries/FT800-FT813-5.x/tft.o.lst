@@ -2730,17 +2730,17 @@
  546:../Libraries/FT800-FT813-5.x/tft.c **** 
  547:../Libraries/FT800-FT813-5.x/tft.c **** 	if(tft_active != 0)
  2210              	 .loc 1 547 0
- 2211 0004 1B4B     	 ldr r3,.L78
+ 2211 0004 1C4B     	 ldr r3,.L78
  2212 0006 1B78     	 ldrb r3,[r3]
  2213 0008 002B     	 cmp r3,#0
- 2214 000a 31D0     	 beq .L75
+ 2214 000a 33D0     	 beq .L75
  548:../Libraries/FT800-FT813-5.x/tft.c **** 	{
  549:../Libraries/FT800-FT813-5.x/tft.c **** 		// Setup static part of the current menu - only needed once when the menu is changed
  550:../Libraries/FT800-FT813-5.x/tft.c **** 		if(TFT_last_Menu != TFT_cur_Menu)
  2215              	 .loc 1 550 0
- 2216 000c 1A4B     	 ldr r3,.L78+4
+ 2216 000c 1B4B     	 ldr r3,.L78+4
  2217 000e 1A78     	 ldrb r2,[r3]
- 2218 0010 1A4B     	 ldr r3,.L78+8
+ 2218 0010 1B4B     	 ldr r3,.L78+8
  2219 0012 1B78     	 ldrb r3,[r3]
  2220 0014 52B2     	 sxtb r2,r2
  2221 0016 5BB2     	 sxtb r3,r3
@@ -2757,100 +2757,105 @@
  556:../Libraries/FT800-FT813-5.x/tft.c **** 			cmd_fifo_size = EVE_dma_buffer_index*4; /* without DMA there is no way to tell how many bytes ar
  557:../Libraries/FT800-FT813-5.x/tft.c **** 		#endif
  558:../Libraries/FT800-FT813-5.x/tft.c **** 
- 559:../Libraries/FT800-FT813-5.x/tft.c **** 
- 560:../Libraries/FT800-FT813-5.x/tft.c **** 		// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address on
- 561:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_start_cmd_burst();
- 2227              	 .loc 1 561 0
- 2228 0020 FFF7FEFF 	 bl EVE_start_cmd_burst
+ 559:../Libraries/FT800-FT813-5.x/tft.c **** 		// Get values from display before burst starts (is not possible during!)
+ 560:../Libraries/FT800-FT813-5.x/tft.c **** 		TFT_display_get_values();
+ 2227              	 .loc 1 560 0
+ 2228 0020 FFF7FEFF 	 bl TFT_display_get_values
+ 561:../Libraries/FT800-FT813-5.x/tft.c **** 
  562:../Libraries/FT800-FT813-5.x/tft.c **** 
- 563:../Libraries/FT800-FT813-5.x/tft.c **** 
- 564:../Libraries/FT800-FT813-5.x/tft.c **** 		/////////////// Start the actual display list
- 565:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(CMD_DLSTART);
- 2229              	 .loc 1 565 0
- 2230 0024 6FF0FF00 	 mvn r0,#255
- 2231 0028 FFF7FEFF 	 bl EVE_cmd_dl_burst
- 566:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
- 2232              	 .loc 1 566 0
- 2233 002c 6FF07D40 	 mvn r0,#-50331648
- 2234 0030 FFF7FEFF 	 bl EVE_cmd_dl_burst
- 567:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the prev
- 2235              	 .loc 1 567 0
- 2236 0034 1248     	 ldr r0,.L78+12
- 2237 0036 FFF7FEFF 	 bl EVE_cmd_dl_burst
- 568:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(TAG(0));
- 2238              	 .loc 1 568 0
- 2239 003a 4FF04070 	 mov r0,#50331648
- 2240 003e FFF7FEFF 	 bl EVE_cmd_dl_burst
- 569:../Libraries/FT800-FT813-5.x/tft.c **** 
- 570:../Libraries/FT800-FT813-5.x/tft.c **** 		// Insert static part of display-list from copy in gfx-mem
- 571:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_append_burst(MEM_DL_STATIC, num_dl_static);
- 2241              	 .loc 1 571 0
- 2242 0042 104B     	 ldr r3,.L78+16
- 2243 0044 1B68     	 ldr r3,[r3]
- 2244 0046 4FF47F20 	 mov r0,#1044480
- 2245 004a 1946     	 mov r1,r3
- 2246 004c FFF7FEFF 	 bl EVE_cmd_append_burst
+ 563:../Libraries/FT800-FT813-5.x/tft.c **** 		// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address on
+ 564:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_start_cmd_burst();
+ 2229              	 .loc 1 564 0
+ 2230 0024 FFF7FEFF 	 bl EVE_start_cmd_burst
+ 565:../Libraries/FT800-FT813-5.x/tft.c **** 
+ 566:../Libraries/FT800-FT813-5.x/tft.c **** 
+ 567:../Libraries/FT800-FT813-5.x/tft.c **** 		/////////////// Start the actual display list
+ 568:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(CMD_DLSTART);
+ 2231              	 .loc 1 568 0
+ 2232 0028 6FF0FF00 	 mvn r0,#255
+ 2233 002c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 569:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
+ 2234              	 .loc 1 569 0
+ 2235 0030 6FF07D40 	 mvn r0,#-50331648
+ 2236 0034 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 570:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the prev
+ 2237              	 .loc 1 570 0
+ 2238 0038 1248     	 ldr r0,.L78+12
+ 2239 003a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 571:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(TAG(0));
+ 2240              	 .loc 1 571 0
+ 2241 003e 4FF04070 	 mov r0,#50331648
+ 2242 0042 FFF7FEFF 	 bl EVE_cmd_dl_burst
  572:../Libraries/FT800-FT813-5.x/tft.c **** 
- 573:../Libraries/FT800-FT813-5.x/tft.c **** 
- 574:../Libraries/FT800-FT813-5.x/tft.c **** 		/////////////// Execute current menu specific code
- 575:../Libraries/FT800-FT813-5.x/tft.c **** 		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
- 2247              	 .loc 1 575 0
- 2248 0050 0A4B     	 ldr r3,.L78+8
- 2249 0052 1B78     	 ldrb r3,[r3]
- 2250 0054 5BB2     	 sxtb r3,r3
- 2251 0056 0C4A     	 ldr r2,.L78+20
- 2252 0058 52F82330 	 ldr r3,[r2,r3,lsl#2]
- 2253 005c 9847     	 blx r3
+ 573:../Libraries/FT800-FT813-5.x/tft.c **** 		// Insert static part of display-list from copy in gfx-mem
+ 574:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_append_burst(MEM_DL_STATIC, num_dl_static);
+ 2243              	 .loc 1 574 0
+ 2244 0046 104B     	 ldr r3,.L78+16
+ 2245 0048 1B68     	 ldr r3,[r3]
+ 2246 004a 4FF47F20 	 mov r0,#1044480
+ 2247 004e 1946     	 mov r1,r3
+ 2248 0050 FFF7FEFF 	 bl EVE_cmd_append_burst
+ 575:../Libraries/FT800-FT813-5.x/tft.c **** 
  576:../Libraries/FT800-FT813-5.x/tft.c **** 
- 577:../Libraries/FT800-FT813-5.x/tft.c **** 
- 578:../Libraries/FT800-FT813-5.x/tft.c **** 		/////////////// Finish Display list and burst
- 579:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
- 2254              	 .loc 1 579 0
- 2255 005e 0020     	 movs r0,#0
- 2256 0060 FFF7FEFF 	 bl EVE_cmd_dl_burst
- 580:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
- 2257              	 .loc 1 580 0
- 2258 0064 6FF0FE00 	 mvn r0,#254
- 2259 0068 FFF7FEFF 	 bl EVE_cmd_dl_burst
- 581:../Libraries/FT800-FT813-5.x/tft.c **** 
- 582:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically
- 2260              	 .loc 1 582 0
- 2261 006c FFF7FEFF 	 bl EVE_end_cmd_burst
- 2262              	.L75:
- 583:../Libraries/FT800-FT813-5.x/tft.c **** 	}
- 584:../Libraries/FT800-FT813-5.x/tft.c **** }
- 2263              	 .loc 1 584 0
- 2264 0070 80BD     	 pop {r7,pc}
- 2265              	.L79:
- 2266 0072 00BF     	 .align 2
- 2267              	.L78:
- 2268 0074 00000000 	 .word tft_active
- 2269 0078 00000000 	 .word TFT_last_Menu
- 2270 007c 00000000 	 .word TFT_cur_Menu
- 2271 0080 07000026 	 .word 637534215
- 2272 0084 00000000 	 .word num_dl_static
- 2273 0088 00000000 	 .word TFT_display_cur_Menu__fptr_arr
- 2274              	 .cfi_endproc
- 2275              	.LFE501:
- 2277              	 .text
- 2278              	.Letext0:
- 2279              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 2280              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 2281              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_gpio.h"
- 2282              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
- 2283              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 2284              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_spi.h"
- 2285              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master.h"
- 2286              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io.h"
- 2287              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
- 2288              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 2289              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
- 2290              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
- 2291              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master_extern.h"
- 2292              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
- 2293              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
- 2294              	 .file 17 "../Libraries/FT800-FT813-5.x/EVE_target.h"
- 2295              	 .file 18 "../Libraries/FT800-FT813-5.x/tft_data.h"
+ 577:../Libraries/FT800-FT813-5.x/tft.c **** 		/////////////// Execute current menu specific code
+ 578:../Libraries/FT800-FT813-5.x/tft.c **** 		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
+ 2249              	 .loc 1 578 0
+ 2250 0054 0A4B     	 ldr r3,.L78+8
+ 2251 0056 1B78     	 ldrb r3,[r3]
+ 2252 0058 5BB2     	 sxtb r3,r3
+ 2253 005a 0C4A     	 ldr r2,.L78+20
+ 2254 005c 52F82330 	 ldr r3,[r2,r3,lsl#2]
+ 2255 0060 9847     	 blx r3
+ 579:../Libraries/FT800-FT813-5.x/tft.c **** 
+ 580:../Libraries/FT800-FT813-5.x/tft.c **** 
+ 581:../Libraries/FT800-FT813-5.x/tft.c **** 		/////////////// Finish Display list and burst
+ 582:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
+ 2256              	 .loc 1 582 0
+ 2257 0062 0020     	 movs r0,#0
+ 2258 0064 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 583:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
+ 2259              	 .loc 1 583 0
+ 2260 0068 6FF0FE00 	 mvn r0,#254
+ 2261 006c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 584:../Libraries/FT800-FT813-5.x/tft.c **** 
+ 585:../Libraries/FT800-FT813-5.x/tft.c **** 		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically
+ 2262              	 .loc 1 585 0
+ 2263 0070 FFF7FEFF 	 bl EVE_end_cmd_burst
+ 2264              	.L75:
+ 586:../Libraries/FT800-FT813-5.x/tft.c **** 	}
+ 587:../Libraries/FT800-FT813-5.x/tft.c **** }
+ 2265              	 .loc 1 587 0
+ 2266 0074 80BD     	 pop {r7,pc}
+ 2267              	.L79:
+ 2268 0076 00BF     	 .align 2
+ 2269              	.L78:
+ 2270 0078 00000000 	 .word tft_active
+ 2271 007c 00000000 	 .word TFT_last_Menu
+ 2272 0080 00000000 	 .word TFT_cur_Menu
+ 2273 0084 07000026 	 .word 637534215
+ 2274 0088 00000000 	 .word num_dl_static
+ 2275 008c 00000000 	 .word TFT_display_cur_Menu__fptr_arr
+ 2276              	 .cfi_endproc
+ 2277              	.LFE501:
+ 2279              	 .text
+ 2280              	.Letext0:
+ 2281              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 2282              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 2283              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_gpio.h"
+ 2284              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 2285              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 2286              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_spi.h"
+ 2287              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master.h"
+ 2288              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io.h"
+ 2289              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
+ 2290              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 2291              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 2292              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 2293              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SPI_MASTER/spi_master_extern.h"
+ 2294              	 .file 15 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 2295              	 .file 16 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
+ 2296              	 .file 17 "../Libraries/FT800-FT813-5.x/EVE_target.h"
+ 2297              	 .file 18 "../Libraries/FT800-FT813-5.x/tft_data.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 tft.c
                             *COM*:00000004 _msCounter
@@ -2916,7 +2921,7 @@ DEFINED SYMBOLS
     {standard input}:2174   .text.TFT_touch:000001cc $d
     {standard input}:2191   .text.TFT_display:00000000 $t
     {standard input}:2196   .text.TFT_display:00000000 TFT_display
-    {standard input}:2268   .text.TFT_display:00000074 $d
+    {standard input}:2270   .text.TFT_display:00000078 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
@@ -2960,4 +2965,5 @@ EVE_cmd_memcpy
 EVE_memRead8
 EVE_memRead32
 toggle_lock
+TFT_display_get_values
 EVE_cmd_append_burst
