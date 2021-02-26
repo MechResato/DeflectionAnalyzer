@@ -106,26 +106,26 @@
   <hwResources name="Reset" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/hwres_port_pad_rst" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
   <hwResources name="Bus Power" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/hwres_port_pad_bus_pwr" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
   <hwResources name="LED" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/hwres_port_pad_led" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
-  <hwResources name="Data pin 0" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_0" resourceGroupUri="devicepackage/0/*" mResGrpUri="devicepackage/0/*">
+  <hwResources name="Data pin 0" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_0" resourceGroupUri="devicepackage/0/124" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.13"/>
   </hwResources>
-  <hwResources name="Data pin 1" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_1" resourceGroupUri="devicepackage/0/*" mResGrpUri="devicepackage/0/*">
+  <hwResources name="Data pin 1" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_1" resourceGroupUri="devicepackage/0/116" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.38"/>
   </hwResources>
-  <hwResources name="Data pin 2" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_2" resourceGroupUri="devicepackage/0/*" mResGrpUri="devicepackage/0/*">
+  <hwResources name="Data pin 2" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_2" resourceGroupUri="devicepackage/0/115" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.37"/>
   </hwResources>
-  <hwResources name="Data pin 3" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_3" resourceGroupUri="devicepackage/0/*" mResGrpUri="devicepackage/0/*">
+  <hwResources name="Data pin 3" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_3" resourceGroupUri="devicepackage/0/123" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.40"/>
   </hwResources>
   <hwResources name="Data pin 4" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_4" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
   <hwResources name="Data pin 5" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_5" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
   <hwResources name="Data pin 6" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_6" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
   <hwResources name="Data pin 7" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_data_7" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
-  <hwResources name="Command pin" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_cmd" resourceGroupUri="devicepackage/0/*" mResGrpUri="devicepackage/0/*">
+  <hwResources name="Command pin" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_cmd" resourceGroupUri="devicepackage/0/130" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.36"/>
   </hwResources>
-  <hwResources name="Clock pin" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_clk" resourceGroupUri="devicepackage/0/*" mResGrpUri="devicepackage/0/*">
+  <hwResources name="Clock pin" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_clk" resourceGroupUri="devicepackage/0/129" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.39"/>
   </hwResources>
   <hwResources name="Card Detect" URI="http://resources/4.0.28/app/SDMMC_BLOCK/0/__pin_hwres_port_pad_sdcd" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>

@@ -69,7 +69,7 @@ uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles 
 /////////// Button states
 extern uint8_t toggle_lock; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
 
-
+uint8_t keypadActive = 0;
 
 
 
@@ -502,6 +502,9 @@ void TFT_touch(void)
 			break;
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
+			// Deactivate Keypad
+			keypadActive = 0;
+
 			// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
 			if(swipeInProgress == 0 && swipeEvokedBy == 0){
 				// Initial touch on background was detected - init swipe and mark me as elicitor
@@ -573,6 +576,25 @@ void TFT_display(void)
 
 		/////////////// Execute current menu specific code
 		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
+
+		// Keypad
+//		if(keypadActive){
+//			// Background Rectangle
+//			EVE_cmd_dl(DL_COLOR_RGB | GREY);
+//			EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
+//			EVE_cmd_dl(VERTEX2F(0, EVE_VSIZE-2-21-(24*3)-2));
+//			EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
+//			EVE_cmd_dl(DL_END);
+//
+//			// Keys
+//			EVE_cmd_dl_burst(TAG(0));
+//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 20, EVE_OPT_CENTER, "qwertzuiop");
+//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 20, EVE_OPT_CENTER, "asdfghijkl");
+//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 20, EVE_OPT_CENTER, "yxcvbnm");
+//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21, EVE_HSIZE-4, 21, 20, 0, " ");
+//			//EVE_cmd_button_burst(2, 74, 156, 21, 20, 0, " ");
+//
+//		}
 
 
 		/////////////// Finish Display list and burst

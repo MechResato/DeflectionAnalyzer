@@ -35,6 +35,7 @@
 #define PURPLE	0x800080UL
 #define WHITE	0xffffffUL
 #define BLACK	0x000000UL
+#define GREY	0x222222UL
 
 void TFT_display_menu0(void);
 void TFT_display_menu1(void);

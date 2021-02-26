@@ -193,6 +193,9 @@ void TFT_display_menu1(void)
 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "re");
 	}
 
+	//EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+	//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Keypad");
+
 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
@@ -255,6 +258,26 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 		case 0:
 			toggle_lock = 0;
 			break;
+
+
+//		// dimmer button on top as on/off radio-switch
+//		case 10:
+//			if(toggle_lock == 0) {
+//				printf("Button Dimmer touched\n");
+//				toggle_lock = 42;
+//				if(toggle_state_dimmer == 0){
+//					toggle_state_dimmer = EVE_OPT_FLAT;
+//					// Activate Keypad
+//					keypadActive = 1;
+//				}
+//				else {
+//					toggle_state_dimmer = 0;
+//					// Deactivate Keypad
+//					keypadActive = 0;
+//				}
+//			}
+//			break;
+
 		// li/re mode toggle on top
 		case 12:
 			if(toggle_lock == 0) {
