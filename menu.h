@@ -37,6 +37,8 @@
 #define BLACK	0x000000UL
 #define GREY	0x222222UL
 
+void TFT_display_get_values(void);
+
 void TFT_display_menu0(void);
 void TFT_display_menu1(void);
 

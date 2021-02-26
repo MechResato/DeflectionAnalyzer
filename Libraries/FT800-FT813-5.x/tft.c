@@ -559,6 +559,9 @@ void TFT_display(void)
 			cmd_fifo_size = EVE_dma_buffer_index*4; /* without DMA there is no way to tell how many bytes are written to the cmd-fifo */
 		#endif
 
+		// Get values from display before burst starts (is not possible during!)
+		TFT_display_get_values();
+
 
 		// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address once)
 		EVE_start_cmd_burst();
