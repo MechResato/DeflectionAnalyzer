@@ -581,23 +581,23 @@ void TFT_display(void)
 		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
 
 		// Keypad
-//		if(keypadActive){
-//			// Background Rectangle
-//			EVE_cmd_dl(DL_COLOR_RGB | GREY);
-//			EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
-//			EVE_cmd_dl(VERTEX2F(0, EVE_VSIZE-2-21-(24*3)-2));
-//			EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
-//			EVE_cmd_dl(DL_END);
-//
-//			// Keys
-//			EVE_cmd_dl_burst(TAG(0));
-//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 20, EVE_OPT_CENTER, "qwertzuiop");
-//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 20, EVE_OPT_CENTER, "asdfghijkl");
-//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 20, EVE_OPT_CENTER, "yxcvbnm");
-//			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21, EVE_HSIZE-4, 21, 20, 0, " ");
-//			//EVE_cmd_button_burst(2, 74, 156, 21, 20, 0, " ");
-//
-//		}
+		if(keypadActive){
+			// Background Rectangle
+			EVE_cmd_dl_burst(DL_COLOR_RGB | GREY);
+			EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
+			EVE_cmd_dl_burst(VERTEX2F(0, EVE_VSIZE-2-21-(24*3)-2));
+			EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
+			EVE_cmd_dl_burst(DL_END);
+
+			// Keys
+			EVE_cmd_dl_burst(TAG(0));
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 26, 0, "qwertzuiop");
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 26, 0, "asdfghijkl");
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 26, 0, "yxcvbnm");
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21, EVE_HSIZE-4, 21, 20, 0, "^ ._");
+			//EVE_cmd_button_burst(2, 74, 156, 21, 20, 0, " ");
+
+		}
 
 
 		/////////////// Finish Display list and burst

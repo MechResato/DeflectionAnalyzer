@@ -121,7 +121,6 @@ void TFT_display_static_menu1(void){
 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
 	EVE_cmd_text(360, 10, 26, 0, "X:");
 	EVE_cmd_text(360, 25, 26, 0, "Y:");
-	printf("TFT_display_static_menu1\n");
 }
 
 void TFT_display_menu0(void)
@@ -192,20 +191,19 @@ void TFT_display_menu1(void)
 		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "re");
 	}
 
-	//EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
-	//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Keypad");
+	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+	uint16_t state;
+	if(keypadActive)state = EVE_OPT_FLAT; else state = 0;
+	EVE_cmd_button_burst(205,15,80,30, 27, state ,"Keypad");
 
 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
-
 	EVE_cmd_int_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
 	EVE_cmd_int_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
 	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
 	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
-
-	printf("TFT_display_menu1\n");
 }
 
 void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -261,23 +259,21 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 			break;
 
 
-//		// dimmer button on top as on/off radio-switch
-//		case 10:
-//			if(toggle_lock == 0) {
-//				printf("Button Dimmer touched\n");
-//				toggle_lock = 42;
-//				if(toggle_state_dimmer == 0){
-//					toggle_state_dimmer = EVE_OPT_FLAT;
-//					// Activate Keypad
-//					keypadActive = 1;
-//				}
-//				else {
-//					toggle_state_dimmer = 0;
-//					// Deactivate Keypad
-//					keypadActive = 0;
-//				}
-//			}
-//			break;
+		// dimmer button on top as on/off radio-switch
+		case 10:
+			if(toggle_lock == 0) {
+				printf("Button Keypad touched\n");
+				toggle_lock = 42;
+				if(keypadActive == 0){
+					// Activate Keypad
+					keypadActive = 1;
+				}
+				else {
+					// Deactivate Keypad
+					keypadActive = 0;
+				}
+			}
+			break;
 
 		// li/re mode toggle on top
 		case 12:
@@ -313,5 +309,4 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 	//		swipeDetect = None;
 	//}
 
-	printf("TFT_touch_menu1\n");
 }
