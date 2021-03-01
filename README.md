@@ -3,6 +3,7 @@
 *** that would make this better, please fork the repo and create a pull request
 *** or simply open an issue with the tag "enhancement".
 *** Thanks again! Now go create something AMAZING! :D
+
 ***
 ***
 ***
@@ -54,32 +55,10 @@
 
 
 <!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#motivation">Motivation</a></li>
-		<li><a href="#hardware">Hardware</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements-and-resources">Acknowledgements and Resources</a></li>
-  </ol>
-</details>
 
+## Table of Contents
+
+[TOC]
 
 
 <!-- ABOUT THE PROJECT -->
@@ -89,10 +68,10 @@
 
 ### Motivation
 
-The currently here growing project acts as a storage for a theses. It is still under construction (estimated finalization May 2021).
-* []()
-* []()
-* []()
+The currently here growing project acts as a storage for a theses and is still under construction (estimated finalization May 2021). The main goals of the project are:
+* [Design of an detachable Platform used to analyze motorcycle suspensions]
+* [Highly modular code structure to be reused in various situations]
+* [Creation of an reusable embedded system platform with sensor/bus input (CAN, I2C, SPI, 0-10V, ...) as well as output via TFT and logging on an SD-Card]
 
 ### Hardware
 * [Microcontroller Board: Infineon XMC4700 Relax Kit](https://www.infineon.com/cms/de/product/evaluation-boards/kit_xmc47_relax_v1/)
@@ -102,15 +81,14 @@ The currently here growing project acts as a storage for a theses. It is still u
 <!-- GETTING STARTED -->
 ## Getting Started
 
+The firmware is written using [Infineon DAVE 4.4.2](https://infineoncommunity.com/dave-download_ID645). It is meant to be used with an Infineon XMC4700 Relax Kit (Version with assembled SD-Card mount, CAN transceiver and RTC) as microcontroller and a RiTFT-43-CAP-UX (4.3″ 480x272px TFT with capacitive touchscreen and BT81x Embedded Video Engine (EVE) coprocessor from Riverdi). The used (custom) mainboard is not necessary, but in this case the connections must be done according to following figure:
+![Main schematics of the main board](images\pinout.png)
 
-### Prerequisites
-
-
-### Installation
-
+Note that the pinout of the TFT connector was designed to use an inverted flat cable (type B). If you use an Breakout board (like this [ZIF-20 Adapter](https://www.robotshop.com/de/de/riverdi-breakout-board-zif-20-zu-idc-20.html)) the pinout might be inverted (20 ->1 instead of 1->20).
 
 <!-- USAGE EXAMPLES -->
-## Usage
+
+<!--## Usage -->
 
 <!-- Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
@@ -119,16 +97,17 @@ _For more examples, please refer to the [Documentation](https://example.com)_-->
 
 
 <!-- ROADMAP -->
-## Roadmap
+<!-- ## Roadmap -->
 
-See the [open issues](https://github.com/MechResato/DeflectionAnalyzer/issues) for a list of proposed features (and known issues).
+ <!--See the [open issues](https://github.com/MechResato/DeflectionAnalyzer/issues) for a list of proposed features (and known issues).--> 
 
 
 
 <!-- CONTRIBUTING -->
-## Contributing
 
-<!--Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+<!-- ## Contributing -->
+
+<!-- Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -159,7 +138,7 @@ Project Link: [https://github.com/MechResato/DeflectionAnalyzer](https://github.
 
 * [othneildrew - Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 * [RudolphRiedel - FT800-FT813](https://github.com/RudolphRiedel/FT800-FT813)
-* []()
+* [Stefan Reinmüller - For contribution while implementing the TFT Library and design of the custom mainboard]
 
 
 
