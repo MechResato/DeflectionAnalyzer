@@ -204,9 +204,28 @@ void TFT_display_menu1(void)
 	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
 	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
+
+
+//	char c [] = "0123456789";
+//
+//	c[0] = (char)120;
+//	c[1] = (char)121;
+//	c[2] = (char)122;
+//	c[3] = (char)123;
+//	c[4] = (char)124;
+//	c[5] = (char)125;
+//	c[6] = (char)126;
+//	c[7] = (char)127;
+//	c[8] = (char)128;
+//	c[9] = (char)129;
+//	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
+
 }
 
 void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// ...
+	/// Do not use tags higher than 32 -> they will be interpreted as keyboard input!
+
 	// Determine which tag was touched
 	switch(tag)
 	{
@@ -250,6 +269,17 @@ void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 	}
 }
 void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// ...
+	/// Do not use tags higher than 32 -> they will be interpreted as keyboard input!
+	if(keypadActive && keypadCurrentKey && tag == 0){
+		// do something with keypadCurrentKey
+		printf("curkey %d\n", keypadCurrentKey);
+
+		// Reset keypadCurrentKey
+		keypadCurrentKey = 0;
+	}
+
+
 	// Determine which tag was touched
 	switch(tag)
 	{

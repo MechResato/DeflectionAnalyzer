@@ -69,7 +69,11 @@ uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles 
 /////////// Button states
 extern uint8_t toggle_lock; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
 
+/////////// Keypad feature (TFT_touch)
 uint8_t keypadActive = 0;
+uint8_t keypadShiftActive = 0; // Determines the shown set of characters
+uint8_t keypadCurrentKey = 0; // Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
+
 
 
 
@@ -492,6 +496,10 @@ void TFT_touch(void)
 		}
 	}
 
+	//
+	if(keypadActive && tag >= 33){
+		keypadCurrentKey = tag;
+	}
 
 	// Execute action based on touched tag
 	switch(tag)
@@ -499,6 +507,18 @@ void TFT_touch(void)
 		// nothing touched - reset states and locks
 		case 0:
 			toggle_lock = 0;
+
+			// If an unprocessed keypadCurrentKey is registered and the key was released (which is why he landed here) execute current menu specific code to handle the input
+			if(keypadCurrentKey){
+				// Shift was pressed - change shift-active and reset current-key
+				if(keypadCurrentKey == 94){
+					keypadShiftActive = !keypadShiftActive;
+					keypadCurrentKey = 0;
+				}
+				else{
+					(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+				}
+			}
 			break;
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
@@ -585,17 +605,37 @@ void TFT_display(void)
 			// Background Rectangle
 			EVE_cmd_dl_burst(DL_COLOR_RGB | GREY);
 			EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-			EVE_cmd_dl_burst(VERTEX2F(0, EVE_VSIZE-2-21-(24*3)-2));
+			EVE_cmd_dl_burst(VERTEX2F(0, EVE_VSIZE-2-21-(24*4)-2));
 			EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
 			EVE_cmd_dl_burst(DL_END);
 
 			// Keys
 			EVE_cmd_dl_burst(TAG(0));
-			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 26, 0, "qwertzuiop");
-			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 26, 0, "asdfghijkl");
-			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 26, 0, "yxcvbnm");
-			EVE_cmd_keys_burst(2, EVE_VSIZE-2-21, EVE_HSIZE-4, 21, 20, 0, "^ ._");
-			//EVE_cmd_button_burst(2, 74, 156, 21, 20, 0, " ");
+			if(keypadShiftActive == 0){
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*4), EVE_HSIZE-4-50-4-4, 21, 26, keypadCurrentKey, "1234567890");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "qwertyuiop");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "asdfghjkl");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "^yxcvbnm._");
+			}
+			else{
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*4), EVE_HSIZE-4-50-4-4, 21, 26, keypadCurrentKey, "!\"%&/()=?\\");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "QWERTYUIOP");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "ASDFGHJKL");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "^ZXCVBNM:-");
+			}
+			char BS[] = "0";
+			BS[0] = (char)46; // Backspace caracter TODO COMMENT
+
+			EVE_cmd_fgcolor_burst(MAIN_BTNCTSCOLOR);
+			EVE_cmd_bgcolor_burst(MAIN_BTNCOLOR);
+			EVE_cmd_keys_burst(EVE_HSIZE-4-50, EVE_VSIZE-2-21-(24*4), 50, 21, 19, keypadCurrentKey, &BS);
+			//EVE_cmd_keys_burst(EVE_HSIZE-4-21-4-21, EVE_VSIZE-2-21, 46, 21, 20, keypadCurrentKey, "._");
+			//EVE_cmd_keys_burst(2, EVE_VSIZE-2-21, EVE_HSIZE-4, 21, 20, 0, "^ ._");
+			//EVE_cmd_dl_burst(TAG(94));
+			//EVE_cmd_button_burst(2, EVE_VSIZE-2-21, 90, 21, 20, 0, "^");
+			//EVE_cmd_dl_burst(TAG(39));
+			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-21, 288, 21, 20, keypadCurrentKey, " ");
+			//EVE_cmd_button_burst(2+30+4+60, EVE_VSIZE-2-21, 288, 21, 20, 0, " ");
 
 		}
 

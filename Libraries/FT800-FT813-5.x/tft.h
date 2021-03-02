@@ -8,6 +8,7 @@ int32_t swipeDistance_X;		  // Distance (in px) between the initial touch and th
 int32_t swipeDistance_Y;
 
 uint8_t keypadActive;
+uint8_t keypadCurrentKey;
 
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines);
 void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor);
