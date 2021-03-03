@@ -224,7 +224,7 @@ void TFT_display_menu1(void)
 
 void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
-	/// Do not use tags higher than 32 -> they will be interpreted as keyboard input!
+	/// Do not use predefined TAGs -> see tft.c
 
 	// Determine which tag was touched
 	switch(tag)

@@ -74,11 +74,19 @@ uint8_t keypadActive = 0;
 uint8_t keypadShiftActive = 0; // Determines the shown set of characters
 uint8_t keypadCurrentKey = 0; // Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
 
+// TAG ASSIGNMENT
+//		0		No touch
+//		1		Background (swipe area)
+//		32-126	Keyboard Common Buttons
+//		94		Keyboard Shift Key (^)
+//		127		Keyboard Backspace
+//		128		Keyboard Enter
 
 
 
+void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height){
 
-
+}
 
 
 
@@ -496,8 +504,8 @@ void TFT_touch(void)
 		}
 	}
 
-	//
-	if(keypadActive && tag >= 33){
+	// Register current keypress if the tag is in character range (or Backspace -> 8)
+	if(keypadActive && (tag >= 32 && tag <= 128)){
 		keypadCurrentKey = tag;
 	}
 
@@ -605,38 +613,45 @@ void TFT_display(void)
 			// Background Rectangle
 			EVE_cmd_dl_burst(DL_COLOR_RGB | GREY);
 			EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-			EVE_cmd_dl_burst(VERTEX2F(0, EVE_VSIZE-2-21-(24*4)-2));
+			EVE_cmd_dl_burst(VERTEX2F(0, EVE_VSIZE-2-29-(32*4)-2));
 			EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
 			EVE_cmd_dl_burst(DL_END);
 
 			// Keys
 			EVE_cmd_dl_burst(TAG(0));
 			if(keypadShiftActive == 0){
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*4), EVE_HSIZE-4-50-4-4, 21, 26, keypadCurrentKey, "1234567890");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "qwertyuiop");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "asdfghjkl");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "^yxcvbnm._");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "1234567890");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "qwertyuiop");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "asdfghjkl");
+				EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "zxcvbnm._");
 			}
 			else{
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*4), EVE_HSIZE-4-50-4-4, 21, 26, keypadCurrentKey, "!\"%&/()=?\\");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*3), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "QWERTYUIOP");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*2), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "ASDFGHJKL");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*1), EVE_HSIZE-4, 21, 26, keypadCurrentKey, "^ZXCVBNM:-");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "!\"%&/()=?\\");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "QWERTYUIOP");
+				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "ASDFGHJKL");
+				EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "ZXCVBNM:-");
 			}
-			char BS[] = "0";
-			BS[0] = (char)46; // Backspace caracter TODO COMMENT
 
+			// Control Keys in different color
 			EVE_cmd_fgcolor_burst(MAIN_BTNCTSCOLOR);
 			EVE_cmd_bgcolor_burst(MAIN_BTNCOLOR);
-			EVE_cmd_keys_burst(EVE_HSIZE-4-50, EVE_VSIZE-2-21-(24*4), 50, 21, 19, keypadCurrentKey, &BS);
-			//EVE_cmd_keys_burst(EVE_HSIZE-4-21-4-21, EVE_VSIZE-2-21, 46, 21, 20, keypadCurrentKey, "._");
-			//EVE_cmd_keys_burst(2, EVE_VSIZE-2-21, EVE_HSIZE-4, 21, 20, 0, "^ ._");
-			//EVE_cmd_dl_burst(TAG(94));
-			//EVE_cmd_button_burst(2, EVE_VSIZE-2-21, 90, 21, 20, 0, "^");
-			//EVE_cmd_dl_burst(TAG(39));
-			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-21, 288, 21, 20, keypadCurrentKey, " ");
-			//EVE_cmd_button_burst(2+30+4+60, EVE_VSIZE-2-21, 288, 21, 20, 0, " ");
 
+			// Shift and Space
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 50, 29, 26, keypadCurrentKey, "^");
+			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 20, keypadCurrentKey, " ");
+
+			// Backspace
+			char BS[] = "0";
+			BS[0] = (char)46; // Backspace character TODO COMMENT
+			EVE_cmd_dl_burst(TAG(127));
+			if(keypadCurrentKey == 127)
+				EVE_cmd_button_burst(EVE_HSIZE-50, EVE_VSIZE-2-29-(32*4), 50, 29, 19, EVE_OPT_FLAT, &BS[0]);
+			else
+				EVE_cmd_button_burst(EVE_HSIZE-2-50, EVE_VSIZE-2-29-(32*4), 50, 29, 19, 0, &BS[0]);
+
+			// Enter Button
+			EVE_cmd_dl_burst(TAG(128));
+			EVE_cmd_button_burst(2+30+4+60+288+4, EVE_VSIZE-2-29, EVE_HSIZE-2-30-4-60-288-2-4, 29, 20, 0, "OK");
 		}
 
 
