@@ -71,8 +71,13 @@ extern uint8_t toggle_lock; // "Debouncing of touches" -> If something is touche
 
 /////////// Keypad feature (TFT_touch)
 uint8_t keypadActive = 0;
-uint8_t keypadShiftActive = 0; // Determines the shown set of characters
-uint8_t keypadCurrentKey = 0; // Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
+uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
+uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
+uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
+
+/////////// Textbox feature
+uint8_t cursor_position = 0;
+
 
 // TAG ASSIGNMENT
 //		0		No touch
@@ -82,16 +87,88 @@ uint8_t keypadCurrentKey = 0; // Integer value (tag) of the currently pressed ke
 //		127		Keyboard Backspace
 //		128		Keyboard Enter
 
+// Define a array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode
+void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
+void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
+void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
+
+#define textboxHeight 31	// overall height of the textbox in pixel
+#define textboxTxtPadV 8	// offset of the text from left border in pixel
+#define textboxTxtPadH 7	// offset of the text from upper border in pixel
+
+void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag){
+	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
+	///
+	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  x		...	beginning of left edge of the textbox. In full Pixels
+	///  y		... beginning of upper edge of the textbox. In full Pixels
+	///  width	... width of the actual textbox data area in full Pixels
+	///  tag	... to be assigned tag for touch recognition
 
 
-void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height){
 
+	/// Set tag
+	(*EVE_cmd_dl__fptr_arr[burst])(TAG(tag));
+
+	/// Background
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0xFFFFFFUL);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_RECTS);
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y       ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+textboxHeight));
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
+
+	/// Frame
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0x000000UL);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
+	// start point
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y));
+	// left vertical
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y+textboxHeight));
+	// bottom horizontal
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+textboxHeight));
+	// right vertical
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y));
+	// bottom horizontal
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y));
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
+
+	/// Reset tag
+	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
+}
+
+void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* text, int8_t text_maxlen, int8_t* text_curlen){
+	/// Write the dynamic parts of an textbox to the TFT (text & cursor) as well as manage the input from keyboard. Used at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
+	///
+	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  x		...	beginning of left edge of the textbox. In full Pixels
+	///  y		... beginning of upper edge of the textbox. In full Pixels
+	///  width	... width of the actual textbox data area in full Pixels
+	///  tag	... to be assigned tag for touch recognition
+	///
+	///  Limitations: Only made for font size 26, make sure the text cant be longer than the textbox width
+
+	/// Manipulate text according to keypad input
+	if(curKey >= 32 && curKey <= 126)
+		text[3] = (char)curKey;
+
+	printf("curkey for txtbx %d\n", curKey);
+
+
+	/// Set tag
+	EVE_cmd_dl_burst(TAG(tag));
+
+	/// Write current text
+	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
+	EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, text);
+
+	/// Reset tag
+	EVE_cmd_dl_burst(TAG(0));
 }
 
 
 
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
-	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during initStaticBackground() or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
+	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
 	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
@@ -104,11 +181,6 @@ void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint
 	///  h_grid_lines ... number of horizontal grid lines
 	///  v_grid_lines ... number of vertical grid lines
 	///  Note: The predefined GRAPH_AXISCOLOR and GRAPH_GRIDCOLOR are used directly!
-
-	// Define a array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used with burst mode
-	void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
-	void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
-	void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
 
 
 	// Internal offsets and sizes
@@ -532,6 +604,7 @@ void TFT_touch(void)
 		case 1:
 			// Deactivate Keypad
 			keypadActive = 0;
+			keypadEvokedBy = 0;
 
 			// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
 			if(swipeInProgress == 0 && swipeEvokedBy == 0){

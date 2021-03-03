@@ -44,15 +44,28 @@ double G_h_grid_lines = 4.0; // number of grey horizontal grid lines
 double G_v_grid_lines = 2.2; // number of grey vertical grid lines
 /////////// Graph Definitions END
 
+
 /////////// Button states
 uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
-
 uint16_t toggle_state_graphmode = 0;
 uint16_t toggle_state_dimmer = 0;
+
 
 /////////// Debug
 uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by the TFT_display() menu specific functions
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
+
+
+/////////// Strings
+#define STR_FILENAME_MAXLEN 20
+char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
+int8_t str_filename_curLength = 8;
+
+
+//filename[1] = 'a';
+
+
+
 
 void TFT_display_get_values(void){
 	// Get size of last display list to be printed on screen (section "Debug Values")
@@ -121,6 +134,9 @@ void TFT_display_static_menu1(void){
 	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
 	EVE_cmd_text(360, 10, 26, 0, "X:");
 	EVE_cmd_text(360, 25, 26, 0, "Y:");
+
+	// Textbox Filename
+	TFT_TextboxStatic(0, 20, 70, 120, 20);
 }
 
 void TFT_display_menu0(void)
@@ -199,12 +215,14 @@ void TFT_display_menu1(void)
 	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
 	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
-	EVE_cmd_int_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
-	EVE_cmd_int_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
-	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
-	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+	//EVE_cmd_int_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
+	//EVE_cmd_int_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
+	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
 
+	str_filename[1] = 'a';
+	TFT_TextboxData(20, 70, keypadCurrentKey, 20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 
 //	char c [] = "0123456789";
 //
@@ -297,10 +315,12 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 				if(keypadActive == 0){
 					// Activate Keypad
 					keypadActive = 1;
+					keypadEvokedBy = 20;
 				}
 				else {
 					// Deactivate Keypad
 					keypadActive = 0;
+					keypadEvokedBy = 0;
 				}
 			}
 			break;
@@ -318,6 +338,22 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 				}
 			}
 			break;
+
+		// textbox
+		case 20:
+			if(toggle_lock == 0) {
+				printf("Textbox touched\n");
+				toggle_lock = 42;
+				if(keypadActive == 0){
+					// Activate Keypad
+					keypadActive = 1;
+					keypadEvokedBy = 20;
+				}
+				else {
+				}
+			}
+			break;
+
 	}
 
 	//// If the user swiped more on x-axis he probably wants to swipe left/right
