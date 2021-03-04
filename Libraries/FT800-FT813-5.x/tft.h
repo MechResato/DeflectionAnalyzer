@@ -10,6 +10,7 @@ int32_t swipeDistance_Y;
 uint8_t keypadActive;
 uint8_t keypadCurrentKey;
 uint8_t keypadEvokedBy;
+uint8_t keypadKeypressFinished;
 
 void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag);
 void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, const char* text, int8_t text_maxlen, int8_t* text_curlen);

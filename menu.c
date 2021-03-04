@@ -221,7 +221,7 @@ void TFT_display_menu1(void)
 	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
 
-	str_filename[1] = 'a';
+	//str_filename[1] = 'a';
 	TFT_TextboxData(20, 70, keypadCurrentKey, 20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 
 //	char c [] = "0123456789";

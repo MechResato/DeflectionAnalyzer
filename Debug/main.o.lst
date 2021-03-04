@@ -648,50 +648,51 @@
  119              	 .comm keypadActive,1,1
  120              	 .comm keypadCurrentKey,1,1
  121              	 .comm keypadEvokedBy,1,1
- 122 001e 00BF     	 .section .rodata
- 123              	 .align 2
- 124              	.LC0:
- 125 0000 44415645 	 .ascii "DAVE APPs initialization failed\000"
- 125      20415050 
- 125      7320696E 
- 125      69746961 
- 125      6C697A61 
- 126              	 .align 2
- 127              	.LC1:
- 128 0020 44415645 	 .ascii "DAVE APPs initialization successful\000"
- 128      20415050 
- 128      7320696E 
- 128      69746961 
- 128      6C697A61 
- 129              	 .align 2
- 130              	.LC2:
- 131 0044 54465420 	 .ascii "TFT init done 1\000"
- 131      696E6974 
- 131      20646F6E 
- 131      65203100 
- 132              	 .align 2
- 133              	.LC3:
- 134 0054 54465420 	 .ascii "TFT init failed 0\000"
- 134      696E6974 
- 134      20666169 
- 134      6C656420 
- 134      3000
- 135 0066 0000     	 .align 2
- 136              	.LC4:
- 137 0068 53746172 	 .ascii "Start Main Loop -----------------------------------"
- 137      74204D61 
- 137      696E204C 
- 137      6F6F7020 
- 137      2D2D2D2D 
- 138 009b 2D2D00   	 .ascii "--\000"
- 139 009e 0000     	 .section .text.main,"ax",%progbits
- 140              	 .align 2
- 141              	 .global main
- 142              	 .thumb
- 143              	 .thumb_func
- 145              	main:
- 146              	.LFB485:
- 147              	 .file 3 "../main.c"
+ 122              	 .comm keypadKeypressFinished,1,1
+ 123 001e 00BF     	 .section .rodata
+ 124              	 .align 2
+ 125              	.LC0:
+ 126 0000 44415645 	 .ascii "DAVE APPs initialization failed\000"
+ 126      20415050 
+ 126      7320696E 
+ 126      69746961 
+ 126      6C697A61 
+ 127              	 .align 2
+ 128              	.LC1:
+ 129 0020 44415645 	 .ascii "DAVE APPs initialization successful\000"
+ 129      20415050 
+ 129      7320696E 
+ 129      69746961 
+ 129      6C697A61 
+ 130              	 .align 2
+ 131              	.LC2:
+ 132 0044 54465420 	 .ascii "TFT init done 1\000"
+ 132      696E6974 
+ 132      20646F6E 
+ 132      65203100 
+ 133              	 .align 2
+ 134              	.LC3:
+ 135 0054 54465420 	 .ascii "TFT init failed 0\000"
+ 135      696E6974 
+ 135      20666169 
+ 135      6C656420 
+ 135      3000
+ 136 0066 0000     	 .align 2
+ 137              	.LC4:
+ 138 0068 53746172 	 .ascii "Start Main Loop -----------------------------------"
+ 138      74204D61 
+ 138      696E204C 
+ 138      6F6F7020 
+ 138      2D2D2D2D 
+ 139 009b 2D2D00   	 .ascii "--\000"
+ 140 009e 0000     	 .section .text.main,"ax",%progbits
+ 141              	 .align 2
+ 142              	 .global main
+ 143              	 .thumb
+ 144              	 .thumb_func
+ 146              	main:
+ 147              	.LFB485:
+ 148              	 .file 3 "../main.c"
    1:../main.c     **** /*
    2:../main.c     ****  * main.c
    3:../main.c     ****  *  Created on: 2021 Feb 19 20:41:21
@@ -719,195 +720,195 @@
   25:../main.c     **** 
   26:../main.c     **** int main(void)
   27:../main.c     **** {
- 148              	 .loc 3 27 0
- 149              	 .cfi_startproc
- 150              	 
+ 149              	 .loc 3 27 0
+ 150              	 .cfi_startproc
  151              	 
- 152 0000 80B5     	 push {r7,lr}
- 153              	.LCFI11:
- 154              	 .cfi_def_cfa_offset 8
- 155              	 .cfi_offset 7,-8
- 156              	 .cfi_offset 14,-4
- 157 0002 82B0     	 sub sp,sp,#8
- 158              	.LCFI12:
- 159              	 .cfi_def_cfa_offset 16
- 160 0004 00AF     	 add r7,sp,#0
- 161              	.LCFI13:
- 162              	 .cfi_def_cfa_register 7
+ 152              	 
+ 153 0000 80B5     	 push {r7,lr}
+ 154              	.LCFI11:
+ 155              	 .cfi_def_cfa_offset 8
+ 156              	 .cfi_offset 7,-8
+ 157              	 .cfi_offset 14,-4
+ 158 0002 82B0     	 sub sp,sp,#8
+ 159              	.LCFI12:
+ 160              	 .cfi_def_cfa_offset 16
+ 161 0004 00AF     	 add r7,sp,#0
+ 162              	.LCFI13:
+ 163              	 .cfi_def_cfa_register 7
   28:../main.c     **** 	// Make semihosting and printf back to DAVE possible if debug is enabled
   29:../main.c     **** 	#if defined (DEBUG_ENABLE)
   30:../main.c     **** 	initialise_monitor_handles();
- 163              	 .loc 3 30 0
- 164 0006 FFF7FEFF 	 bl initialise_monitor_handles
+ 164              	 .loc 3 30 0
+ 165 0006 FFF7FEFF 	 bl initialise_monitor_handles
   31:../main.c     **** 	#endif
   32:../main.c     **** 
   33:../main.c     **** 	// Initialize environment
   34:../main.c     **** 	DAVE_STATUS_t status;
   35:../main.c     **** 	status = DAVE_Init();           /* Initialization of DAVE APPs  */
- 165              	 .loc 3 35 0
- 166 000a FFF7FEFF 	 bl DAVE_Init
- 167 000e 0346     	 mov r3,r0
- 168 0010 BB71     	 strb r3,[r7,#6]
+ 166              	 .loc 3 35 0
+ 167 000a FFF7FEFF 	 bl DAVE_Init
+ 168 000e 0346     	 mov r3,r0
+ 169 0010 BB71     	 strb r3,[r7,#6]
   36:../main.c     **** 	if(status != DAVE_STATUS_SUCCESS) {
- 169              	 .loc 3 36 0
- 170 0012 BB79     	 ldrb r3,[r7,#6]
- 171 0014 002B     	 cmp r3,#0
- 172 0016 03D0     	 beq .L4
+ 170              	 .loc 3 36 0
+ 171 0012 BB79     	 ldrb r3,[r7,#6]
+ 172 0014 002B     	 cmp r3,#0
+ 173 0016 03D0     	 beq .L4
   37:../main.c     **** 		/* Placeholder for error handler code. The while loop below can be replaced with an user error ha
   38:../main.c     **** 		printf("DAVE APPs initialization failed\n");
- 173              	 .loc 3 38 0
- 174 0018 2148     	 ldr r0,.L12
- 175 001a FFF7FEFF 	 bl puts
- 176              	.L5:
+ 174              	 .loc 3 38 0
+ 175 0018 2148     	 ldr r0,.L12
+ 176 001a FFF7FEFF 	 bl puts
+ 177              	.L5:
   39:../main.c     **** 		while(1U){ }
- 177              	 .loc 3 39 0 discriminator 1
- 178 001e FEE7     	 b .L5
- 179              	.L4:
+ 178              	 .loc 3 39 0 discriminator 1
+ 179 001e FEE7     	 b .L5
+ 180              	.L4:
   40:../main.c     **** 	}
   41:../main.c     **** 	else{ printf("DAVE APPs initialization successful\n"); }
- 180              	 .loc 3 41 0
- 181 0020 2048     	 ldr r0,.L12+4
- 182 0022 FFF7FEFF 	 bl puts
+ 181              	 .loc 3 41 0
+ 182 0020 2048     	 ldr r0,.L12+4
+ 183 0022 FFF7FEFF 	 bl puts
   42:../main.c     **** 
   43:../main.c     **** 	// Arm-M internal interrupt init
   44:../main.c     **** 	//SysTick_Config(SystemCoreClock / 144);
   45:../main.c     **** 
   46:../main.c     **** 	// Counter for TFT_display init
   47:../main.c     **** 	uint8_t display_delay = 0;
- 183              	 .loc 3 47 0
- 184 0026 0023     	 movs r3,#0
- 185 0028 FB71     	 strb r3,[r7,#7]
+ 184              	 .loc 3 47 0
+ 185 0026 0023     	 movs r3,#0
+ 186 0028 FB71     	 strb r3,[r7,#7]
   48:../main.c     **** 
   49:../main.c     **** 	// Initial disable of CS pin
   50:../main.c     **** 	DIGITAL_IO_SetOutputHigh(&IO_DIO_DIGOUT_CS_TFT);
- 186              	 .loc 3 50 0
- 187 002a 1F48     	 ldr r0,.L12+8
- 188 002c FFF7FEFF 	 bl DIGITAL_IO_SetOutputHigh
+ 187              	 .loc 3 50 0
+ 188 002a 1F48     	 ldr r0,.L12+8
+ 189 002c FFF7FEFF 	 bl DIGITAL_IO_SetOutputHigh
   51:../main.c     **** 
   52:../main.c     **** 	// Initialize Display
   53:../main.c     **** 	if( TFT_init() ){ printf("TFT init done 1\n"); }
- 189              	 .loc 3 53 0
- 190 0030 FFF7FEFF 	 bl TFT_init
- 191 0034 0346     	 mov r3,r0
- 192 0036 002B     	 cmp r3,#0
- 193 0038 03D0     	 beq .L6
- 194              	 .loc 3 53 0 is_stmt 0 discriminator 1
- 195 003a 1C48     	 ldr r0,.L12+12
- 196 003c FFF7FEFF 	 bl puts
- 197 0040 02E0     	 b .L7
- 198              	.L6:
+ 190              	 .loc 3 53 0
+ 191 0030 FFF7FEFF 	 bl TFT_init
+ 192 0034 0346     	 mov r3,r0
+ 193 0036 002B     	 cmp r3,#0
+ 194 0038 03D0     	 beq .L6
+ 195              	 .loc 3 53 0 is_stmt 0 discriminator 1
+ 196 003a 1C48     	 ldr r0,.L12+12
+ 197 003c FFF7FEFF 	 bl puts
+ 198 0040 02E0     	 b .L7
+ 199              	.L6:
   54:../main.c     **** 	else{ printf("TFT init failed 0\n"); }
- 199              	 .loc 3 54 0 is_stmt 1
- 200 0042 1B48     	 ldr r0,.L12+16
- 201 0044 FFF7FEFF 	 bl puts
- 202              	.L7:
+ 200              	 .loc 3 54 0 is_stmt 1
+ 201 0042 1B48     	 ldr r0,.L12+16
+ 202 0044 FFF7FEFF 	 bl puts
+ 203              	.L7:
   55:../main.c     **** 
   56:../main.c     **** 	// Show initial logo
   57:../main.c     **** 	TFT_display_init_screen();
- 203              	 .loc 3 57 0
- 204 0048 FFF7FEFF 	 bl TFT_display_init_screen
+ 204              	 .loc 3 57 0
+ 205 0048 FFF7FEFF 	 bl TFT_display_init_screen
   58:../main.c     **** 	uint32_t now = SYSTIMER_GetTime();
- 205              	 .loc 3 58 0
- 206 004c FFF7FEFF 	 bl SYSTIMER_GetTime
- 207 0050 3860     	 str r0,[r7]
+ 206              	 .loc 3 58 0
+ 207 004c FFF7FEFF 	 bl SYSTIMER_GetTime
+ 208 0050 3860     	 str r0,[r7]
   59:../main.c     **** 	while (SYSTIMER_GetTime() < now + (100*1000)) __NOP();
- 208              	 .loc 3 59 0
- 209 0052 00E0     	 b .L8
- 210              	.L9:
- 211              	 .loc 3 59 0 is_stmt 0 discriminator 2
- 212              	
- 213 0054 00BF     	 nop
- 214              	
- 215              	 .thumb
- 216              	.L8:
- 217              	 .loc 3 59 0 discriminator 1
- 218 0056 FFF7FEFF 	 bl SYSTIMER_GetTime
- 219 005a 0246     	 mov r2,r0
- 220 005c 3B68     	 ldr r3,[r7]
- 221 005e 03F5C333 	 add r3,r3,#99840
- 222 0062 A033     	 adds r3,r3,#160
- 223 0064 9A42     	 cmp r2,r3
- 224 0066 F5D3     	 bcc .L9
+ 209              	 .loc 3 59 0
+ 210 0052 00E0     	 b .L8
+ 211              	.L9:
+ 212              	 .loc 3 59 0 is_stmt 0 discriminator 2
+ 213              	
+ 214 0054 00BF     	 nop
+ 215              	
+ 216              	 .thumb
+ 217              	.L8:
+ 218              	 .loc 3 59 0 discriminator 1
+ 219 0056 FFF7FEFF 	 bl SYSTIMER_GetTime
+ 220 005a 0246     	 mov r2,r0
+ 221 005c 3B68     	 ldr r3,[r7]
+ 222 005e 03F5C333 	 add r3,r3,#99840
+ 223 0062 A033     	 adds r3,r3,#160
+ 224 0064 9A42     	 cmp r2,r3
+ 225 0066 F5D3     	 bcc .L9
   60:../main.c     **** 
   61:../main.c     **** 	// Main loop
   62:../main.c     **** 	printf("Start Main Loop -------------------------------------\n");
- 225              	 .loc 3 62 0 is_stmt 1
- 226 0068 1248     	 ldr r0,.L12+20
- 227 006a FFF7FEFF 	 bl puts
- 228              	.L11:
+ 226              	 .loc 3 62 0 is_stmt 1
+ 227 0068 1248     	 ldr r0,.L12+20
+ 228 006a FFF7FEFF 	 bl puts
+ 229              	.L11:
   63:../main.c     **** 	while(1U) {
   64:../main.c     **** 		if(tft_tick) { // Is set by Adc_Measurement_Handler at every interrupt of it
- 229              	 .loc 3 64 0
- 230 006e 124B     	 ldr r3,.L12+24
- 231 0070 1B78     	 ldrb r3,[r3]
- 232 0072 DBB2     	 uxtb r3,r3
- 233 0074 002B     	 cmp r3,#0
- 234 0076 11D0     	 beq .L10
+ 230              	 .loc 3 64 0
+ 231 006e 124B     	 ldr r3,.L12+24
+ 232 0070 1B78     	 ldrb r3,[r3]
+ 233 0072 DBB2     	 uxtb r3,r3
+ 234 0074 002B     	 cmp r3,#0
+ 235 0076 11D0     	 beq .L10
   65:../main.c     **** 			// reset tick
   66:../main.c     **** 			tft_tick = 0;
- 235              	 .loc 3 66 0
- 236 0078 0F4B     	 ldr r3,.L12+24
- 237 007a 0022     	 movs r2,#0
- 238 007c 1A70     	 strb r2,[r3]
+ 236              	 .loc 3 66 0
+ 237 0078 0F4B     	 ldr r3,.L12+24
+ 238 007a 0022     	 movs r2,#0
+ 239 007c 1A70     	 strb r2,[r3]
   67:../main.c     **** 
   68:../main.c     **** 			// Evaluate touches
   69:../main.c     **** 			TFT_touch();
- 239              	 .loc 3 69 0
- 240 007e FFF7FEFF 	 bl TFT_touch
+ 240              	 .loc 3 69 0
+ 241 007e FFF7FEFF 	 bl TFT_touch
   70:../main.c     **** 
   71:../main.c     **** 			// Evaluate and rewrite display list
   72:../main.c     **** 			display_delay++;
- 241              	 .loc 3 72 0
- 242 0082 FB79     	 ldrb r3,[r7,#7]
- 243 0084 0133     	 adds r3,r3,#1
- 244 0086 FB71     	 strb r3,[r7,#7]
+ 242              	 .loc 3 72 0
+ 243 0082 FB79     	 ldrb r3,[r7,#7]
+ 244 0084 0133     	 adds r3,r3,#1
+ 245 0086 FB71     	 strb r3,[r7,#7]
   73:../main.c     **** 			if(MeasurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
- 245              	 .loc 3 73 0
- 246 0088 0C4B     	 ldr r3,.L12+28
- 247 008a 1B68     	 ldr r3,[r3]
- 248 008c 03F00303 	 and r3,r3,#3
- 249 0090 002B     	 cmp r3,#0
- 250 0092 03D1     	 bne .L10
+ 246              	 .loc 3 73 0
+ 247 0088 0C4B     	 ldr r3,.L12+28
+ 248 008a 1B68     	 ldr r3,[r3]
+ 249 008c 03F00303 	 and r3,r3,#3
+ 250 0090 002B     	 cmp r3,#0
+ 251 0092 03D1     	 bne .L10
   74:../main.c     **** 				display_delay = 0;
- 251              	 .loc 3 74 0
- 252 0094 0023     	 movs r3,#0
- 253 0096 FB71     	 strb r3,[r7,#7]
+ 252              	 .loc 3 74 0
+ 253 0094 0023     	 movs r3,#0
+ 254 0096 FB71     	 strb r3,[r7,#7]
   75:../main.c     **** 				TFT_display();
- 254              	 .loc 3 75 0
- 255 0098 FFF7FEFF 	 bl TFT_display
- 256              	.L10:
+ 255              	 .loc 3 75 0
+ 256 0098 FFF7FEFF 	 bl TFT_display
+ 257              	.L10:
   76:../main.c     **** 			}
   77:../main.c     **** 
   78:../main.c     **** 		}
   79:../main.c     **** 	}
- 257              	 .loc 3 79 0
- 258 009c E7E7     	 b .L11
- 259              	.L13:
- 260 009e 00BF     	 .align 2
- 261              	.L12:
- 262 00a0 00000000 	 .word .LC0
- 263 00a4 20000000 	 .word .LC1
- 264 00a8 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
- 265 00ac 44000000 	 .word .LC2
- 266 00b0 54000000 	 .word .LC3
- 267 00b4 68000000 	 .word .LC4
- 268 00b8 00000000 	 .word tft_tick
- 269 00bc 00000000 	 .word MeasurementCounter
- 270              	 .cfi_endproc
- 271              	.LFE485:
- 273              	 .text
- 274              	.Letext0:
- 275              	 .file 4 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 276              	 .file 5 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 277              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
- 278              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 279              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h"
- 280              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 281              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
- 282              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
- 283              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
- 284              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
- 285              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h"
+ 258              	 .loc 3 79 0
+ 259 009c E7E7     	 b .L11
+ 260              	.L13:
+ 261 009e 00BF     	 .align 2
+ 262              	.L12:
+ 263 00a0 00000000 	 .word .LC0
+ 264 00a4 20000000 	 .word .LC1
+ 265 00a8 00000000 	 .word IO_DIO_DIGOUT_CS_TFT
+ 266 00ac 44000000 	 .word .LC2
+ 267 00b0 54000000 	 .word .LC3
+ 268 00b4 68000000 	 .word .LC4
+ 269 00b8 00000000 	 .word tft_tick
+ 270 00bc 00000000 	 .word MeasurementCounter
+ 271              	 .cfi_endproc
+ 272              	.LFE485:
+ 274              	 .text
+ 275              	.Letext0:
+ 276              	 .file 4 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 277              	 .file 5 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 278              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 279              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 280              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h"
+ 281              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 282              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 283              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 284              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 285              	 .file 13 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
+ 286              	 .file 14 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
     {standard input}:20     .text.XMC_GPIO_SetOutputHigh:00000000 $t
@@ -925,10 +926,11 @@ DEFINED SYMBOLS
                             *COM*:00000001 keypadActive
                             *COM*:00000001 keypadCurrentKey
                             *COM*:00000001 keypadEvokedBy
-    {standard input}:123    .rodata:00000000 $d
-    {standard input}:140    .text.main:00000000 $t
-    {standard input}:145    .text.main:00000000 main
-    {standard input}:262    .text.main:000000a0 $d
+                            *COM*:00000001 keypadKeypressFinished
+    {standard input}:124    .rodata:00000000 $d
+    {standard input}:141    .text.main:00000000 $t
+    {standard input}:146    .text.main:00000000 main
+    {standard input}:263    .text.main:000000a0 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

@@ -74,15 +74,19 @@ uint8_t keypadActive = 0;
 uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
 uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
 uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
+uint8_t keypadKeypressFinished = 0;
+
 
 /////////// Textbox feature
-uint8_t cursor_position = 0;
+uint8_t cursor_position = 2;
 
 
 // TAG ASSIGNMENT
 //		0		No touch
 //		1		Background (swipe area)
 //		32-126	Keyboard Common Buttons
+//		60		Keyboard left <
+//		62		Keyboard right >
 //		94		Keyboard Shift Key (^)
 //		127		Keyboard Backspace
 //		128		Keyboard Enter
@@ -147,24 +151,75 @@ void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* t
 	///
 	///  Limitations: Only made for font size 26, make sure the text cant be longer than the textbox width
 
+	// Buffers
+	char outputBuffer[100] = ""; // Used, to be manipulated to add cursor
+
+	/// Copy text to buffer but add the cursor
+	// Copy actual text before the cursor to the buffer
+	strncpy(outputBuffer, text, cursor_position);
+	// Add Cursor
+	outputBuffer[cursor_position] = '|';
+	// Copy rest of string
+	for (int8_t c = cursor_position; c < *text_curlen+1; c++) {
+		outputBuffer[c+1] = text[c];
+		//printf("text %s, char %c\n", text, text[cursor_position]);
+	}
+	// Terminate String
+	//outputBuffer[*text_curlen+2] = '\0';
+	//while(1){}
+
 	/// Manipulate text according to keypad input
-	if(curKey >= 32 && curKey <= 126)
-		text[3] = (char)curKey;
+	if(keypadKeypressFinished && curKey >= 32 && curKey <= 127){
+		// Backspace
+		if(curKey == 127){}
 
-	printf("curkey for txtbx %d\n", curKey);
+		// Cursor Left
+		else if(curKey == 60 && cursor_position > 0){ cursor_position--; }
 
+		// Cursor Right
+		else if(curKey == 62 && cursor_position < *text_curlen){ cursor_position++; }
+
+		// Add character
+		else { text[cursor_position] = (char)curKey; }
+
+		// Mark keypress as handeled
+		keypadKeypressFinished = 0;
+
+		printf("curkey for txtbx %d\n", curKey);
+	}
 
 	/// Set tag
 	EVE_cmd_dl_burst(TAG(tag));
 
 	/// Write current text
 	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
-	EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, text);
+	EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, outputBuffer);
 
 	/// Reset tag
 	EVE_cmd_dl_burst(TAG(0));
 }
 
+//////////TODO
+void str_insert(char* target, int8_t* len, char ch, int8_t pos){
+	char buf[100] = "";
+
+	/// Copy text to buffer but add the cursor
+	// Copy actual text before the cursor to the buffer
+	strncpy(buf, target, pos);
+	// Add Cursor
+	buf[pos] = ch;
+	// Copy rest of string
+	for (int8_t c = pos; c < *len+1; c++) {
+		buf[c+1] = target[c];
+		//printf("text %s, char %c\n", text, text[cursor_position]);
+	}
+
+	// Copy buffer back to target
+	strcpy(target,buf);
+
+	// Increase length
+	(*len)++;
+}
 
 
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
@@ -596,7 +651,10 @@ void TFT_touch(void)
 					keypadCurrentKey = 0;
 				}
 				else{
+					// Mark the last keypress as finished and let menu specific touch code run
+					keypadKeypressFinished = 1;
 					(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+
 				}
 			}
 			break;
@@ -709,9 +767,10 @@ void TFT_display(void)
 			EVE_cmd_fgcolor_burst(MAIN_BTNCTSCOLOR);
 			EVE_cmd_bgcolor_burst(MAIN_BTNCOLOR);
 
-			// Shift and Space
+			// Shift, Space and Left/Right Key
 			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 50, 29, 26, keypadCurrentKey, "^");
 			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 20, keypadCurrentKey, " ");
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29, 90, 29, 20, keypadCurrentKey, "<>");
 
 			// Backspace
 			char BS[] = "0";
