@@ -140,29 +140,37 @@ void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, in
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
 }
 
-void str_insert(char* target, int8_t* len, char ch, int8_t pos){
-	/// Insert a character 'ch' at given position of an string 'target'.
-	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
+char buf[100] = ""; // Common string buffer for functions like str_insert and str_remove
 
-	char buf[100] = "";
+
+void str_insert(char* target, int8_t* len, char ch, int8_t pos){
+	/// Insert a character 'ch' at given position of a string 'target'.
+	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
 
 	// Copy actual text before the new char to the buffer
 	strncpy(buf, target, pos);
+
+	//
+	strcpy(&buf[pos+1], &target[pos]);
+
 	// Add character
 	buf[pos] = ch;
-
-	printf("target %s, char %c, len %i, pos %d\n", target, ch, (*len), pos);
-	// Copy rest of string
-	for (int8_t c = pos; c < (*len)+1; c++) {
-		buf[c+1] = target[c];
-
-	}
 
 	// Copy buffer back to target
 	strcpy(target,buf);
 
 	// Increase length
 	(*len)++;
+}
+
+void str_remove(char* target, int8_t* len, char ch, int8_t pos){
+	/// Remove a character at given position of a string 'target'.
+	/// Note: 'len' will be automatically decreased (string gets shorter)!
+
+	strcpy(&target[pos], &target[pos+1]);
+
+	// Decrease length
+	(*len)--;
 }
 
 void str_copyinsert(char* target, char* source, int8_t* len, char ch, int8_t pos){
@@ -175,11 +183,11 @@ void str_copyinsert(char* target, char* source, int8_t* len, char ch, int8_t pos
 	// Add character
 	target[pos] = ch;
 
-
 	// Copy rest of string
-	for (int8_t c = pos; c < (*len)+1; c++) {
-		target[c+1] = source[c];
-	}
+	strcpy(&target[pos+1], &source[pos]);
+	//for (int8_t c = pos; c < (*len)+1; c++) {
+	//	target[c+1] = source[c];
+	//}
 }
 
 //printf("source %s, char %c, len %i, pos %d\n", source, ch, (*len), pos);
@@ -196,65 +204,77 @@ void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* t
 	///  Limitations: Only made for font size 26, make sure the text cant be longer than the textbox width
 
 	// Buffers
-	char outputBuffer[100] = ""; // Used, to be manipulated to add cursor
-
-	//strcpy(outputBuffer,text);
-	/// Copy text to buffer but add the cursor
-	str_copyinsert(outputBuffer, text, text_curlen, '|', cursor_position);
-//	// Copy actual text before the cursor to the buffer
-//	strncpy(outputBuffer, text, cursor_position);
-//	// Add Cursor
-//	outputBuffer[cursor_position] = '|';
-//	// Copy rest of string
-//	for (int8_t c = cursor_position; c < *text_curlen+1; c++) {
-//		outputBuffer[c+1] = text[c];
-//		//printf("text %s, char %c\n", text, text[cursor_position]);
-//	}
-//	// Terminate String
-//	//outputBuffer[*text_curlen+2] = '\0';
-//	//while(1){}
-
-	/// Manipulate text according to keypad input
-	if(keypadKeypressFinished && curKey >= 32 && curKey <= 127){
-		// Backspace
-		if(curKey == 127)
-			__NOP();
-		// Cursor Left
-		else if(curKey == 60){
-			if(cursor_position > 0)
-				cursor_position--;
-		}
-		// Cursor Right
-		else if(curKey == 62){
-			if(cursor_position < *text_curlen)
-				cursor_position++;
-		}
-		// Enter
-		else if(curKey == 62)
-			__NOP();
-		// Add character if its not shift
-		else if(curKey != 94 && curKey != 66)
-			str_insert(text, text_curlen, (char)curKey, cursor_position); //text[cursor_position] = (char)curKey;
-
-		// Mark keypress as handeled
-		keypadKeypressFinished = 0;
-
-		printf("curkey for txtbx %d\n", curKey);
-	}
+	static char outputBuffer[100] = ""; // Copy of 'text' with added cursor
 
 	/// Set tag
 	EVE_cmd_dl_burst(TAG(tag));
 
-	/// Write current text
+	/// Set text color
 	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
-	EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, outputBuffer);
+
+	/// If the keyboard is active manipulate text according to input - else just write text directly
+	if(keypadActive){
+		/// Manipulate text according to keypad input
+		if(keypadKeypressFinished && curKey >= 32 && curKey <= 128){
+			// Enter
+			if(curKey == 128){
+				//strcpy(outputBuffer, text);
+				//keypadActive = 0;
+				//keypadEvokedBy = 0;
+			}
+			else {
+				// Backspace
+				if(curKey == 127){
+					// Only remove character if the cursor is inside of string
+					if(cursor_position >= 1 && cursor_position <= (*text_curlen)){
+						strcpy(&text[cursor_position-1], &text[cursor_position]);
+						(*text_curlen)--;
+						cursor_position--;
+					}
+				}
+				// Cursor Left
+				else if(curKey == 60){
+					if(cursor_position > 0)
+						cursor_position--;
+				}
+				// Cursor Right
+				else if(curKey == 62){
+					if(cursor_position < (*text_curlen))
+						cursor_position++;
+				}
+				// Add character if its not shift
+				else if(curKey != 94 && curKey != 66 && (*text_curlen) < (text_maxlen-1)){
+
+					str_insert(text, text_curlen, (char)curKey, cursor_position);
+					cursor_position++;
+				}
+			}
+
+			// Mark keypress as handeled
+			keypadKeypressFinished = 0;
+
+			printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
+		}
+
+		/// Copy text to buffer but add the cursor
+		str_copyinsert(outputBuffer, text, text_curlen, '|', cursor_position);
+
+		// Write current text
+		EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, outputBuffer);
+	}
+	else{
+		// Write current text
+		EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, text);
+	}
 
 	/// Reset tag
 	EVE_cmd_dl_burst(TAG(0));
+
+	// Mark keypadCurrentKey as handled (we did what we had to do, now we wait till the next one comes)
+	//if(keypadActive && keypadEvokedBy == 20 ){
+	//	keypadCurrentKey = 0;
+	//}
 }
-
-//////////TODO
-
 
 
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
@@ -819,6 +839,9 @@ void TFT_display(void)
 			// Enter Button
 			EVE_cmd_dl_burst(TAG(128));
 			EVE_cmd_button_burst(2+30+4+60+288+4, EVE_VSIZE-2-29, EVE_HSIZE-2-30-4-60-288-2-4, 29, 20, 0, "OK");
+
+			// Mark keypadCurrentKey as handled (we did what we had to do in this cycle, now we wait till the next one comes)
+			keypadCurrentKey = 0;
 		}
 
 
