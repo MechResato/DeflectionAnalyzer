@@ -253,7 +253,7 @@ void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* t
 			// Mark keypress as handeled
 			keypadKeypressFinished = 0;
 
-			printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
+			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
 		}
 
 		/// Copy text to buffer but add the cursor
@@ -687,8 +687,30 @@ void TFT_touch(void)
 	}
 
 	// Register current keypress if the tag is in character range (or Backspace -> 8)
-	if(keypadActive && (tag >= 32 && tag <= 128)){
-		keypadCurrentKey = tag;
+	//if(keypadActive && (tag >= 32 && tag <= 128)){
+	//	keypadCurrentKey = tag;
+	//}
+
+
+	// Register current keypress if the tag is in character range (or Backspace -> 8)
+	if(keypadActive){
+		if(tag >= 32 && tag <= 128)
+			keypadCurrentKey = tag;
+
+		// If there is an unprocessed current key but nothing is touched anymore (key was just released) - evaluate if it was shift or run menu specific code
+		if(tag == 0 && keypadCurrentKey != 0){
+			// Shift was pressed - change shift-active and reset current-key
+			if(keypadCurrentKey == 94){
+				keypadShiftActive = !keypadShiftActive;
+				keypadCurrentKey = 0;
+			}
+			else{
+				// Mark the last keypress as finished and let menu specific touch code run
+				keypadKeypressFinished = 1;
+				(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+
+			}
+		}
 	}
 
 	// Execute action based on touched tag
@@ -697,21 +719,6 @@ void TFT_touch(void)
 		// nothing touched - reset states and locks
 		case 0:
 			toggle_lock = 0;
-
-			// If an unprocessed keypadCurrentKey is registered and the key was released (which is why he landed here) execute current menu specific code to handle the input
-			if(keypadCurrentKey){
-				// Shift was pressed - change shift-active and reset current-key
-				if(keypadCurrentKey == 94){
-					keypadShiftActive = !keypadShiftActive;
-					keypadCurrentKey = 0;
-				}
-				else{
-					// Mark the last keypress as finished and let menu specific touch code run
-					keypadKeypressFinished = 1;
-					(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
-
-				}
-			}
 			break;
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
