@@ -289,13 +289,6 @@ void TFT_touch_menu0(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
 	/// Do not use tags higher than 32 -> they will be interpreted as keyboard input!
-	//	if(keypadActive && keypadCurrentKey && tag == 0){
-	//		// do something with keypadCurrentKey
-	//		//printf("curkey %d\n", keypadCurrentKey);
-	//
-	//		// Reset keypadCurrentKey
-	//		keypadCurrentKey = 0;
-	//	}
 
 
 	// Determine which tag was touched
@@ -348,7 +341,7 @@ void TFT_touch_menu1(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedB
 			}
 			break;
 		default:
-			TFT_textbox_touch(str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
+			TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 			break;
 	}
 

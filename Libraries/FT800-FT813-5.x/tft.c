@@ -188,7 +188,7 @@ void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, i
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
 }
 
-void TFT_textbox_touch(char* text, int8_t text_maxlen, int8_t* text_curlen){
+void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* text_curlen){
 	/// Manage the input from keyboard and manipulate text. Used at recurring display list build in TFT_touch()
 	///
 	///  text			...
@@ -197,15 +197,15 @@ void TFT_textbox_touch(char* text, int8_t text_maxlen, int8_t* text_curlen){
 	///
 	///  Limitations:
 
-	/// If the keyboard is active manipulate text according to input - else just write text directly
-	if(keypadActive){
+	/// If the keyboard is active and evoked by the current textbox, manipulate text according to input
+	if(keypadActive && keypadEvokedBy == mytag){
 		/// Manipulate text according to keypad input
 		if(keypadKeypressFinished && keypadCurrentKey >= 32 && keypadCurrentKey <= 128){
 			// Enter
 			if(keypadCurrentKey == 128){
-				//keypadKeypressFinished = 0;
-				//keypadActive = 0;
-				//keypadEvokedBy = 0;
+				keypadActive = 0;
+				keypadEvokedBy = 0;
+				keypadKeypressFinished = 0;
 			}
 			else {
 				// Backspace
@@ -235,21 +235,17 @@ void TFT_textbox_touch(char* text, int8_t text_maxlen, int8_t* text_curlen){
 				}
 			}
 
-			// Mark keypress as handeled
+			// Mark keypress as handled (we did what we had to do, now we wait till the next one comes)
 			keypadKeypressFinished = 0;
 			keypadCurrentKey = 0;
+
 			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
 		}
 
 	}
-
-	// Mark keypadCurrentKey as handled (we did what we had to do, now we wait till the next one comes)
-	//if(keypadActive && keypadEvokedBy == 20 ){
-	//	keypadCurrentKey = 0;
-	//}
 }
 
-void TFT_textbox_display(uint16_t x, uint16_t y, int8_t tag, char* text, int8_t text_maxlen, int8_t* text_curlen){
+void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text, int8_t text_maxlen, int8_t* text_curlen){
 	/// Write the dynamic parts of an textbox to the TFT (text & cursor) as well as manage the input from keyboard. Used at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
@@ -262,25 +258,37 @@ void TFT_textbox_display(uint16_t x, uint16_t y, int8_t tag, char* text, int8_t 
 
 	// Buffers
 	static char outputBuffer[100] = ""; // Copy of 'text' with added cursor
-	//static char cursor = '|';
+	static char cursor = '|';
+	static uint32_t lastBlink = 0;
 
 
 	/// Set tag
-	EVE_cmd_dl_burst(TAG(tag));
+	EVE_cmd_dl_burst(TAG(mytag));
 
 	/// Set text color
 	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
 
 	/// If the keyboard is active manipulate text according to input - else just write text directly
-	if(keypadActive && keypadEvokedBy == tag){
-//		if(SYSTIMER_GetTime() % 550000){
-//			if(cursor == '|')
-//				cursor == ' ';
-//			else
-//				cursor == '|';
-//		}
+	if(keypadActive && keypadEvokedBy == mytag){ //
+		if(SYSTIMER_GetTime() > (lastBlink + 550000)){
+			lastBlink = SYSTIMER_GetTime();
+			if(cursor == '|')
+				cursor = ' ';
+			else
+				cursor = '|';
+		}
 		/// Copy text to buffer but add the cursor
-		str_copyinsert(outputBuffer, text, text_curlen, '|', cursor_position);
+		str_copyinsert(outputBuffer, text, text_curlen, cursor, cursor_position);
+		// Copy actual text before the new char to the buffer
+		//strncpy(outputBuffer, text, cursor_position);
+		//
+		//// Add character
+		//outputBuffer[cursor_position] = cursor;
+		//
+		//// Copy rest of string
+		//strcpy(&outputBuffer[cursor_position+1], &text[cursor_position]);
+
+
 
 		// Write current text
 		EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, outputBuffer);
