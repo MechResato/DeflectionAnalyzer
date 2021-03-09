@@ -42,8 +42,8 @@ void TFT_display_get_values(void);
 void TFT_display_menu0(void);
 void TFT_display_menu1(void);
 
-void TFT_touch_menu0(uint8_t, uint8_t, uint8_t*, int32_t*, int32_t*);
-void TFT_touch_menu1(uint8_t, uint8_t, uint8_t*, int32_t*, int32_t*);
+void TFT_touch_menu0(uint8_t, uint8_t, uint8_t, uint8_t*, int32_t*, int32_t*);
+void TFT_touch_menu1(uint8_t, uint8_t, uint8_t, uint8_t*, int32_t*, int32_t*);
 
 void TFT_display_static_menu0(void);
 void TFT_display_static_menu1(void);

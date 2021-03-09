@@ -23,26 +23,27 @@
 #include "EVE.h"
 #include "tft_data.h"
 #include "menu.h"
+#include "tft.h"
 
 // Memory-map definitions
 #define MEM_LOGO 0x00000000 // start-address of logo, needs about 20228 bytes of memory. Will be written by TFT_display_init_screen and overwritten by TFT_GraphStatic (and everything else...)
 #define MEM_DL_STATIC (EVE_RAM_G_SIZE - 4096) // 0xff000 -> Start-address of the static part of the display-list. Defined as the upper 4k of gfx-mem (WARNING: If static part gets bigger than 4k it gets clipped. IF dynamic part gets so big that it touches the last 4k (1MiB-4k) it overwrites the static part)
-uint32_t num_dl_static; // amount of bytes in the static part of our display-list
+static uint32_t num_dl_static; // amount of bytes in the static part of our display-list
 
 
 /////////// General Variables
-uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
+static uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
 
 // Current menu display function pointer - At the end of the TFT_display() the function referenced to this pointer is executed
-int8_t TFT_cur_Menu = 0; // Used as index of currently used menu (TFT_display,TFT_touch)
-int8_t TFT_last_Menu = -1; // Used as index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
+static int8_t TFT_cur_Menu = 0; // Used as index of currently used menu (TFT_display,TFT_touch)
+static int8_t TFT_last_Menu = -1; // Used as index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 
 void (*TFT_display_cur_Menu__fptr_arr[])(void) = {
 		&TFT_display_menu0,
 		&TFT_display_menu1
 };
 
-void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t tag, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
+void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
 		&TFT_touch_menu0,
 		&TFT_touch_menu1
 };
@@ -54,55 +55,59 @@ void (*TFT_display_static_cur_Menu__fptr_arr[])(void) = {
 
 #define TFT_MENU_SIZE (sizeof(TFT_display_cur_Menu__fptr_arr) / sizeof(*(TFT_display_cur_Menu__fptr_arr)))
 
+// Define a array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode
+void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
+void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
+void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
 
-/////////// Swipe feature (TFT_touch)
-enum SwipeDetection{None, Up, Down, Left, Right};
-enum SwipeDetection swipeDetect = None;
-uint8_t swipeInProgress = 0;
-uint8_t swipeEvokedBy = 0; 			  // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
-int32_t swipeInitialTouch_X = 32768; // X position of the initial touch of an swipe
-int32_t swipeInitialTouch_Y = 32768;
-int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch and the current position of an swipe
-int32_t swipeDistance_Y = 0;
-uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an swipe is finished
+
 
 /////////// Button states
-extern uint8_t toggle_lock; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
+static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
+
+
+
+/////////// Swipe feature (TFT_touch)
+SwipeDetection swipeDetect = None;
+static uint8_t swipeInProgress = 0;
+static uint8_t swipeEvokedBy = 0; 			  // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
+static int32_t swipeInitialTouch_X = 32768; // X position of the initial touch of an swipe
+static int32_t swipeInitialTouch_Y = 32768;
+static uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an swipe is finished
+int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch and the current position of an swipe
+int32_t swipeDistance_Y = 0;
+
 
 /////////// Keypad feature (TFT_touch)
+keypadTypes keypadType = Standard;
 uint8_t keypadActive = 0;
 uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
 uint8_t keypadKeypressFinished = 0;
 uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
 uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
 uint8_t keypadEndOfKeypress_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
-
-
-/////////// Textbox feature
-uint8_t textbox_cursor_pos = 2;
-
+const char backspace_char = 46; // The code that needs to be used for the selected backspace character. It is the offset of the extended ASCII code ('<<' = 174, minus the offset of 128 => 46). Need to use font 19 for extended ASCII characters!
 
 // TAG ASSIGNMENT
 //		0		No touch
 //		1		Background (swipe area)
 //		32-126	Keyboard Common Buttons
-//		60		Keyboard left <
-//		62		Keyboard right >
+//		60		Keyboard Left <
+//		62		Keyboard Right >
 //		94		Keyboard Shift Key (^)
-//		127		Keyboard Backspace
+//		127		Keyboard Backspace (displayed character is different, see 'backspace_char'!)
 //		128		Keyboard Enter
 
-// Define a array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode
-void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
-void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
-void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
 
-#define textboxHeight 31	// overall height of the textbox in pixel
-#define textboxTxtPadV 8	// offset of the text from left border in pixel
-#define textboxTxtPadH 7	// offset of the text from upper border in pixel
+/////////// Textbox feature
+uint8_t textbox_cursor_pos = 2;
+
+#define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
+#define TEXTBOX_PAD_V 8	// offset of the text from left border in pixel
+#define TEXTBOX_PAD_H 7	// offset of the text from upper border in pixel
+
 
 char buf[100] = ""; // Common string buffer for functions like str_insert
-
 void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 	/// Insert a character 'ch' at given position 'pos' of a string 'target'.
 	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
@@ -126,12 +131,15 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	///
-	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
-	///  x		...	beginning of left edge of the textbox. In full Pixels
-	///  y		... beginning of upper edge of the textbox. In full Pixels
-	///  width	... width of the actual textbox data area in full Pixels
-	///  tag	... to be assigned tag for touch recognition
-
+	///  burst		Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  x			Position of left textbox edge. In full Pixels
+	///  y			Position of upper textbox edge. In full Pixels
+	///  width		Width of the actual textbox data area in full Pixels
+	///  tag		To be assigned tag for touch recognition
+	///
+	///	 Uses tft-global variables:
+	///		EVE_cmd_dl__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
+	///		TEXTBOX_HEIGTH
 
 
 	/// Set tag
@@ -141,7 +149,7 @@ void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, i
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0xFFFFFFUL);
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_RECTS);
 	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y       ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+textboxHeight));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+TEXTBOX_HEIGTH));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 	/// Frame
@@ -150,9 +158,9 @@ void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, i
 	// start point
 	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y));
 	// left vertical
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y+textboxHeight));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y+TEXTBOX_HEIGTH));
 	// bottom horizontal
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+textboxHeight));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+TEXTBOX_HEIGTH));
 	// right vertical
 	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y));
 	// bottom horizontal
@@ -171,11 +179,13 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 	///  text_maxlen	Maximum length of the manipulated text (this will not add characters if length is at maximum)
 	///  text_curlen	Current length of the manipulated text (this will change length according to input)
 	///
-	///	 Used global variables
+	///	 Uses tft-global variables:
 	///		keypad:  keypadActive, keypadEvokedBy, keypadCurrentKey, keypadKeypressFinished
 	///		textbox_cursor_pos
 	///
-	///  Limitations:
+	///  Limitations: TFT_touch() must run prior to this! Check TAG ASSIGNMENT above - this refers to the convention given there! Set textbox_cursor_pos initial before entering this the first time.
+
+
 
 	/// If the keyboard is active and evoked by the current textbox, manipulate text according to input
 	if(keypadActive && keypadEvokedBy == mytag){
@@ -184,9 +194,7 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 			// Enter key
 			if(keypadCurrentKey == 128){
 				// Close/reset keypad
-				keypadActive = 0;
-				keypadEvokedBy = 0;
-				keypadKeypressFinished = 0;
+				keypad_close();
 			}
 			else {
 				// Backspace key
@@ -212,33 +220,37 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 				}
 				// Add character if the string isn't at max length
 				else if((*text_curlen) < (text_maxlen-1)){
-					str_insert(text, text_curlen, (char)keypadCurrentKey, textbox_cursor_pos);
-					textbox_cursor_pos++;
+						str_insert(text, text_curlen, (char)keypadCurrentKey, textbox_cursor_pos);
+						textbox_cursor_pos++;
 				}
 			}
 
 			// Mark keypress as handled (we did what we had to do, now we wait till the next one comes)
 			keypadKeypressFinished = 0;
 			keypadCurrentKey = 0;
-
-			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), textbox_cursor_pos);
 		}
 
 	}
 }
 
-void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text, int8_t text_maxlen, int8_t* text_curlen){
-	/// Write the dynamic parts of an textbox to the TFT (text & cursor) as well as manage the input from keyboard. Used at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
+void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text){
+	/// Write the dynamic parts of an textbox to the TFT (text & cursor). Used at recurring display list build in TFT_display()
 	///
-	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
-	///  x		...	beginning of left edge of the textbox. In full Pixels
-	///  y		... beginning of upper edge of the textbox. In full Pixels
-	///  width	... width of the actual textbox data area in full Pixels
-	///  tag	... to be assigned tag for touch recognition
+	///  x				Position of left textbox edge. In full Pixels
+	///  y				Position of upper textbox edge. In full Pixels
+	///  mytag			The tag of the current control element (cursor is only shown if keypadEvokedBy is mytag)
+	///  text			The string that shall be displayed
 	///
-	///  Limitations: Only made for font size 26, make sure the text cant be longer than the textbox width
+	///	 Uses tft-global variables:
+	///		keypad:  keypadActive, keypadEvokedBy
+	///		textbox_cursor_pos
+	///		TEXTBOX_PAD_V, TEXTBOX_PAD_H
+	///
+	///  Limitations: Only made for font size 26. Make sure the text can't be longer than the textbox width
 
-	// Buffers
+
+
+	// Buffers and control variables (static: will keep value between function executions)
 	static char outputBuffer[100] = ""; // Copy of 'text' with added cursor
 	static char cursor = '|';
 	static uint32_t lastBlink = 0;
@@ -250,7 +262,7 @@ void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text, int8_
 	/// Set text color
 	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
 
-	/// If the keyboard is active manipulate text according to input - else just write text directly
+	/// If the keyboard is active, show textbox text with cursor - else just write text directly
 	if(keypadActive && keypadEvokedBy == mytag){ //
 		if(SYSTIMER_GetTime() > (lastBlink + 550000)){
 			lastBlink = SYSTIMER_GetTime();
@@ -259,34 +271,64 @@ void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text, int8_
 			else
 				cursor = '|';
 		}
+
 		/// Copy text to buffer but add the cursor
-		//str_copyinsert(outputBuffer, text, text_curlen, cursor, textbox_cursor_pos);
-		// Copy actual text before the new char to the buffer
+		// Copy actual text previous to the new char to the buffer
 		strncpy(outputBuffer, text, textbox_cursor_pos);
-
-		// Add character
+		// Add cursor
 		outputBuffer[textbox_cursor_pos] = cursor;
-
 		// Copy rest of string
 		strcpy(&outputBuffer[textbox_cursor_pos+1], &text[textbox_cursor_pos]);
 
-
-
 		// Write current text
-		EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, outputBuffer);
+		EVE_cmd_text_burst(x+TEXTBOX_PAD_H, y+TEXTBOX_PAD_V, 26, 0, outputBuffer);
 	}
 	else{
 		// Write current text
-		EVE_cmd_text_burst(x+textboxTxtPadH, y+textboxTxtPadV, 26, 0, text);
+		EVE_cmd_text_burst(x+TEXTBOX_PAD_H, y+TEXTBOX_PAD_V, 26, 0, text);
 	}
 
 	/// Reset tag
 	EVE_cmd_dl_burst(TAG(0));
+}
 
-	// Mark keypadCurrentKey as handled (we did what we had to do, now we wait till the next one comes)
-	//if(keypadActive && keypadEvokedBy == 20 ){
-	//	keypadCurrentKey = 0;
-	//}
+void TFT_textbox_setCursor(int16_t position, int16_t len){
+	/// Sets the position of the textbox cursor.
+	/// -1	... Set to end
+	/// 0	...	Set to begin
+	/// x	... Set to position x if "x <= len"
+
+	switch (position) {
+		case -1:
+			textbox_cursor_pos = len;
+			break;
+		default:
+			if(position <= len)
+				textbox_cursor_pos = position;
+			break;
+	}
+}
+
+void keypad_open(uint8_t evokedBy, enum keypadTypes type){
+	/// Open a keypad for the according evoker (control element - e.g. tag of an textbox)
+
+	// Only open keypad if it isn't open
+	if(keypadActive == 0){
+		// Activate Keypad and set type
+		keypadActive = 1;
+		keypadEvokedBy = evokedBy;
+		keypadType = type;
+	}
+}
+
+void keypad_close(){
+	/// Close and reset the keypad
+
+	// Deactivate Keypad and reset control variables
+	keypadActive = 0;
+	keypadEvokedBy = 0;
+	keypadType = Standard;
+	keypadKeypressFinished = 0;
 }
 
 
@@ -303,6 +345,7 @@ void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint
 	///  t_max 	 ... maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
 	///  h_grid_lines ... number of horizontal grid lines
 	///  v_grid_lines ... number of vertical grid lines
+	///
 	///  Note: The predefined GRAPH_AXISCOLOR and GRAPH_GRIDCOLOR are used directly!
 
 
@@ -477,16 +520,11 @@ void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 }
 
 
+
 void touch_calibrate(void) {
-// Sends pre-recorded touch calibration values, depending on the display the code is compiled for. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
-#if defined (EVE_RiTFT43)
-	// Original library values
-	//EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000062cd);
-	//EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0xfffffe45);
-	//EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff45e0a);
-	//EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000001a3);
-	//EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00005b33);
-	//EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFFbb870);
+	/// Sends pre-recorded touch calibration values. Made for EVE_RiTFT43. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
+	/// Note: All targets other than EVE_RiTFT43 where deleted -> see original lib
+
 
 	// Actual values (measured with routine down below) by Rene S. at 20.12.2020 on Display SM-RVT43ULBNWC01 2031/20/609 00010
 	EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000061c4);
@@ -495,12 +533,17 @@ void touch_calibrate(void) {
 	EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0xffffff91);
 	EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00005b6b);
 	EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFFac7ab);
-#endif
+	// Original library values
+	//EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000062cd);
+	//EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0xfffffe45);
+	//EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfff45e0a);
+	//EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000001a3);
+	//EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00005b33);
+	//EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xFFFbb870);
 
-// All targets other than EVE_RiTFT43 where deleted -> see original lib 4
 
 /* activate this if you are using a module for the first time or if you need to re-calibrate it */
-/* write down the numbers on the screen and either place them in one of the pre-defined blocks above or make a new block */
+/* write down the numbers on the screen and either place them in pre-defined block above or make a new block */
 #if 0
 	/* calibrate touch and displays values to screen */
 	EVE_cmd_dl(CMD_DLSTART);
@@ -549,15 +592,16 @@ void touch_calibrate(void) {
 #endif
 }
 
-uint8_t TFT_init(void)
-{
+uint8_t TFT_init(void) {
 	/// Initializes EVE (or checks if its already initialized). Only at first sucessful EVE_init() the tft is set active, backlight is set to medium brightness, the pre-elaborated touch calibration is loaded and the static Background is initiated. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
+
+	// Initialize EVE and initialize TFT if that is OK
 	if(EVE_init() != 0)
 	{
 		#if defined (DEBUG_ENABLE)
 			printf("TFT_init - EVE_init was ok, starting to init TFT!\n");
 		#endif
-		// Mark Display as active (TFT_display only does anythin after his)
+		// Mark Display as active (TFT_display only does anything after his)
 		tft_active = 1;
 
 		// Initial Backlight strength
@@ -584,9 +628,10 @@ uint8_t TFT_init(void)
 	}
 }
 
-void TFT_display_init_screen(void)
-{
+void TFT_display_init_screen(void) {
 	/// Display logo over full screen
+
+	// If tft is active (TFT_init was executed and didn't fail) load initial logo and show DL
 	if(tft_active != 0)
 	{
 		EVE_cmd_inflate(MEM_LOGO, logo_init, sizeof(logo_init)); /* load logo into gfx-memory and de-compress it */
@@ -604,7 +649,6 @@ void TFT_display_init_screen(void)
 		EVE_cmd_dl_burst(VERTEX2F(86*16, 11*16));  //105*16
 		EVE_cmd_dl_burst(DL_END);
 
-
 		EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the graphics processor to show the list */
 		EVE_cmd_dl_burst(CMD_SWAP); /* make this list active */
 
@@ -614,10 +658,24 @@ void TFT_display_init_screen(void)
 
 
 
-void TFT_display_static(void)
-{
-	// Static portion of display-handling, meant to be called once at startup. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
-	EVE_cmd_dl(CMD_DLSTART); // Start a new display list (resets REG_CMD_DL to 0)
+void TFT_display_static(void) {
+	/// Static portion of display-handling, meant to be called once at every change of menu. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
+	/// It creates a fresh display list, sets the background, loads the static part of the currently to be shown menu and copy's the display list to the rear end of the TFT RAM.
+	/// This copy can than be used during TFT_display(). Purpose: The parts of the display that do not change must only be written to the display once, which decreases the main uC time cost.
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		Colors:  MAIN_BGCOLOR
+	///		TFT_display_static_cur_Menu__fptr_arr:	Function pointer for menu specific TFT_display_static function
+	///		TFT_last_Menu, TFT_cur_Menu				Index of last and current menu
+	///		num_dl_static							Current size of display list
+	///		MEM_DL_STATIC							Start position where static DL shall be stored
+
+
+
+
+	// Start a new display list (resets REG_CMD_DL to 0)
+	EVE_cmd_dl(CMD_DLSTART);
 
 	/// Main settings
 	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
@@ -629,6 +687,7 @@ void TFT_display_static(void)
 	EVE_cmd_dl(VERTEX2F(0, 0));
 	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
 	EVE_cmd_dl(DL_END);
+
 
 
 	/////////////// Execute current menu specific code
@@ -652,19 +711,34 @@ void TFT_display_static(void)
 
 void TFT_touch(void)
 {
-	/// Check for touch events and setup vars for TFT_display() (Buttons). Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
+	/// Check for touch events and evaluate them. Manages swipe/keyboard feature and control vars for TFT_display() (therefore it must initially run before it).
+	/// Meant to be called more often that TFT_display() from main. Divided into 5 parts:
+	/// 	Read from TFT, evaluate swipe feature, evaluate keypad feature, evaluate global tags and run menu specific code.
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		Swipe feature:  swipeInProgress, swipeEvokedBy, swipeInitialTouch_X, swipeInitialTouch_Y, swipeDistance_X, swipeDistance_Y, swipeEndOfTouch_Debounce. (all of them)
+	///		Keypad feature: keypadActive, keypadEvokedBy, keypadKeypressFinished, keypadCurrentKey, keypadShiftActive, keypadEndOfKeypress_Debounce. (all of them)
+	///		toggle_lock:	Used to react to an button-press (not keypress!) only after it is fished and animate the button accordingly
+	///		swipeDetect:	Used to detect a swipe and react to it (ain't listed in 'Swipe feature' because this can be used by any code block that evaluates swipes)
+	///		TFT_touch_cur_Menu__fptr_arr: Function pointer for menu specific TFT_touch function
+
+
+
 	// Init vars
 	uint8_t tag; // temporary store of received touched tag
 	
 	// If Display is still busy, skip this evaluation to prevent hanging, glitches and flickers
 	if(EVE_busy()) { return; } /* is EVE still processing the last display list? */
 
+	/// Read values from TFT
 	// Read the value for the first touch point
 	tag = EVE_memRead8(REG_TOUCH_TAG);
 	// Read currently touched position in pixels
 	uint32_t TouchXY = EVE_memRead32(REG_TOUCH_SCREEN_XY); // Currently touched X and Y coordinate from register (1.byte=X, 2.byte=Y)
 	uint16_t Y = TouchXY;
 	uint16_t X = TouchXY >> 16;
+
 
 	/// If a swipe is in progress, save start coordinates (once at start), calculate swipe distance and detect the end-of-touch (debounced).
 	/// A swipe gets started by a touch tag action (switch statement below) and lasts till no touch was detected for at least 5 executions (debounce).
@@ -703,8 +777,9 @@ void TFT_touch(void)
 		}
 	}
 
-	/// If the keypad is active, check if an keypress is finished or a new keypress must be registered
-	/// The Keyboard gets started by menu specific code (setting keypadActive = 1 and keypadEvokedBy = [controlElementTag]) and lasts till keypadActive and keypadEvokedBy are set to 0
+
+	/// If the keypad is active, check if a keypress is finished or a new keypress must be registered
+	/// The Keyboard gets started by menu specific code (calling keypad_open([tag of evoker],[type of keypad]) and lasts till it's disabled by keypad_close().
 	/// Any function that deals with the keypad output MUST mark a keypress as handled afterwards by reseting keypadKeypressFinished and keypadCurrentKey to 0!
 	if(keypadActive){
 		// If there is an unprocessed current key but nothing is touched anymore (key was just released) - evaluate if it was shift or run menu specific code
@@ -738,7 +813,8 @@ void TFT_touch(void)
 		}
 	}
 
-	// Execute action based on touched tag
+
+	/// Execute action based on touched tag
 	switch(tag)
 	{
 		// nothing touched - reset states and locks
@@ -748,8 +824,7 @@ void TFT_touch(void)
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
 			/// Deactivate Keypad
-			keypadActive = 0;
-			keypadEvokedBy = 0;
+			keypad_close();
 
 
 			/// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
@@ -784,17 +859,28 @@ void TFT_touch(void)
 
 	/////////////// Execute current menu specific code if a non global tag is touched or a Keypress is finished and can be processed
 	if(tag > 1 || keypadKeypressFinished)
-		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
-
-
-	//printf("%d %d %d %d-%d\n", swipeInProgress, (int)swipeDetect, TFT_cur_Menu, swipeInitialTouch_X, X);
+		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, toggle_lock, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
 }
 
 void TFT_display(void)
 {
-	/// Dynamic portion of display-handling, meant to be called every 20ms or more. Created by Rudolph Riedel, extensively adapted by RS @ MCI 2020/21
+	/// Dynamic portion of display-handling, meant to be called less often that TFT_touch() from main (at least every 20ms for min 50FPS). Created by Rudolph Riedel, extensively adapted by RS @ MCI 2020/21
+	/// It manages the creates a fresh display list, manages the static part (let it be build or uses it) of the display list and shows the menu specific code as well as the keyboard.
+	/// It is divided into following parts:
+	///		Let the static part be created if necassary, get values from TFT (extern), copy's the previously saved static part of the current menu from the rear end of the TFT RAM to the beginning,
+	///		let menu specific code run, draw keypad in its current state if needed and finish display list.
 	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		Colors:  WHITE, GREY, MAIN_BTNCTSCOLOR, MAIN_BTNCOLOR
+	///		Keypad feature: keypadActive, keypadCurrentKey, keypadShiftActive
+	///		tft_active							Marker if library was initialized successfully
+	///		TFT_display_cur_Menu__fptr_arr:		Function pointer for menu specific TFT_display function
+	///		TFT_last_Menu, TFT_cur_Menu			Index of last and current menu
+	///		num_dl_static						Current size of display list
+	///		MEM_DL_STATIC						Start position where static DL shall be stored
 
+	// If tft is active (TFT_init was executed and didn't fail) load initial logo and show DL
 	if(tft_active != 0)
 	{
 		// Setup static part of the current menu - only needed once when the menu is changed
@@ -839,43 +925,73 @@ void TFT_display(void)
 
 			// Keys
 			EVE_cmd_dl_burst(TAG(0));
-			if(keypadShiftActive == 0){
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "1234567890");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "qwertyuiop");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "asdfghjkl");
-				EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "zxcvbnm._");
+			// Show different keypads based on type
+			int8_t showShiftKey;
+			switch (keypadType) {
+				case Filename:
+					// keypadType = Filename
+					if(keypadShiftActive == 0){
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "1234567890");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "qwertyuiop");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "asdfghjkl");
+						EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "zxcvbnm._");
+					}
+					else{
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "1234567890");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "QWERTYUIOP");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "ASDFGHJKL");
+						EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "ZXCVBNM#-");
+					}
+					showShiftKey = 1;
+					break;
+				case Numeric:
+					// keypadType = Numeric
+					EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "789");
+					EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "456");
+					EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "123");
+					EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 138+138+4, 29, 26, keypadCurrentKey, "0");
+					EVE_cmd_keys_burst(2+138+4+138+4-1, EVE_VSIZE-2-29-(32*1), 138+1, 29, 26, keypadCurrentKey, ".");
+					showShiftKey = 0;
+					break;
+				default:
+					// keypadType = Standard
+					if(keypadShiftActive == 0){
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "1234567890");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "qwertyuiop");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "asdfghjkl");
+						EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "zxcvbnm._");
+					}
+					else{
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "!\"%&/()=?\\");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "QWERTYUIOP");
+						EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "ASDFGHJKL");
+						EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "ZXCVBNM:-");
+					}
+					showShiftKey = 1;
+					break;
 			}
-			else{
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*4), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "!\"%&/()=?\\");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*3), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "QWERTYUIOP");
-				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*2), EVE_HSIZE-4, 29, 26, keypadCurrentKey, "ASDFGHJKL");
-				EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "ZXCVBNM:-");
-			}
+
 
 			// Control Keys in different color
 			EVE_cmd_fgcolor_burst(MAIN_BTNCTSCOLOR);
 			EVE_cmd_bgcolor_burst(MAIN_BTNCOLOR);
 
-			// Shift, Space and Left/Right Key
-			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 50, 29, 26, keypadCurrentKey, "^");
-			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 20, keypadCurrentKey, " ");
-			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29, 90, 29, 20, keypadCurrentKey, "<>");
+			// Space, Left/Right and Shift Key
+			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 26, keypadCurrentKey, " ");
+			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29, 90, 29, 26, keypadCurrentKey, "<>");
+			if(showShiftKey == 1)
+							EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 50, 29, 26, keypadCurrentKey, "^");
 
 			// Backspace
-			char BS[] = "0";
-			BS[0] = (char)46; // Backspace character TODO COMMENT
 			EVE_cmd_dl_burst(TAG(127));
 			if(keypadCurrentKey == 127)
-				EVE_cmd_button_burst(EVE_HSIZE-50, EVE_VSIZE-2-29-(32*4), 50, 29, 19, EVE_OPT_FLAT, &BS[0]);
+				EVE_cmd_button_burst(EVE_HSIZE-50, EVE_VSIZE-2-29-(32*4), 50, 29, 19, EVE_OPT_FLAT, &backspace_char);
 			else
-				EVE_cmd_button_burst(EVE_HSIZE-2-50, EVE_VSIZE-2-29-(32*4), 50, 29, 19, 0, &BS[0]);
+				EVE_cmd_button_burst(EVE_HSIZE-2-50, EVE_VSIZE-2-29-(32*4), 50, 29, 19, 0, &backspace_char);
 
 			// Enter Button
 			EVE_cmd_dl_burst(TAG(128));
 			EVE_cmd_button_burst(2+30+4+60+288+4, EVE_VSIZE-2-29, EVE_HSIZE-2-30-4-60-288-2-4, 29, 20, 0, "OK");
-
-			// Mark keypadCurrentKey as handled (we did what we had to do in this cycle, now we wait till the next one comes)
-			//keypadCurrentKey = 0;
 		}
 
 
