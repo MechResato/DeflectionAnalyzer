@@ -16,6 +16,29 @@
 #include "record.h"
 #include "menu.h"
 
+/////////// Menu function pointers - At the end of the menu control functions (TFT_display_static, TFT_display and TFT_touch inside tft.h) the function referenced to this pointer is executed
+// Every new menu needs to be defined in menu.h, declared at the end of this file and registered here in this function pointer array!
+// TFT_MENU_SIZE 	   is declared in menu.h and must be changed if menus are added or removed
+// TFT_MAIN_MENU_SIZE  is declared in menu.h. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
+int8_t TFT_cur_Menu = 0; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
+void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
+		&TFT_display_menu0,
+		&TFT_display_menu1
+};
+
+void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
+		&TFT_touch_menu0,
+		&TFT_touch_menu1
+};
+
+void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
+		&TFT_display_static_menu0,
+		&TFT_display_static_menu1
+};
+
+
+
+
 /////////// Banner line strip edge positions (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
 #define LAYOUT_Y1 66
 #define LAYOUT_Y2 50
@@ -51,7 +74,7 @@ uint16_t toggle_state_dimmer = 0;
 
 
 /////////// Debug
-uint16_t display_list_size = 0; // Currently size of the display-list from register. Used by the TFT_display() menu specific functions
+uint16_t display_list_size = 0; // Current size of the display-list from register. Used by the TFT_display() menu specific functions
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
 
 
@@ -59,9 +82,6 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 #define STR_FILENAME_MAXLEN 20
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
 int8_t str_filename_curLength = 8;
-
-
-//filename[1] = 'a';
 
 
 
@@ -188,8 +208,7 @@ void TFT_display_menu0(void)
 	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, toggle_state_graphmode, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
 
 }
-void TFT_display_menu1(void)
-{
+void TFT_display_menu1(void){
 	/// Test menu
 
 	/////////////// Display BUTTONS and Toggles
@@ -233,19 +252,36 @@ void TFT_display_menu1(void)
 //	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
 
 }
+//void TFT_display_menu_setup(void)
+//{
+//	///
+//
+//	/////////////// Display BUTTONS and Toggles
+//	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+//	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+//	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+//	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+//
+//	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+//	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+//
+//	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+//
+//}
 
-void TFT_touch_menu0(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+
+void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
-	/// Do not use predefined TAGs -> see tft.c
+	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
 
 	// Determine which tag was touched
 	switch(tag)
 	{
 		// dimmer button on top as on/off radio-switch
 		case 10:
-			if(toggle_lock == 0) {
+			if(*toggle_lock == 0) {
 				printf("Button Dimmer touched\n");
-				toggle_lock = 42;
+				*toggle_lock = 42;
 				if(toggle_state_dimmer == 0){
 					toggle_state_dimmer = EVE_OPT_FLAT;
 					EVE_memWrite8(REG_PWM_DUTY, 0x01);	/* setup backlight, range is from 0 = off to 0x80 = max */
@@ -258,9 +294,9 @@ void TFT_touch_menu0(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, 
 			break;
 		// roll/frame mode toggle on top
 		case 12:
-			if(toggle_lock == 0) {
+			if(*toggle_lock == 0) {
 				printf("Toggle Roll touched\n");
-				toggle_lock = 42;
+				*toggle_lock = 42;
 				if(toggle_state_graphmode == 0)	{
 					toggle_state_graphmode = 1;
 				}
@@ -271,18 +307,18 @@ void TFT_touch_menu0(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, 
 			break;
 		// signal switcher button
 		case 13:
-			if(toggle_lock == 0) {
+			if(*toggle_lock == 0) {
 				printf("Switch Signal\n");
-				toggle_lock = 42;
+				*toggle_lock = 42;
 				InputType++;
 				if(InputType > 3){ InputType = 0; }
 			}
 			break;
 	}
 }
-void TFT_touch_menu1(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
-	/// Do not use tags higher than 32 -> they will be interpreted as keyboard input!
+	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
 
 
 	// Determine which tag was touched
@@ -290,9 +326,9 @@ void TFT_touch_menu1(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, 
 	{
 		// li/re mode toggle on top
 		case 12:
-			if(toggle_lock == 0) {
+			if(*toggle_lock == 0) {
 				printf("Toggle li/re touched\n");
-				toggle_lock = 42;
+				*toggle_lock = 42;
 				if(toggle_state_graphmode == 0)	{
 					toggle_state_graphmode = 1;
 				}
@@ -304,9 +340,9 @@ void TFT_touch_menu1(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, 
 
 		// textbox
 		case 20:
-			if(toggle_lock == 0) {
+			if(*toggle_lock == 0) {
 				printf("Textbox touched\n");
-				toggle_lock = 42;
+				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
 				keypad_open(20, Filename);

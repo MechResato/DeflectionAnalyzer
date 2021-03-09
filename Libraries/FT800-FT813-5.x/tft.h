@@ -3,6 +3,19 @@
 #ifndef TFT_H_
 #define TFT_H_
 
+// Simple pre-defined colors
+#define RED		0xff0000UL
+#define ORANGE	0xffa500UL
+#define GREEN	0x00ff00UL
+#define BLUE	0x0000ffUL
+#define BLUE_1	0x5dade2UL
+#define YELLOW	0xffff00UL
+#define PINK	0xff00ffUL
+#define PURPLE	0x800080UL
+#define WHITE	0xffffffUL
+#define BLACK	0x000000UL
+#define GREY	0x222222UL
+
 // Swipe feature
 enum SwipeDetection{None=0, Up, Down, Left, Right};
 typedef enum SwipeDetection SwipeDetection;
@@ -24,7 +37,6 @@ void TFT_textbox_setCursor(int16_t position, int16_t len);
 // Graph feature
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines);
 void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor);
-
 
 
 

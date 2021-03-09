@@ -31,34 +31,24 @@
 static uint32_t num_dl_static; // amount of bytes in the static part of our display-list
 
 
+
 /////////// General Variables
 static uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
-
-// Current menu display function pointer - At the end of the TFT_display() the function referenced to this pointer is executed
-static int8_t TFT_cur_Menu = 0; // Used as index of currently used menu (TFT_display,TFT_touch)
-static int8_t TFT_last_Menu = -1; // Used as index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
-
-void (*TFT_display_cur_Menu__fptr_arr[])(void) = {
-		&TFT_display_menu0,
-		&TFT_display_menu1
-};
-
-void (*TFT_touch_cur_Menu__fptr_arr[])(uint8_t tag, uint8_t toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
-		&TFT_touch_menu0,
-		&TFT_touch_menu1
-};
-
-void (*TFT_display_static_cur_Menu__fptr_arr[])(void) = {
-		&TFT_display_static_menu0,
-		&TFT_display_static_menu1
-};
-
-#define TFT_MENU_SIZE (sizeof(TFT_display_cur_Menu__fptr_arr) / sizeof(*(TFT_display_cur_Menu__fptr_arr)))
-
 // Define a array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode
-void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
-void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
-void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
+static void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
+static void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
+static void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
+
+
+
+/////////// Menu function pointers - At the end of the TFT_display_static, TFT_display and TFT_touch the function referenced to this pointer is executed
+extern void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
+extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
+extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
+// TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
+// TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
+extern int8_t TFT_cur_Menu; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
+static int8_t TFT_last_Menu = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 
 
 
@@ -68,7 +58,7 @@ static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is to
 
 
 /////////// Swipe feature (TFT_touch)
-SwipeDetection swipeDetect = None;
+static SwipeDetection swipeDetect = None;
 static uint8_t swipeInProgress = 0;
 static uint8_t swipeEvokedBy = 0; 			  // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
 static int32_t swipeInitialTouch_X = 32768; // X position of the initial touch of an swipe
@@ -78,15 +68,16 @@ int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch an
 int32_t swipeDistance_Y = 0;
 
 
+
 /////////// Keypad feature (TFT_touch)
-keypadTypes keypadType = Standard;
-uint8_t keypadActive = 0;
-uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
-uint8_t keypadKeypressFinished = 0;
-uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
-uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
-uint8_t keypadEndOfKeypress_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
-const char backspace_char = 46; // The code that needs to be used for the selected backspace character. It is the offset of the extended ASCII code ('<<' = 174, minus the offset of 128 => 46). Need to use font 19 for extended ASCII characters!
+static keypadTypes keypadType = Standard;
+static uint8_t keypadActive = 0;
+static uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
+static uint8_t keypadKeypressFinished = 0;
+static uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
+static uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
+static uint8_t keypadEndOfKeypress_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
+static const char backspace_char = 46; // The code that needs to be used for the selected backspace character. It is the offset of the extended ASCII code ('<<' = 174, minus the offset of 128 => 46). Need to use font 19 for extended ASCII characters!
 
 // TAG ASSIGNMENT
 //		0		No touch
@@ -99,15 +90,43 @@ const char backspace_char = 46; // The code that needs to be used for the select
 //		128		Keyboard Enter
 
 
+
 /////////// Textbox feature
 uint8_t textbox_cursor_pos = 2;
-
 #define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
 #define TEXTBOX_PAD_V 8	// offset of the text from left border in pixel
 #define TEXTBOX_PAD_H 7	// offset of the text from upper border in pixel
-
-
 char buf[100] = ""; // Common string buffer for functions like str_insert
+
+
+
+
+
+
+void keypad_open(uint8_t evokedBy, enum keypadTypes type){
+	/// Open a keypad for the according evoker (control element - e.g. tag of an textbox)
+
+	// Only open keypad if it isn't open
+	if(keypadActive == 0){
+		// Activate Keypad and set type
+		keypadActive = 1;
+		keypadEvokedBy = evokedBy;
+		keypadType = type;
+	}
+}
+
+void keypad_close(){
+	/// Close and reset the keypad
+
+	// Deactivate Keypad and reset control variables
+	keypadActive = 0;
+	keypadEvokedBy = 0;
+	keypadType = Standard;
+	keypadKeypressFinished = 0;
+}
+
+
+
 void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 	/// Insert a character 'ch' at given position 'pos' of a string 'target'.
 	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
@@ -309,27 +328,6 @@ void TFT_textbox_setCursor(int16_t position, int16_t len){
 	}
 }
 
-void keypad_open(uint8_t evokedBy, enum keypadTypes type){
-	/// Open a keypad for the according evoker (control element - e.g. tag of an textbox)
-
-	// Only open keypad if it isn't open
-	if(keypadActive == 0){
-		// Activate Keypad and set type
-		keypadActive = 1;
-		keypadEvokedBy = evokedBy;
-		keypadType = type;
-	}
-}
-
-void keypad_close(){
-	/// Close and reset the keypad
-
-	// Deactivate Keypad and reset control variables
-	keypadActive = 0;
-	keypadEvokedBy = 0;
-	keypadType = Standard;
-	keypadKeypressFinished = 0;
-}
 
 
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
@@ -717,11 +715,12 @@ void TFT_touch(void)
 	///
 	///	 Uses tft-global variables:
 	///		EVE Library ...
-	///		Swipe feature:  swipeInProgress, swipeEvokedBy, swipeInitialTouch_X, swipeInitialTouch_Y, swipeDistance_X, swipeDistance_Y, swipeEndOfTouch_Debounce. (all of them)
-	///		Keypad feature: keypadActive, keypadEvokedBy, keypadKeypressFinished, keypadCurrentKey, keypadShiftActive, keypadEndOfKeypress_Debounce. (all of them)
-	///		toggle_lock:	Used to react to an button-press (not keypress!) only after it is fished and animate the button accordingly
-	///		swipeDetect:	Used to detect a swipe and react to it (ain't listed in 'Swipe feature' because this can be used by any code block that evaluates swipes)
+	///		Swipe feature:  	swipeInProgress, swipeEvokedBy, swipeInitialTouch_X, swipeInitialTouch_Y, swipeDistance_X, swipeDistance_Y, swipeEndOfTouch_Debounce. (all of them)
+	///		Keypad feature: 	keypadActive, keypadEvokedBy, keypadKeypressFinished, keypadCurrentKey, keypadShiftActive, keypadEndOfKeypress_Debounce. (all of them)
+	///		toggle_lock:		Used to react to an button-press (not keypress!) only after it is fished and animate the button accordingly
+	///		swipeDetect:		Used to detect a swipe and react to it (ain't listed in 'Swipe feature' because this can be used by any code block that evaluates swipes)
 	///		TFT_touch_cur_Menu__fptr_arr: Function pointer for menu specific TFT_touch function
+	///		TFT_MAIN_MENU_SIZE:	States to where the main menus (accessible via swipe an background) are listed (see menu.h!)
 
 
 
@@ -848,7 +847,7 @@ void TFT_touch(void)
 			// Final actions after end-of-touch was detected - if the swipe is not in progress but swipeEvokedBy is still on me
 			else if(swipeInProgress == 0 && swipeEvokedBy == 1){
 				// Change menu if swipe was detected
-				if(swipeDetect == Left && TFT_cur_Menu < (TFT_MENU_SIZE-1)) TFT_cur_Menu++;
+				if(swipeDetect == Left && TFT_cur_Menu < (TFT_MAIN_MENU_SIZE-1)) TFT_cur_Menu++;
 				else if(swipeDetect == Right && TFT_cur_Menu > 0) TFT_cur_Menu--;
 
 				// Finalize swipe by resetting swipeEvokedBy
@@ -859,7 +858,7 @@ void TFT_touch(void)
 
 	/////////////// Execute current menu specific code if a non global tag is touched or a Keypress is finished and can be processed
 	if(tag > 1 || keypadKeypressFinished)
-		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, toggle_lock, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, &toggle_lock, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
 }
 
 void TFT_display(void)
