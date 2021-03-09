@@ -71,15 +71,15 @@ extern uint8_t toggle_lock; // "Debouncing of touches" -> If something is touche
 
 /////////// Keypad feature (TFT_touch)
 uint8_t keypadActive = 0;
-uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
-uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
 uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
 uint8_t keypadKeypressFinished = 0;
+uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
+uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
 uint8_t keypadEndOfKeypress_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
 
 
 /////////// Textbox feature
-uint8_t cursor_position = 2;
+uint8_t textbox_cursor_pos = 2;
 
 
 // TAG ASSIGNMENT
@@ -101,19 +101,19 @@ void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t)
 #define textboxTxtPadV 8	// offset of the text from left border in pixel
 #define textboxTxtPadH 7	// offset of the text from upper border in pixel
 
-char buf[100] = ""; // Common string buffer for functions like str_insert and str_remove
+char buf[100] = ""; // Common string buffer for functions like str_insert
 
 void str_insert(char* target, int8_t* len, char ch, int8_t pos){
-	/// Insert a character 'ch' at given position of a string 'target'.
+	/// Insert a character 'ch' at given position 'pos' of a string 'target'.
 	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
 
-	// Copy actual text before the new char to the buffer
+	// Copy actual text in front of the new char to the buffer
 	strncpy(buf, target, pos);
 
-	//
+	// Copy the rest of the text one character behind the new on
 	strcpy(&buf[pos+1], &target[pos]);
 
-	// Add character
+	// Add new character
 	buf[pos] = ch;
 
 	// Copy buffer back to target
@@ -123,33 +123,8 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 	(*len)++;
 }
 
-void str_remove(char* target, int8_t* len, int8_t pos){
-	/// Remove a character at given position of a string 'target'.
-	/// Note: 'len' will be automatically decreased (string gets shorter)!
-
-	strcpy(&target[pos], &target[pos+1]);
-
-	// Decrease length
-	(*len)--;
-}
-
-void str_copyinsert(char* target, char* source, int8_t* len, char ch, int8_t pos){
-	/// Copy a string from 'source' to 'target', but add a character 'ch' at given position
-	/// Note: 'len' will not be automatically increased because it is thought to be related to the source (which remains unchanged)!
-
-	// Copy actual text before the new char to the buffer
-	strncpy(target, source, pos);
-
-	// Add character
-	target[pos] = ch;
-
-	// Copy rest of string
-	strcpy(&target[pos+1], &source[pos]);
-}
-
-
 void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag){
-	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
+	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
 	///  x		...	beginning of left edge of the textbox. In full Pixels
@@ -189,11 +164,16 @@ void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, i
 }
 
 void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* text_curlen){
-	/// Manage the input from keyboard and manipulate text. Used at recurring display list build in TFT_touch()
+	/// Manage input from keyboard and manipulate text. Used at recurring touch evaluation in TFT_touch().
 	///
-	///  text			...
-	///  text_maxlen	...
-	///  text_curlen	...
+	///  mytag			The tag of the current control element (code only responds if keypadEvokedBy is mytag)
+	///  text			The string that shall be manipulated
+	///  text_maxlen	Maximum length of the manipulated text (this will not add characters if length is at maximum)
+	///  text_curlen	Current length of the manipulated text (this will change length according to input)
+	///
+	///	 Used global variables
+	///		keypad:  keypadActive, keypadEvokedBy, keypadCurrentKey, keypadKeypressFinished
+	///		textbox_cursor_pos
 	///
 	///  Limitations:
 
@@ -201,37 +181,39 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 	if(keypadActive && keypadEvokedBy == mytag){
 		/// Manipulate text according to keypad input
 		if(keypadKeypressFinished && keypadCurrentKey >= 32 && keypadCurrentKey <= 128){
-			// Enter
+			// Enter key
 			if(keypadCurrentKey == 128){
+				// Close/reset keypad
 				keypadActive = 0;
 				keypadEvokedBy = 0;
 				keypadKeypressFinished = 0;
 			}
 			else {
-				// Backspace
+				// Backspace key
 				if(keypadCurrentKey == 127){
-					// Only remove character if the cursor is inside of string
-					if(cursor_position >= 1 && cursor_position <= (*text_curlen)){
-						strcpy(&text[cursor_position-1], &text[cursor_position]);
+					// Remove last character (if cursor is inside of string)
+					if(textbox_cursor_pos >= 1 && textbox_cursor_pos <= (*text_curlen)){
+						// Overwrite previous char with rest of string
+						strcpy(&text[textbox_cursor_pos-1], &text[textbox_cursor_pos]);
+						// Decrease text length and move cursor back
 						(*text_curlen)--;
-						cursor_position--;
+						textbox_cursor_pos--;
 					}
 				}
-				// Cursor Left
+				// Move cursor Left (if cursor is inside of string)
 				else if(keypadCurrentKey == 60){
-					if(cursor_position > 0)
-						cursor_position--;
+					if(textbox_cursor_pos > 0)
+						textbox_cursor_pos--;
 				}
-				// Cursor Right
+				// Move cursor Right (if cursor is inside of string)
 				else if(keypadCurrentKey == 62){
-					if(cursor_position < (*text_curlen))
-						cursor_position++;
+					if(textbox_cursor_pos < (*text_curlen))
+						textbox_cursor_pos++;
 				}
-				// Add character if its not shift
-				else if(keypadCurrentKey != 94 && keypadCurrentKey != 66 && (*text_curlen) < (text_maxlen-1)){
-
-					str_insert(text, text_curlen, (char)keypadCurrentKey, cursor_position);
-					cursor_position++;
+				// Add character if the string isn't at max length
+				else if((*text_curlen) < (text_maxlen-1)){
+					str_insert(text, text_curlen, (char)keypadCurrentKey, textbox_cursor_pos);
+					textbox_cursor_pos++;
 				}
 			}
 
@@ -239,7 +221,7 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 			keypadKeypressFinished = 0;
 			keypadCurrentKey = 0;
 
-			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
+			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), textbox_cursor_pos);
 		}
 
 	}
@@ -278,15 +260,15 @@ void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text, int8_
 				cursor = '|';
 		}
 		/// Copy text to buffer but add the cursor
-		str_copyinsert(outputBuffer, text, text_curlen, cursor, cursor_position);
+		//str_copyinsert(outputBuffer, text, text_curlen, cursor, textbox_cursor_pos);
 		// Copy actual text before the new char to the buffer
-		//strncpy(outputBuffer, text, cursor_position);
-		//
-		//// Add character
-		//outputBuffer[cursor_position] = cursor;
-		//
-		//// Copy rest of string
-		//strcpy(&outputBuffer[cursor_position+1], &text[cursor_position]);
+		strncpy(outputBuffer, text, textbox_cursor_pos);
+
+		// Add character
+		outputBuffer[textbox_cursor_pos] = cursor;
+
+		// Copy rest of string
+		strcpy(&outputBuffer[textbox_cursor_pos+1], &text[textbox_cursor_pos]);
 
 
 
@@ -723,6 +705,7 @@ void TFT_touch(void)
 
 	/// If the keypad is active, check if an keypress is finished or a new keypress must be registered
 	/// The Keyboard gets started by menu specific code (setting keypadActive = 1 and keypadEvokedBy = [controlElementTag]) and lasts till keypadActive and keypadEvokedBy are set to 0
+	/// Any function that deals with the keypad output MUST mark a keypress as handled afterwards by reseting keypadKeypressFinished and keypadCurrentKey to 0!
 	if(keypadActive){
 		// If there is an unprocessed current key but nothing is touched anymore (key was just released) - evaluate if it was shift or run menu specific code
 		if(tag == 0 && keypadCurrentKey != 0){
