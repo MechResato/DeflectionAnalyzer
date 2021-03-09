@@ -8,7 +8,7 @@
 
 @section History
 2.0 (adapted from Rudolph Riedel base version 1.13 - below changes are from RS 2020/21)
-- Added color scheme, adaptable banner, dynamic graph implementation (TFT_GraphStatic & TFT_GraphData), a display init which adds the static part of a graph to static DL (initStaticGraphBackground), a display init to show a bitmap (TFT_display_init_screen), ...
+- Added color scheme, adaptable banner, dynamic graph implementation (TFT_GraphStatic & TFT_GraphData), a display init which adds the static part of a graph to static DL (TFT_GraphStatic), a display init to show a bitmap (TFT_display_init_screen), ...
 - Adapted TFT_init to only do the most necessary thins for init (no static DL creation! you need to call one afterwards before using TFT_display!)
 
 // See https://brtchip.com/eve-toolchains/ for helpful Tools
@@ -25,7 +25,7 @@
 #include "menu.h"
 
 // Memory-map definitions
-#define MEM_LOGO 0x00000000 // start-address of logo, needs about 20228 bytes of memory. Will be written by TFT_display_init_screen and overwritten by initStaticGraphBackground (and everything else...)
+#define MEM_LOGO 0x00000000 // start-address of logo, needs about 20228 bytes of memory. Will be written by TFT_display_init_screen and overwritten by TFT_GraphStatic (and everything else...)
 #define MEM_DL_STATIC (EVE_RAM_G_SIZE - 4096) // 0xff000 -> Start-address of the static part of the display-list. Defined as the upper 4k of gfx-mem (WARNING: If static part gets bigger than 4k it gets clipped. IF dynamic part gets so big that it touches the last 4k (1MiB-4k) it overwrites the static part)
 uint32_t num_dl_static; // amount of bytes in the static part of our display-list
 
@@ -75,6 +75,7 @@ uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
 uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
 uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
 uint8_t keypadKeypressFinished = 0;
+uint8_t keypadEndOfKeypress_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
 
 
 /////////// Textbox feature
@@ -100,7 +101,54 @@ void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t)
 #define textboxTxtPadV 8	// offset of the text from left border in pixel
 #define textboxTxtPadH 7	// offset of the text from upper border in pixel
 
-void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag){
+char buf[100] = ""; // Common string buffer for functions like str_insert and str_remove
+
+void str_insert(char* target, int8_t* len, char ch, int8_t pos){
+	/// Insert a character 'ch' at given position of a string 'target'.
+	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
+
+	// Copy actual text before the new char to the buffer
+	strncpy(buf, target, pos);
+
+	//
+	strcpy(&buf[pos+1], &target[pos]);
+
+	// Add character
+	buf[pos] = ch;
+
+	// Copy buffer back to target
+	strcpy(target,buf);
+
+	// Increase length
+	(*len)++;
+}
+
+void str_remove(char* target, int8_t* len, int8_t pos){
+	/// Remove a character at given position of a string 'target'.
+	/// Note: 'len' will be automatically decreased (string gets shorter)!
+
+	strcpy(&target[pos], &target[pos+1]);
+
+	// Decrease length
+	(*len)--;
+}
+
+void str_copyinsert(char* target, char* source, int8_t* len, char ch, int8_t pos){
+	/// Copy a string from 'source' to 'target', but add a character 'ch' at given position
+	/// Note: 'len' will not be automatically increased because it is thought to be related to the source (which remains unchanged)!
+
+	// Copy actual text before the new char to the buffer
+	strncpy(target, source, pos);
+
+	// Add character
+	target[pos] = ch;
+
+	// Copy rest of string
+	strcpy(&target[pos+1], &source[pos]);
+}
+
+
+void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
@@ -140,59 +188,68 @@ void TFT_TextboxStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, in
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
 }
 
-char buf[100] = ""; // Common string buffer for functions like str_insert and str_remove
+void TFT_textbox_touch(char* text, int8_t text_maxlen, int8_t* text_curlen){
+	/// Manage the input from keyboard and manipulate text. Used at recurring display list build in TFT_touch()
+	///
+	///  text			...
+	///  text_maxlen	...
+	///  text_curlen	...
+	///
+	///  Limitations:
 
+	/// If the keyboard is active manipulate text according to input - else just write text directly
+	if(keypadActive){
+		/// Manipulate text according to keypad input
+		if(keypadKeypressFinished && keypadCurrentKey >= 32 && keypadCurrentKey <= 128){
+			// Enter
+			if(keypadCurrentKey == 128){
+				//keypadKeypressFinished = 0;
+				//keypadActive = 0;
+				//keypadEvokedBy = 0;
+			}
+			else {
+				// Backspace
+				if(keypadCurrentKey == 127){
+					// Only remove character if the cursor is inside of string
+					if(cursor_position >= 1 && cursor_position <= (*text_curlen)){
+						strcpy(&text[cursor_position-1], &text[cursor_position]);
+						(*text_curlen)--;
+						cursor_position--;
+					}
+				}
+				// Cursor Left
+				else if(keypadCurrentKey == 60){
+					if(cursor_position > 0)
+						cursor_position--;
+				}
+				// Cursor Right
+				else if(keypadCurrentKey == 62){
+					if(cursor_position < (*text_curlen))
+						cursor_position++;
+				}
+				// Add character if its not shift
+				else if(keypadCurrentKey != 94 && keypadCurrentKey != 66 && (*text_curlen) < (text_maxlen-1)){
 
-void str_insert(char* target, int8_t* len, char ch, int8_t pos){
-	/// Insert a character 'ch' at given position of a string 'target'.
-	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
+					str_insert(text, text_curlen, (char)keypadCurrentKey, cursor_position);
+					cursor_position++;
+				}
+			}
 
-	// Copy actual text before the new char to the buffer
-	strncpy(buf, target, pos);
+			// Mark keypress as handeled
+			keypadKeypressFinished = 0;
+			keypadCurrentKey = 0;
+			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
+		}
 
-	//
-	strcpy(&buf[pos+1], &target[pos]);
+	}
 
-	// Add character
-	buf[pos] = ch;
-
-	// Copy buffer back to target
-	strcpy(target,buf);
-
-	// Increase length
-	(*len)++;
-}
-
-void str_remove(char* target, int8_t* len, char ch, int8_t pos){
-	/// Remove a character at given position of a string 'target'.
-	/// Note: 'len' will be automatically decreased (string gets shorter)!
-
-	strcpy(&target[pos], &target[pos+1]);
-
-	// Decrease length
-	(*len)--;
-}
-
-void str_copyinsert(char* target, char* source, int8_t* len, char ch, int8_t pos){
-	/// Copy a string from 'source' to 'target', but add a character 'ch' at given position
-	/// Note: 'len' will not be automatically increased because it is thought to be related to the source (which remains unchanged)!
-
-	// Copy actual text before the new char to the buffer
-	strncpy(target, source, pos);
-
-	// Add character
-	target[pos] = ch;
-
-	// Copy rest of string
-	strcpy(&target[pos+1], &source[pos]);
-	//for (int8_t c = pos; c < (*len)+1; c++) {
-	//	target[c+1] = source[c];
+	// Mark keypadCurrentKey as handled (we did what we had to do, now we wait till the next one comes)
+	//if(keypadActive && keypadEvokedBy == 20 ){
+	//	keypadCurrentKey = 0;
 	//}
 }
 
-//printf("source %s, char %c, len %i, pos %d\n", source, ch, (*len), pos);
-
-void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* text, int8_t text_maxlen, int8_t* text_curlen){
+void TFT_textbox_display(uint16_t x, uint16_t y, int8_t tag, char* text, int8_t text_maxlen, int8_t* text_curlen){
 	/// Write the dynamic parts of an textbox to the TFT (text & cursor) as well as manage the input from keyboard. Used at recurring display list build in TFT_display() completely coded by RS 03.03.2021.
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
@@ -205,6 +262,8 @@ void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* t
 
 	// Buffers
 	static char outputBuffer[100] = ""; // Copy of 'text' with added cursor
+	//static char cursor = '|';
+
 
 	/// Set tag
 	EVE_cmd_dl_burst(TAG(tag));
@@ -213,49 +272,13 @@ void TFT_TextboxData(uint16_t x, uint16_t y, uint8_t curKey, int8_t tag, char* t
 	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
 
 	/// If the keyboard is active manipulate text according to input - else just write text directly
-	if(keypadActive){
-		/// Manipulate text according to keypad input
-		if(keypadKeypressFinished && curKey >= 32 && curKey <= 128){
-			// Enter
-			if(curKey == 128){
-				//strcpy(outputBuffer, text);
-				//keypadActive = 0;
-				//keypadEvokedBy = 0;
-			}
-			else {
-				// Backspace
-				if(curKey == 127){
-					// Only remove character if the cursor is inside of string
-					if(cursor_position >= 1 && cursor_position <= (*text_curlen)){
-						strcpy(&text[cursor_position-1], &text[cursor_position]);
-						(*text_curlen)--;
-						cursor_position--;
-					}
-				}
-				// Cursor Left
-				else if(curKey == 60){
-					if(cursor_position > 0)
-						cursor_position--;
-				}
-				// Cursor Right
-				else if(curKey == 62){
-					if(cursor_position < (*text_curlen))
-						cursor_position++;
-				}
-				// Add character if its not shift
-				else if(curKey != 94 && curKey != 66 && (*text_curlen) < (text_maxlen-1)){
-
-					str_insert(text, text_curlen, (char)curKey, cursor_position);
-					cursor_position++;
-				}
-			}
-
-			// Mark keypress as handeled
-			keypadKeypressFinished = 0;
-
-			//printf("txtbx len %d, c_pos %d\n", (*text_curlen), cursor_position);
-		}
-
+	if(keypadActive && keypadEvokedBy == tag){
+//		if(SYSTIMER_GetTime() % 550000){
+//			if(cursor == '|')
+//				cursor == ' ';
+//			else
+//				cursor == '|';
+//		}
 		/// Copy text to buffer but add the cursor
 		str_copyinsert(outputBuffer, text, text_curlen, '|', cursor_position);
 
@@ -653,9 +676,10 @@ void TFT_touch(void)
 	uint16_t Y = TouchXY;
 	uint16_t X = TouchXY >> 16;
 
-	/// If a swipe is in progress save start coordinates (once at start), calculate swipe distance and detect the end-of-touch (debounced).
+	/// If a swipe is in progress, save start coordinates (once at start), calculate swipe distance and detect the end-of-touch (debounced).
 	/// A swipe gets started by a touch tag action (switch statement below) and lasts till no touch was detected for at least 5 executions (debounce).
 	/// At an end-of-touch the evoking tag is run one again so it can execute final actions.
+	/// This code block manages the swipe itself but the effect of it must be implemented inside the tag-switch (here at global TFT_touch or in menu specific TFT_touch)
 	if(swipeInProgress){
 		// If the initial touched position is not set, remember it (used to determine how far the user swiped)
 		if(swipeInitialTouch_X == 32768 && swipeInitialTouch_Y == 32768){
@@ -670,46 +694,56 @@ void TFT_touch(void)
 			swipeDistance_Y = swipeInitialTouch_Y - Y;
 		}
 
-		// Increase end-of-touch debounce timer
-		if(tag == 0) swipeEndOfTouch_Debounce++;
+		// If nothing is touched detect possible end-of-touch (debounceed)
+		if(tag == 0){
+			// Increase end-of-touch debounce timer
+			swipeEndOfTouch_Debounce++;
 
-		// Detect end-of-touch (Swipe ends if there was no touch detected for 5 cycles)
-		if(swipeEndOfTouch_Debounce >= 5){
-			// Execute the tag action that invoked the swipe process one last time
-			tag = swipeEvokedBy;
+			// Detect end-of-touch (Swipe ends if there was no touch detected for 5 cycles)
+			if(swipeEndOfTouch_Debounce >= 5){
+				// Execute the tag action that invoked the swipe process one last time
+				tag = swipeEvokedBy;
 
-			// Reset swipe feature variables
-			swipeInProgress = 0;
-			swipeEndOfTouch_Debounce = 0;
-			swipeInitialTouch_X = 32768;
-			swipeInitialTouch_Y = 32768;
+				// Reset swipe feature variables
+				swipeInProgress = 0;
+				swipeEndOfTouch_Debounce = 0;
+				swipeInitialTouch_X = 32768;
+				swipeInitialTouch_Y = 32768;
+			}
 		}
 	}
 
-	// Register current keypress if the tag is in character range (or Backspace -> 8)
-	//if(keypadActive && (tag >= 32 && tag <= 128)){
-	//	keypadCurrentKey = tag;
-	//}
-
-
-	// Register current keypress if the tag is in character range (or Backspace -> 8)
+	/// If the keypad is active, check if an keypress is finished or a new keypress must be registered
+	/// The Keyboard gets started by menu specific code (setting keypadActive = 1 and keypadEvokedBy = [controlElementTag]) and lasts till keypadActive and keypadEvokedBy are set to 0
 	if(keypadActive){
-		if(tag >= 32 && tag <= 128)
-			keypadCurrentKey = tag;
-
 		// If there is an unprocessed current key but nothing is touched anymore (key was just released) - evaluate if it was shift or run menu specific code
 		if(tag == 0 && keypadCurrentKey != 0){
-			// Shift was pressed - change shift-active and reset current-key
-			if(keypadCurrentKey == 94){
-				keypadShiftActive = !keypadShiftActive;
-				keypadCurrentKey = 0;
-			}
-			else{
-				// Mark the last keypress as finished and let menu specific touch code run
-				keypadKeypressFinished = 1;
-				(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+			// Increase end-of-keypress debounce timer
+			keypadEndOfKeypress_Debounce++;
 
+			// Detect end-of-keypress (keypress ends if there was no touch detected for 5 cycles)
+			if(keypadEndOfKeypress_Debounce >= 5){
+				// Shift was pressed - change shift-active and reset current-key
+				if(keypadCurrentKey == 94){
+					keypadShiftActive = !keypadShiftActive;
+					keypadCurrentKey = 0;
+				}
+				// Every key but shift
+				else{
+					// Mark the last keypress as finished (will make the menu specific touch code run) and reset debounce counter
+					keypadKeypressFinished = 1;
+					keypadEndOfKeypress_Debounce = 0;
+				}
 			}
+		}
+		// Register current keypress if the tag is in character range
+		else if(tag >= 32 && tag <= 128){
+			// Reset debounce counter
+			keypadEndOfKeypress_Debounce = 0;
+
+			// Register new keypress
+			keypadCurrentKey = tag;
+			tag = 0;
 		}
 	}
 
@@ -722,11 +756,12 @@ void TFT_touch(void)
 			break;
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
-			// Deactivate Keypad
+			/// Deactivate Keypad
 			keypadActive = 0;
 			keypadEvokedBy = 0;
 
-			// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
+
+			/// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
 			if(swipeInProgress == 0 && swipeEvokedBy == 0){
 				// Initial touch on background was detected - init swipe and mark me as elicitor
 				swipeInProgress = 1;
@@ -754,11 +789,12 @@ void TFT_touch(void)
 				swipeEvokedBy = 0;
 			}
 			break;
-		default:
-			// Execute current menu specific code
-			(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
-			break;
 	}
+
+	/////////////// Execute current menu specific code if a non global tag is touched or a Keypress is finished and can be processed
+	if(tag > 1 || keypadKeypressFinished)
+		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+
 
 	//printf("%d %d %d %d-%d\n", swipeInProgress, (int)swipeDetect, TFT_cur_Menu, swipeInitialTouch_X, X);
 }
@@ -848,7 +884,7 @@ void TFT_display(void)
 			EVE_cmd_button_burst(2+30+4+60+288+4, EVE_VSIZE-2-29, EVE_HSIZE-2-30-4-60-288-2-4, 29, 20, 0, "OK");
 
 			// Mark keypadCurrentKey as handled (we did what we had to do in this cycle, now we wait till the next one comes)
-			keypadCurrentKey = 0;
+			//keypadCurrentKey = 0;
 		}
 
 
