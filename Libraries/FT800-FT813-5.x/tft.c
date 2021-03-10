@@ -67,7 +67,8 @@ static uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive 
 int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch and the current position of an swipe
 int32_t swipeDistance_Y = 0;
 
-
+/////////// Scroll feature
+static int16_t V_Scroll = 0;
 
 /////////// Keypad feature (TFT_touch)
 static keypadTypes keypadType = Standard;
@@ -147,7 +148,52 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 	(*len)++;
 }
 
-void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag){
+
+void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText){
+	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
+	///
+	///  burst			Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  layout			Banner line strip edge positions. Array of 4 elements [Y1,X1,Y2,X2] (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
+	///  bannerColor	Color of the banner surface
+	///  dividerColor	Color of the line at the edge of the banner
+	///  headerColor	Color of the text
+	///  headerText		Name of the current menu (Header)
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		EVE_cmd_dl__fptr_arr, EVE_cmd_text__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
+	///		TEXTBOX_HEIGTH
+
+
+
+	/// Draw Banner and divider line on top
+	// Banner
+	(*EVE_cmd_dl__fptr_arr[burst])(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	(*EVE_cmd_dl__fptr_arr[burst])(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | bannerColor);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_EDGE_STRIP_A);
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(0, layout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[1], layout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[3], layout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE, layout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
+	// Divider
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | dividerColor);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(0, layout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[1], layout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[3], layout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE, layout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
+
+	// Add Header
+	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | headerColor);
+	(*EVE_cmd_text__fptr_arr[burst])(20, 15, 30, 0, headerText);
+}
+
+
+void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	///
 	///  burst		Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
@@ -157,40 +203,52 @@ void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, i
 	///  tag		To be assigned tag for touch recognition
 	///
 	///	 Uses tft-global variables:
+	///		EVE Library ...
 	///		EVE_cmd_dl__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
 	///		TEXTBOX_HEIGTH
 
 
+
+	/// Write label
+	(*EVE_cmd_text__fptr_arr[burst])(tbx->x, tbx->y + TEXTBOX_PAD_H, 26, 0, tbx->labelText); // +7 to get same
+
+	/// Calculate coordinates
+	uint16_t abs_x_left = 	tbx->x + tbx->labelOffsetY;
+	uint16_t abs_x_right = 	tbx->x + tbx->labelOffsetY + tbx->width;
+	uint16_t abs_y_top = 	V_Scroll + tbx->y;
+	uint16_t abs_y_bottom = V_Scroll + tbx->y + TEXTBOX_HEIGTH;
+
+
 	/// Set tag
-	(*EVE_cmd_dl__fptr_arr[burst])(TAG(tag));
+	(*EVE_cmd_dl__fptr_arr[burst])(TAG(tbx->mytag));
 
 	/// Background
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0xFFFFFFUL);
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_RECTS);
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y       ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+TEXTBOX_HEIGTH));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left , abs_y_top   ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_bottom));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 	/// Frame
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0x000000UL);
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
 	// start point
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_top));
 	// left vertical
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y+TEXTBOX_HEIGTH));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_bottom));
 	// bottom horizontal
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y+TEXTBOX_HEIGTH));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_bottom));
 	// right vertical
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x+width, y));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_top));
 	// bottom horizontal
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x      , y));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_top));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 	/// Reset tag
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
 }
 
-void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* text_curlen){
+void TFT_textbox_touch(textbox* tbx){
 	/// Manage input from keyboard and manipulate text. Used at recurring touch evaluation in TFT_touch().
 	///
 	///  mytag			The tag of the current control element (code only responds if keypadEvokedBy is mytag)
@@ -199,6 +257,7 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 	///  text_curlen	Current length of the manipulated text (this will change length according to input)
 	///
 	///	 Uses tft-global variables:
+	///		EVE Library ...
 	///		keypad:  keypadActive, keypadEvokedBy, keypadCurrentKey, keypadKeypressFinished
 	///		textbox_cursor_pos
 	///
@@ -207,7 +266,7 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 
 
 	/// If the keyboard is active and evoked by the current textbox, manipulate text according to input
-	if(keypadActive && keypadEvokedBy == mytag){
+	if(keypadActive && keypadEvokedBy == tbx->mytag){
 		/// Manipulate text according to keypad input
 		if(keypadKeypressFinished && keypadCurrentKey >= 32 && keypadCurrentKey <= 128){
 			// Enter key
@@ -219,11 +278,11 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 				// Backspace key
 				if(keypadCurrentKey == 127){
 					// Remove last character (if cursor is inside of string)
-					if(textbox_cursor_pos >= 1 && textbox_cursor_pos <= (*text_curlen)){
+					if(textbox_cursor_pos >= 1 && textbox_cursor_pos <= *(tbx->text_curlen)){
 						// Overwrite previous char with rest of string
-						strcpy(&text[textbox_cursor_pos-1], &text[textbox_cursor_pos]);
+						strcpy(&(tbx->text[textbox_cursor_pos-1]), &(tbx->text[textbox_cursor_pos]));
 						// Decrease text length and move cursor back
-						(*text_curlen)--;
+						(*(tbx->text_curlen))--;
 						textbox_cursor_pos--;
 					}
 				}
@@ -234,12 +293,12 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 				}
 				// Move cursor Right (if cursor is inside of string)
 				else if(keypadCurrentKey == 62){
-					if(textbox_cursor_pos < (*text_curlen))
+					if(textbox_cursor_pos < *(tbx->text_curlen))
 						textbox_cursor_pos++;
 				}
 				// Add character if the string isn't at max length
-				else if((*text_curlen) < (text_maxlen-1)){
-						str_insert(text, text_curlen, (char)keypadCurrentKey, textbox_cursor_pos);
+				else if(*(tbx->text_curlen) < ((tbx->text_maxlen)-1)){
+						str_insert(tbx->text, (tbx->text_curlen), (char)keypadCurrentKey, textbox_cursor_pos);
 						textbox_cursor_pos++;
 				}
 			}
@@ -252,7 +311,7 @@ void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* tex
 	}
 }
 
-void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text){
+void TFT_textbox_display(textbox* tbx){
 	/// Write the dynamic parts of an textbox to the TFT (text & cursor). Used at recurring display list build in TFT_display()
 	///
 	///  x				Position of left textbox edge. In full Pixels
@@ -261,6 +320,7 @@ void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text){
 	///  text			The string that shall be displayed
 	///
 	///	 Uses tft-global variables:
+	///		EVE Library ...
 	///		keypad:  keypadActive, keypadEvokedBy
 	///		textbox_cursor_pos
 	///		TEXTBOX_PAD_V, TEXTBOX_PAD_H
@@ -274,41 +334,47 @@ void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text){
 	static char cursor = '|';
 	static uint32_t lastBlink = 0;
 
+	// Determine current position (with scroll value)
+	uint16_t y = tbx->y + TEXTBOX_PAD_V - V_Scroll;
 
-	/// Set tag
-	EVE_cmd_dl_burst(TAG(mytag));
+	// Only show text if it is inside display
+	if(y > 0 && y < EVE_VSIZE){
 
-	/// Set text color
-	EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
+		/// Set tag
+		EVE_cmd_dl_burst(TAG(tbx->mytag));
 
-	/// If the keyboard is active, show textbox text with cursor - else just write text directly
-	if(keypadActive && keypadEvokedBy == mytag){ //
-		if(SYSTIMER_GetTime() > (lastBlink + 550000)){
-			lastBlink = SYSTIMER_GetTime();
-			if(cursor == '|')
-				cursor = ' ';
-			else
-				cursor = '|';
+		/// Set text color
+		EVE_cmd_dl_burst(DL_COLOR_RGB | 0x000000UL);
+
+		/// If the keyboard is active, show textbox text with cursor - else just write text directly
+		if(keypadActive && keypadEvokedBy == tbx->mytag){ //
+			if(SYSTIMER_GetTime() > (lastBlink + 550000)){
+				lastBlink = SYSTIMER_GetTime();
+				if(cursor == '|')
+					cursor = ' ';
+				else
+					cursor = '|';
+			}
+
+			/// Copy text to buffer but add the cursor
+			// Copy actual text previous to the new char to the buffer
+			strncpy(outputBuffer, tbx->text, textbox_cursor_pos);
+			// Add cursor
+			outputBuffer[textbox_cursor_pos] = cursor;
+			// Copy rest of string
+			strcpy(&outputBuffer[textbox_cursor_pos+1], &(tbx->text[textbox_cursor_pos]));
+
+			// Write current text
+			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetY + TEXTBOX_PAD_H, y, 26, 0, outputBuffer);
+		}
+		else{
+			// Write current text
+			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetY + TEXTBOX_PAD_H, y, 26, 0, tbx->text);
 		}
 
-		/// Copy text to buffer but add the cursor
-		// Copy actual text previous to the new char to the buffer
-		strncpy(outputBuffer, text, textbox_cursor_pos);
-		// Add cursor
-		outputBuffer[textbox_cursor_pos] = cursor;
-		// Copy rest of string
-		strcpy(&outputBuffer[textbox_cursor_pos+1], &text[textbox_cursor_pos]);
-
-		// Write current text
-		EVE_cmd_text_burst(x+TEXTBOX_PAD_H, y+TEXTBOX_PAD_V, 26, 0, outputBuffer);
+		/// Reset tag
+		EVE_cmd_dl_burst(TAG(0));
 	}
-	else{
-		// Write current text
-		EVE_cmd_text_burst(x+TEXTBOX_PAD_H, y+TEXTBOX_PAD_V, 26, 0, text);
-	}
-
-	/// Reset tag
-	EVE_cmd_dl_burst(TAG(0));
 }
 
 void TFT_textbox_setCursor(int16_t position, int16_t len){

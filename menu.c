@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <DAVE.h>
 #include <globals.h>
 #include "FT800-FT813-5.x/EVE.h"
 #include "FT800-FT813-5.x/tft.h"
@@ -23,17 +24,20 @@
 int8_t TFT_cur_Menu = 0; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&TFT_display_menu0,
-		&TFT_display_menu1
+		&TFT_display_menu1,
+		&TFT_display_menu_setup
 };
 
 void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
 		&TFT_touch_menu0,
-		&TFT_touch_menu1
+		&TFT_touch_menu1,
+		&TFT_touch_menu_setup
 };
 
 void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&TFT_display_static_menu0,
-		&TFT_display_static_menu1
+		&TFT_display_static_menu1,
+		&TFT_display_static_menu_setup
 };
 
 
@@ -83,8 +87,43 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
 int8_t str_filename_curLength = 8;
 
+//typedef struct {
+//	uint16_t x;
+//	uint16_t y;
+//	uint16_t width;
+//	uint16_t labelOffsetY;
+//	char* labelText;
+//	int8_t mytag;
+//	char* text;
+//	int8_t text_maxlen;
+//	int8_t* text_curlen;
+//} textbox;
 
 
+
+
+textbox tbx_filename = {
+		.x = 140,
+		.y = 80,
+		.width = 190,
+		.labelOffsetY = 60,
+		.labelText = "Filename",
+		.mytag = 20,
+		.text = str_filename,
+		.text_maxlen = STR_FILENAME_MAXLEN,
+		.text_curlen = &str_filename_curLength,
+};
+
+
+
+//tbx_filename.
+//TFT_textbox_static(0, 140, 80, 190, 20, "Filename", 60);
+//TFT_textbox_static(0, &tbx_filename);
+
+
+//TFT_textbox_display(20, 70, 20, str_filename);
+//TFT_textbox_display(&tbx_filename);
+//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 
 void TFT_display_get_values(void){
 	// Get size of last display list to be printed on screen (section "Debug Values")
@@ -155,11 +194,26 @@ void TFT_display_static_menu1(void){
 	EVE_cmd_text(360, 25, 26, 0, "Y:");
 
 	// Textbox Filename
-	TFT_textbox_static(0, 20, 70, 190, 20);
+	//TFT_textbox_static(0, 20, 70, 190, 20, "test", 50);
+}
+void TFT_display_static_menu_setup(void){
+	/// Draw Banner and divider line on top
+	uint16_t headerLayout[4] = {66, 280, 50, 320};
+	TFT_header_static(0, headerLayout, MAIN_BANNERCOLOR, MAIN_DIVIDERCOLOR, MAIN_TEXTCOLOR, "Setup");
+
+	// Recording section
+	EVE_cmd_dl(DL_COLOR_RGB | BLACK);
+	EVE_cmd_text(25, 80, 28, 0, "Recording");
+
+	// Filename
+	//EVE_cmd_text(140, 87, 26, 0, "Filename");
+	//TFT_textbox_static(0, 140, 80, 190, 20, "Filename", 60);
+	TFT_textbox_static(0, &tbx_filename);
+
+
 }
 
-void TFT_display_menu0(void)
-{
+void TFT_display_menu0(void){
 	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
 
 	/////////////// Display BUTTONS and Toggles
@@ -235,7 +289,7 @@ void TFT_display_menu1(void){
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
 
 	//str_filename[1] = 'a';
-	TFT_textbox_display(20, 70, 20, str_filename);
+	//TFT_textbox_display(20, 70, 20, str_filename);
 
 //	char c [] = "0123456789";
 //
@@ -252,22 +306,24 @@ void TFT_display_menu1(void){
 //	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
 
 }
-//void TFT_display_menu_setup(void)
-//{
-//	///
-//
-//	/////////////// Display BUTTONS and Toggles
-//	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
-//	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
-//	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
-//	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
-//
-//	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
-//	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
-//
-//	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
-//
-//}
+void TFT_display_menu_setup(void){
+	///
+
+	/////////////// Display BUTTONS and Toggles
+	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+
+	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+
+	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+
+	// Filename textbox
+	//TFT_textbox_display(20, 70, 20, str_filename);
+	TFT_textbox_display(&tbx_filename);
+}
 
 
 void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -350,7 +406,7 @@ void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 			}
 			break;
 		default:
-			TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
+			//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 			break;
 	}
 
@@ -373,4 +429,43 @@ void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 	//		swipeDetect = None;
 	//}
 
+}
+void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// ...
+	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
+
+	// Determine which tag was touched
+	switch(tag)
+	{
+		// dimmer button on top as on/off radio-switch
+		case 10:
+			if(*toggle_lock == 0) {
+				printf("Button Dimmer touched\n");
+				*toggle_lock = 42;
+				if(toggle_state_dimmer == 0){
+					toggle_state_dimmer = EVE_OPT_FLAT;
+					EVE_memWrite8(REG_PWM_DUTY, 0x01);	/* setup backlight, range is from 0 = off to 0x80 = max */
+				}
+				else {
+					toggle_state_dimmer = 0;
+					EVE_memWrite8(REG_PWM_DUTY, 0x80);	/* setup backlight, range is from 0 = off to 0x80 = max */
+				}
+			}
+			break;
+		// textbox
+		case 20:
+			if(*toggle_lock == 0) {
+				printf("Textbox touched\n");
+				*toggle_lock = 42;
+
+				// Activate Keypad and set cursor to end
+				keypad_open(20, Filename);
+				TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
+			}
+			break;
+		default:
+			//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
+			TFT_textbox_touch(&tbx_filename);
+			break;
+	}
 }
