@@ -104,14 +104,16 @@ int8_t str_filename_curLength = 8;
 
 textbox tbx_filename = {
 		.x = 140,
-		.y = 80,
+		.y = 120,
 		.width = 190,
-		.labelOffsetY = 60,
+		.labelOffsetX = 60,
 		.labelText = "Filename",
 		.mytag = 20,
 		.text = str_filename,
 		.text_maxlen = STR_FILENAME_MAXLEN,
 		.text_curlen = &str_filename_curLength,
+		.keypadType = Filename,
+		.active = 0
 };
 
 
@@ -459,8 +461,9 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
-				keypad_open(20, Filename);
-				TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
+				TFT_textbox_setStatus(&tbx_filename, 1, *(tbx_filename.text_curlen)-4);
+				//keypad_open(20, Filename);
+				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
 		default:

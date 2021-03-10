@@ -68,7 +68,8 @@ int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch an
 int32_t swipeDistance_Y = 0;
 
 /////////// Scroll feature
-static int16_t V_Scroll = 0;
+static int16_t TFT_cur_ScrollV = 0;
+static int16_t TFT_last_ScrollV = 0;
 
 /////////// Keypad feature (TFT_touch)
 static keypadTypes keypadType = Standard;
@@ -97,6 +98,7 @@ uint8_t textbox_cursor_pos = 2;
 #define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
 #define TEXTBOX_PAD_V 8	// offset of the text from left border in pixel
 #define TEXTBOX_PAD_H 7	// offset of the text from upper border in pixel
+#define TEXTBOX_ACTIVE_TARGET_HEIGTH 80	// target offset of the text from upper border of the TFT (position so that it can easily be edited/seen) in pixel
 char buf[100] = ""; // Common string buffer for functions like str_insert
 
 
@@ -208,44 +210,50 @@ void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	///		TEXTBOX_HEIGTH
 
 
+	// Determine current position (with scroll value)
+	uint16_t curY = tbx->y - TFT_cur_ScrollV;
 
-	/// Write label
-	(*EVE_cmd_text__fptr_arr[burst])(tbx->x, tbx->y + TEXTBOX_PAD_H, 26, 0, tbx->labelText); // +7 to get same
+	// Only show textbox if it is inside display
+	if(curY > 0 && curY < EVE_VSIZE){
 
-	/// Calculate coordinates
-	uint16_t abs_x_left = 	tbx->x + tbx->labelOffsetY;
-	uint16_t abs_x_right = 	tbx->x + tbx->labelOffsetY + tbx->width;
-	uint16_t abs_y_top = 	V_Scroll + tbx->y;
-	uint16_t abs_y_bottom = V_Scroll + tbx->y + TEXTBOX_HEIGTH;
+		/// Write label
+		(*EVE_cmd_text__fptr_arr[burst])(tbx->x, curY + TEXTBOX_PAD_H, 26, 0, tbx->labelText); // +7 to get same
+
+		/// Calculate coordinates
+		uint16_t abs_x_left = 	tbx->x + tbx->labelOffsetX;
+		uint16_t abs_x_right = 	tbx->x + tbx->labelOffsetX + tbx->width;
+		uint16_t abs_y_top = 	curY;
+		uint16_t abs_y_bottom = curY + TEXTBOX_HEIGTH;
 
 
-	/// Set tag
-	(*EVE_cmd_dl__fptr_arr[burst])(TAG(tbx->mytag));
+		/// Set tag
+		(*EVE_cmd_dl__fptr_arr[burst])(TAG(tbx->mytag));
 
-	/// Background
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0xFFFFFFUL);
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_RECTS);
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left , abs_y_top   ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_bottom));
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
+		/// Background
+		(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0xFFFFFFUL);
+		(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_RECTS);
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left , abs_y_top   ));
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_bottom));
+		(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
-	/// Frame
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0x000000UL);
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
-	// start point
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_top));
-	// left vertical
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_bottom));
-	// bottom horizontal
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_bottom));
-	// right vertical
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_top));
-	// bottom horizontal
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_top));
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
+		/// Frame
+		(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | 0x000000UL);
+		(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
+		// start point
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_top));
+		// left vertical
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_bottom));
+		// bottom horizontal
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_bottom));
+		// right vertical
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_right, abs_y_top));
+		// bottom horizontal
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(abs_x_left,  abs_y_top));
+		(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
-	/// Reset tag
-	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
+		/// Reset tag
+		(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
+	}
 }
 
 void TFT_textbox_touch(textbox* tbx){
@@ -272,7 +280,8 @@ void TFT_textbox_touch(textbox* tbx){
 			// Enter key
 			if(keypadCurrentKey == 128){
 				// Close/reset keypad
-				keypad_close();
+				//keypad_close();
+				TFT_textbox_setStatus(tbx, 0, 0);
 			}
 			else {
 				// Backspace key
@@ -309,6 +318,10 @@ void TFT_textbox_touch(textbox* tbx){
 		}
 
 	}
+	//else if(tbx->active == 1){
+	//	// Keypad was aborted - deactivate textbox
+	//	TFT_textbox_setStatus(tbx, 0, 0);
+	//}
 }
 
 void TFT_textbox_display(textbox* tbx){
@@ -335,10 +348,10 @@ void TFT_textbox_display(textbox* tbx){
 	static uint32_t lastBlink = 0;
 
 	// Determine current position (with scroll value)
-	uint16_t y = tbx->y + TEXTBOX_PAD_V - V_Scroll;
+	uint16_t curY = tbx->y + TEXTBOX_PAD_V - TFT_cur_ScrollV;
 
 	// Only show text if it is inside display
-	if(y > 0 && y < EVE_VSIZE){
+	if(curY > 0 && curY < EVE_VSIZE){
 
 		/// Set tag
 		EVE_cmd_dl_burst(TAG(tbx->mytag));
@@ -365,11 +378,11 @@ void TFT_textbox_display(textbox* tbx){
 			strcpy(&outputBuffer[textbox_cursor_pos+1], &(tbx->text[textbox_cursor_pos]));
 
 			// Write current text
-			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetY + TEXTBOX_PAD_H, y, 26, 0, outputBuffer);
+			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H,curY, 26, 0, outputBuffer);
 		}
 		else{
 			// Write current text
-			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetY + TEXTBOX_PAD_H, y, 26, 0, tbx->text);
+			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H,curY, 26, 0, tbx->text);
 		}
 
 		/// Reset tag
@@ -391,6 +404,31 @@ void TFT_textbox_setCursor(int16_t position, int16_t len){
 			if(position <= len)
 				textbox_cursor_pos = position;
 			break;
+	}
+}
+
+void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
+
+	if(active == 1){
+		// Set vertical scroll so that the textbox can be seen
+		TFT_cur_ScrollV = tbx->y - TEXTBOX_ACTIVE_TARGET_HEIGTH;
+		tbx->active = 1;
+
+		// Activate Keypad and set cursor to end
+		keypad_open(20, tbx->keypadType);
+		TFT_textbox_setCursor(cursorPos, *tbx->text_curlen);
+
+		printf("activate tbx\n");
+	}
+	else{
+		// Reset vertical scroll to normal
+		TFT_cur_ScrollV = 0;
+		tbx->active = 0;
+
+		// Deactivate Keypad and set cursor to end
+		keypad_close();
+
+		printf("deactivate tbx\n");
 	}
 }
 
@@ -771,6 +809,7 @@ void TFT_display_static(void) {
 
 	// The menu is now established and can be set as last known menu
 	TFT_last_Menu = TFT_cur_Menu;
+	TFT_last_ScrollV = TFT_cur_ScrollV;
 }
 
 void TFT_touch(void)
@@ -889,7 +928,7 @@ void TFT_touch(void)
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
 			/// Deactivate Keypad
-			keypad_close();
+			//keypad_close();
 
 
 			/// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
@@ -949,7 +988,7 @@ void TFT_display(void)
 	if(tft_active != 0)
 	{
 		// Setup static part of the current menu - only needed once when the menu is changed
-		if(TFT_last_Menu != TFT_cur_Menu)
+		if(TFT_last_Menu != TFT_cur_Menu || TFT_last_ScrollV != TFT_cur_ScrollV)
 			TFT_display_static();
 
 		// Debug

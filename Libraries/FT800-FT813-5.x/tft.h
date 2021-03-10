@@ -36,20 +36,23 @@ typedef struct {
 	uint16_t x;
 	uint16_t y;
 	uint16_t width;
-	uint16_t labelOffsetY;
+	uint16_t labelOffsetX;
 	char* labelText;
 	int8_t mytag;
 	char* text;
 	int8_t text_maxlen;
 	int8_t* text_curlen;
+	int8_t active;
+	keypadTypes keypadType;
 } textbox;
 void TFT_textbox_static(uint8_t burst, textbox* tbx);
 void TFT_textbox_touch(textbox* tbx);
 void TFT_textbox_display(textbox* tbx);
-//void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag, char* labelText, uint16_t labelOffsetY);
+//void TFT_textbox_static(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, int8_t tag, char* labelText, uint16_t labelOffsetX);
 //void TFT_textbox_touch(int8_t mytag, char* text, int8_t text_maxlen, int8_t* text_curlen);
 //void TFT_textbox_display(uint16_t x, uint16_t y, int8_t mytag, char* text);
 void TFT_textbox_setCursor(int16_t position, int16_t len);
+void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos);
 
 // Graph feature
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines);
