@@ -49,7 +49,8 @@ extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 // TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
 extern int8_t TFT_cur_Menu; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
 static int8_t TFT_last_Menu = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
-
+static uint32_t TFT_Menu_FG_color = 0;
+static uint32_t TFT_Menu_BG_color = 0;
 
 
 /////////// Button states
@@ -60,26 +61,28 @@ static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is to
 /////////// Swipe feature (TFT_touch)
 static SwipeDetection swipeDetect = None;
 static uint8_t swipeInProgress = 0;
-static uint8_t swipeEvokedBy = 0; 			  // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
-static int32_t swipeInitialTouch_X = 32768; // X position of the initial touch of an swipe
+static uint8_t swipeEvokedBy = 0; 			 // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
+static int32_t swipeInitialTouch_X = 32768;  // X position of the initial touch of an swipe
 static int32_t swipeInitialTouch_Y = 32768;
 static uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an swipe is finished
-int32_t swipeDistance_X = 0;		  // Distance (in px) between the initial touch and the current position of an swipe
+int32_t swipeDistance_X = 0;		  		 // Distance (in px) between the initial touch and the current position of an swipe
 int32_t swipeDistance_Y = 0;
 
 /////////// Scroll feature
 static int16_t TFT_cur_ScrollV = 0;
 static int16_t TFT_last_ScrollV = 0;
+static int16_t TFT_UpperBond = EVE_VSIZE; 	// Defines up to which point elements are displayed. Needed to not scroll elements from main area into header or similar. Set by TFT_header, used by all element display functions.
 
 /////////// Keypad feature (TFT_touch)
 static keypadTypes keypadType = Standard;
 static uint8_t keypadActive = 0;
-static uint8_t keypadEvokedBy = 0;		// The tag that initiated the keypad (needed to only edit this element with the keypad)
+static uint8_t keypadEvokedBy = 0;					// The tag that initiated the keypad (needed to only edit this element with the keypad)
 static uint8_t keypadKeypressFinished = 0;
-static uint8_t keypadCurrentKey = 0; 	// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
-static uint8_t keypadShiftActive = 0; 	// Determines the shown set of characters
-static uint8_t keypadEndOfKeypress_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
-static const char backspace_char = 46; // The code that needs to be used for the selected backspace character. It is the offset of the extended ASCII code ('<<' = 174, minus the offset of 128 => 46). Need to use font 19 for extended ASCII characters!
+static uint8_t keypadCurrentKey = 0; 				// Integer value (tag) of the currently pressed key. The function that uses it must reset it to 0!
+static uint8_t keypadShiftActive = 0; 				// Determines the shown set of characters
+static uint8_t keypadEndOfKeypress_Debounce = 0; 	// Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
+static uint8_t keypadInitialLock = 0; 				// When keyboard is activated the keypadInitialLock is set so it only starts accepting input after the finger is first lifted (otherwise it would recognize the random button the aligns with the activating button as a keypress)
+static const char backspace_char = 46; 				// The code that needs to be used for the selected backspace character. It is the offset of the extended ASCII code ('<<' = 174, minus the offset of 128 => 46). Need to use font 19 for extended ASCII characters!
 
 // TAG ASSIGNMENT
 //		0		No touch
@@ -98,7 +101,7 @@ uint8_t textbox_cursor_pos = 2;
 #define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
 #define TEXTBOX_PAD_V 8	// offset of the text from left border in pixel
 #define TEXTBOX_PAD_H 7	// offset of the text from upper border in pixel
-#define TEXTBOX_ACTIVE_TARGET_HEIGTH 80	// target offset of the text from upper border of the TFT (position so that it can easily be edited/seen) in pixel
+#define TEXTBOX_ACTIVE_TARGET_HEIGTH 72	// target offset of the text from upper border of the TFT (position so that it can easily be edited/seen) in pixel
 char buf[100] = ""; // Common string buffer for functions like str_insert
 
 
@@ -115,6 +118,9 @@ void keypad_open(uint8_t evokedBy, enum keypadTypes type){
 		keypadActive = 1;
 		keypadEvokedBy = evokedBy;
 		keypadType = type;
+
+		// When keyboard is activated the keypadInitialLock is set so it only starts accepting input after the finger is first lifted (otherwise it would recognize the random button the aligns with the activating button as a keypress)
+		keypadInitialLock = 1;
 	}
 }
 
@@ -150,6 +156,74 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 	(*len)++;
 }
 
+void TFT_setMenu(uint8_t menu, uint32_t menu_FG_color, uint32_t menu_BG_color){
+	TFT_Menu_FG_color = menu_FG_color;
+	TFT_Menu_BG_color = menu_BG_color;
+
+	TFT_cur_Menu = menu;
+
+}
+
+void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor){
+	/// Write the to be used colors to the TFT. Used by all graphic elements.
+	///
+	///  textColor	...
+	///  fgColor	...
+	///	 bgColor	...
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+
+	if(burst){
+		EVE_cmd_dl_burst(DL_COLOR_RGB | textColor);
+		EVE_cmd_fgcolor_burst(fgColor);
+		EVE_cmd_bgcolor_burst(bgColor);
+	}
+	else{
+		EVE_cmd_dl(DL_COLOR_RGB | textColor);
+		EVE_cmd_fgcolor(fgColor);
+		EVE_cmd_bgcolor(bgColor);
+	}
+}
+void TFT_control(control* ctrl, uint8_t ignoreScroll){
+	/// Write a user control element (button/toggle) to the TFT. Adapts the y coordinate automatically to current vertical scroll! (Use EVE_cmd_... command direct if wanted otherwise)
+	/// Meant to be used at recurring display list build in TFT_display().
+	/// Note: Use TFT_setColor(...) before calling this!
+	///
+	///  x
+	///  y
+	///	 ...
+	///  font
+	///  textColor	Color of the text
+	///  text		Name of the current menu (Header)
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		TFT_cur_ScrollV
+
+
+	uint16_t curY = ctrl->y;
+	if(ignoreScroll == 0){
+		// Determine current position (with scroll value)
+		curY -= TFT_cur_ScrollV;
+	}
+
+	// Only show textbox if it is inside display
+	if(ignoreScroll || (curY > TFT_UpperBond && curY < EVE_VSIZE)){
+		// Set assigned Tag
+		EVE_cmd_dl_burst(TAG(ctrl->mytag)); /* do not use the following objects for touch-detection */
+
+		// Draw Element
+		switch (ctrl->controlType) {
+			case Button:
+				EVE_cmd_button_burst(ctrl->x, curY, ctrl->w0, ctrl->h0, ctrl->font, ctrl->options, ctrl->text);
+				break;
+			case Toggle:
+				EVE_cmd_toggle_burst(ctrl->x, curY, ctrl->w0, ctrl->font, ctrl->options, ctrl->state, ctrl->text);
+				break;
+		}
+	}
+}
 
 void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
@@ -167,6 +241,12 @@ void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, u
 	///		TEXTBOX_HEIGTH
 
 
+
+	// Set upper bond
+	if(layout[0] > layout[2])
+		TFT_UpperBond = layout[0];
+	else
+		TFT_UpperBond = layout[2];
 
 	/// Draw Banner and divider line on top
 	// Banner
@@ -213,37 +293,11 @@ void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t tex
 		uint16_t curY = y - TFT_cur_ScrollV;
 
 		// Only show textbox if it is inside display
-		if(curY > 0 && curY < EVE_VSIZE){
+		if(curY > TFT_UpperBond && curY < EVE_VSIZE){
 			// Add text
 			(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
 			(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | textColor);
 			(*EVE_cmd_text__fptr_arr[burst])(x, curY, font, 0, text);
-		}
-}
-
-void TFT_control(uint16_t x, uint16_t y, uint16_t w0, uint16_t h0, uint16_t font, uint16_t options, uint32_t textColor, uint32_t btnColor, uint32_t btnContrastColor, char* text){
-	/// Write a use control element (button/toggle) to the TFT. Can be used once during init of a static background TFT_display_static() or at recurring display list build in TFT_display()
-	///
-	///  x
-	///  y
-	///  font
-	///  textColor	Color of the text
-	///  text		Name of the current menu (Header)
-	///
-	///	 Uses tft-global variables:
-	///		EVE Library ...
-	///		EVE_cmd_dl__fptr_arr, EVE_cmd_text__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
-	///		TEXTBOX_HEIGTH
-
-	// Determine current position (with scroll value)
-		uint16_t curY = y - TFT_cur_ScrollV;
-
-		// Only show textbox if it is inside display
-		if(curY > 0 && curY < EVE_VSIZE){
-			// Add text
-			EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
-			EVE_cmd_dl_burst(DL_COLOR_RGB | textColor);
-			EVE_cmd_button(x, curY, w0, h0, font, options, text);
 		}
 }
 
@@ -267,7 +321,7 @@ void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	uint16_t curY = tbx->y - TFT_cur_ScrollV;
 
 	// Only show textbox if it is inside display
-	if(curY > 0 && curY < EVE_VSIZE){
+	if(curY > TFT_UpperBond && curY < EVE_VSIZE){
 
 		/// Write label
 		(*EVE_cmd_text__fptr_arr[burst])(tbx->x, curY + TEXTBOX_PAD_H, 26, 0, tbx->labelText); // +7 to get same
@@ -404,7 +458,7 @@ void TFT_textbox_display(textbox* tbx){
 	uint16_t curY = tbx->y + TEXTBOX_PAD_V - TFT_cur_ScrollV;
 
 	// Only show text if it is inside display
-	if(curY > 0 && curY < EVE_VSIZE){
+	if(curY > TFT_UpperBond && curY < EVE_VSIZE){
 
 		/// Set tag
 		EVE_cmd_dl_burst(TAG(tbx->mytag));
@@ -484,6 +538,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 		printf("deactivate tbx\n");
 	}
 }
+
 
 
 
@@ -938,7 +993,8 @@ void TFT_touch(void)
 	/// If the keypad is active, check if a keypress is finished or a new keypress must be registered
 	/// The Keyboard gets started by menu specific code (calling keypad_open([tag of evoker],[type of keypad]) and lasts till it's disabled by keypad_close().
 	/// Any function that deals with the keypad output MUST mark a keypress as handled afterwards by reseting keypadKeypressFinished and keypadCurrentKey to 0!
-	if(keypadActive){
+	// When keyboard is activated the keypadInitialLock is set so it only starts accepting input after the finger is first lifted (otherwise it would recognize the random button the aligns with the activating button as a keypress)
+	if(keypadActive && keypadInitialLock == 0){
 		// If there is an unprocessed current key but nothing is touched anymore (key was just released) - evaluate if it was shift or run menu specific code
 		if(tag == 0 && keypadCurrentKey != 0){
 			// Increase end-of-keypress debounce timer
@@ -977,6 +1033,9 @@ void TFT_touch(void)
 		// nothing touched - reset states and locks
 		case 0:
 			toggle_lock = 0;
+
+			// When keyboard is activated the keypadInitialLock is set so it only starts accepting input after the finger is first lifted (otherwise it would recognize the random button the aligns with the activating button as a keypress)
+			keypadInitialLock = 0;
 			break;
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
@@ -1029,7 +1088,7 @@ void TFT_display(void)
 	///
 	///	 Uses tft-global variables:
 	///		EVE Library ...
-	///		Colors:  WHITE, GREY, MAIN_BTNCTSCOLOR, MAIN_BTNCOLOR
+	///		Colors:  WHITE, GREY, TFT_Menu_BG_color, TFT_Menu_FG_color
 	///		Keypad feature: keypadActive, keypadCurrentKey, keypadShiftActive
 	///		tft_active							Marker if library was initialized successfully
 	///		TFT_display_cur_Menu__fptr_arr:		Function pointer for menu specific TFT_display function
@@ -1130,8 +1189,8 @@ void TFT_display(void)
 
 
 			// Control Keys in different color
-			EVE_cmd_fgcolor_burst(MAIN_BTNCTSCOLOR);
-			EVE_cmd_bgcolor_burst(MAIN_BTNCOLOR);
+			EVE_cmd_fgcolor_burst(TFT_Menu_BG_color); //MAIN_BTNCTSCOLOR
+			EVE_cmd_bgcolor_burst(TFT_Menu_FG_color); //MAIN_BTNCOLOR
 
 			// Space, Left/Right and Shift Key
 			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 26, keypadCurrentKey, " ");

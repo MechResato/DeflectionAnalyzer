@@ -87,35 +87,37 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
 int8_t str_filename_curLength = 8;
 
-//typedef struct {
-//	uint16_t x;
-//	uint16_t y;
-//	uint16_t width;
-//	uint16_t labelOffsetY;
-//	char* labelText;
-//	int8_t mytag;
-//	char* text;
-//	int8_t text_maxlen;
-//	int8_t* text_curlen;
-//} textbox;
 
 
 
 
 textbox tbx_filename = {
-		.x = 140,
-		.y = 120,
-		.width = 190,
-		.labelOffsetX = 60,
-		.labelText = "Filename",
-		.mytag = 20,
-		.text = str_filename,
-		.text_maxlen = STR_FILENAME_MAXLEN,
-		.text_curlen = &str_filename_curLength,
-		.keypadType = Filename,
-		.active = 0
+	.x = 140,
+	.y = 120,
+	.width = 190,
+	.labelOffsetX = 60,
+	.labelText = "Filename",
+	.mytag = 20,
+	.text = str_filename,
+	.text_maxlen = STR_FILENAME_MAXLEN,
+	.text_curlen = &str_filename_curLength,
+	.keypadType = Filename,
+	.active = 0
 };
 
+//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+control btn_dimmmer = {
+	.x = 205,
+	.y = 15,
+	.w0 = 80,
+	.h0 = 30,
+	.font = 27,
+	.options = 0,
+	.mytag = 10,
+	.text = "Dimmer",
+	.state = 0,
+	.controlType = Button
+};
 
 
 //tbx_filename.
@@ -199,17 +201,21 @@ void TFT_display_static_menu1(void){
 	//TFT_textbox_static(0, 20, 70, 190, 20, "test", 50);
 }
 void TFT_display_static_menu_setup(void){
+	// Set configuration for current menu
+	TFT_setMenu(2, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+
 	/// Draw Banner and divider line on top
 	uint16_t headerLayout[4] = {66, 280, 50, 320};
 	TFT_header_static(0, headerLayout, MAIN_BANNERCOLOR, MAIN_DIVIDERCOLOR, MAIN_TEXTCOLOR, "Setup");
+
+	// Set Color
+	TFT_setColor(0, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
 
 	// Recording section
 	TFT_label(0, 25, 80, 28, BLACK, "Recording");
 
 	// Filename
 	TFT_textbox_static(0, &tbx_filename);
-
-
 }
 
 void TFT_display_menu0(void){
@@ -308,16 +314,23 @@ void TFT_display_menu1(void){
 void TFT_display_menu_setup(void){
 	///
 
+
 	/////////////// Display BUTTONS and Toggles
-	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
-	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
-	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+	//EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+	//EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+	//EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
 
-	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
-	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+	//EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+	//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+	// Set button color for header
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+	TFT_control(&btn_dimmmer, 1);
 
-	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+	//EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+
+	// Set Color
+	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
 
 	// Filename textbox
 	//TFT_textbox_display(20, 70, 20, str_filename);

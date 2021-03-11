@@ -10,19 +10,19 @@
 
 
 /////////// COLOR SCHEME
-#define MAIN_BGCOLOR       0x00F5F1EE // background
-#define MAIN_TEXTCOLOR     0x00F3CD29 // main text
-#define MAIN_BANNERCOLOR   0x0064584B // banner
-#define MAIN_DIVIDERCOLOR  0x00F3CD29 // divider
-#define MAIN_BTNCOLOR  	   0x00EAA92B // button
-#define MAIN_BTNCTSCOLOR   0x00AD9666 // button contrast
-#define MAIN_BTNTXTCOLOR   0x00FFF8EE // button text
-#define MAIN_BTNGRDCOLOR   0x008C4B12 // 3D gradient color
-#define GRAPH_AXISCOLOR    0x003B1E0B // graph axis
-#define GRAPH_GRIDCOLOR    0x00C5DAE2 // graph grid
-#define GRAPH_DATA1COLOR   0x00003F9E // graph data 1
-#define GRAPH_DATA2COLOR   0x0064584B // graph data 2 (alternative/additional color)
-#define GRAPH_POSMARKCOLOR 0x00ff0000 // graph position marker
+#define MAIN_BGCOLOR       0xF5F1EE // background
+#define MAIN_TEXTCOLOR     0xF3CD29 // main text
+#define MAIN_BANNERCOLOR   0x64584B // banner
+#define MAIN_DIVIDERCOLOR  0xF3CD29 // divider
+#define MAIN_BTNCOLOR  	   0xEAA92B // button
+#define MAIN_BTNCTSCOLOR   0xAD9666 // button contrast
+#define MAIN_BTNTXTCOLOR   0xFFF8EE // button text
+#define MAIN_BTNGRDCOLOR   0x8C4B12 // 3D gradient color
+#define GRAPH_AXISCOLOR    0x3B1E0B // graph axis
+#define GRAPH_GRIDCOLOR    0xC5DAE2 // graph grid
+#define GRAPH_DATA1COLOR   0x03F9E // graph data 1
+#define GRAPH_DATA2COLOR   0x64584B // graph data 2 (alternative/additional color)
+#define GRAPH_POSMARKCOLOR 0xff0000 // graph position marker
 
 void TFT_display_get_values(void);
 

@@ -28,12 +28,31 @@ typedef enum keypadTypes keypadTypes;
 void keypad_open(uint8_t evokedBy, enum keypadTypes type);
 void keypad_close();
 
-// Header
-void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
 
+
+void TFT_setMenu(uint8_t menu, uint32_t menu_FG_color, uint32_t TFT_Menu_BG_color);
+void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor);
+void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
 void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text);
 
-void TFT_control(uint16_t x, uint16_t y, uint16_t w0, uint16_t h0, uint16_t font, uint16_t options, uint32_t textColor, uint32_t btnColor, uint32_t btnContrastColor, char* text);
+
+// Control (buttons, toggles, ...)
+enum controlTypes{Button=0, Toggle};
+typedef enum controlTypes controlTypes;
+typedef struct {
+	uint16_t x;
+	uint16_t y;
+	uint16_t w0;
+	uint16_t h0;
+	uint16_t font;
+	uint16_t options;
+	int8_t mytag;
+	char* text;
+	uint16_t state;
+	controlTypes controlType;
+} control;
+
+void TFT_control(control* ctrl, uint8_t force);
 
 // Textbox feature
 typedef struct {
