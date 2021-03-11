@@ -154,7 +154,7 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	///
-	///  burst			Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  burst			Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
 	///  layout			Banner line strip edge positions. Array of 4 elements [Y1,X1,Y2,X2] (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
 	///  bannerColor	Color of the banner surface
 	///  dividerColor	Color of the line at the edge of the banner
@@ -194,11 +194,64 @@ void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, u
 	(*EVE_cmd_text__fptr_arr[burst])(20, 15, 30, 0, headerText);
 }
 
+void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text){
+	/// Write a text/label to the TFT. Can be used once during init of a static background TFT_display_static() or at recurring display list build in TFT_display()
+	///
+	///  burst		Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
+	///  x
+	///  y
+	///  font
+	///  textColor	Color of the text
+	///  text		Name of the current menu (Header)
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		EVE_cmd_dl__fptr_arr, EVE_cmd_text__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
+	///		TEXTBOX_HEIGTH
+
+	// Determine current position (with scroll value)
+		uint16_t curY = y - TFT_cur_ScrollV;
+
+		// Only show textbox if it is inside display
+		if(curY > 0 && curY < EVE_VSIZE){
+			// Add text
+			(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
+			(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | textColor);
+			(*EVE_cmd_text__fptr_arr[burst])(x, curY, font, 0, text);
+		}
+}
+
+void TFT_control(uint16_t x, uint16_t y, uint16_t w0, uint16_t h0, uint16_t font, uint16_t options, uint32_t textColor, uint32_t btnColor, uint32_t btnContrastColor, char* text){
+	/// Write a use control element (button/toggle) to the TFT. Can be used once during init of a static background TFT_display_static() or at recurring display list build in TFT_display()
+	///
+	///  x
+	///  y
+	///  font
+	///  textColor	Color of the text
+	///  text		Name of the current menu (Header)
+	///
+	///	 Uses tft-global variables:
+	///		EVE Library ...
+	///		EVE_cmd_dl__fptr_arr, EVE_cmd_text__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
+	///		TEXTBOX_HEIGTH
+
+	// Determine current position (with scroll value)
+		uint16_t curY = y - TFT_cur_ScrollV;
+
+		// Only show textbox if it is inside display
+		if(curY > 0 && curY < EVE_VSIZE){
+			// Add text
+			EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
+			EVE_cmd_dl_burst(DL_COLOR_RGB | textColor);
+			EVE_cmd_button(x, curY, w0, h0, font, options, text);
+		}
+}
+
 
 void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	///
-	///  burst		Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  burst		Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
 	///  x			Position of left textbox edge. In full Pixels
 	///  y			Position of upper textbox edge. In full Pixels
 	///  width		Width of the actual textbox data area in full Pixels
@@ -437,7 +490,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
 	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
-	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst). In full Pixels
+	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
 	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
 	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
 	///  width	... width of the actual graph data area in full Pixels

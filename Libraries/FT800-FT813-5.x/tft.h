@@ -31,6 +31,10 @@ void keypad_close();
 // Header
 void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
 
+void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text);
+
+void TFT_control(uint16_t x, uint16_t y, uint16_t w0, uint16_t h0, uint16_t font, uint16_t options, uint32_t textColor, uint32_t btnColor, uint32_t btnContrastColor, char* text);
+
 // Textbox feature
 typedef struct {
 	uint16_t x;

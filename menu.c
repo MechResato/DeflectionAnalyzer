@@ -204,12 +204,9 @@ void TFT_display_static_menu_setup(void){
 	TFT_header_static(0, headerLayout, MAIN_BANNERCOLOR, MAIN_DIVIDERCOLOR, MAIN_TEXTCOLOR, "Setup");
 
 	// Recording section
-	EVE_cmd_dl(DL_COLOR_RGB | BLACK);
-	EVE_cmd_text(25, 80, 28, 0, "Recording");
+	TFT_label(0, 25, 80, 28, BLACK, "Recording");
 
 	// Filename
-	//EVE_cmd_text(140, 87, 26, 0, "Filename");
-	//TFT_textbox_static(0, 140, 80, 190, 20, "Filename", 60);
 	TFT_textbox_static(0, &tbx_filename);
 
 
