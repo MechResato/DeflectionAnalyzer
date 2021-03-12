@@ -41,8 +41,68 @@ void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&TFT_display_static_menu_setup
 };
 
+#define M_0_UPPERBOND 66
+menu menu_0 = {
+		.headerText = "Monitoring",
+		.upperBond = M_0_UPPERBOND,
+		.headerLayout = {M_0_UPPERBOND, 280, 50, 320},
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
+
+#define M_1_UPPERBOND 66
+menu menu_1 = {
+		.headerText = "Debug",
+		.upperBond = M_1_UPPERBOND,
+		.headerLayout = {M_1_UPPERBOND, 280, 50, 320},
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
+
+#define M_SETUP_UPPERBOND 66
+menu menu_setup = {
+		.headerText = "Setup",
+		.upperBond = M_SETUP_UPPERBOND,
+		.headerLayout = {M_SETUP_UPPERBOND, 280, 50, 320},
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
 
 
+menu* Menu_Objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup};
+
+
+
+
+
+
+
+
+
+
+/////////// Menu space and distance conventions
+#define M_UPPER_PAD	14	// Common padding from upper border (offset in pixels from the upper header or display edge)
+#define M_ROW_DIST 40	// Common distance between rows of content
+#define M_COL_1 25		// Start of first Column (is also the padding/indent from the left edge)
+#define M_COL_2 140		// Suggestion of an absolute second column coordinate to be used when displaying stuff (no need to use this, but easier to structure)
+#define M_COL_3 200		// Suggestion ...
+#define M_COL_4 400
+#define FONT_COMP 3		// In order to get text of different fonts to the same level an adjustment is need
+#ifndef TEXTBOX_PAD_V		// This should be defined in tft.c
+#define TEXTBOX_PAD_V 8		// offset of the text from vertical border in pixel
+#endif
+
+/////////// Button states
+uint16_t toggle_state_graphmode = 0;
+uint16_t toggle_state_dimmer = 0;
+//TODO: these are implemented in the TFT_control struct but not yet switchid at the touch functions!
+
+/////////// Debug
+uint16_t display_list_size = 0; // Current size of the display-list from register. Used by the TFT_display() menu specific functions
+uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
 
 /////////// Banner line strip edge positions (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
 #define LAYOUT_Y1 66
@@ -54,7 +114,13 @@ void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 
 
 
-/////////// Graph Definitions
+
+
+
+
+/////////// MENU 0 MONITORING
+
+// Graph Definitions
 // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be to fill the whole main area
 #define G_PADDING 10 									// Only needed because we want to calc how much width and height can be used to "fill" the whole main area. The actual passing is set inside TFT_GraphStatic() hard to 10.
 uint16_t G_x        = 10;													 // 10 px from left to leave some room
@@ -70,72 +136,19 @@ double G_y_max = 4095.0; // maximum allowed amplitude y (here for 12bit sensor v
 // grid
 double G_h_grid_lines = 4.0; // number of grey horizontal grid lines
 double G_v_grid_lines = 2.2; // number of grey vertical grid lines
-/////////// Graph Definitions END
+// Graph Definitions END
+
+/////////// MENU 0 MONITORING END ---
 
 
-/////////// Button states
-uint16_t toggle_state_graphmode = 0;
-uint16_t toggle_state_dimmer = 0;
+/////////// MENU 1 DEBUG
+/////////// MENU 1 DEBUG END ---
 
 
-/////////// Debug
-uint16_t display_list_size = 0; // Current size of the display-list from register. Used by the TFT_display() menu specific functions
-uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
-
-/////////// Menu space and distance conventions
-#define M_UPPER_PAD	14	// Common padding from upper border (offset in pixels from the upper header or display edge)
-#define M_ROW_DIST 40	// Common distance between rows of content
-#define M_COL_1 25		// Start of first Column (is also the padding/indent from the left edge)
-#define M_COL_2 140		// Suggestion of an absolute second column coordinate to be used when displaying stuff (no need to use this, but easier to structure)
-#define M_COL_3 200		// Suggestion ...
-#define M_COL_4 400
-#define FONT_COMP 3		// In order to get text of different fonts to the same level an adjustment is need
-#ifndef TEXTBOX_PAD_V		// This should be defined in tft.c
-#define TEXTBOX_PAD_V 8		// offset of the text from vertical border in pixel
-#endif
-
-menu menu_0 = {
-		.index = 0,
-		.headerText = "Monitoring",
-		.upperBond = 66,
-		.headerLayout = {66, 280, 50, 320},
-		.bannerColor = MAIN_BANNERCOLOR,
-		.dividerColor = MAIN_DIVIDERCOLOR,
-		.headerColor = MAIN_TEXTCOLOR,
-};
-
-menu menu_1 = {
-		.index = 1,
-		.headerText = "Debug",
-		.upperBond = 66,
-		.headerLayout = {66, 280, 50, 320},
-		.bannerColor = MAIN_BANNERCOLOR,
-		.dividerColor = MAIN_DIVIDERCOLOR,
-		.headerColor = MAIN_TEXTCOLOR,
-};
-
-menu menu_setup = {
-		.index = 2,
-		.headerText = "Setup",
-		.upperBond = 66,
-		.headerLayout = {66, 280, 50, 320},
-		.bannerColor = MAIN_BANNERCOLOR,
-		.dividerColor = MAIN_DIVIDERCOLOR,
-		.headerColor = MAIN_TEXTCOLOR,
-};
-
-
-menu* Menu_Objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup};
-//Menu_Objects[0] = &menu_0;
-
-#define M_SETUP_UPPERBOND 66
-uint16_t menu_setup_headerLayout[4] = {M_SETUP_UPPERBOND, 280, 50, 320};
-
-/////////// Strings
+/////////// MENU 3 SETUP
 #define STR_FILENAME_MAXLEN 16
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
 int8_t str_filename_curLength = 8;
-
 textbox tbx_filename = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND - TEXTBOX_PAD_V + FONT_COMP*1,
@@ -150,11 +163,9 @@ textbox tbx_filename = {
 	.active = 0
 };
 
-
 #define STR_S1_LINSPEC_MAXLEN 10
 char str_s1_linspec[STR_S1_LINSPEC_MAXLEN] = "s1.lin";
 int8_t str_s1_linspec_curLength = 6;
-
 textbox tbx_sensor1 = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
@@ -170,42 +181,24 @@ textbox tbx_sensor1 = {
 };
 
 control btn_linSensor1 = {
-	.x = M_COL_4,
-	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
-	.w0 = 55,
-	.h0 = 31,
-	.font = 27,
-	.options = 0,
-	.mytag = 22,
+	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 31,
+	.mytag = 22,	.font = 27,	.options = 0, .state = 0,
 	.text = "Set",
-	.state = 0,
 	.controlType = Button
 };
-
-
 
 control btn_dimmmer = {
-	.x = 205,
-	.y = 15,
-	.w0 = 80,
-	.h0 = 30,
-	.font = 27,
-	.options = 0,
-	.mytag = 10,
+	.x = 205,		.y = 15,
+	.w0 = 80,		.h0 = 30,
+	.mytag = 10,	.font = 27, .options = 0, .state = 0,
 	.text = "Dimmer",
-	.state = 0,
 	.controlType = Button
 };
 
-
-//tbx_filename.
-//TFT_textbox_static(0, 140, 80, 190, 20, "Filename", 60);
-//TFT_textbox_static(0, &tbx_filename);
+/////////// MENU 3 SETUP END ---
 
 
-//TFT_textbox_display(20, 70, 20, str_filename);
-//TFT_textbox_display(&tbx_filename);
-//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 
 void TFT_display_get_values(void){
 	// Get size of last display list to be printed on screen (section "Debug Values")
@@ -283,7 +276,6 @@ void TFT_display_static_menu_setup(void){
 	TFT_setMenu(2);
 
 	/// Draw Banner and divider line on top
-	//TFT_header_static(1, menu_setup_headerLayout, MAIN_BANNERCOLOR, MAIN_DIVIDERCOLOR, MAIN_TEXTCOLOR, "Setup");
 	TFT_header_static(1, &menu_setup);
 
 	// Set Color

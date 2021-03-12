@@ -18,10 +18,10 @@
 
 // Menu definition
 typedef struct {
-	uint8_t index;
 	char* headerText;
 	int16_t upperBond; 		  // TFT elements will only be shown below this coordinate, usually deepest y from headerLayout
 	uint16_t headerLayout[4]; // Banner line strip edge positions. Array of 4 elements [Y1,X1,Y2,X2] (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
+	uint32_t bgColor;
 	uint32_t bannerColor;
 	uint32_t dividerColor;
 	uint32_t headerColor;

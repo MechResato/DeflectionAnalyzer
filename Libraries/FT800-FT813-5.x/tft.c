@@ -50,7 +50,7 @@ extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t*
 extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 // TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
 // TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
-static int8_t TFT_cur_MenuIdx = 2; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
+static int8_t TFT_cur_MenuIdx = 2; // Index of currently used menu (TFT_display,TFT_touch).
 static int8_t TFT_last_MenuIdx = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_MenuIdx the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 #ifndef MAIN_BTNCTSCOLOR
 #define MAIN_BTNCTSCOLOR	0xAD9666
@@ -58,8 +58,12 @@ static int8_t TFT_last_MenuIdx = -1; // Index of last used menu (TFT_display_sta
 #ifndef MAIN_BTNCOLOR
 #define MAIN_BTNCOLOR		0xEAA92B
 #endif
+#ifndef MAIN_BGCOLOR
+#define MAIN_BGCOLOR		0xF5F1EE
+#endif
 static uint32_t keypadControlKeyBgColor = MAIN_BTNCOLOR;
 static uint32_t keypadControlKeyFgColor = MAIN_BTNCTSCOLOR;
+static uint32_t mainBgColor = MAIN_BGCOLOR;
 
 /////////// Scroll feature
 static int16_t TFT_cur_ScrollV = 0;
@@ -837,7 +841,7 @@ uint8_t TFT_init(void) {
 		EVE_start_cmd_burst(); /* start writing to the cmd-fifo as one stream of bytes, only sending the address once */
 		EVE_cmd_dl_burst(CMD_DLSTART); /* start the display list */
 		EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
-		EVE_cmd_bgcolor_burst(MAIN_BGCOLOR);
+		EVE_cmd_bgcolor_burst(mainBgColor);
 		EVE_cmd_dl_burst(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
 		EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE); /* set the default clear color to white */
 		EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG); /* clear the screen - this and the previous prevent artifacts between lists, Attributes are the color, stencil and tag buffers */
@@ -888,7 +892,7 @@ void TFT_display_static(void) {
 	///
 	///	 Uses tft-global variables:
 	///		EVE Library ...
-	///		Colors:  MAIN_BGCOLOR
+	///		Colors:  mainBgColor
 	///		TFT_display_static_cur_Menu__fptr_arr:	Function pointer for menu specific TFT_display_static function
 	///		TFT_last_MenuIdx, TFT_cur_MenuIdx				Index of last and current menu
 	///		num_dl_static							Current size of display list
@@ -904,10 +908,10 @@ void TFT_display_static(void) {
 
 	/// Main settings
 	EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_bgcolor_burst(MAIN_BGCOLOR); /* light grey */
+	EVE_cmd_bgcolor_burst(mainBgColor); /* light grey */
 	EVE_cmd_dl_burst(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
 	// Main Rectangle
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BGCOLOR);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | mainBgColor);
 	EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
 	EVE_cmd_dl_burst(VERTEX2F(0, 0));
 	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
