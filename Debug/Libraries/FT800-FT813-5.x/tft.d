@@ -83,6 +83,7 @@ Libraries/FT800-FT813-5.x/tft.o \
  ../Libraries/FT800-FT813-5.x/EVE_commands.h \
  ../Libraries/FT800-FT813-5.x/tft_data.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/menu.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h \
  ../Libraries/FT800-FT813-5.x/tft.h
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h:
@@ -248,5 +249,7 @@ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/FATFS/fatfs_
 ../Libraries/FT800-FT813-5.x/tft_data.h:
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/menu.h:
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/FT800-FT813-5.x/tft.h:
 
 ../Libraries/FT800-FT813-5.x/tft.h:

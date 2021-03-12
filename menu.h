@@ -5,6 +5,8 @@
  *      Author: Admin
  */
 
+#include "FT800-FT813-5.x/tft.h"
+
 #ifndef MENU_H_
 #define MENU_H_
 
@@ -43,11 +45,11 @@ void TFT_touch_menu_setup(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_
 #define TFT_MENU_SIZE 3
 // TFT_MAIN_MENU_SIZE  States to where the main menus (accessible via swipe an background) are listed. All higher menus are considered sub-menus (control on how to get there is on menu.c)
 #define TFT_MAIN_MENU_SIZE 3
-int8_t TFT_cur_Menu;
 void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
 
+extern menu* Menu_Objects[TFT_MENU_SIZE];
 
 
 #endif /* MENU_H_ */

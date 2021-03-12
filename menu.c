@@ -17,6 +17,7 @@
 #include "record.h"
 #include "menu.h"
 
+
 /////////// Menu function pointers - At the end of the menu control functions (TFT_display_static, TFT_display and TFT_touch inside tft.h) the function referenced to this pointer is executed
 // Every new menu needs to be defined in menu.h, declared at the end of this file and registered here in this function pointer array!
 // TFT_MENU_SIZE 	   is declared in menu.h and must be changed if menus are added or removed
@@ -81,19 +82,63 @@ uint16_t toggle_state_dimmer = 0;
 uint16_t display_list_size = 0; // Current size of the display-list from register. Used by the TFT_display() menu specific functions
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
 
+/////////// Menu space and distance conventions
+#define M_UPPER_PAD	14	// Common padding from upper border (offset in pixels from the upper header or display edge)
+#define M_ROW_DIST 40	// Common distance between rows of content
+#define M_COL_1 25		// Start of first Column (is also the padding/indent from the left edge)
+#define M_COL_2 140		// Suggestion of an absolute second column coordinate to be used when displaying stuff (no need to use this, but easier to structure)
+#define M_COL_3 200		// Suggestion ...
+#define M_COL_4 400
+#define FONT_COMP 3		// In order to get text of different fonts to the same level an adjustment is need
+#ifndef TEXTBOX_PAD_V		// This should be defined in tft.c
+#define TEXTBOX_PAD_V 8		// offset of the text from vertical border in pixel
+#endif
+
+menu menu_0 = {
+		.index = 0,
+		.headerText = "Monitoring",
+		.upperBond = 66,
+		.headerLayout = {66, 280, 50, 320},
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
+
+menu menu_1 = {
+		.index = 1,
+		.headerText = "Debug",
+		.upperBond = 66,
+		.headerLayout = {66, 280, 50, 320},
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
+
+menu menu_setup = {
+		.index = 2,
+		.headerText = "Setup",
+		.upperBond = 66,
+		.headerLayout = {66, 280, 50, 320},
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
+
+
+menu* Menu_Objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup};
+//Menu_Objects[0] = &menu_0;
+
+#define M_SETUP_UPPERBOND 66
+uint16_t menu_setup_headerLayout[4] = {M_SETUP_UPPERBOND, 280, 50, 320};
 
 /////////// Strings
-#define STR_FILENAME_MAXLEN 20
+#define STR_FILENAME_MAXLEN 16
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
 int8_t str_filename_curLength = 8;
 
-
-
-
-
 textbox tbx_filename = {
-	.x = 140,
-	.y = 120,
+	.x = M_COL_2,
+	.y = M_UPPER_PAD + M_SETUP_UPPERBOND - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = 190,
 	.labelOffsetX = 60,
 	.labelText = "Filename",
@@ -105,7 +150,40 @@ textbox tbx_filename = {
 	.active = 0
 };
 
-//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+
+#define STR_S1_LINSPEC_MAXLEN 10
+char str_s1_linspec[STR_S1_LINSPEC_MAXLEN] = "s1.lin";
+int8_t str_s1_linspec_curLength = 6;
+
+textbox tbx_sensor1 = {
+	.x = M_COL_2,
+	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.width = 120,
+	.labelOffsetX = 130,
+	.labelText = "Sensor1:   Spec File",
+	.mytag = 21,
+	.text = str_s1_linspec,
+	.text_maxlen = STR_S1_LINSPEC_MAXLEN,
+	.text_curlen = &str_s1_linspec_curLength,
+	.keypadType = Standard,
+	.active = 0
+};
+
+control btn_linSensor1 = {
+	.x = M_COL_4,
+	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,
+	.h0 = 31,
+	.font = 27,
+	.options = 0,
+	.mytag = 22,
+	.text = "Set",
+	.state = 0,
+	.controlType = Button
+};
+
+
+
 control btn_dimmmer = {
 	.x = 205,
 	.y = 15,
@@ -138,84 +216,87 @@ void TFT_display_get_values(void){
 void TFT_display_static_menu0(void){
 	/// Draw Banner and divider line on top
 	// Banner
-	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
-	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl(DL_END);
+	EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	EVE_cmd_dl_burst(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_EDGE_STRIP_A);
+	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl_burst(DL_END);
 	// Divider
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
-	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl(DL_END);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl_burst(DL_END);
 
 	// Add the static text
-	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
 	#if defined (EVE_DMA)
-		EVE_cmd_text(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
+	EVE_cmd_text_burst(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
 	#endif
-	EVE_cmd_text(360, 10, 26, 0, "DL-size:");
-	EVE_cmd_text(360, 25, 26, 0, "Sensor:");
+	EVE_cmd_text_burst(360, 10, 26, 0, "DL-size:");
+	EVE_cmd_text_burst(360, 25, 26, 0, "Sensor:");
 
 	/// Write the static part of the Graph to the display list
-	TFT_GraphStatic(0, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
+	TFT_GraphStatic(1, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
 
 
 }
 void TFT_display_static_menu1(void){
 	/// Draw Banner and divider line on top
 	// Banner
-	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_dl(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_EDGE_STRIP_A);
-	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl(DL_END);
+	EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	EVE_cmd_dl_burst(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_EDGE_STRIP_A);
+	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl_burst(DL_END);
 	// Divider
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_LINE_STRIP);
-	EVE_cmd_dl(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl(DL_END);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	EVE_cmd_dl_burst(DL_END);
 
 	// Add the static text
-	EVE_cmd_dl(TAG(0)); /* do not use the following objects for touch-detection */
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_TEXTCOLOR);
-	EVE_cmd_text(360, 10, 26, 0, "X:");
-	EVE_cmd_text(360, 25, 26, 0, "Y:");
+	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	EVE_cmd_text_burst(360, 10, 26, 0, "X:");
+	EVE_cmd_text_burst(360, 25, 26, 0, "Y:");
 
 	// Textbox Filename
 	//TFT_textbox_static(0, 20, 70, 190, 20, "test", 50);
 }
 void TFT_display_static_menu_setup(void){
 	// Set configuration for current menu
-	TFT_setMenu(2, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+	TFT_setMenu(2);
 
 	/// Draw Banner and divider line on top
-	uint16_t headerLayout[4] = {66, 280, 50, 320};
-	TFT_header_static(0, headerLayout, MAIN_BANNERCOLOR, MAIN_DIVIDERCOLOR, MAIN_TEXTCOLOR, "Setup");
+	//TFT_header_static(1, menu_setup_headerLayout, MAIN_BANNERCOLOR, MAIN_DIVIDERCOLOR, MAIN_TEXTCOLOR, "Setup");
+	TFT_header_static(1, &menu_setup);
 
 	// Set Color
-	TFT_setColor(0, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
 
 	// Recording section
-	TFT_label(0, 25, 80, 28, BLACK, "Recording");
-
+	TFT_label(1, M_COL_1, M_UPPER_PAD + M_SETUP_UPPERBOND, 27, BLACK, "Recording");
 	// Filename
-	TFT_textbox_static(0, &tbx_filename);
+	TFT_textbox_static(1, &tbx_filename);
+
+	// Linearisation section
+	TFT_label(1, M_COL_1, M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1), 27, BLACK, "Linearisation");
+	TFT_textbox_static(1, &tbx_sensor1);
 }
 
 void TFT_display_menu0(void){
@@ -326,6 +407,7 @@ void TFT_display_menu_setup(void){
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
 	TFT_control(&btn_dimmmer, 1);
+	TFT_control(&btn_linSensor1, 0);
 
 	//EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
@@ -335,6 +417,9 @@ void TFT_display_menu_setup(void){
 	// Filename textbox
 	//TFT_textbox_display(20, 70, 20, str_filename);
 	TFT_textbox_display(&tbx_filename);
+	TFT_textbox_display(&tbx_sensor1);
+
+
 }
 
 
@@ -476,9 +561,21 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
+		case 21:
+			if(*toggle_lock == 0) {
+				printf("Textbox touched\n");
+				*toggle_lock = 42;
+
+				// Activate Keypad and set cursor to end
+				TFT_textbox_setStatus(&tbx_sensor1, 1, *(tbx_sensor1.text_curlen));
+				//keypad_open(20, Filename);
+				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
+			}
+			break;
 		default:
 			//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 			TFT_textbox_touch(&tbx_filename);
+			TFT_textbox_touch(&tbx_sensor1);
 			break;
 	}
 }

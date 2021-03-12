@@ -16,6 +16,17 @@
 #define BLACK	0x000000UL
 #define GREY	0x222222UL
 
+// Menu definition
+typedef struct {
+	uint8_t index;
+	char* headerText;
+	int16_t upperBond; 		  // TFT elements will only be shown below this coordinate, usually deepest y from headerLayout
+	uint16_t headerLayout[4]; // Banner line strip edge positions. Array of 4 elements [Y1,X1,Y2,X2] (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
+	uint32_t bannerColor;
+	uint32_t dividerColor;
+	uint32_t headerColor;
+} menu;
+
 // Swipe feature
 enum SwipeDetection{None=0, Up, Down, Left, Right};
 typedef enum SwipeDetection SwipeDetection;
@@ -30,9 +41,10 @@ void keypad_close();
 
 
 
-void TFT_setMenu(uint8_t menu, uint32_t menu_FG_color, uint32_t TFT_Menu_BG_color);
+void TFT_setMenu(uint8_t idx);
 void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor);
-void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
+//void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
+void TFT_header_static(uint8_t burst, menu* men);
 void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text);
 
 
@@ -55,10 +67,13 @@ typedef struct {
 void TFT_control(control* ctrl, uint8_t force);
 
 // Textbox feature
+#define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
+#define TEXTBOX_PAD_V 8		// offset of the text from upper border in pixel
+#define TEXTBOX_PAD_H 7		// offset of the text from left border in pixel
 typedef struct {
 	uint16_t x;
 	uint16_t y;
-	uint16_t width;
+	uint16_t width; // 11px per possible character (+some space on the left border) should be fine (A width of 190-200 is perfect for a worst case 16 character string in a textbox)
 	uint16_t labelOffsetX;
 	char* labelText;
 	int8_t mytag;

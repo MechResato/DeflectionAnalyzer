@@ -38,23 +38,34 @@ static uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE
 static void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
 static void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
 static void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
+/////////// Button states
+static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
 
 
 
 /////////// Menu function pointers - At the end of the TFT_display_static, TFT_display and TFT_touch the function referenced to this pointer is executed
+extern menu* Menu_Objects[TFT_MENU_SIZE];
 extern void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
 extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 // TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
 // TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
-extern int8_t TFT_cur_Menu; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
-static int8_t TFT_last_Menu = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_Menu the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
-static uint32_t TFT_Menu_FG_color = 0;
-static uint32_t TFT_Menu_BG_color = 0;
+static int8_t TFT_cur_MenuIdx = 2; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
+static int8_t TFT_last_MenuIdx = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_MenuIdx the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
+#ifndef MAIN_BTNCTSCOLOR
+#define MAIN_BTNCTSCOLOR	0xAD9666
+#endif
+#ifndef MAIN_BTNCOLOR
+#define MAIN_BTNCOLOR		0xEAA92B
+#endif
+static uint32_t keypadControlKeyBgColor = MAIN_BTNCOLOR;
+static uint32_t keypadControlKeyFgColor = MAIN_BTNCTSCOLOR;
 
+/////////// Scroll feature
+static int16_t TFT_cur_ScrollV = 0;
+static int16_t TFT_last_ScrollV = 0;
+static int16_t TFT_UpperBond = EVE_VSIZE; 	// Defines up to which point elements are displayed. Needed to not scroll elements from main area into header or similar. Set by TFT_header, used by all element display functions.
 
-/////////// Button states
-static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
 
 
 
@@ -68,10 +79,6 @@ static uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive 
 int32_t swipeDistance_X = 0;		  		 // Distance (in px) between the initial touch and the current position of an swipe
 int32_t swipeDistance_Y = 0;
 
-/////////// Scroll feature
-static int16_t TFT_cur_ScrollV = 0;
-static int16_t TFT_last_ScrollV = 0;
-static int16_t TFT_UpperBond = EVE_VSIZE; 	// Defines up to which point elements are displayed. Needed to not scroll elements from main area into header or similar. Set by TFT_header, used by all element display functions.
 
 /////////// Keypad feature (TFT_touch)
 static keypadTypes keypadType = Standard;
@@ -98,13 +105,10 @@ static const char backspace_char = 46; 				// The code that needs to be used for
 
 /////////// Textbox feature
 uint8_t textbox_cursor_pos = 2;
-#define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
-#define TEXTBOX_PAD_V 8	// offset of the text from left border in pixel
-#define TEXTBOX_PAD_H 7	// offset of the text from upper border in pixel
 #define TEXTBOX_ACTIVE_TARGET_HEIGTH 72	// target offset of the text from upper border of the TFT (position so that it can easily be edited/seen) in pixel
 char buf[100] = ""; // Common string buffer for functions like str_insert
 
-
+////// TODO: Early on all display_static functions were build to be able to use or not use burst mode. for now they are set to always use  burst. If no problems with this occur the functions can be stripped of this functionality
 
 
 
@@ -156,16 +160,18 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 	(*len)++;
 }
 
-void TFT_setMenu(uint8_t menu, uint32_t menu_FG_color, uint32_t menu_BG_color){
-	TFT_Menu_FG_color = menu_FG_color;
-	TFT_Menu_BG_color = menu_BG_color;
+void TFT_setMenu(uint8_t idx){
+	// Set upper bond
+	TFT_UpperBond = Menu_Objects[idx]->upperBond;
+	//if(keypadActive) keypad_close();
 
-	TFT_cur_Menu = menu;
+	TFT_cur_MenuIdx = idx;
 
 }
 
 void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor){
 	/// Write the to be used colors to the TFT. Used by all graphic elements.
+	/// Parameters set to 1 will be ignored!
 	///
 	///  textColor	...
 	///  fgColor	...
@@ -175,14 +181,20 @@ void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t 
 	///		EVE Library ...
 
 	if(burst){
-		EVE_cmd_dl_burst(DL_COLOR_RGB | textColor);
-		EVE_cmd_fgcolor_burst(fgColor);
-		EVE_cmd_bgcolor_burst(bgColor);
+		if(textColor != 1)
+			EVE_cmd_dl_burst(DL_COLOR_RGB | textColor);
+		if(fgColor != 1)
+			EVE_cmd_fgcolor_burst(fgColor);
+		if(bgColor != 1)
+			EVE_cmd_bgcolor_burst(bgColor);
 	}
 	else{
-		EVE_cmd_dl(DL_COLOR_RGB | textColor);
-		EVE_cmd_fgcolor(fgColor);
-		EVE_cmd_bgcolor(bgColor);
+		if(textColor != 1)
+			EVE_cmd_dl(DL_COLOR_RGB | textColor);
+		if(fgColor != 1)
+			EVE_cmd_fgcolor(fgColor);
+		if(bgColor != 1)
+			EVE_cmd_bgcolor(bgColor);
 	}
 }
 void TFT_control(control* ctrl, uint8_t ignoreScroll){
@@ -225,7 +237,8 @@ void TFT_control(control* ctrl, uint8_t ignoreScroll){
 	}
 }
 
-void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText){
+//void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText){
+void TFT_header_static(uint8_t burst, menu* men){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	///
 	///  burst			Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
@@ -243,35 +256,35 @@ void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, u
 
 
 	// Set upper bond
-	if(layout[0] > layout[2])
-		TFT_UpperBond = layout[0];
-	else
-		TFT_UpperBond = layout[2];
+	//if(layout[0] > layout[2])
+	//	TFT_UpperBond = layout[0];
+	//else
+	//	TFT_UpperBond = layout[2];
 
 	/// Draw Banner and divider line on top
 	// Banner
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
 	(*EVE_cmd_dl__fptr_arr[burst])(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | bannerColor);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | men->bannerColor);
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_EDGE_STRIP_A);
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(0, layout[0]));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[1], layout[0]));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[3], layout[2]));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE, layout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(0                   , men->headerLayout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(men->headerLayout[1], men->headerLayout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(men->headerLayout[3], men->headerLayout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE           , men->headerLayout[2]));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 	// Divider
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | dividerColor);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | men->dividerColor);
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(0, layout[0]));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[1], layout[0]));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(layout[3], layout[2]));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE, layout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(0                   , men->headerLayout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(men->headerLayout[1], men->headerLayout[0]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(men->headerLayout[3], men->headerLayout[2]));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE           , men->headerLayout[2]));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 	// Add Header
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | headerColor);
-	(*EVE_cmd_text__fptr_arr[burst])(20, 15, 30, 0, headerText);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | men->headerColor);
+	(*EVE_cmd_text__fptr_arr[burst])(20, 15, 30, 0, men->headerText);
 }
 
 void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text){
@@ -324,7 +337,7 @@ void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	if(curY > TFT_UpperBond && curY < EVE_VSIZE){
 
 		/// Write label
-		(*EVE_cmd_text__fptr_arr[burst])(tbx->x, curY + TEXTBOX_PAD_H, 26, 0, tbx->labelText); // +7 to get same
+		(*EVE_cmd_text__fptr_arr[burst])(tbx->x, curY + TEXTBOX_PAD_V, 26, 0, tbx->labelText); // +7 to get same
 
 		/// Calculate coordinates
 		uint16_t abs_x_left = 	tbx->x + tbx->labelOffsetX;
@@ -522,7 +535,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 		tbx->active = 1;
 
 		// Activate Keypad and set cursor to end
-		keypad_open(20, tbx->keypadType);
+		keypad_open(tbx->mytag, tbx->keypadType);
 		TFT_textbox_setCursor(cursorPos, *tbx->text_curlen);
 
 		printf("activate tbx\n");
@@ -877,33 +890,37 @@ void TFT_display_static(void) {
 	///		EVE Library ...
 	///		Colors:  MAIN_BGCOLOR
 	///		TFT_display_static_cur_Menu__fptr_arr:	Function pointer for menu specific TFT_display_static function
-	///		TFT_last_Menu, TFT_cur_Menu				Index of last and current menu
+	///		TFT_last_MenuIdx, TFT_cur_MenuIdx				Index of last and current menu
 	///		num_dl_static							Current size of display list
 	///		MEM_DL_STATIC							Start position where static DL shall be stored
 
 
 
+	// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address once)
+	EVE_start_cmd_burst();
 
 	// Start a new display list (resets REG_CMD_DL to 0)
-	EVE_cmd_dl(CMD_DLSTART);
+	EVE_cmd_dl_burst(CMD_DLSTART);
 
 	/// Main settings
-	EVE_cmd_dl(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_bgcolor(MAIN_BGCOLOR); /* light grey */
-	EVE_cmd_dl(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
+	EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	EVE_cmd_bgcolor_burst(MAIN_BGCOLOR); /* light grey */
+	EVE_cmd_dl_burst(VERTEX_FORMAT(0)); /* reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default */
 	// Main Rectangle
-	EVE_cmd_dl(DL_COLOR_RGB | MAIN_BGCOLOR);
-	EVE_cmd_dl(DL_BEGIN | EVE_RECTS);
-	EVE_cmd_dl(VERTEX2F(0, 0));
-	EVE_cmd_dl(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
-	EVE_cmd_dl(DL_END);
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BGCOLOR);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
+	EVE_cmd_dl_burst(VERTEX2F(0, 0));
+	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, EVE_VSIZE));
+	EVE_cmd_dl_burst(DL_END);
 
 
 
 	/////////////// Execute current menu specific code
-	(*TFT_display_static_cur_Menu__fptr_arr[TFT_cur_Menu])();
+	(*TFT_display_static_cur_Menu__fptr_arr[TFT_cur_MenuIdx])();
 
 
+
+	EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
 
 	// Wait for Display to be finished
 	while (EVE_busy());
@@ -916,7 +933,7 @@ void TFT_display_static(void) {
 	while (EVE_busy());
 
 	// The menu is now established and can be set as last known menu
-	TFT_last_Menu = TFT_cur_Menu;
+	TFT_last_MenuIdx = TFT_cur_MenuIdx;
 	TFT_last_ScrollV = TFT_cur_ScrollV;
 }
 
@@ -1064,8 +1081,10 @@ void TFT_touch(void)
 			// Final actions after end-of-touch was detected - if the swipe is not in progress but swipeEvokedBy is still on me
 			else if(swipeInProgress == 0 && swipeEvokedBy == 1){
 				// Change menu if swipe was detected
-				if(swipeDetect == Left && TFT_cur_Menu < (TFT_MAIN_MENU_SIZE-1)) TFT_cur_Menu++;
-				else if(swipeDetect == Right && TFT_cur_Menu > 0) TFT_cur_Menu--;
+				if(swipeDetect == Left && TFT_cur_MenuIdx < (TFT_MAIN_MENU_SIZE-1))
+					TFT_setMenu(TFT_cur_MenuIdx+1);
+				else if(swipeDetect == Right && TFT_cur_MenuIdx > 0)
+					TFT_setMenu(TFT_cur_MenuIdx-1);
 
 				// Finalize swipe by resetting swipeEvokedBy
 				swipeEvokedBy = 0;
@@ -1075,7 +1094,7 @@ void TFT_touch(void)
 
 	/////////////// Execute current menu specific code if a non global tag is touched or a Keypress is finished and can be processed
 	if(tag > 1 || keypadKeypressFinished)
-		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_Menu])(tag, &toggle_lock, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
+		(*TFT_touch_cur_Menu__fptr_arr[TFT_cur_MenuIdx])(tag, &toggle_lock, swipeInProgress, &swipeEvokedBy, &swipeDistance_X, &swipeDistance_Y);
 }
 
 void TFT_display(void)
@@ -1083,16 +1102,16 @@ void TFT_display(void)
 	/// Dynamic portion of display-handling, meant to be called less often that TFT_touch() from main (at least every 20ms for min 50FPS). Created by Rudolph Riedel, extensively adapted by RS @ MCI 2020/21
 	/// It manages the creates a fresh display list, manages the static part (let it be build or uses it) of the display list and shows the menu specific code as well as the keyboard.
 	/// It is divided into following parts:
-	///		Let the static part be created if necassary, get values from TFT (extern), copy's the previously saved static part of the current menu from the rear end of the TFT RAM to the beginning,
+	///		Let the static part be created if necessary, get values from TFT (extern), copy's the previously saved static part of the current menu from the rear end of the TFT RAM to the beginning,
 	///		let menu specific code run, draw keypad in its current state if needed and finish display list.
 	///
 	///	 Uses tft-global variables:
 	///		EVE Library ...
-	///		Colors:  WHITE, GREY, TFT_Menu_BG_color, TFT_Menu_FG_color
+	///		Colors:  WHITE, GREY, keypadControlKeyFgColor, keypadControlKeyBgColor
 	///		Keypad feature: keypadActive, keypadCurrentKey, keypadShiftActive
 	///		tft_active							Marker if library was initialized successfully
 	///		TFT_display_cur_Menu__fptr_arr:		Function pointer for menu specific TFT_display function
-	///		TFT_last_Menu, TFT_cur_Menu			Index of last and current menu
+	///		TFT_last_MenuIdx, TFT_cur_MenuIdx			Index of last and current menu
 	///		num_dl_static						Current size of display list
 	///		MEM_DL_STATIC						Start position where static DL shall be stored
 
@@ -1100,7 +1119,7 @@ void TFT_display(void)
 	if(tft_active != 0)
 	{
 		// Setup static part of the current menu - only needed once when the menu is changed
-		if(TFT_last_Menu != TFT_cur_Menu || TFT_last_ScrollV != TFT_cur_ScrollV)
+		if(TFT_last_MenuIdx != TFT_cur_MenuIdx || TFT_last_ScrollV != TFT_cur_ScrollV)
 			TFT_display_static();
 
 		// Debug
@@ -1128,7 +1147,7 @@ void TFT_display(void)
 
 
 		/////////////// Execute current menu specific code
-		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_Menu])();
+		(*TFT_display_cur_Menu__fptr_arr[TFT_cur_MenuIdx])();
 
 		// Keypad
 		if(keypadActive){
@@ -1189,8 +1208,8 @@ void TFT_display(void)
 
 
 			// Control Keys in different color
-			EVE_cmd_fgcolor_burst(TFT_Menu_BG_color); //MAIN_BTNCTSCOLOR
-			EVE_cmd_bgcolor_burst(TFT_Menu_FG_color); //MAIN_BTNCOLOR
+			EVE_cmd_fgcolor_burst(keypadControlKeyFgColor); //MAIN_BTNCTSCOLOR
+			EVE_cmd_bgcolor_burst(keypadControlKeyBgColor); //MAIN_BTNCOLOR
 
 			// Space, Left/Right and Shift Key
 			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 26, keypadCurrentKey, " ");
