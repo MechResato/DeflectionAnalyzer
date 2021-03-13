@@ -120,6 +120,22 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 
 /////////// MENU 0 MONITORING
 
+control btn_input = {
+	.x = 20,		.y = 15,
+	.w0 = 80,		.h0 = 30,
+	.mytag = 13,	.font = 27, .options = 0, .state = 0,
+	.text = "Sensor",
+	.controlType = Button
+};
+
+control tgl_graphMode = {
+	.x = 120,		.y = 24,
+	.w0 = 62,		.h0 = 27,
+	.mytag = 12,	.font = 27, .options = 0, .state = 0,
+	.text = "Frame",
+	.controlType = Toggle
+};
+
 // Graph Definitions
 // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be to fill the whole main area
 #define G_PADDING 10 									// Only needed because we want to calc how much width and height can be used to "fill" the whole main area. The actual passing is set inside TFT_GraphStatic() hard to 10.
@@ -279,7 +295,7 @@ void TFT_display_static_menu_setup(void){
 	TFT_header_static(1, &menu_setup);
 
 	// Set Color
-	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
 
 	// Recording section
 	TFT_label(1, M_COL_1, M_UPPER_PAD + M_SETUP_UPPERBOND, 27, BLACK, "Recording");
@@ -295,36 +311,33 @@ void TFT_display_menu0(void){
 	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
 
 	/////////////// Display BUTTONS and Toggles
-	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
-	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
-	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	//TFT_control(&btn_dimmmer, 1);
+	//EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
+	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
+	//EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
+	//EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
 
-	EVE_cmd_dl_burst(TAG(13)); /* assign tag-value '13' to the button that follows */
-	if(InputType == 0){ 		EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sensor");	}
-	else if(InputType == 1){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Imp");	}
-	else if(InputType == 2){	EVE_cmd_button_burst(20,15,80,30, 27, 0,"Saw");	}
-	else{						EVE_cmd_button_burst(20,15,80,30, 27, 0,"Sine");	}
+	//EVE_cmd_dl_burst(TAG(13)); /* assign tag-value '13' to the button that follows */
+	TFT_control(&btn_input, 1);
 
-	EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
-	if(toggle_state_graphmode){
-		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "Roll");
-	}
-	else{
-		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "Frame");
-	}
+	//EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
+	TFT_control(&tgl_graphMode, 1);
+	//if(toggle_state_graphmode){
+	//	EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "Roll");
+	//}
+	//else{
+	//	EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "Frame");
+	//}
 
-	EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
-	EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
+	//EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
+	//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
 
-	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+	//EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
 
 
 	/////////////// Debug Values
-	#if defined (EVE_DMA)
-	EVE_cmd_number_burst(120, EVE_VSIZE - 65, 26, EVE_OPT_RIGHTX, cmd_fifo_size); /* number of bytes written to the cmd-fifo */
-	#endif
 	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
 
 	// Write current sensor value with unit
@@ -337,7 +350,7 @@ void TFT_display_menu0(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, toggle_state_graphmode, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
+	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, tgl_graphMode.state, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
 
 }
 void TFT_display_menu1(void){
@@ -397,14 +410,14 @@ void TFT_display_menu_setup(void){
 	//EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
 	//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
 	// Set button color for header
-	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
 	TFT_control(&btn_dimmmer, 1);
 	TFT_control(&btn_linSensor1, 0);
 
 	//EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
 
 	// Set Color
-	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR);
+	TFT_setColor(1, BLACK, 0, 0, 0);
 
 	// Filename textbox
 	//TFT_textbox_display(20, 70, 20, str_filename);
@@ -422,31 +435,17 @@ void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 	// Determine which tag was touched
 	switch(tag)
 	{
-		// dimmer button on top as on/off radio-switch
-		case 10:
-			if(*toggle_lock == 0) {
-				printf("Button Dimmer touched\n");
-				*toggle_lock = 42;
-				if(toggle_state_dimmer == 0){
-					toggle_state_dimmer = EVE_OPT_FLAT;
-					EVE_memWrite8(REG_PWM_DUTY, 0x01);	/* setup backlight, range is from 0 = off to 0x80 = max */
-				}
-				else {
-					toggle_state_dimmer = 0;
-					EVE_memWrite8(REG_PWM_DUTY, 0x80);	/* setup backlight, range is from 0 = off to 0x80 = max */
-				}
-			}
-			break;
-		// roll/frame mode toggle on top
 		case 12:
 			if(*toggle_lock == 0) {
 				printf("Toggle Roll touched\n");
 				*toggle_lock = 42;
-				if(toggle_state_graphmode == 0)	{
-					toggle_state_graphmode = 1;
+				if(tgl_graphMode.state == 0){
+					tgl_graphMode.state = 0xFFFF;
+					tgl_graphMode.text = "Roll";
 				}
 				else {
-					toggle_state_graphmode = 0;
+					tgl_graphMode.state = 0;
+					tgl_graphMode.text = "Frame";
 				}
 			}
 			break;
@@ -455,8 +454,16 @@ void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 			if(*toggle_lock == 0) {
 				printf("Switch Signal\n");
 				*toggle_lock = 42;
+
+				// Switch signal type
 				InputType++;
 				if(InputType > 3){ InputType = 0; }
+
+				// Switch label of button to new input type
+				if(InputType == 0){ 		btn_input.text = "Sensor";	}
+				else if(InputType == 1){	btn_input.text = "Imp";	}
+				else if(InputType == 2){	btn_input.text = "Saw";	}
+				else{						btn_input.text = "Sine";	}
 			}
 			break;
 	}
@@ -531,12 +538,12 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 			if(*toggle_lock == 0) {
 				printf("Button Dimmer touched\n");
 				*toggle_lock = 42;
-				if(toggle_state_dimmer == 0){
-					toggle_state_dimmer = EVE_OPT_FLAT;
+				if(btn_dimmmer.state == 0){
+					btn_dimmmer.state = EVE_OPT_FLAT;
 					EVE_memWrite8(REG_PWM_DUTY, 0x01);	/* setup backlight, range is from 0 = off to 0x80 = max */
 				}
 				else {
-					toggle_state_dimmer = 0;
+					btn_dimmmer.state = 0;
 					EVE_memWrite8(REG_PWM_DUTY, 0x80);	/* setup backlight, range is from 0 = off to 0x80 = max */
 				}
 			}

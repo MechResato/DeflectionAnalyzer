@@ -42,7 +42,7 @@ void keypad_close();
 
 
 void TFT_setMenu(uint8_t idx);
-void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor);
+void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor, uint32_t gradColor);
 //void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
 void TFT_header_static(uint8_t burst, menu* men);
 void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text);

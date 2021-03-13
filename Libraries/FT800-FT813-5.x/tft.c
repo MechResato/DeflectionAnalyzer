@@ -173,9 +173,10 @@ void TFT_setMenu(uint8_t idx){
 
 }
 
-void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor){
+void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor, uint32_t gradColor){
 	/// Write the to be used colors to the TFT. Used by all graphic elements.
 	/// Parameters set to 1 will be ignored!
+	///	TODO: This is not the best solution
 	///
 	///  textColor	...
 	///  fgColor	...
@@ -191,6 +192,8 @@ void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t 
 			EVE_cmd_fgcolor_burst(fgColor);
 		if(bgColor != 1)
 			EVE_cmd_bgcolor_burst(bgColor);
+		if(gradColor != 1)
+			EVE_cmd_gradcolor_burst(gradColor);
 	}
 	else{
 		if(textColor != 1)
@@ -199,6 +202,8 @@ void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t 
 			EVE_cmd_fgcolor(fgColor);
 		if(bgColor != 1)
 			EVE_cmd_bgcolor(bgColor);
+		if(gradColor != 1)
+					EVE_cmd_gradcolor(gradColor);
 	}
 }
 void TFT_control(control* ctrl, uint8_t ignoreScroll){
@@ -232,7 +237,7 @@ void TFT_control(control* ctrl, uint8_t ignoreScroll){
 		// Draw Element
 		switch (ctrl->controlType) {
 			case Button:
-				EVE_cmd_button_burst(ctrl->x, curY, ctrl->w0, ctrl->h0, ctrl->font, ctrl->options, ctrl->text);
+				EVE_cmd_button_burst(ctrl->x, curY, ctrl->w0, ctrl->h0, ctrl->font, ctrl->options | ctrl->state, ctrl->text);
 				break;
 			case Toggle:
 				EVE_cmd_toggle_burst(ctrl->x, curY, ctrl->w0, ctrl->font, ctrl->options, ctrl->state, ctrl->text);
