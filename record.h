@@ -12,4 +12,9 @@
 
 
 
+
+void record_buffer(void);
+
+
+
 #endif /* RECORD_H_ */

@@ -270,7 +270,7 @@ void TFT_header_static(uint8_t burst, menu* men){
 	//else
 	//	TFT_UpperBond = layout[2];
 
-	/// Draw Banner and divider line on top
+	/// Draw Banner and divider line on top (line strip edge positions from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
 	// Banner
 	(*EVE_cmd_dl__fptr_arr[burst])(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
 	(*EVE_cmd_dl__fptr_arr[burst])(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
@@ -620,8 +620,8 @@ void TFT_GraphStatic(uint8_t burst, graph* gph){
 
 	/// Axes LABELS
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
-	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding              + h_ax_lbl_comp_x, gph->y + gph->padding               - h_ax_lbl_comp_y, axis_lbl_txt_size, 0, "V");
-	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding + gph->width + v_ax_lbl_comp_x, gph->y + gph->padding + gph->height - v_ax_lbl_comp_y, axis_lbl_txt_size, 0, "t");
+	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding              + h_ax_lbl_comp_x, gph->y + gph->padding               - h_ax_lbl_comp_y, axis_lbl_txt_size, 0, gph->y_label);
+	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding + gph->width + v_ax_lbl_comp_x, gph->y + gph->padding + gph->height - v_ax_lbl_comp_y, axis_lbl_txt_size, EVE_OPT_RIGHTX, gph->x_label);
 
 	/// AXES lines
 	//(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
@@ -1083,38 +1083,37 @@ void TFT_touch(void)
 			break;
 		// Background elements are touched - detect swipes to left/right for menu changes
 		case 1:
-			/// Deactivate Keypad
-			//keypad_close();
-
-
-			/// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
-			if(swipeInProgress == 0 && swipeEvokedBy == 0){
-				// Initial touch on background was detected - init swipe and mark me as elicitor
-				swipeInProgress = 1;
-				swipeEvokedBy = 1;
-			}
-			// Evaluate current status of the swipe - if it is in progress and evoked by me
-			else if(swipeInProgress == 1 && swipeEvokedBy == 1){
-				// If the user swiped more on x than on y-axis he probably wants to swipe left/right
-				if(abs(swipeDistance_X) > abs(swipeDistance_Y)){
-					if(swipeDistance_X > 50)      	// swipe to left
-						swipeDetect = Left;
-					else if(swipeDistance_X < -50)	// swipe to right
-						swipeDetect = Right;
-					else
-						swipeDetect = None;
+			// Change menu on swipe (only if current menu is a main menu - no not allow swipe in submenu's)
+			if(TFT_cur_MenuIdx < TFT_MAIN_MENU_SIZE){
+				/// Init a new swipe - if it isn't already running (and no end-of-touch of a previous swipe is detected)
+				if(swipeInProgress == 0 && swipeEvokedBy == 0){
+					// Initial touch on background was detected - init swipe and mark me as elicitor
+					swipeInProgress = 1;
+					swipeEvokedBy = 1;
 				}
-			}
-			// Final actions after end-of-touch was detected - if the swipe is not in progress but swipeEvokedBy is still on me
-			else if(swipeInProgress == 0 && swipeEvokedBy == 1){
-				// Change menu if swipe was detected
-				if(swipeDetect == Left && TFT_cur_MenuIdx < (TFT_MAIN_MENU_SIZE-1))
-					TFT_setMenu(TFT_cur_MenuIdx+1);
-				else if(swipeDetect == Right && TFT_cur_MenuIdx > 0)
-					TFT_setMenu(TFT_cur_MenuIdx-1);
+				// Evaluate current status of the swipe - if it is in progress and evoked by me
+				else if(swipeInProgress == 1 && swipeEvokedBy == 1){
+					// If the user swiped more on x than on y-axis he probably wants to swipe left/right
+					if(abs(swipeDistance_X) > abs(swipeDistance_Y)){
+						if(swipeDistance_X > 50)      	// swipe to left
+							swipeDetect = Left;
+						else if(swipeDistance_X < -50)	// swipe to right
+							swipeDetect = Right;
+						else
+							swipeDetect = None;
+					}
+				}
+				// Final actions after end-of-touch was detected - if the swipe is not in progress but swipeEvokedBy is still on me
+				else if(swipeInProgress == 0 && swipeEvokedBy == 1){
+					// Change menu if swipe was detected
+					if(swipeDetect == Left && TFT_cur_MenuIdx < (TFT_MAIN_MENU_SIZE-1))
+						TFT_setMenu(TFT_cur_MenuIdx+1);
+					else if(swipeDetect == Right && TFT_cur_MenuIdx > 0)
+						TFT_setMenu(TFT_cur_MenuIdx-1);
 
-				// Finalize swipe by resetting swipeEvokedBy
-				swipeEvokedBy = 0;
+					// Finalize swipe by resetting swipeEvokedBy
+					swipeEvokedBy = 0;
+				}
 			}
 			break;
 	}

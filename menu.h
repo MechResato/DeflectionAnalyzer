@@ -30,18 +30,21 @@ void TFT_display_get_values(void);
 void TFT_display_static_menu0(void);
 void TFT_display_static_menu1(void);
 void TFT_display_static_menu_setup(void);
+void TFT_display_static_menu_linset(void);
 
 void TFT_display_menu0(void);
 void TFT_display_menu1(void);
 void TFT_display_menu_setup(void);
+void TFT_display_menu_linset(void);
 
 void TFT_touch_menu0(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
 void TFT_touch_menu1(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
 void TFT_touch_menu_setup(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void TFT_touch_menu_linset(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
 
 
 // TFT_MENU_SIZE 	   Amount of overall menus. Must be changed if menus are added or removed
-#define TFT_MENU_SIZE 3
+#define TFT_MENU_SIZE 4
 // TFT_MAIN_MENU_SIZE  States to where the main menus (accessible via swipe an background) are listed. All higher menus are considered sub-menus (control on how to get there is on menu.c)
 #define TFT_MAIN_MENU_SIZE 3
 void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);

@@ -16,13 +16,273 @@
   16              	 .text
   17              	.Ltext0:
   18              	 .cfi_sections .debug_frame
-  19              	.Letext0:
-  20              	 .file 1 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
-  21              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
-  22              	 .file 3 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
-  23              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
-  24              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+  19              	 .comm fs,564,4
+  20              	 .comm fil,556,4
+  21              	 .section .rodata
+  22              	 .align 2
+  23              	.LC0:
+  24 0000 303A00   	 .ascii "0:\000"
+  25 0003 00       	 .align 2
+  26              	.LC1:
+  27 0004 584D4334 	 .ascii "XMC4500\000"
+  27      35303000 
+  28              	 .align 2
+  29              	.LC2:
+  30 000c 584D4334 	 .ascii "XMC4500/hello.txt\000"
+  30      3530302F 
+  30      68656C6C 
+  30      6F2E7478 
+  30      7400
+  31 001e 0000     	 .align 2
+  32              	.LC3:
+  33 0020 48656C6C 	 .ascii "Hello, World!\015\012\000"
+  33      6F2C2057 
+  33      6F726C64 
+  33      210D0A00 
+  34              	 .align 2
+  35              	.LC4:
+  36 0030 0A57656C 	 .ascii "\012Welcome to Infineon\000"
+  36      636F6D65 
+  36      20746F20 
+  36      496E6669 
+  36      6E656F6E 
+  37 0045 000000   	 .section .text.record_buffer,"ax",%progbits
+  38              	 .align 2
+  39              	 .global record_buffer
+  40              	 .thumb
+  41              	 .thumb_func
+  43              	record_buffer:
+  44              	.LFB485:
+  45              	 .file 1 "../record.c"
+   1:../record.c   **** /*
+   2:../record.c   ****  * record.c
+   3:../record.c   ****  *
+   4:../record.c   ****  *  Created on: 25 Feb 2021
+   5:../record.c   ****  *      Author: Admin
+   6:../record.c   ****  */
+   7:../record.c   **** 
+   8:../record.c   **** #include <stdint.h>
+   9:../record.c   **** #include <stdio.h>
+  10:../record.c   **** #include <string.h>
+  11:../record.c   **** #include <stdlib.h>
+  12:../record.c   **** #include <DAVE.h>
+  13:../record.c   **** 
+  14:../record.c   **** 
+  15:../record.c   **** FATFS fs; /* File system object (volume work area) */
+  16:../record.c   **** FIL fil; /* File object */
+  17:../record.c   **** 
+  18:../record.c   **** 
+  19:../record.c   **** void record_buffer(void)
+  20:../record.c   **** {
+  46              	 .loc 1 20 0
+  47              	 .cfi_startproc
+  48              	 
+  49              	 
+  50 0000 80B5     	 push {r7,lr}
+  51              	.LCFI0:
+  52              	 .cfi_def_cfa_offset 8
+  53              	 .cfi_offset 7,-8
+  54              	 .cfi_offset 14,-4
+  55 0002 88B0     	 sub sp,sp,#32
+  56              	.LCFI1:
+  57              	 .cfi_def_cfa_offset 40
+  58 0004 00AF     	 add r7,sp,#0
+  59              	.LCFI2:
+  60              	 .cfi_def_cfa_register 7
+  21:../record.c   **** 	FRESULT res; /* API result code */
+  22:../record.c   **** 	UINT bw,br; /* Bytes written */
+  23:../record.c   **** 	char buff[20];
+  24:../record.c   **** 
+  25:../record.c   **** 	/* Register work area */
+  26:../record.c   **** 	res = f_mount(&fs, "0:", 1);
+  61              	 .loc 1 26 0
+  62 0006 3048     	 ldr r0,.L7
+  63 0008 3049     	 ldr r1,.L7+4
+  64 000a 0122     	 movs r2,#1
+  65 000c FFF7FEFF 	 bl f_mount
+  66 0010 0346     	 mov r3,r0
+  67 0012 FB77     	 strb r3,[r7,#31]
+  27:../record.c   **** 	if (res == FR_OK)
+  68              	 .loc 1 27 0
+  69 0014 FB7F     	 ldrb r3,[r7,#31]
+  70 0016 002B     	 cmp r3,#0
+  71 0018 52D1     	 bne .L1
+  28:../record.c   **** 	{
+  29:../record.c   **** 		/* Create a new directory */
+  30:../record.c   **** 		res = f_mkdir("XMC4500");
+  72              	 .loc 1 30 0
+  73 001a 2D48     	 ldr r0,.L7+8
+  74 001c FFF7FEFF 	 bl f_mkdir
+  75 0020 0346     	 mov r3,r0
+  76 0022 FB77     	 strb r3,[r7,#31]
+  31:../record.c   **** 		if ((res == FR_OK) || (res == FR_EXIST))
+  77              	 .loc 1 31 0
+  78 0024 FB7F     	 ldrb r3,[r7,#31]
+  79 0026 002B     	 cmp r3,#0
+  80 0028 02D0     	 beq .L3
+  81              	 .loc 1 31 0 is_stmt 0 discriminator 1
+  82 002a FB7F     	 ldrb r3,[r7,#31]
+  83 002c 082B     	 cmp r3,#8
+  84 002e 40D1     	 bne .L4
+  85              	.L3:
+  32:../record.c   **** 		{
+  33:../record.c   **** 			/* Create a file as new */
+  34:../record.c   **** 			res = f_open(&fil, "XMC4500/hello.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+  86              	 .loc 1 34 0 is_stmt 1
+  87 0030 2848     	 ldr r0,.L7+12
+  88 0032 2949     	 ldr r1,.L7+16
+  89 0034 0B22     	 movs r2,#11
+  90 0036 FFF7FEFF 	 bl f_open
+  91 003a 0346     	 mov r3,r0
+  92 003c FB77     	 strb r3,[r7,#31]
+  35:../record.c   **** 			if ((res == FR_OK) || (res == FR_EXIST))
+  93              	 .loc 1 35 0
+  94 003e FB7F     	 ldrb r3,[r7,#31]
+  95 0040 002B     	 cmp r3,#0
+  96 0042 02D0     	 beq .L5
+  97              	 .loc 1 35 0 is_stmt 0 discriminator 1
+  98 0044 FB7F     	 ldrb r3,[r7,#31]
+  99 0046 082B     	 cmp r3,#8
+ 100 0048 30D1     	 bne .L6
+ 101              	.L5:
+  36:../record.c   **** 			{
+  37:../record.c   **** 				/* Write a message */
+  38:../record.c   **** 				res = f_write(&fil, "Hello, World!\r\n", 15, &bw);
+ 102              	 .loc 1 38 0 is_stmt 1
+ 103 004a 07F11803 	 add r3,r7,#24
+ 104 004e 2148     	 ldr r0,.L7+12
+ 105 0050 2249     	 ldr r1,.L7+20
+ 106 0052 0F22     	 movs r2,#15
+ 107 0054 FFF7FEFF 	 bl f_write
+ 108 0058 0346     	 mov r3,r0
+ 109 005a FB77     	 strb r3,[r7,#31]
+  39:../record.c   **** 				if (res == FR_OK )
+ 110              	 .loc 1 39 0
+ 111 005c FB7F     	 ldrb r3,[r7,#31]
+ 112 005e 002B     	 cmp r3,#0
+ 113 0060 24D1     	 bne .L6
+  40:../record.c   **** 				{
+  41:../record.c   **** 					res = f_lseek(&fil, 0);
+ 114              	 .loc 1 41 0
+ 115 0062 1C48     	 ldr r0,.L7+12
+ 116 0064 0021     	 movs r1,#0
+ 117 0066 FFF7FEFF 	 bl f_lseek
+ 118 006a 0346     	 mov r3,r0
+ 119 006c FB77     	 strb r3,[r7,#31]
+  42:../record.c   **** 					/* Read the buffer from file */
+  43:../record.c   **** 					res = f_read(&fil, &buff[0], 15, &br);
+ 120              	 .loc 1 43 0
+ 121 006e 3A46     	 mov r2,r7
+ 122 0070 07F11403 	 add r3,r7,#20
+ 123 0074 1748     	 ldr r0,.L7+12
+ 124 0076 1146     	 mov r1,r2
+ 125 0078 0F22     	 movs r2,#15
+ 126 007a FFF7FEFF 	 bl f_read
+ 127 007e 0346     	 mov r3,r0
+ 128 0080 FB77     	 strb r3,[r7,#31]
+  44:../record.c   **** 					if(res == FR_OK)
+ 129              	 .loc 1 44 0
+ 130 0082 FB7F     	 ldrb r3,[r7,#31]
+ 131 0084 002B     	 cmp r3,#0
+ 132 0086 11D1     	 bne .L6
+  45:../record.c   **** 					{
+  46:../record.c   **** 						/* Go to location 15 */
+  47:../record.c   **** 						res = f_lseek(&fil, 15);
+ 133              	 .loc 1 47 0
+ 134 0088 1248     	 ldr r0,.L7+12
+ 135 008a 0F21     	 movs r1,#15
+ 136 008c FFF7FEFF 	 bl f_lseek
+ 137 0090 0346     	 mov r3,r0
+ 138 0092 FB77     	 strb r3,[r7,#31]
+  48:../record.c   **** 						if(res == FR_OK)
+ 139              	 .loc 1 48 0
+ 140 0094 FB7F     	 ldrb r3,[r7,#31]
+ 141 0096 002B     	 cmp r3,#0
+ 142 0098 08D1     	 bne .L6
+  49:../record.c   **** 						{
+  50:../record.c   **** 							/* Add some more content to the file */
+  51:../record.c   **** 							res = f_write(&fil, "\nWelcome to Infineon", 20, &bw);
+ 143              	 .loc 1 51 0
+ 144 009a 07F11803 	 add r3,r7,#24
+ 145 009e 0D48     	 ldr r0,.L7+12
+ 146 00a0 0F49     	 ldr r1,.L7+24
+ 147 00a2 1422     	 movs r2,#20
+ 148 00a4 FFF7FEFF 	 bl f_write
+ 149 00a8 0346     	 mov r3,r0
+ 150 00aa FB77     	 strb r3,[r7,#31]
+ 151              	.L6:
+  52:../record.c   **** 							if(res == FR_OK)
+  53:../record.c   **** 							{
+  54:../record.c   **** 
+  55:../record.c   **** 							}
+  56:../record.c   **** 						}
+  57:../record.c   **** 					}
+  58:../record.c   **** 				}
+  59:../record.c   **** 			}
+  60:../record.c   **** 			f_close(&fil);
+ 152              	 .loc 1 60 0
+ 153 00ac 0948     	 ldr r0,.L7+12
+ 154 00ae FFF7FEFF 	 bl f_close
+ 155              	.L4:
+  61:../record.c   **** 		}
+  62:../record.c   **** 		res = f_unmount("0:");
+ 156              	 .loc 1 62 0
+ 157 00b2 0020     	 movs r0,#0
+ 158 00b4 0549     	 ldr r1,.L7+4
+ 159 00b6 0022     	 movs r2,#0
+ 160 00b8 FFF7FEFF 	 bl f_mount
+ 161 00bc 0346     	 mov r3,r0
+ 162 00be FB77     	 strb r3,[r7,#31]
+ 163              	.L1:
+  63:../record.c   **** 	}
+  64:../record.c   **** 
+  65:../record.c   **** 
+  66:../record.c   **** }
+ 164              	 .loc 1 66 0
+ 165 00c0 2037     	 adds r7,r7,#32
+ 166              	.LCFI3:
+ 167              	 .cfi_def_cfa_offset 8
+ 168 00c2 BD46     	 mov sp,r7
+ 169              	.LCFI4:
+ 170              	 .cfi_def_cfa_register 13
+ 171              	 
+ 172 00c4 80BD     	 pop {r7,pc}
+ 173              	.L8:
+ 174 00c6 00BF     	 .align 2
+ 175              	.L7:
+ 176 00c8 00000000 	 .word fs
+ 177 00cc 00000000 	 .word .LC0
+ 178 00d0 04000000 	 .word .LC1
+ 179 00d4 00000000 	 .word fil
+ 180 00d8 0C000000 	 .word .LC2
+ 181 00dc 20000000 	 .word .LC3
+ 182 00e0 30000000 	 .word .LC4
+ 183              	 .cfi_endproc
+ 184              	.LFE485:
+ 186              	 .text
+ 187              	.Letext0:
+ 188              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 189              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 190              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 191              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/FATFS/ff_Src/ff.h"
+ 192              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 193              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 194              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 record.c
+                            *COM*:00000234 fs
+                            *COM*:0000022c fil
+    {standard input}:22     .rodata:00000000 $d
+    {standard input}:38     .text.record_buffer:00000000 $t
+    {standard input}:43     .text.record_buffer:00000000 record_buffer
+    {standard input}:176    .text.record_buffer:000000c8 $d
+                     .debug_frame:00000010 $d
 
-NO UNDEFINED SYMBOLS
+UNDEFINED SYMBOLS
+f_mount
+f_mkdir
+f_open
+f_write
+f_lseek
+f_read
+f_close

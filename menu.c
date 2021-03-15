@@ -26,23 +26,27 @@ int8_t TFT_cur_Menu = 0; // Index of currently used menu (TFT_display,TFT_touch)
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&TFT_display_menu0,
 		&TFT_display_menu1,
-		&TFT_display_menu_setup
+		&TFT_display_menu_setup,
+		&TFT_display_menu_linset
 };
 
 void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
 		&TFT_touch_menu0,
 		&TFT_touch_menu1,
-		&TFT_touch_menu_setup
+		&TFT_touch_menu_setup,
+		&TFT_touch_menu_linset
 };
 
 void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&TFT_display_static_menu0,
 		&TFT_display_static_menu1,
-		&TFT_display_static_menu_setup
+		&TFT_display_static_menu_setup,
+		&TFT_display_static_menu_linset
 };
 
 #define M_0_UPPERBOND 66 // deepest coordinate (greatest number) of the header
 menu menu_0 = {
+		.index = 0,
 		.headerText = "Monitoring",
 		.upperBond = M_0_UPPERBOND,
 		.headerLayout = {M_0_UPPERBOND, 320, 50, 360}, //[Y1,X1,Y2,X2]
@@ -53,7 +57,8 @@ menu menu_0 = {
 
 #define M_1_UPPERBOND 66  // deepest coordinate (greatest number) of the header
 menu menu_1 = {
-		.headerText = "Debug",
+		.index = 1,
+		.headerText = "Dashboard",
 		.upperBond = M_1_UPPERBOND,
 		.headerLayout = {M_1_UPPERBOND, 280, 50, 320},//[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
@@ -63,6 +68,7 @@ menu menu_1 = {
 
 #define M_SETUP_UPPERBOND 66 // deepest coordinate (greatest number) of the header
 menu menu_setup = {
+		.index = 2,
 		.headerText = "Setup",
 		.upperBond = M_SETUP_UPPERBOND,
 		.headerLayout = {M_SETUP_UPPERBOND, 240, 50, 280},//[Y1,X1,Y2,X2]
@@ -71,8 +77,19 @@ menu menu_setup = {
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
+#define M_LINSET_UPPERBOND 30 // deepest coordinate (greatest number) of the header
+menu menu_linset = {
+		.index = 3,
+		.headerText = "",
+		.upperBond = M_LINSET_UPPERBOND,
+		.headerLayout = {0, EVE_HSIZE-65, 40, EVE_HSIZE-50},//[Y1,X1,Y2,X2]
+		.bannerColor = MAIN_BANNERCOLOR,
+		.dividerColor = MAIN_DIVIDERCOLOR,
+		.headerColor = MAIN_TEXTCOLOR,
+};
 
-menu* Menu_Objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup};
+
+menu* Menu_Objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup, &menu_linset};
 
 
 
@@ -104,11 +121,6 @@ uint16_t toggle_state_dimmer = 0;
 uint16_t display_list_size = 0; // Current size of the display-list from register. Used by the TFT_display() menu specific functions
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
 
-/////////// Banner line strip edge positions (from left to right: Y1 is held horizontal till X1, increasing till X2/Y2 and finally held horizontal at Y2 till EVE_HSIZE)
-#define LAYOUT_Y1 66
-#define LAYOUT_Y2 50
-#define LAYOUT_X1 280
-#define LAYOUT_X2 320
 
 
 
@@ -178,6 +190,8 @@ graph gph_monitor = {
 	.width = (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10),			   			// actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
 	.height = (0 + EVE_VSIZE - (M_0_UPPERBOND + 15) - (2*G_PADDING) - 10), 	// actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
 	.padding = G_PADDING,
+	.x_label = "V",
+	.y_label = "t",
 	.y_max = 4095.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
 	.amp_max = 10.0, 		// volts - used at print of vertical grid value labels
 	.t_max = 2.2,    		// seconds - used at print of horizontal grid value labels
@@ -190,8 +204,17 @@ graph gph_monitor = {
 /////////// MENU 0 MONITORING END ---
 
 
-/////////// MENU 1 DEBUG
-/////////// MENU 1 DEBUG END ---
+/////////// MENU 1 DASHBOARD
+#define BTN_STARTREC_TAG 10
+control btn_startRec = {
+	.x = M_COL_3,	.y = 15,
+	.w0 = 55,		.h0 = 31,
+	.mytag = BTN_STARTREC_TAG,	.font = 27,	.options = 0, .state = 0,
+	.text = "Start",
+	.controlType = Button,
+	.ignoreScroll = 1
+};
+/////////// MENU 1 DASHBOARD END ---
 
 
 /////////// MENU 3 SETUP
@@ -297,7 +320,110 @@ control btn_dimmmer = {
 
 /////////// MENU 3 SETUP END ---
 
+/////////// MENU LINSET
+#define BTN_BACK_TAG 10
+control btn_back = {
+	.x = EVE_HSIZE-45,	.y = 5,
+	.w0 = 40,			.h0 = 30,
+	.mytag = BTN_BACK_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Back",
+	.controlType = Button,
+	.ignoreScroll = 1
+};
 
+uint16_t buf_linset_idx = 0; // Current index in Buffer
+uint16_t buf_linset_size = 3; // TODO - see TODO below
+INPUT_BUFFER_SIZE_t buf_linset[3] = { 0, 100, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
+#define G_PADDING 10 //
+graph gph_linset = {
+	.x = 10,		// 10 px from left to leave some room
+	.y = M_LINSET_UPPERBOND + M_UPPER_PAD,		// end of banner plus 10 to leave some room  (e.g. for Y1=66: 66+15=81)
+	.width  = (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10),		// actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
+	.height = (0 + EVE_VSIZE - 15 - (2*G_PADDING) - 10 - (M_ROW_DIST*2)), 	// actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
+	.padding = G_PADDING,
+	.x_label = "nominal",
+	.y_label = "actual in mm",
+	.y_max = 200.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
+	.amp_max = 200.0, 		// in given unit - used at print of vertical grid value labels
+	.t_max = 4096,    		// seconds - used at print of horizontal grid value labels
+	.h_grid_lines = 4.0, 	// number of grey horizontal grid lines
+	.v_grid_lines = 2.0, 	// number of grey vertical grid lines
+	.graphmode = 1
+};
+
+#define STR_DP_MAXLEN 3
+char str_dp[STR_S2_LINSPEC_MAXLEN] = "0";
+int8_t str_dp_curLength = 1;
+#define TBX_DP_TAG 24
+textbox tbx_dp = {
+	.x = M_COL_1,
+	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.width = 36,
+	.labelOffsetX = 75,
+	.labelText = "Data Point:",
+	.mytag = TBX_DP_TAG,
+	.text = str_dp,
+	.text_maxlen = STR_DP_MAXLEN,
+	.text_curlen = &str_dp_curLength,
+	.keypadType = Numeric,
+	.active = 0
+};
+
+#define BTN_DP_LAST_TAG 11
+control btn_db_last = {
+	.x = M_COL_1 + 75 + 36 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 25				  ,	.h0 = 30,
+	.mytag = BTN_DP_LAST_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "<",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+#define BTN_DP_NEXT_TAG 12
+control btn_db_next = {
+	.x = M_COL_1 + 75 + 36 + 1 + 25 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 25						   , 	.h0 = 30,
+	.mytag = BTN_DP_NEXT_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = ">",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+#define STR_NOM_MAXLEN 10
+char str_nom[STR_NOM_MAXLEN] = "4095";
+int8_t str_nom_curLength = 4;
+#define TBX_NOM_TAG 25
+textbox tbx_nom = {
+	.x = M_COL_1 + 75 + 36 + 1 + 25 + 1 + 30 + 10,
+	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.width = 50,
+	.labelOffsetX = 60,
+	.labelText = "Nominal:",
+	.mytag = TBX_NOM_TAG,
+	.text = str_nom,
+	.text_maxlen = STR_NOM_MAXLEN,
+	.text_curlen = &str_nom_curLength,
+	.keypadType = Numeric,
+	.active = 0
+};
+#define STR_ACT_MAXLEN 10
+char str_act[STR_ACT_MAXLEN] = "";
+int8_t str_act_curLength = 0;
+#define TBX_ACT_TAG 26
+textbox tbx_act = {
+	.x = M_COL_1 + 75 + 36 + 1 + 25 + 1 + 30 + 10 + 1 + 120,
+	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.width = 60,
+	.labelOffsetX = 60,
+	.labelText = "Actual:",
+	.mytag = TBX_ACT_TAG,
+	.text = str_act,
+	.text_maxlen = STR_ACT_MAXLEN,
+	.text_curlen = &str_act_curLength,
+	.keypadType = Numeric,
+	.active = 0
+};
+
+
+/////////// MENU LINSET END ---
 
 void TFT_display_get_values(void){
 	// Get size of last display list to be printed on screen (section "Debug Values")
@@ -306,26 +432,6 @@ void TFT_display_get_values(void){
 }
 
 void TFT_display_static_menu0(void){
-	///// Draw Banner and divider line on top
-	//// Banner
-	//EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	//EVE_cmd_dl_burst(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-	//EVE_cmd_dl_burst(DL_BEGIN | EVE_EDGE_STRIP_A);
-	//EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
-	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	//EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	//EVE_cmd_dl_burst(DL_END);
-	//// Divider
-	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-	//EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
-	//EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
-	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	//EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	//EVE_cmd_dl_burst(DL_END);
-
 	// Set configuration for current menu
 	TFT_setMenu(0);
 
@@ -352,25 +458,11 @@ void TFT_display_static_menu0(void){
 
 }
 void TFT_display_static_menu1(void){
+	// Set configuration for current menu
+	TFT_setMenu(1);
+
 	/// Draw Banner and divider line on top
-	// Banner
-	EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_dl_burst(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-	EVE_cmd_dl_burst(DL_BEGIN | EVE_EDGE_STRIP_A);
-	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl_burst(DL_END);
-	// Divider
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
-	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl_burst(DL_END);
+	TFT_header_static(1, &menu_1);
 
 	// Add the static text
 	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
@@ -403,6 +495,20 @@ void TFT_display_static_menu_setup(void){
 
 	/// Backlight
 	TFT_label(1, &lbl_backlight);
+}
+void TFT_display_static_menu_linset(void){
+	// Set configuration for current menu
+	TFT_setMenu(3);
+
+	// Set Color
+	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
+
+	/// Write the static part of the Graph to the display list
+	TFT_GraphStatic(1, &gph_linset);
+
+	TFT_textbox_static(1, &tbx_dp);
+	TFT_textbox_static(1, &tbx_nom);
+	TFT_textbox_static(1, &tbx_act);
 }
 
 
@@ -458,24 +564,12 @@ void TFT_display_menu1(void){
 	/// Test menu
 
 	/////////////// Display BUTTONS and Toggles
-	EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
-	EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
-	EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	// Button start recording
+	TFT_control(&btn_startRec);
 
-	EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
-	if(toggle_state_graphmode){
-		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "li");
-	}
-	else{
-		EVE_cmd_toggle_burst(120,24,62, 27, 0, 0x0000, "re");
-	}
 
-	EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
-
-	EVE_cmd_fgcolor_burst(MAIN_TEXTCOLOR);
-	//EVE_cmd_int_burst(470, 10, 26, EVE_OPT_RIGHTX, swipeDistance_X);
-	//EVE_cmd_int_burst(470, 25, 26, EVE_OPT_RIGHTX, swipeDistance_Y);
+	TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
 	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
 	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
@@ -483,19 +577,20 @@ void TFT_display_menu1(void){
 	//str_filename[1] = 'a';
 	//TFT_textbox_display(20, 70, 20, str_filename);
 
-//	char c [] = "0123456789";
-//
-//	c[0] = (char)120;
-//	c[1] = (char)121;
-//	c[2] = (char)122;
-//	c[3] = (char)123;
-//	c[4] = (char)124;
-//	c[5] = (char)125;
-//	c[6] = (char)126;
-//	c[7] = (char)127;
-//	c[8] = (char)128;
-//	c[9] = (char)129;
-//	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
+	//	char c [] = "0123456789";
+	//
+	//	c[0] = (char)120;
+	//	c[1] = (char)121;
+	//	c[2] = (char)122;
+	//	c[3] = (char)123;
+	//	c[4] = (char)124;
+	//	c[5] = (char)125;
+	//	c[6] = (char)126;
+	//	c[7] = (char)127;
+	//	c[8] = (char)128;
+	//	c[9] = (char)129;
+	//	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
+
 
 }
 void TFT_display_menu_setup(void){
@@ -517,7 +612,27 @@ void TFT_display_menu_setup(void){
 	TFT_textbox_display(&tbx_sensor1);
 	TFT_textbox_display(&tbx_sensor2);
 }
+void TFT_display_menu_linset(void){
+	///
 
+	/////////////// GRAPH
+	///// Print dynamic part of the Graph (data & marker)
+	TFT_GraphData(&gph_linset, &buf_linset[0], buf_linset_size, &buf_linset_idx, GRAPH_DATA1COLOR);
+
+	/// Draw Banner and divider line on top
+	TFT_header_static(1, &menu_linset);
+
+	// Set button color for header
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
+	TFT_control(&btn_back);
+
+	TFT_textbox_display(&tbx_dp);
+	TFT_control(&btn_db_last);
+	TFT_control(&btn_db_next);
+	TFT_textbox_display(&tbx_nom);
+	TFT_textbox_display(&tbx_act);
+
+}
 
 void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
@@ -569,29 +684,13 @@ void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 	// Determine which tag was touched
 	switch(tag)
 	{
-		// li/re mode toggle on top
-		case 12:
-			if(*toggle_lock == 0) {
-				printf("Toggle li/re touched\n");
-				*toggle_lock = 42;
-				if(toggle_state_graphmode == 0)	{
-					toggle_state_graphmode = 1;
-				}
-				else {
-					toggle_state_graphmode = 0;
-				}
-			}
-			break;
-
 		// textbox
-		case 20:
+		case BTN_STARTREC_TAG:
 			if(*toggle_lock == 0) {
-				printf("Textbox touched\n");
+				printf("Button StartRec\n");
 				*toggle_lock = 42;
 
-				// Activate Keypad and set cursor to end
-				keypad_open(20, Filename);
-				TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
+				record_buffer();
 			}
 			break;
 		default:
@@ -664,6 +763,15 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
+		case BTN_LINSENSOR1_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button LinS1\n");
+				*toggle_lock = 42;
+
+				// Change menu
+				TFT_setMenu(menu_linset.index);
+			}
+			break;
 		case TBX_SENSOR2_TAG:
 			if(*toggle_lock == 0) {
 				printf("Textbox S2\n");
@@ -678,6 +786,27 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 			TFT_textbox_touch(&tbx_filename);
 			TFT_textbox_touch(&tbx_sensor1);
 			TFT_textbox_touch(&tbx_sensor2);
+			break;
+	}
+}
+void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// ...
+	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
+
+	// Determine which tag was touched
+	switch(tag)
+	{
+		// BUTTON BACK
+		case BTN_BACK_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button Back\n");
+				*toggle_lock = 42;
+
+				// Change menu
+				TFT_setMenu(menu_setup.index);
+			}
+			break;
+		default:
 			break;
 	}
 }
