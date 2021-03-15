@@ -41,31 +41,31 @@ void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&TFT_display_static_menu_setup
 };
 
-#define M_0_UPPERBOND 66
+#define M_0_UPPERBOND 66 // deepest coordinate (greatest number) of the header
 menu menu_0 = {
 		.headerText = "Monitoring",
 		.upperBond = M_0_UPPERBOND,
-		.headerLayout = {M_0_UPPERBOND, 280, 50, 320},
+		.headerLayout = {M_0_UPPERBOND, 320, 50, 360}, //[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
-#define M_1_UPPERBOND 66
+#define M_1_UPPERBOND 66  // deepest coordinate (greatest number) of the header
 menu menu_1 = {
 		.headerText = "Debug",
 		.upperBond = M_1_UPPERBOND,
-		.headerLayout = {M_1_UPPERBOND, 280, 50, 320},
+		.headerLayout = {M_1_UPPERBOND, 280, 50, 320},//[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
-#define M_SETUP_UPPERBOND 66
+#define M_SETUP_UPPERBOND 66 // deepest coordinate (greatest number) of the header
 menu menu_setup = {
 		.headerText = "Setup",
 		.upperBond = M_SETUP_UPPERBOND,
-		.headerLayout = {M_SETUP_UPPERBOND, 280, 50, 320},
+		.headerLayout = {M_SETUP_UPPERBOND, 240, 50, 280},//[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
@@ -120,38 +120,71 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 
 /////////// MENU 0 MONITORING
 
+#define BTN_INPUT_TAG 13
 control btn_input = {
-	.x = 20,		.y = 15,
-	.w0 = 80,		.h0 = 30,
-	.mytag = 13,	.font = 27, .options = 0, .state = 0,
+	.x = 180,		.y = 15,
+	.w0 = 70,		.h0 = 30,
+	.mytag = BTN_INPUT_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Sensor",
-	.controlType = Button
+	.controlType = Button,
+	.ignoreScroll = 1
 };
 
+#define BTN_GRAPHMODE_TAG 12
 control tgl_graphMode = {
-	.x = 120,		.y = 24,
-	.w0 = 62,		.h0 = 27,
-	.mytag = 12,	.font = 27, .options = 0, .state = 0,
+	.x = 270,		.y = 24,
+	.w0 = 60,		.h0 = 27,
+	.mytag = BTN_GRAPHMODE_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Frame",
-	.controlType = Toggle
+	.controlType = Toggle,
+	.ignoreScroll = 1
 };
+
+label lbl_DLsize = {
+		.x = 360,		.y = 10,
+		.font = 26,		.options = 0,	.text = "DL-size:",
+		.ignoreScroll = 1,
+};
+
+label lbl_sensor = {
+		.x = 360,		.y = 25,
+		.font = 26,		.options = 0,	.text = "Sensor:",
+		.ignoreScroll = 1
+};
+
 
 // Graph Definitions
 // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be to fill the whole main area
-#define G_PADDING 10 									// Only needed because we want to calc how much width and height can be used to "fill" the whole main area. The actual passing is set inside TFT_GraphStatic() hard to 10.
-uint16_t G_x        = 10;													 // 10 px from left to leave some room
-uint16_t G_y      	= (LAYOUT_Y1 + 15);										 // end of banner plus 10 to leave some room  (for Y1=66: 66+15=81)
-uint16_t G_width 	= (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10);			   // actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
-uint16_t G_height	= (0 + EVE_VSIZE - (LAYOUT_Y1 + 15) - (2*G_PADDING) - 10); // actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
-// axes
-const char unit_Sensor[] = " V"; // unit string used at print of current sensor value
-double G_amp_max = 10.0; // volts - used at print of vertical grid value labels
-double G_t_max = 2.2;    // seconds - used at print of horizontal grid value labels
-// data properties
-double G_y_max = 4095.0; // maximum allowed amplitude y (here for 12bit sensor value)
-// grid
-double G_h_grid_lines = 4.0; // number of grey horizontal grid lines
-double G_v_grid_lines = 2.2; // number of grey vertical grid lines
+
+//uint16_t G_x        = 10;													 // 10 px from left to leave some room
+//uint16_t G_y      	= (M_0_UPPERBOND + 15);										 // end of banner plus 10 to leave some room  (for Y1=66: 66+15=81)
+//uint16_t G_width 	= (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10);			   // actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
+//uint16_t G_height	= (0 + EVE_VSIZE - (M_0_UPPERBOND + 15) - (2*G_PADDING) - 10); // actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
+//// axes
+//const char unit_Sensor[] = " V"; // unit string used at print of current sensor value
+//double G_amp_max = 10.0; // volts - used at print of vertical grid value labels
+//double G_t_max = 2.2;    // seconds - used at print of horizontal grid value labels
+//// data properties
+//double G_y_max = 4095.0; // maximum allowed amplitude y (here for 12bit sensor value)
+//// grid
+//double G_h_grid_lines = 4.0; // number of grey horizontal grid lines
+//double G_v_grid_lines = 2.2; // number of grey vertical grid lines
+
+
+#define G_PADDING 10 //
+graph gph_monitor = {
+	.x = 10,																 // 10 px from left to leave some room
+	.y = (M_0_UPPERBOND + 15),												// end of banner plus 10 to leave some room  (for Y1=66: 66+15=81)
+	.width = (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10),			   			// actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
+	.height = (0 + EVE_VSIZE - (M_0_UPPERBOND + 15) - (2*G_PADDING) - 10), 	// actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
+	.padding = G_PADDING,
+	.y_max = 4095.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
+	.amp_max = 10.0, 		// volts - used at print of vertical grid value labels
+	.t_max = 2.2,    		// seconds - used at print of horizontal grid value labels
+	.h_grid_lines = 4.0, 	// number of grey horizontal grid lines
+	.v_grid_lines = 2.2, 	// number of grey vertical grid lines
+	.graphmode = 0
+};
 // Graph Definitions END
 
 /////////// MENU 0 MONITORING END ---
@@ -162,16 +195,23 @@ double G_v_grid_lines = 2.2; // number of grey vertical grid lines
 
 
 /////////// MENU 3 SETUP
+label lbl_recording = {
+		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND,
+		.font = 27,		.options = 0,		.text = "Recording",
+		.ignoreScroll = 0
+};
+
 #define STR_FILENAME_MAXLEN 16
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
 int8_t str_filename_curLength = 8;
+#define TBX_FILENAME_TAG 20
 textbox tbx_filename = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = 190,
 	.labelOffsetX = 60,
 	.labelText = "Filename",
-	.mytag = 20,
+	.mytag = TBX_FILENAME_TAG,
 	.text = str_filename,
 	.text_maxlen = STR_FILENAME_MAXLEN,
 	.text_curlen = &str_filename_curLength,
@@ -179,37 +219,80 @@ textbox tbx_filename = {
 	.active = 0
 };
 
+label lbl_linearisation = {
+		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
+		.font = 27,		.options = 0,		.text = "Linearisation",
+		.ignoreScroll = 0
+};
+
 #define STR_S1_LINSPEC_MAXLEN 10
 char str_s1_linspec[STR_S1_LINSPEC_MAXLEN] = "s1.lin";
 int8_t str_s1_linspec_curLength = 6;
+#define TBX_SENSOR1_TAG 21
 textbox tbx_sensor1 = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = 120,
 	.labelOffsetX = 130,
 	.labelText = "Sensor1:   Spec File",
-	.mytag = 21,
+	.mytag = TBX_SENSOR1_TAG,
 	.text = str_s1_linspec,
 	.text_maxlen = STR_S1_LINSPEC_MAXLEN,
 	.text_curlen = &str_s1_linspec_curLength,
 	.keypadType = Standard,
 	.active = 0
 };
-
+#define BTN_LINSENSOR1_TAG 22
 control btn_linSensor1 = {
 	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 55,		.h0 = 31,
-	.mytag = 22,	.font = 27,	.options = 0, .state = 0,
+	.mytag = BTN_LINSENSOR1_TAG,	.font = 27,	.options = 0, .state = 0,
 	.text = "Set",
-	.controlType = Button
+	.controlType = Button,
+	.ignoreScroll = 0
 };
 
+#define STR_S2_LINSPEC_MAXLEN 10
+char str_s2_linspec[STR_S2_LINSPEC_MAXLEN] = "s2.lin";
+int8_t str_s2_linspec_curLength = 6;
+#define TBX_SENSOR2_TAG 23
+textbox tbx_sensor2 = {
+	.x = M_COL_2,
+	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.width = 120,
+	.labelOffsetX = 130,
+	.labelText = "Sensor2:   Spec File",
+	.mytag = TBX_SENSOR2_TAG,
+	.text = str_s2_linspec,
+	.text_maxlen = STR_S2_LINSPEC_MAXLEN,
+	.text_curlen = &str_s2_linspec_curLength,
+	.keypadType = Standard,
+	.active = 0
+};
+#define BTN_LINSENSOR2_TAG 24
+control btn_linSensor2 = {
+	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 31,
+	.mytag = BTN_LINSENSOR2_TAG,	.font = 27,	.options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+
+label lbl_backlight = {
+		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3),
+		.font = 27,		.options = 0,		.text = "Backlight",
+		.ignoreScroll = 0
+};
+
+#define BTN_DIMMER_TAG 10
 control btn_dimmmer = {
-	.x = 205,		.y = 15,
+	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 80,		.h0 = 30,
-	.mytag = 10,	.font = 27, .options = 0, .state = 0,
+	.mytag = BTN_DIMMER_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Dimmer",
-	.controlType = Button
+	.controlType = Button,
+	.ignoreScroll = 0
 };
 
 /////////// MENU 3 SETUP END ---
@@ -223,37 +306,48 @@ void TFT_display_get_values(void){
 }
 
 void TFT_display_static_menu0(void){
+	///// Draw Banner and divider line on top
+	//// Banner
+	//EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
+	//EVE_cmd_dl_burst(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
+	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BANNERCOLOR);
+	//EVE_cmd_dl_burst(DL_BEGIN | EVE_EDGE_STRIP_A);
+	//EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
+	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	//EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	//EVE_cmd_dl_burst(DL_END);
+	//// Divider
+	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
+	//EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	//EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
+	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
+	//EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
+	//EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
+	//EVE_cmd_dl_burst(DL_END);
+
+	// Set configuration for current menu
+	TFT_setMenu(0);
+
 	/// Draw Banner and divider line on top
-	// Banner
-	EVE_cmd_dl_burst(TAG(1)); /* give everything considered background area tag 1 -> used for wipe feature*/
-	EVE_cmd_dl_burst(LINE_WIDTH(1*16)); /* size is in 1/16 pixel */
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BANNERCOLOR);
-	EVE_cmd_dl_burst(DL_BEGIN | EVE_EDGE_STRIP_A);
-	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl_burst(DL_END);
-	// Divider
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_DIVIDERCOLOR);
-	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
-	EVE_cmd_dl_burst(VERTEX2F(0, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X1, LAYOUT_Y1));
-	EVE_cmd_dl_burst(VERTEX2F(LAYOUT_X2, LAYOUT_Y2));
-	EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE, LAYOUT_Y2));
-	EVE_cmd_dl_burst(DL_END);
+	TFT_header_static(1, &menu_0);
+
+	// Set Color
+	TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
 
 	// Add the static text
-	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
-	#if defined (EVE_DMA)
-	EVE_cmd_text_burst(10, EVE_VSIZE - 65, 26, 0, "Bytes: ");
-	#endif
-	EVE_cmd_text_burst(360, 10, 26, 0, "DL-size:");
-	EVE_cmd_text_burst(360, 25, 26, 0, "Sensor:");
+	//EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
+	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	//EVE_cmd_text_burst(360, 10, 26, 0, "DL-size:");
+	//EVE_cmd_text_burst(360, 25, 26, 0, "Sensor:");
+	TFT_label(1, &lbl_DLsize);
+	TFT_label(1, &lbl_sensor);
+	//TFT_label(1, 360, 10, 26, 0, "DL-size:");
+	//TFT_label(1, 360, 25, 26, 0, "Sensor:");
 
 	/// Write the static part of the Graph to the display list
-	TFT_GraphStatic(1, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
+	TFT_GraphStatic(1, &gph_monitor);
+	//TFT_GraphStatic(1, G_x, G_y, G_width, G_height, G_PADDING, G_amp_max, G_t_max, G_h_grid_lines, G_v_grid_lines);
 
 
 }
@@ -297,15 +391,21 @@ void TFT_display_static_menu_setup(void){
 	// Set Color
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
 
-	// Recording section
-	TFT_label(1, M_COL_1, M_UPPER_PAD + M_SETUP_UPPERBOND, 27, BLACK, "Recording");
+	/// Recording section
+	TFT_label(1, &lbl_recording);
 	// Filename
 	TFT_textbox_static(1, &tbx_filename);
 
-	// Linearisation section
-	TFT_label(1, M_COL_1, M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1), 27, BLACK, "Linearisation");
+	/// Linearisation section
+	TFT_label(1, &lbl_linearisation);
 	TFT_textbox_static(1, &tbx_sensor1);
+	TFT_textbox_static(1, &tbx_sensor2);
+
+	/// Backlight
+	TFT_label(1, &lbl_backlight);
 }
+
+
 
 void TFT_display_menu0(void){
 	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
@@ -319,10 +419,10 @@ void TFT_display_menu0(void){
 	//EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
 
 	//EVE_cmd_dl_burst(TAG(13)); /* assign tag-value '13' to the button that follows */
-	TFT_control(&btn_input, 1);
+	TFT_control(&btn_input);
 
 	//EVE_cmd_dl_burst(TAG(12)); /* assign tag-value '12' to the toggle that follows */
-	TFT_control(&tgl_graphMode, 1);
+	TFT_control(&tgl_graphMode);
 	//if(toggle_state_graphmode){
 	//	EVE_cmd_toggle_burst(120,24,62, 27, 0, 0xFFFF, "Roll");
 	//}
@@ -341,16 +441,17 @@ void TFT_display_menu0(void){
 	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
 
 	// Write current sensor value with unit
-	char buffer[32]; // buffer for double to string conversion
-	sprintf(buffer, "%.2lf", (G_amp_max/G_y_max)*InputBuffer1[InputBuffer1_idx]); // double to string conversion
-	strcat(buffer, unit_Sensor);
+	char buffer[32]; // buffe.ouble to string conversion
+	sprintf(buffer, "%.2lf", (gph_monitor.amp_max/gph_monitor.y_max)*InputBuffer1[InputBuffer1_idx]); // double to string conversion
+	strcat(buffer, " V"); //unit_Sensor
 	EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
 
 
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, tgl_graphMode.state, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
+	TFT_GraphData(&gph_monitor, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, GRAPH_DATA1COLOR);
+	//TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, tgl_graphMode.state, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
 
 }
 void TFT_display_menu1(void){
@@ -401,30 +502,20 @@ void TFT_display_menu_setup(void){
 	///
 
 
-	/////////////// Display BUTTONS and Toggles
-	//EVE_cmd_gradcolor_burst(MAIN_BTNGRDCOLOR);
-	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_BTNTXTCOLOR);
-	//EVE_cmd_fgcolor_burst(MAIN_BTNCOLOR);
-	//EVE_cmd_bgcolor_burst(MAIN_BTNCTSCOLOR);
-
-	//EVE_cmd_dl_burst(TAG(10)); /* assign tag-value '10' to the button that follows */
-	//EVE_cmd_button_burst(205,15,80,30, 27, toggle_state_dimmer,"Dimmer");
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
-	TFT_control(&btn_dimmmer, 1);
-	TFT_control(&btn_linSensor1, 0);
-
-	//EVE_cmd_dl_burst(TAG(0)); /* no touch from here on */
+	TFT_control(&btn_linSensor1);
+	TFT_control(&btn_linSensor2);
+	TFT_control(&btn_dimmmer);
 
 	// Set Color
-	TFT_setColor(1, BLACK, 0, 0, 0);
+	TFT_setColor(1, BLACK, 1, 1, 1);
 
 	// Filename textbox
 	//TFT_textbox_display(20, 70, 20, str_filename);
 	TFT_textbox_display(&tbx_filename);
 	TFT_textbox_display(&tbx_sensor1);
-
-
+	TFT_textbox_display(&tbx_sensor2);
 }
 
 
@@ -442,10 +533,12 @@ void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 				if(tgl_graphMode.state == 0){
 					tgl_graphMode.state = 0xFFFF;
 					tgl_graphMode.text = "Roll";
+					gph_monitor.graphmode = 1;
 				}
 				else {
 					tgl_graphMode.state = 0;
 					tgl_graphMode.text = "Frame";
+					gph_monitor.graphmode = 0;
 				}
 			}
 			break;
@@ -534,7 +627,7 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 	switch(tag)
 	{
 		// dimmer button on top as on/off radio-switch
-		case 10:
+		case BTN_DIMMER_TAG:
 			if(*toggle_lock == 0) {
 				printf("Button Dimmer touched\n");
 				*toggle_lock = 42;
@@ -549,9 +642,9 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 			}
 			break;
 		// textbox
-		case 20:
+		case TBX_FILENAME_TAG:
 			if(*toggle_lock == 0) {
-				printf("Textbox touched\n");
+				printf("Textbox filename\n");
 				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
@@ -560,9 +653,9 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
-		case 21:
+		case TBX_SENSOR1_TAG:
 			if(*toggle_lock == 0) {
-				printf("Textbox touched\n");
+				printf("Textbox S1\n");
 				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
@@ -571,10 +664,20 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
+		case TBX_SENSOR2_TAG:
+			if(*toggle_lock == 0) {
+				printf("Textbox S2\n");
+				*toggle_lock = 42;
+
+				// Activate Keypad and set cursor to end
+				TFT_textbox_setStatus(&tbx_sensor2, 1, *(tbx_sensor2.text_curlen));
+			}
+			break;
 		default:
 			//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 			TFT_textbox_touch(&tbx_filename);
 			TFT_textbox_touch(&tbx_sensor1);
+			TFT_textbox_touch(&tbx_sensor2);
 			break;
 	}
 }

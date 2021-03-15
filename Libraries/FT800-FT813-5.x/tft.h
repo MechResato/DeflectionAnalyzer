@@ -16,6 +16,8 @@
 #define BLACK	0x000000UL
 #define GREY	0x222222UL
 
+// INPUT_BUFFER_SIZE_t is defined in globals files
+
 // Menu definition
 typedef struct {
 	char* headerText;
@@ -45,7 +47,17 @@ void TFT_setMenu(uint8_t idx);
 void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor, uint32_t gradColor);
 //void TFT_header_static(uint8_t burst, uint16_t layout[], uint32_t bannerColor, uint32_t dividerColor, uint32_t headerColor, char* headerText);
 void TFT_header_static(uint8_t burst, menu* men);
-void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text);
+
+// Label
+typedef struct {
+	uint16_t x;
+	uint16_t y;
+	uint16_t font;
+	uint16_t options;
+	char* text;
+	uint8_t ignoreScroll;
+} label;
+void TFT_label(uint8_t burst, label* lbl);
 
 
 // Control (buttons, toggles, ...)
@@ -58,13 +70,13 @@ typedef struct {
 	uint16_t h0;
 	uint16_t font;
 	uint16_t options;
-	int8_t mytag;
+	const int8_t mytag;
 	char* text;
 	uint16_t state;
 	controlTypes controlType;
+	uint8_t ignoreScroll;
 } control;
-
-void TFT_control(control* ctrl, uint8_t force);
+void TFT_control(control* ctrl);
 
 // Textbox feature
 #define TEXTBOX_HEIGTH 31	// overall height of the textbox in pixel
@@ -76,7 +88,7 @@ typedef struct {
 	uint16_t width; // 11px per possible character (+some space on the left border) should be fine (A width of 190-200 is perfect for a worst case 16 character string in a textbox)
 	uint16_t labelOffsetX;
 	char* labelText;
-	int8_t mytag;
+	const int8_t mytag;
 	char* text;
 	int8_t text_maxlen;
 	int8_t* text_curlen;
@@ -93,8 +105,26 @@ void TFT_textbox_setCursor(int16_t position, int16_t len);
 void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos);
 
 // Graph feature
-void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines);
-void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor);
+typedef struct {
+	uint16_t x; 	  // beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
+	uint16_t y; 	  // beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
+	uint16_t width;   // width of the actual graph data area in full Pixels
+	uint16_t height;  // height of the actual graph data area in full Pixels
+	uint16_t padding; // clearance from the outer corners (x,y) to the axes
+	double y_max; 	  // maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
+	double amp_max;   // maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% horizontal line
+	double t_max; 	  // maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
+	double h_grid_lines; 	// number of horizontal grid lines
+	double v_grid_lines; 	// number of vertical grid lines
+	uint8_t graphmode;		// 0 = frame-mode, 1 = roll-mode
+	//uint32_t datacolor;  	// 24bit color (as 32 bit integer with leading 0's) used for the data-line
+	//uint32_t markercolor;	// 24bit color (as 32 bit integer with leading 0's) used for the current position line
+} graph;
+void TFT_GraphStatic(uint8_t burst, graph* gph);
+void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
+//void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines);
+//void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor);
+
 
 
 

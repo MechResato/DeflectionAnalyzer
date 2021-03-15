@@ -24,7 +24,6 @@
 #define GRAPH_GRIDCOLOR    0xC5DAE2 // graph grid
 #define GRAPH_DATA1COLOR   0x03F9E // graph data 1
 #define GRAPH_DATA2COLOR   0x64584B // graph data 2 (alternative/additional color)
-#define GRAPH_POSMARKCOLOR 0xff0000 // graph position marker
 
 void TFT_display_get_values(void);
 

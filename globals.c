@@ -6,7 +6,7 @@
  */
 
 #include <DAVE.h>
-//#include <globals.h>
+#include <globals.h>
 
 /*  MACROS - DEFINEs */
 #define DEBUG_ENABLE // self implemented Debug flag
@@ -33,13 +33,13 @@ volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
 
 // Buffer 1
 uint16_t InputBuffer1_idx = 0; // Current index in Buffer
-XMC_VADC_RESULT_SIZE_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
+INPUT_BUFFER_SIZE_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
 
 
 
 ///*  MENU AND USER INTERFACE */
 // Input signal type used for measurement and GUI display
-volatile uint8_t InputType = 3; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+volatile uint8_t InputType = 0; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
 
 
 

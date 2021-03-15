@@ -206,7 +206,7 @@ void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t 
 					EVE_cmd_gradcolor(gradColor);
 	}
 }
-void TFT_control(control* ctrl, uint8_t ignoreScroll){
+void TFT_control(control* ctrl){
 	/// Write a user control element (button/toggle) to the TFT. Adapts the y coordinate automatically to current vertical scroll! (Use EVE_cmd_... command direct if wanted otherwise)
 	/// Meant to be used at recurring display list build in TFT_display().
 	/// Note: Use TFT_setColor(...) before calling this!
@@ -220,17 +220,17 @@ void TFT_control(control* ctrl, uint8_t ignoreScroll){
 	///
 	///	 Uses tft-global variables:
 	///		EVE Library ...
-	///		TFT_cur_ScrollV
+	///		TFT_cur_ScrollV, TFT_UpperBond
 
 
 	uint16_t curY = ctrl->y;
-	if(ignoreScroll == 0){
+	if(ctrl->ignoreScroll == 0){
 		// Determine current position (with scroll value)
 		curY -= TFT_cur_ScrollV;
 	}
 
 	// Only show textbox if it is inside display
-	if(ignoreScroll || (curY > TFT_UpperBond && curY < EVE_VSIZE)){
+	if(ctrl->ignoreScroll || (curY > TFT_UpperBond && curY < EVE_VSIZE)){
 		// Set assigned Tag
 		EVE_cmd_dl_burst(TAG(ctrl->mytag)); /* do not use the following objects for touch-detection */
 
@@ -290,13 +290,15 @@ void TFT_header_static(uint8_t burst, menu* men){
 	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(EVE_HSIZE           , men->headerLayout[2]));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
-	// Add Header
-	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
+	// Add header text
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | men->headerColor);
 	(*EVE_cmd_text__fptr_arr[burst])(20, 15, 30, 0, men->headerText);
+
+	(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
 }
 
-void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text){
+//void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t textColor, char* text){
+void TFT_label(uint8_t burst, label* lbl){
 	/// Write a text/label to the TFT. Can be used once during init of a static background TFT_display_static() or at recurring display list build in TFT_display()
 	///
 	///  burst		Determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
@@ -309,18 +311,22 @@ void TFT_label(uint8_t burst, uint16_t x, uint16_t y, uint8_t font, uint32_t tex
 	///	 Uses tft-global variables:
 	///		EVE Library ...
 	///		EVE_cmd_dl__fptr_arr, EVE_cmd_text__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
-	///		TEXTBOX_HEIGTH
+	///		TFT_cur_ScrollV, TFT_UpperBond
 
-	// Determine current position (with scroll value)
-		uint16_t curY = y - TFT_cur_ScrollV;
 
-		// Only show textbox if it is inside display
-		if(curY > TFT_UpperBond && curY < EVE_VSIZE){
-			// Add text
-			(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
-			(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | textColor);
-			(*EVE_cmd_text__fptr_arr[burst])(x, curY, font, 0, text);
-		}
+	uint16_t curY = lbl->y;
+	if(lbl->ignoreScroll == 0){
+		// Determine current position (with scroll value)
+		curY -= TFT_cur_ScrollV;
+	}
+
+	// Only show label if it is inside display
+	if(lbl->ignoreScroll || (curY > TFT_UpperBond && curY < EVE_VSIZE)){
+		// Add text
+		(*EVE_cmd_dl__fptr_arr[burst])(TAG(0)); /* do not use the following objects for touch-detection */
+		//(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | textColor);
+		(*EVE_cmd_text__fptr_arr[burst])(lbl->x, curY, lbl->font, lbl->options, lbl->text);
+	}
 }
 
 
@@ -337,6 +343,7 @@ void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	///		EVE Library ...
 	///		EVE_cmd_dl__fptr_arr	Function pointer for "EVE_cmd_dl..." function with or without burst
 	///		TEXTBOX_HEIGTH
+	///		TFT_cur_ScrollV, TFT_UpperBond
 
 
 	// Determine current position (with scroll value)
@@ -564,7 +571,9 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 
 
 
-void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
+//void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx);
+//void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
+void TFT_GraphStatic(uint8_t burst, graph* gph){
 	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
@@ -599,74 +608,79 @@ void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint
 	const uint8_t v_grid_lbl_comp_x = 7;  // Offset used to print the vertical grid labels (numbers) at the right position (text width compensation)
 	const uint8_t v_grid_lbl_comp_y = 0;  // Offset used to print the vertical grid labels (numbers) at the right position (text height compensation)
 
+
+	// Determine current position (with scroll value)
+	uint16_t curY = gph->y - TFT_cur_ScrollV;
+
+
 	/// Calculate pixels between lines and labels of the grid
 	// Used by grid lines and labels (space between them)
-	double widthPerSection = (double)(width)/v_grid_lines;
-	double heightPerSection = (double)(height)/h_grid_lines;
+	double widthPerSection = (double)(gph->width)/gph->v_grid_lines;
+	double heightPerSection = (double)(gph->height)/gph->h_grid_lines;
 
 	/// Axes LABELS
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
-	(*EVE_cmd_text__fptr_arr[burst])(x + padding         + h_ax_lbl_comp_x, y + padding          - h_ax_lbl_comp_y, axis_lbl_txt_size, 0, "V");
-	(*EVE_cmd_text__fptr_arr[burst])(x + padding + width + v_ax_lbl_comp_x, y + padding + height - v_ax_lbl_comp_y, axis_lbl_txt_size, 0, "t");
+	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding              + h_ax_lbl_comp_x, gph->y + gph->padding               - h_ax_lbl_comp_y, axis_lbl_txt_size, 0, "V");
+	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding + gph->width + v_ax_lbl_comp_x, gph->y + gph->padding + gph->height - v_ax_lbl_comp_y, axis_lbl_txt_size, 0, "t");
 
 	/// AXES lines
 	//(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINES);
 	// left vertical line (Amplitude)
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding, y));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding, y + padding + height + padding));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding, curY));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding, curY + gph->padding + gph->height + gph->padding));
 	// bottom horizontal line (Time)
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x                            , y + padding + height ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + width + padding, y + padding + height ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x                            				 , curY + gph->padding + gph->height ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + gph->width + gph->padding, curY + gph->padding + gph->height ));
 
 	/// GRID lines
 	(*EVE_cmd_dl__fptr_arr[burst])(LINE_WIDTH(grid_linewidth)); /* size is in 1/16 pixel */
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_GRIDCOLOR);
 	// vertical grid
-	for(int i=1; i<=(int)floor(v_grid_lines); i++){
+	for(int i=1; i<=(int)floor(gph->v_grid_lines); i++){
 		// y-position at upper and lower corner; x-position from left with padding and width of graph divided by number of gridlines - times current line
-		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + (uint16_t)(widthPerSection*(double)i), y + padding ));
-		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + (uint16_t)(widthPerSection*(double)i), y + padding + height ));
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + (uint16_t)(widthPerSection*(double)i), curY + gph->padding ));
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + (uint16_t)(widthPerSection*(double)i), curY + gph->padding + gph->height ));
 	}
 	// horizontal grid
-	for(int i=1; i<=(int)floor(h_grid_lines); i++){
+	for(int i=1; i<=(int)floor(gph->h_grid_lines); i++){
 		// x-position at left and right corner; y-position from top y, padding and height divided by number of gridlines - times current line
-		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding        , y + padding + height - (uint16_t)(heightPerSection*(double)i) ));
-		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + width, y + padding + height - (uint16_t)(heightPerSection*(double)i) ));
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding        	  , curY + gph->padding + gph->height - (uint16_t)(heightPerSection*(double)i) ));
+		(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + gph->width, curY + gph->padding + gph->height - (uint16_t)(heightPerSection*(double)i) ));
 	}
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 	/// Grid VALUES
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
 	// vertical grid (time)
-	for(int i=1; i<=(int)ceil(v_grid_lines); i++){ // "ceil" and "i-1" at val -> print also the 0 value
+	for(int i=1; i<=(int)ceil(gph->v_grid_lines); i++){ // "ceil" and "i-1" at val -> print also the 0 value
 		// Calc time at current vertical line
-		double val = (t_max/v_grid_lines*(double)(i-1));
+		double val = (gph->t_max/gph->v_grid_lines*(double)(i-1));
 
 		// If its a pure integer write it as number, else convert and write it to string
 		if((val - (double)((uint32_t)val)) == 0){ //val % 1.0 == 0
-			(*EVE_cmd_number__fptr_arr[burst])(x + padding + (uint16_t)(widthPerSection*(double)(i-1)) + h_grid_lbl_comp_x, y + height + h_grid_lbl_comp_y, grid_lbl_txt_size, 0, (int32_t)val); //EVE_OPT_RIGHTX| + 18
+			(*EVE_cmd_number__fptr_arr[burst])(gph->x + gph->padding + (uint16_t)(widthPerSection*(double)(i-1)) + h_grid_lbl_comp_x, curY + gph->height + h_grid_lbl_comp_y, grid_lbl_txt_size, 0, (int32_t)val); //EVE_OPT_RIGHTX| + 18
 		}
 		else{
 			char buffer[32]; // buffer for double to string conversion
 			sprintf(buffer, "%.1lf", val); // double to string conversion
-			(*EVE_cmd_text__fptr_arr[burst])(x + padding + (uint16_t)(widthPerSection*(double)(i-1)) + h_grid_lbl_comp_x, y + height + h_grid_lbl_comp_y, grid_lbl_txt_size, 0, buffer);
+			(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding + (uint16_t)(widthPerSection*(double)(i-1)) + h_grid_lbl_comp_x, curY + gph->height + h_grid_lbl_comp_y, grid_lbl_txt_size, 0, buffer);
 		}
 	}
 	// horizontal grid (amplitude)
 	//(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
-	for(int i=1; i<=(int)floor(h_grid_lines); i++){  // "floor" and "i" at val -> don't print the 0 value
+	for(int i=1; i<=(int)floor(gph->h_grid_lines); i++){  // "floor" and "i" at val -> don't print the 0 value
 		// Calc amplitude at current horizontal line
-		double val = (amp_max/h_grid_lines*(double)i);
+		double val = (gph->amp_max/gph->h_grid_lines*(double)i);
 
 		// If its a pure integer write it as number, else convert and write it to string
 		if((val - (double)((uint32_t)val)) == 0){ //val % 1.0 == 0
-			(*EVE_cmd_number__fptr_arr[burst])(x - v_grid_lbl_comp_x, y + padding + height - (uint16_t)(heightPerSection*(double)i) + v_grid_lbl_comp_y, grid_lbl_txt_size, 0, (int32_t)val); //EVE_OPT_RIGHTX|
+			(*EVE_cmd_number__fptr_arr[burst])(gph->x - v_grid_lbl_comp_x, curY + gph->padding + gph->height - (uint16_t)(heightPerSection*(double)i) + v_grid_lbl_comp_y, grid_lbl_txt_size, 0, (int32_t)val); //EVE_OPT_RIGHTX|
 		}
 		else{
 			char buffer[32]; // buffer for double to string conversion
 			sprintf(buffer, "%.1lf", val); // double to string conversion
-			(*EVE_cmd_text__fptr_arr[burst])(x - v_grid_lbl_comp_x, y + padding + height - (uint16_t)(heightPerSection*(double)i) + v_grid_lbl_comp_y, grid_lbl_txt_size, 0, buffer);
+			(*EVE_cmd_text__fptr_arr[burst])(gph->x - v_grid_lbl_comp_x, curY + gph->padding + gph->height - (uint16_t)(heightPerSection*(double)i) + v_grid_lbl_comp_y, grid_lbl_txt_size, 0, buffer);
 		}
 	}
 
@@ -674,46 +688,50 @@ void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint
 	//(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
 	// bottom vertical arrow (Amplitude)
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + arrow_offset, y + arrow_offset ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding               , y                ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding - arrow_offset, y + arrow_offset ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + arrow_offset, curY + arrow_offset ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding               , curY                ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding - arrow_offset, curY + arrow_offset ));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 	// bottom horizontal arrow (Time)
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_BEGIN | EVE_LINE_STRIP);
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + width + padding - arrow_offset, y + padding + height + arrow_offset ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + width + padding               , y + padding + height                ));
-	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(x + padding + width + padding - arrow_offset, y + padding + height - arrow_offset ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + gph->width + gph->padding - arrow_offset, curY + gph->padding + gph->height + arrow_offset ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + gph->width + gph->padding               , curY + gph->padding + gph->height                ));
+	(*EVE_cmd_dl__fptr_arr[burst])(VERTEX2F(gph->x + gph->padding + gph->width + gph->padding - arrow_offset, curY + gph->padding + gph->height - arrow_offset ));
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 }
 
-void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor){
+//void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, INPUT_BUFFER_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor){
+void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
 	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
 	///  width	... width of the actual graph data area in full Pixels
 	///  height	... height of the actual graph data area in full Pixels
-	///  padding	...	clearance from the outer corners (x,y) to the axes
-	///  y_max   ... maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
-	///  SBuffer[] 		...	Array of data values
-	///  size	 		... size of array of data values
-	///  *SBuffer_curidx ... current position (index of most recent value)
-	///  graphmode 		... 0 = frame-mode, 1 = roll-mode
-	///  datacolor 		... 24bit color (as 32 bit integer with leading 0's) used for the dataline
-	///  markercolor		... 24bit color (as 32 bit integer with leading 0's) used for the current position line
+	///  padding	 ... clearance from the outer corners (x,y) to the axes
+	///  y_max   	 ... maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
+	///  buf[] 		 ... Array of data values
+	///  buf_size	 ... size of array of data values
+	///  *buf_curidx ... current position (index of most recent value)
+	///  graphmode 	 ... 0 = frame-mode, 1 = roll-mode
+	///  datacolor 	 ... 24bit color (as 32 bit integer with leading 0's) used for the dataline
+	///  markercolor ... 24bit color (as 32 bit integer with leading 0's) used for the current position line
 	///  Note: No predefined graph settings are used direct (#define ...)!
 
+
+	// Determine current position (with scroll value)
+	uint16_t curY = gph->y - TFT_cur_ScrollV;
 
 
 	/// Display current DATA as line strip in frame or roll mode
 	EVE_cmd_dl_burst(DL_COLOR_RGB | datacolor);
 	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
 	/// Display graph frame-mode
-	if(graphmode == 0){
+	if(gph->graphmode == 0){
 		// Print values in the order they are stored
-		for (int x_cur = 0; x_cur < size; ++x_cur) {
-			EVE_cmd_dl_burst(VERTEX2F(x + padding + x_cur, y + padding + height - (uint16_t)(( ((double)SBuffer[x_cur]) / ((double)y_max) )*(double)(height)) )); //if(frameover==1) printf("%lf %lf\n", ((((double)(SBuffer[x_cur]))/((double)y_max))*(double)(height)), (double)SBuffer[x]);
+		for (int x_cur = 0; x_cur < buf_size; ++x_cur) {
+			EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + x_cur, curY + gph->padding + gph->height - (uint16_t)(( ((double)buf[x_cur]) / ((double)gph->y_max) )*(double)(gph->height)) )); //if(frameover==1) printf("%lf %lf\n", ((((double)(buf[x_cur]))/((double)gph->y_max))*(double)(gph->height)), (double)buf[gph->x]);
 		}
 	}
 	/// Display graph roll-mode
@@ -723,13 +741,13 @@ void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 		// => Start Arrayindex i at current index and decrement every loop. If i goes below 0, reset to max index and decrement further till
 		//    value before current is hit.
 
-		int16_t i = *SBuffer_curidx;
-		for (int16_t x_cur = size-1; x_cur >= 0; x_cur--) {
+		int16_t i = *buf_curidx;
+		for (int16_t x_cur = buf_size-1; x_cur >= 0; x_cur--) {
 			// if index goes below 0 set to highest buffer index
-			if(i < 0){i = size-1;}
+			if(i < 0){i = buf_size-1;}
 
 			// Send next point for EVE_LINE_STRIP at current x+padding and normalized buffer value
-			EVE_cmd_dl_burst(VERTEX2F(x + padding + x_cur, y + padding + height - (uint16_t)(( ((double)SBuffer[i]) / ((double)y_max) )*(double)(height)) )); 				// EVE_cmd_dl_burst(VERTEX2F(x + padding + x_cur, EVE_VSIZE - ((uint16_t)(SBuffer[i]/y_div) + margin + padding)));
+			EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + x_cur, curY + gph->padding + gph->height - (uint16_t)(( ((double)buf[i]) / ((double)gph->y_max) )*(double)(gph->height)) )); 				// EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + x_cur, EVE_VSIZE - ((uint16_t)(buf[i]/y_div) + margin + gph->padding)));
 
 			// decrement index
 			i--;
@@ -740,11 +758,11 @@ void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 
 
 	/// Draw current POSITION MARKER in frame mode
-	if(graphmode == 0){
-		EVE_cmd_dl_burst(DL_COLOR_RGB | markercolor);
+	if(gph->graphmode == 0){
+		EVE_cmd_dl_burst(DL_COLOR_RGB | 0xff0000);
 		EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
-		EVE_cmd_dl_burst(VERTEX2F(x + padding + *SBuffer_curidx, y + padding - 5 ));
-		EVE_cmd_dl_burst(VERTEX2F(x + padding + *SBuffer_curidx, y + padding + height + 5 ));
+		EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + *buf_curidx, curY + gph->padding - 5 ));
+		EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + *buf_curidx, curY + gph->padding + gph->height + 5 ));
 		EVE_cmd_dl_burst(DL_END);
 	}
 	/////////////// GRAPH END

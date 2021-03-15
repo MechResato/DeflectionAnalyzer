@@ -18,9 +18,10 @@ volatile uint32_t _msCounter;
 volatile uint8_t tft_tick;
 
 /*  MEASUREMENTs */
+typedef uint16_t INPUT_BUFFER_SIZE_t;
 volatile uint32_t MeasurementCounter;
 uint16_t InputBuffer1_idx;
-extern XMC_VADC_RESULT_SIZE_t InputBuffer1[];
+extern INPUT_BUFFER_SIZE_t InputBuffer1[];
 
 /*  MENU AND USER INTERFACE */
 volatile uint8_t InputType;
