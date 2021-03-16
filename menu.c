@@ -77,12 +77,12 @@ menu menu_setup = {
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
-#define M_LINSET_UPPERBOND 30 // deepest coordinate (greatest number) of the header
+#define M_LINSET_UPPERBOND 40 // deepest coordinate (greatest number) of the header
 menu menu_linset = {
 		.index = 3,
 		.headerText = "",
-		.upperBond = M_LINSET_UPPERBOND,
-		.headerLayout = {0, EVE_HSIZE-65, 40, EVE_HSIZE-50},//[Y1,X1,Y2,X2]
+		.upperBond = 0, // removed upper bond because header is written every TFT_display() in this submenu (on top -> no overlay possible)
+		.headerLayout = {0, EVE_HSIZE-65, M_LINSET_UPPERBOND, EVE_HSIZE-50},//[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
@@ -194,7 +194,7 @@ graph gph_monitor = {
 	.y_label = "t",
 	.y_max = 4095.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
 	.amp_max = 10.0, 		// volts - used at print of vertical grid value labels
-	.t_max = 2.2,    		// seconds - used at print of horizontal grid value labels
+	.cx_max = 2.2,    		// seconds - used at print of horizontal grid value labels
 	.h_grid_lines = 4.0, 	// number of grey horizontal grid lines
 	.v_grid_lines = 2.2, 	// number of grey vertical grid lines
 	.graphmode = 0
@@ -331,13 +331,18 @@ control btn_back = {
 	.ignoreScroll = 1
 };
 
-uint16_t buf_linset_idx = 0; // Current index in Buffer
+label lbl_linset = {
+		.x = 20,		.y = 7,
+		.font = 27,		.options = 0,		.text = "Linearisation record - Sensor",
+		.ignoreScroll = 0
+};
+
 uint16_t buf_linset_size = 3; // TODO - see TODO below
-INPUT_BUFFER_SIZE_t buf_linset[3] = { 0, 100, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
+INPUT_BUFFER_SIZE_t buf_linset[3] = { 0, 50, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
 #define G_PADDING 10 //
 graph gph_linset = {
 	.x = 10,		// 10 px from left to leave some room
-	.y = M_LINSET_UPPERBOND + M_UPPER_PAD,		// end of banner plus 10 to leave some room  (e.g. for Y1=66: 66+15=81)
+	.y = 30 + M_UPPER_PAD,		// end of banner plus 10 to leave some room  (e.g. for Y1=66: 66+15=81)
 	.width  = (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10),		// actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
 	.height = (0 + EVE_VSIZE - 15 - (2*G_PADDING) - 10 - (M_ROW_DIST*2)), 	// actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
 	.padding = G_PADDING,
@@ -345,14 +350,17 @@ graph gph_linset = {
 	.y_label = "actual in mm",
 	.y_max = 200.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
 	.amp_max = 200.0, 		// in given unit - used at print of vertical grid value labels
-	.t_max = 4096,    		// seconds - used at print of horizontal grid value labels
+	.cx_initial = 0,
+	.cx_max = 4096,    		// seconds - used at print of horizontal grid value labels
 	.h_grid_lines = 4.0, 	// number of grey horizontal grid lines
 	.v_grid_lines = 2.0, 	// number of grey vertical grid lines
 	.graphmode = 1
 };
 
+uint8_t DP_num = 3;
+uint8_t DP_cur = 1;
 #define STR_DP_MAXLEN 3
-char str_dp[STR_S2_LINSPEC_MAXLEN] = "0";
+char str_dp[STR_S2_LINSPEC_MAXLEN] = "1";
 int8_t str_dp_curLength = 1;
 #define TBX_DP_TAG 24
 textbox tbx_dp = {
@@ -415,6 +423,7 @@ textbox tbx_act = {
 	.labelOffsetX = 60,
 	.labelText = "Actual:",
 	.mytag = TBX_ACT_TAG,
+	.num_src = 0,
 	.text = str_act,
 	.text_maxlen = STR_ACT_MAXLEN,
 	.text_curlen = &str_act_curLength,
@@ -556,8 +565,8 @@ void TFT_display_menu0(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	TFT_GraphData(&gph_monitor, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, GRAPH_DATA1COLOR);
-	//TFT_GraphData(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, tgl_graphMode.state, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
+	TFT_GraphData_Pixel(&gph_monitor, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, GRAPH_DATA1COLOR);
+	//TFT_GraphData_Pixel(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, tgl_graphMode.state, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
 
 }
 void TFT_display_menu1(void){
@@ -617,20 +626,26 @@ void TFT_display_menu_linset(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	TFT_GraphData(&gph_linset, &buf_linset[0], buf_linset_size, &buf_linset_idx, GRAPH_DATA1COLOR);
+	//TFT_GraphData_Pixel(&gph_linset, &buf_linset[0], buf_linset_size, &buf_linset_idx, GRAPH_DATA1COLOR);
+	TFT_GraphData(&gph_linset, &buf_linset[0], buf_linset_size, 2048.0, GRAPH_DATA1COLOR);
 
 	/// Draw Banner and divider line on top
 	TFT_header_static(1, &menu_linset);
 
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, 0);
+	// Button - return from submenu
 	TFT_control(&btn_back);
 
+	// Data point controls
 	TFT_textbox_display(&tbx_dp);
 	TFT_control(&btn_db_last);
 	TFT_control(&btn_db_next);
 	TFT_textbox_display(&tbx_nom);
 	TFT_textbox_display(&tbx_act);
+
+	// Header label
+	TFT_label(1, &lbl_linset);
 
 }
 
@@ -793,6 +808,9 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 	/// ...
 	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
 
+	//
+	uint8_t rewriteValues = 0;
+
 	// Determine which tag was touched
 	switch(tag)
 	{
@@ -806,7 +824,76 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 				TFT_setMenu(menu_setup.index);
 			}
 			break;
-		default:
+		case TBX_DP_TAG:
+			if(*toggle_lock == 0) {
+				printf("Textbox actual\n");
+				*toggle_lock = 42;
+
+				// Activate Keypad and set cursor to end
+				TFT_textbox_setStatus(&tbx_dp, 1, *(tbx_dp.text_curlen));
+			}
 			break;
+		case TBX_ACT_TAG:
+			if(*toggle_lock == 0) {
+				printf("Textbox actual\n");
+				*toggle_lock = 42;
+
+				// Activate Keypad and set cursor to end
+				TFT_textbox_setStatus(&tbx_act, 1, *(tbx_act.text_curlen));
+			}
+			break;
+		case BTN_DP_LAST_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button last\n");
+				*toggle_lock = 42;
+
+				// if the data point isn't at the limits - change current index, set text of DP-textbox and set text of Actual-textbox
+				if(DP_cur > 0){
+					// Decrease currently selected data point index
+					DP_cur--;
+
+					// Let the textboxes be rewritten
+					rewriteValues = 1;
+				}
+			}
+			break;
+		case BTN_DP_NEXT_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button last\n");
+				*toggle_lock = 42;
+
+				// if the data point isn't at the limits - change current index, set text of DP-textbox and set text of Actual-textbox
+				if(DP_cur < 254){
+					// Decrease currently selected data point index
+					DP_cur++;
+
+					// Let the textboxes be rewritten
+					rewriteValues = 1;
+				}
+			}
+			break;
+		default:
+			TFT_textbox_touch(&tbx_act);
+			TFT_textbox_touch(&tbx_dp);
+			break;
+	}
+
+	// IF requested by keypress - rewrite the values referenced with the textboxes DP and actual
+	if(rewriteValues){
+		// Reset trigger and crate a string buffer
+		rewriteValues = 0;
+
+		// Set source pointers
+		//tbx_dp.num_src = &DP_cur;
+		tbx_act.num_src = &buf_linset[DP_cur];
+
+		char str[10];
+		// Set data point text
+		sprintf(&str[0], "%d", DP_cur); //%.2lf
+		strcpy(tbx_dp.text, &str[0]);
+
+		// Set actual value text
+		sprintf(&str[0], "%d", buf_linset[DP_cur]); //%.2lf
+		strcpy(tbx_act.text, &str[0]);
 	}
 }

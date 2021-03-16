@@ -90,6 +90,7 @@ typedef struct {
 	uint16_t labelOffsetX;
 	char* labelText;
 	const int8_t mytag;
+	INPUT_BUFFER_SIZE_t* num_src; 	// A pointer to the numeric source this tbx represets. Set to 0 if tbx has no numeric source (pure text).
 	char* text;
 	int8_t text_maxlen;
 	int8_t* text_curlen;
@@ -116,7 +117,8 @@ typedef struct {
 	char* y_label;
 	double y_max; 	  // maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
 	double amp_max;   // maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% horizontal line
-	double t_max; 	  // maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
+	double cx_initial;// NOT USED YET!
+	double cx_max; 	  // maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
 	double h_grid_lines; 	// number of horizontal grid lines
 	double v_grid_lines; 	// number of vertical grid lines
 	uint8_t graphmode;		// 0 = frame-mode, 1 = roll-mode
@@ -124,8 +126,9 @@ typedef struct {
 	//uint32_t markercolor;	// 24bit color (as 32 bit integer with leading 0's) used for the current position line
 } graph;
 void TFT_GraphStatic(uint8_t burst, graph* gph);
-void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
-//void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines);
+void TFT_GraphData_Pixel(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
+void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, double cx_step, uint32_t datacolor);
+//void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double cx_max, double h_grid_lines, double v_grid_lines);
 //void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, XMC_VADC_RESULT_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor);
 
 

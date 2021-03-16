@@ -68,7 +68,7 @@ static uint32_t mainBgColor = MAIN_BGCOLOR;
 /////////// Scroll feature
 static int16_t TFT_cur_ScrollV = 0;
 static int16_t TFT_last_ScrollV = 0;
-static int16_t TFT_UpperBond = EVE_VSIZE; 	// Defines up to which point elements are displayed. Needed to not scroll elements from main area into header or similar. Set by TFT_header, used by all element display functions.
+static int16_t TFT_UpperBond = 0; 	// Defines up to which point elements are displayed. Needed to not scroll elements from main area into header or similar. Set by TFT_header, used by all element display functions.
 
 
 
@@ -165,12 +165,22 @@ void str_insert(char* target, int8_t* len, char ch, int8_t pos){
 }
 
 void TFT_setMenu(uint8_t idx){
-	// Set upper bond
-	TFT_UpperBond = Menu_Objects[idx]->upperBond;
-	//if(keypadActive) keypad_close();
 
+
+	// If the menu changed - reset features
+	if(keypadActive && (TFT_cur_MenuIdx != TFT_last_MenuIdx)){
+		// Set upper bond
+		TFT_UpperBond = Menu_Objects[idx]->upperBond;
+
+		// Close keypad if necessary
+		keypad_close();
+
+		// Reset scroll
+		TFT_cur_ScrollV = 0;
+	}
+
+	// Set new index (used by all function pointers and menu based objects)
 	TFT_cur_MenuIdx = idx;
-
 }
 
 void TFT_setColor(uint8_t burst, uint32_t textColor, uint32_t fgColor, uint32_t bgColor, uint32_t gradColor){
@@ -557,6 +567,11 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 		printf("activate tbx\n");
 	}
 	else{
+		// If a numeric source is given, write the text back to source
+		if(tbx->num_src != 0){
+			*tbx->num_src = (INPUT_BUFFER_SIZE_t)strtod(tbx->text, 0);
+		}
+
 		// Reset vertical scroll to normal
 		TFT_cur_ScrollV = 0;
 		tbx->active = 0;
@@ -572,7 +587,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 
 
 //void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx);
-//void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double t_max, double h_grid_lines, double v_grid_lines){
+//void TFT_GraphStatic(uint8_t burst, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double amp_max, double cx_max, double h_grid_lines, double v_grid_lines){
 void TFT_GraphStatic(uint8_t burst, graph* gph){
 	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
@@ -583,7 +598,7 @@ void TFT_GraphStatic(uint8_t burst, graph* gph){
 	///  height	... height of the actual graph data area in full Pixels
 	///  padding ... clearance from the outer corners (x,y) to the axes
 	///  amp_max ... maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% horizontal line
-	///  t_max 	 ... maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
+	///  cx_max 	 ... maximum represented value of time (e.g. 2.2 Seconds), will be used at 100% horizontal line
 	///  h_grid_lines ... number of horizontal grid lines
 	///  v_grid_lines ... number of vertical grid lines
 	///
@@ -652,10 +667,10 @@ void TFT_GraphStatic(uint8_t burst, graph* gph){
 
 	/// Grid VALUES
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
-	// vertical grid (time)
+	// vertical grid (x)
 	for(int i=1; i<=(int)ceil(gph->v_grid_lines); i++){ // "ceil" and "i-1" at val -> print also the 0 value
 		// Calc time at current vertical line
-		double val = (gph->t_max/gph->v_grid_lines*(double)(i-1));
+		double val = (gph->cx_max/gph->v_grid_lines*(double)(i-1));
 
 		// If its a pure integer write it as number, else convert and write it to string
 		if((val - (double)((uint32_t)val)) == 0){ //val % 1.0 == 0
@@ -667,7 +682,7 @@ void TFT_GraphStatic(uint8_t burst, graph* gph){
 			(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding + (uint16_t)(widthPerSection*(double)(i-1)) + h_grid_lbl_comp_x, curY + gph->height + h_grid_lbl_comp_y, grid_lbl_txt_size, 0, buffer);
 		}
 	}
-	// horizontal grid (amplitude)
+	// horizontal grid (y)
 	//(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
 	for(int i=1; i<=(int)floor(gph->h_grid_lines); i++){  // "floor" and "i" at val -> don't print the 0 value
 		// Calc amplitude at current horizontal line
@@ -702,8 +717,9 @@ void TFT_GraphStatic(uint8_t burst, graph* gph){
 }
 
 //void TFT_GraphData(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t padding, double y_max, INPUT_BUFFER_SIZE_t SBuffer[], uint16_t size, uint16_t *SBuffer_curidx, uint8_t graphmode, uint32_t datacolor, uint32_t markercolor){
-void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
+void TFT_GraphData_Pixel(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
+	/// Every data-point is assumed to be at one pixel of the screen. Make this as wide as there are elements in the data-array.
 	///
 	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
 	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
@@ -770,6 +786,55 @@ void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uin
 }
 
 
+void TFT_GraphData(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, double cx_step, uint32_t datacolor){
+	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
+	///
+	///
+	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
+	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
+	///  width	... width of the actual graph data area in full Pixels
+	///  height	... height of the actual graph data area in full Pixels
+	///  padding	 ... clearance from the outer corners (x,y) to the axes
+	///  y_max   	 ... maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
+	///  y_buf[] 		 ... Array of data values
+	///  y_buf_size	 ... size of array of data values
+	///  graphmode 	 ... 0 = frame-mode, 1 = roll-mode
+	///  datacolor 	 ... 24bit color (as 32 bit integer with leading 0's) used for the dataline
+	///  markercolor ... 24bit color (as 32 bit integer with leading 0's) used for the current position line
+	///  Note: No predefined graph settings are used direct (#define ...)!
+
+
+	// Determine current position (with scroll value)
+	uint16_t curY = gph->y - TFT_cur_ScrollV;
+
+
+	// Convert coordinate x_step to actual pixels per step
+	uint16_t cx_step_px = gph->width / (gph->cx_max - gph->cx_initial) * cx_step;
+
+	/// Display current DATA as line strip in frame or roll mode
+	EVE_cmd_dl_burst(DL_COLOR_RGB | datacolor);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	/// Display graph
+	// Print values in the order they are stored
+	//for (int x_cur = 0; x_cur < y_buf_size; ++x_cur) {
+	uint16_t x_cur = 0;
+	for (int i = 0; i < cy_buf_size; i++) {
+		// Write point
+		EVE_cmd_dl_burst(
+			VERTEX2F(
+				gph->x + gph->padding + x_cur,
+				  curY + gph->padding + gph->height - (uint16_t)(( ((double)cy_buf[i]) / ((double)gph->y_max) )*(double)(gph->height))
+			)
+		);
+		// Add a step in x direction
+		x_cur += cx_step_px;
+	}
+
+	// End EVE_LINE_STRIP and therefore DATA
+	EVE_cmd_dl_burst(DL_END);
+	/////////////// GRAPH END
+
+}
 
 void touch_calibrate(void) {
 	/// Sends pre-recorded touch calibration values. Made for EVE_RiTFT43. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
