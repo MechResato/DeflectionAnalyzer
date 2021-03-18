@@ -316,8 +316,7 @@ label lbl_linset = {
 		.ignoreScroll = 0
 };
 
-uint16_t buf_linset_size = 3; // TODO - see TODO below
-INPUT_BUFFER_SIZE_t buf_linset[3] = { 0, 50, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
+
 #define G_PADDING 10 //
 graph gph_linset = {
 	.x = 10,		// 10 px from left to leave some room
@@ -334,26 +333,6 @@ graph gph_linset = {
 	.h_grid_lines = 4.0, 	// number of grey horizontal grid lines
 	.v_grid_lines = 2.0, 	// number of grey vertical grid lines
 	.graphmode = 1
-};
-
-uint8_t DP_num = 3;
-uint8_t DP_cur = 1;
-#define STR_DP_MAXLEN 3
-char str_dp[STR_S2_LINSPEC_MAXLEN] = "1";
-int8_t str_dp_curLength = 1;
-#define TBX_DP_TAG 24
-textbox tbx_dp = {
-	.x = M_COL_1,
-	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.width = 36,
-	.labelOffsetX = 75,
-	.labelText = "Data Point:",
-	.mytag = TBX_DP_TAG,
-	.text = str_dp,
-	.text_maxlen = STR_DP_MAXLEN,
-	.text_curlen = &str_dp_curLength,
-	.keypadType = Numeric,
-	.active = 0
 };
 
 #define BTN_DP_LAST_TAG 11
@@ -373,6 +352,32 @@ control btn_db_next = {
 	.text = ">",
 	.controlType = Button,
 	.ignoreScroll = 0
+};
+
+//double buf_acty_linset[3] = { 0, 50, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
+uint8_t DP_size = 3;
+uint8_t DP_cur = 0;
+uint8_t DP_last = 254;
+
+double* buf_acty_linset;
+double* buf_nomx_linset;
+
+#define STR_DP_MAXLEN 3
+char str_dp[STR_S2_LINSPEC_MAXLEN] = "0";
+int8_t str_dp_curLength = 1;
+#define TBX_DP_TAG 24
+textbox tbx_dp = {
+	.x = M_COL_1,
+	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.width = 36,
+	.labelOffsetX = 75,
+	.labelText = "Data Point:",
+	.mytag = TBX_DP_TAG,
+	.text = str_dp,
+	.text_maxlen = STR_DP_MAXLEN,
+	.text_curlen = &str_dp_curLength,
+	.keypadType = Numeric,
+	.active = 0
 };
 #define STR_NOM_MAXLEN 10
 char str_nom[STR_NOM_MAXLEN] = "4095";
@@ -410,8 +415,42 @@ textbox tbx_act = {
 	.active = 0
 };
 
-
 /////////// MENU LINSET END ---
+
+void prepareLinSet(){
+	///
+
+	// Get current settings from spec file
+
+	// Allocate and set the y-value array (buf_acty_linset)
+	DP_size = 3;
+	buf_acty_linset = malloc(DP_size*sizeof(double));
+	buf_acty_linset[0] = 11.0;
+	buf_acty_linset[1] = 100.0;
+	buf_acty_linset[2] = 200.0;
+
+	// Allocate and set the x-value array (buf_nomx_linset)
+	DP_size = 3;
+	buf_nomx_linset = malloc(DP_size*sizeof(double));
+	buf_nomx_linset[0] = 0.0;
+	buf_nomx_linset[1] = 2048.0;
+	buf_nomx_linset[2] = 4096.0;
+
+	// Set current DP
+	//tbx_dp.num_src = &buf_acty_linset[DP_cur];
+	//*tbx_dp.num_src = 0;
+	//*tbx_dp.text = "0";
+
+	// Set current actual value
+	tbx_act.num_src = &buf_acty_linset[0];
+	char str[10];
+	sprintf(&str[0], "%.2lf", buf_acty_linset[0]); //%.2lf
+	strcpy(tbx_act.text, &str[0]);
+	*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
+
+	//printf("prep y1: %lf", buf_acty_linset[1]);
+}
+
 
 void TFT_display_get_values(void){
 	// Get size of last display list to be printed on screen (section "Debug Values")
@@ -604,7 +643,8 @@ void TFT_display_menu_linset(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	TFT_graph_stepdata(&gph_linset, &buf_linset[0], buf_linset_size, 2048.0, GRAPH_DATA1COLOR);
+	//TFT_graph_stepdata(&gph_linset, &buf_acty_linset[0], DP_size, 2048.0, GRAPH_DATA1COLOR);
+	TFT_graph_XYdata(&gph_linset, &buf_acty_linset[0], DP_size, &buf_nomx_linset[0], str_nom_curLength, GRAPH_DATA1COLOR);
 
 	/// Draw Banner and divider line on top
 	TFT_header(1, &menu_linset);
@@ -741,8 +781,6 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 
 				// Activate Keypad and set cursor to end
 				TFT_textbox_setStatus(&tbx_filename, 1, *(tbx_filename.text_curlen)-4);
-				//keypad_open(20, Filename);
-				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
 		case TBX_SENSOR1_TAG:
@@ -750,16 +788,17 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				printf("Textbox S1\n");
 				*toggle_lock = 42;
 
-				// Activate Keypad and set cursor to end
+				// Activate textbox/keypad and set cursor to end
 				TFT_textbox_setStatus(&tbx_sensor1, 1, *(tbx_sensor1.text_curlen));
-				//keypad_open(20, Filename);
-				//TFT_textbox_setCursor(str_filename_curLength-4, str_filename_curLength);
 			}
 			break;
 		case BTN_LINSENSOR1_TAG:
 			if(*toggle_lock == 0) {
 				printf("Button LinS1\n");
 				*toggle_lock = 42;
+
+				// Prepare linSet menu for current sensor
+				prepareLinSet();
 
 				// Change menu
 				TFT_setMenu(menu_linset.index);
@@ -785,7 +824,7 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
 	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
-	/// ToDo: This menu is not finished! (Dynamic allocation ofdatapoints array, ...)
+	/// ToDo: This menu is not finished! (dynamic allocation of data points array, ...)
 
 	//
 	uint8_t rewriteValues = 0;
@@ -864,7 +903,7 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 
 		// Set source pointers
 		//tbx_dp.num_src = &DP_cur;
-		tbx_act.num_src = &buf_linset[DP_cur];
+		tbx_act.num_src = &buf_acty_linset[DP_cur];
 
 		char str[10];
 		// Set data point text and length
@@ -873,7 +912,7 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 		*tbx_dp.text_curlen = strlen(&tbx_dp.text[0]);
 
 		// Set actual value text and length
-		sprintf(&str[0], "%d", buf_linset[DP_cur]); //%.2lf
+		sprintf(&str[0], "%.2lf", buf_acty_linset[DP_cur]); //%.2lf
 		strcpy(tbx_act.text, &str[0]);
 		*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
 	}

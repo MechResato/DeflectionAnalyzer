@@ -100,7 +100,7 @@ typedef struct {
 	uint16_t labelOffsetX;	// Distance between x and the actual start of the textbox (space needed for label).
 	char* labelText;		// Text of the preceding label.
 	const int8_t mytag;		// The touch tag used for the textbox.
-	INPUT_BUFFER_SIZE_t* num_src; 	// A pointer to the numeric source this textbox represents. Set to 0 if tbx has no numeric source (pure text).
+	double* num_src; 	// A pointer to the numeric source this textbox represents. Set to 0 if tbx has no numeric source (pure text).
 	char* text;				// Pointer to the text buffer or value the textbox is linked to. Must be set!
 	int8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
 	int8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
@@ -136,7 +136,7 @@ typedef struct {
 void TFT_graph_static(uint8_t burst, graph* gph);
 void TFT_graph_pixeldata(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
 void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, double cx_step, uint32_t datacolor);
-
+void TFT_graph_XYdata(graph* gph, double cy_buf[], uint16_t cy_buf_size, double cx_buf[], uint16_t cx_buf_size, uint32_t datacolor);
 
 // General
 uint8_t TFT_init(void);

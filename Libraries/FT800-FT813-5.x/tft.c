@@ -864,6 +864,58 @@ void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_bu
 
 }
 
+void TFT_graph_XYdata(graph* gph, double cy_buf[], uint16_t cy_buf_size, double cx_buf[], uint16_t cx_buf_size, uint32_t datacolor){
+	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
+	///
+	///
+	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
+	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
+	///  width	... width of the actual graph data area in full Pixels
+	///  height	... height of the actual graph data area in full Pixels
+	///  padding	 ... clearance from the outer corners (x,y) to the axes
+	///  y_max   	 ... maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
+	///  y_buf[] 	 ... Array of data values
+	///  y_buf_size	 ... size of array of data values
+	///  graphmode 	 ... 0 = frame-mode, 1 = roll-mode
+	///  datacolor 	 ... 24bit color (as 32 bit integer with leading 0's) used for the dataline
+	///  markercolor ... 24bit color (as 32 bit integer with leading 0's) used for the current position line
+	///  Note: No predefined graph settings are used direct (#define ...)!
+
+
+	// Determine current position (with scroll value)
+	uint16_t curY = gph->y - TFT_cur_ScrollV;
+
+
+	// Convert coordinate x_step to actual pixels per step
+	//uint16_t cx_step_px = gph->width / (gph->cx_max - gph->cx_initial) * cx_step;
+
+	/// Display current DATA as line strip in frame or roll mode
+	EVE_cmd_dl_burst(DL_COLOR_RGB | datacolor);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	/// Display graph
+	// Print values in the order they are stored
+	uint16_t cx_cur = 0;
+	uint16_t cy_cur = 0;
+	for (int i = 0; i < cy_buf_size; i++) {
+		//
+		cx_cur = gph->width / (gph->cx_max - gph->cx_initial) * cx_buf[i];
+		cy_cur = gph->height - (uint16_t)(( ((double)cy_buf[i]) / ((double)gph->y_max) )*(double)(gph->height));
+
+		// Write point
+		EVE_cmd_dl_burst(
+			VERTEX2F(
+				gph->x + gph->padding + cx_cur,
+				  curY + gph->padding + cy_cur
+			)
+		);
+	}
+
+	// End EVE_LINE_STRIP and therefore DATA
+	EVE_cmd_dl_burst(DL_END);
+	/////////////// GRAPH END
+
+}
+
 
 
 void touch_calibrate(uint8_t startCalibrate){
