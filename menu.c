@@ -125,8 +125,12 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 
 
 
-/////////// MENU 0 MONITORING
 
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Monitoring Elements         -----------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define BTN_INPUT_TAG 13
 control btn_input = {
 	.x = 180,		.y = 15,
@@ -160,7 +164,6 @@ label lbl_sensor = {
 };
 
 
-// Graph Definitions
 // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be to fill the whole main area
 #define G_PADDING 10 //
 graph gph_monitor = {
@@ -178,12 +181,16 @@ graph gph_monitor = {
 	.v_grid_lines = 2.2, 	// number of grey vertical grid lines
 	.graphmode = 0
 };
-// Graph Definitions END
-
-/////////// MENU 0 MONITORING END ---
 
 
-/////////// MENU 1 DASHBOARD
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Dashboard Elements         -----------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define BTN_STARTREC_TAG 10
 control btn_startRec = {
 	.x = M_COL_3,	.y = 15,
@@ -193,10 +200,16 @@ control btn_startRec = {
 	.controlType = Button,
 	.ignoreScroll = 1
 };
-/////////// MENU 1 DASHBOARD END ---
 
 
-/////////// MENU 3 SETUP
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Setup Elements         -----------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 label lbl_recording = {
 		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND,
 		.font = 27,		.options = 0,		.text = "Recording",
@@ -218,7 +231,8 @@ textbox tbx_filename = {
 	.text_maxlen = STR_FILENAME_MAXLEN,
 	.text_curlen = &str_filename_curLength,
 	.keypadType = Filename,
-	.active = 0
+	.active = 0,
+	.srcType = 0
 };
 
 label lbl_linearisation = {
@@ -242,7 +256,8 @@ textbox tbx_sensor1 = {
 	.text_maxlen = STR_S1_LINSPEC_MAXLEN,
 	.text_curlen = &str_s1_linspec_curLength,
 	.keypadType = Standard,
-	.active = 0
+	.active = 0,
+	.srcType = 0
 };
 #define BTN_LINSENSOR1_TAG 22
 control btn_linSensor1 = {
@@ -269,7 +284,8 @@ textbox tbx_sensor2 = {
 	.text_maxlen = STR_S2_LINSPEC_MAXLEN,
 	.text_curlen = &str_s2_linspec_curLength,
 	.keypadType = Standard,
-	.active = 0
+	.active = 0,
+	.srcType = 0
 };
 #define BTN_LINSENSOR2_TAG 24
 control btn_linSensor2 = {
@@ -297,9 +313,17 @@ control btn_dimmmer = {
 	.ignoreScroll = 0
 };
 
-/////////// MENU 3 SETUP END ---
 
-/////////// MENU LINSET
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		LinSet Elements         -----------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void linset_prepare(INPUT_BUFFER_SIZE_t* sensBuffer, uint16_t* sensBuffer_curIdx);
+void linset_setEditMode(uint8_t editMode);
 #define BTN_BACK_TAG 10
 control btn_back = {
 	.x = EVE_HSIZE-45,	.y = 5,
@@ -337,7 +361,7 @@ graph gph_linset = {
 
 #define BTN_DP_LAST_TAG 11
 control btn_db_last = {
-	.x = M_COL_1 + 75 + 36 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.x = (M_COL_1/2) + 75 + 36 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.w0 = 25				  ,	.h0 = 30,
 	.mytag = BTN_DP_LAST_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "<",
@@ -346,7 +370,7 @@ control btn_db_last = {
 };
 #define BTN_DP_NEXT_TAG 12
 control btn_db_next = {
-	.x = M_COL_1 + 75 + 36 + 1 + 25 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.w0 = 25						   , 	.h0 = 30,
 	.mytag = BTN_DP_NEXT_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = ">",
@@ -354,20 +378,23 @@ control btn_db_next = {
 	.ignoreScroll = 0
 };
 
-//double buf_acty_linset[3] = { 0, 50, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
+//float buf_acty_linset[3] = { 0, 50, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
 uint8_t DP_size = 3;
 uint8_t DP_cur = 0;
-uint8_t DP_last = 254;
+//uint8_t DP_last = 254;
 
-double* buf_acty_linset;
-double* buf_nomx_linset;
+float* buf_acty_linset;
+INPUT_BUFFER_SIZE_t* buf_nomx_linset;
+
+INPUT_BUFFER_SIZE_t* linset_sensBuffer;
+uint16_t* linset_sensBuffer_curIdx;
 
 #define STR_DP_MAXLEN 3
 char str_dp[STR_S2_LINSPEC_MAXLEN] = "0";
 int8_t str_dp_curLength = 1;
 #define TBX_DP_TAG 24
 textbox tbx_dp = {
-	.x = M_COL_1,
+	.x = (M_COL_1/2),
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.width = 36,
 	.labelOffsetX = 75,
@@ -377,79 +404,79 @@ textbox tbx_dp = {
 	.text_maxlen = STR_DP_MAXLEN,
 	.text_curlen = &str_dp_curLength,
 	.keypadType = Numeric,
-	.active = 0
+	.active = 0,
+	.srcType = 0
 };
 #define STR_NOM_MAXLEN 10
 char str_nom[STR_NOM_MAXLEN] = "4095";
 int8_t str_nom_curLength = 4;
 //#define TBX_NOM_TAG 0
 textbox tbx_nom = {
-	.x = M_COL_1 + 75 + 36 + 1 + 25 + 1 + 30 + 10,
+	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.width = 50,
-	.labelOffsetX = 60,
+	.labelOffsetX = 58,
 	.labelText = "Nominal:",
 	.mytag = 0,
 	.text = str_nom,
 	.text_maxlen = STR_NOM_MAXLEN,
 	.text_curlen = &str_nom_curLength,
 	.keypadType = Numeric,
-	.active = 0
+	.active = 0,
+	.srcType = 1,
+	.src.intSrc = 0,
+	//.srcOffset = 0
 };
 #define STR_ACT_MAXLEN 10
 char str_act[STR_ACT_MAXLEN] = "";
 int8_t str_act_curLength = 0;
 #define TBX_ACT_TAG 26
 textbox tbx_act = {
-	.x = M_COL_1 + 75 + 36 + 1 + 25 + 1 + 30 + 10 + 1 + 120,
+	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.width = 60,
-	.labelOffsetX = 60,
+	.labelOffsetX = 50,
 	.labelText = "Actual:",
-	.mytag = TBX_ACT_TAG,
-	.num_src = 0,
+	.mytag = 0,
 	.text = str_act,
 	.text_maxlen = STR_ACT_MAXLEN,
 	.text_curlen = &str_act_curLength,
 	.keypadType = Numeric,
-	.active = 0
+	.active = 0,
+	.srcType = 2,
+	.src.floatSrc = 0,
+	//.srcOffset = 0
+};
+#define BTN_DP_SETCHANGE_TAG 13
+control btn_setchange = {
+	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8 + 50 + 60 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 50, 	.h0 = 30,
+	.mytag = BTN_DP_SETCHANGE_TAG,	.font = 26, .options = 0, .state = 0,
+	.text = "Change",
+	.controlType = Button,
+	.ignoreScroll = 0
 };
 
-/////////// MENU LINSET END ---
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//		End of Elements definition         ----------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void prepareLinSet(){
-	///
 
-	// Get current settings from spec file
 
-	// Allocate and set the y-value array (buf_acty_linset)
-	DP_size = 3;
-	buf_acty_linset = malloc(DP_size*sizeof(double));
-	buf_acty_linset[0] = 11.0;
-	buf_acty_linset[1] = 100.0;
-	buf_acty_linset[2] = 200.0;
 
-	// Allocate and set the x-value array (buf_nomx_linset)
-	DP_size = 3;
-	buf_nomx_linset = malloc(DP_size*sizeof(double));
-	buf_nomx_linset[0] = 0.0;
-	buf_nomx_linset[1] = 2048.0;
-	buf_nomx_linset[2] = 4096.0;
 
-	// Set current DP
-	//tbx_dp.num_src = &buf_acty_linset[DP_cur];
-	//*tbx_dp.num_src = 0;
-	//*tbx_dp.text = "0";
 
-	// Set current actual value
-	tbx_act.num_src = &buf_acty_linset[0];
-	char str[10];
-	sprintf(&str[0], "%.2lf", buf_acty_linset[0]); //%.2lf
-	strcpy(tbx_act.text, &str[0]);
-	*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
 
-	//printf("prep y1: %lf", buf_acty_linset[1]);
-}
+
+
+
+
+
+
+
+
+
+
 
 
 void TFT_display_get_values(void){
@@ -458,6 +485,14 @@ void TFT_display_get_values(void){
 	tracker = EVE_memRead32(REG_TRACKER);
 }
 
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Monitoring          --------------------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void TFT_display_static_menu0(void){
 	// Set configuration for current menu
 	TFT_setMenu(0);
@@ -484,61 +519,6 @@ void TFT_display_static_menu0(void){
 
 
 }
-void TFT_display_static_menu1(void){
-	// Set configuration for current menu
-	TFT_setMenu(1);
-
-	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_1);
-
-	// Add the static text
-	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
-	EVE_cmd_text_burst(360, 10, 26, 0, "X:");
-	EVE_cmd_text_burst(360, 25, 26, 0, "Y:");
-
-	// Textbox Filename
-	//TFT_textbox_static(0, 20, 70, 190, 20, "test", 50);
-}
-void TFT_display_static_menu_setup(void){
-	// Set configuration for current menu
-	TFT_setMenu(2);
-
-	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_setup);
-
-	// Set Color
-	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-
-	/// Recording section
-	TFT_label(1, &lbl_recording);
-	// Filename
-	TFT_textbox_static(1, &tbx_filename);
-
-	/// Linearisation section
-	TFT_label(1, &lbl_linearisation);
-	TFT_textbox_static(1, &tbx_sensor1);
-	TFT_textbox_static(1, &tbx_sensor2);
-
-	/// Backlight
-	TFT_label(1, &lbl_backlight);
-}
-void TFT_display_static_menu_linset(void){
-	// Set configuration for current menu
-	TFT_setMenu(3);
-
-	// Set Color
-	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-
-	/// Write the static part of the Graph to the display list
-	TFT_graph_static(1, &gph_linset);
-
-	TFT_textbox_static(1, &tbx_dp);
-	TFT_textbox_static(1, &tbx_nom);
-	TFT_textbox_static(1, &tbx_act);
-}
-
-
 void TFT_display_menu0(void){
 	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
 
@@ -574,7 +554,7 @@ void TFT_display_menu0(void){
 
 	// Write current sensor value with unit
 	char buffer[32]; // buffe.ouble to string conversion
-	sprintf(buffer, "%.2lf", (gph_monitor.amp_max/gph_monitor.y_max)*InputBuffer1[InputBuffer1_idx]); // double to string conversion
+	sprintf(buffer, "%.2lf", (gph_monitor.amp_max/gph_monitor.y_max)*InputBuffer1[InputBuffer1_idx]); // float to string conversion
 	strcat(buffer, " V"); //unit_Sensor
 	EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
 
@@ -586,87 +566,6 @@ void TFT_display_menu0(void){
 	//TFT_graph_pixeldata(G_x, G_y, G_width, G_height, G_PADDING, G_y_max, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, tgl_graphMode.state, GRAPH_DATA1COLOR, GRAPH_POSMARKCOLOR);
 
 }
-void TFT_display_menu1(void){
-	/// Test menu
-
-	/////////////// Display BUTTONS and Toggles
-	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	// Button start recording
-	TFT_control(&btn_startRec);
-
-
-	TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
-	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
-	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
-
-	//str_filename[1] = 'a';
-	//TFT_textbox_display(20, 70, 20, str_filename);
-
-	//	char c [] = "0123456789";
-	//
-	//	c[0] = (char)120;
-	//	c[1] = (char)121;
-	//	c[2] = (char)122;
-	//	c[3] = (char)123;
-	//	c[4] = (char)124;
-	//	c[5] = (char)125;
-	//	c[6] = (char)126;
-	//	c[7] = (char)127;
-	//	c[8] = (char)128;
-	//	c[9] = (char)129;
-	//	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
-
-
-}
-void TFT_display_menu_setup(void){
-	///
-
-
-	// Set button color for header
-	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	TFT_control(&btn_linSensor1);
-	TFT_control(&btn_linSensor2);
-	TFT_control(&btn_dimmmer);
-
-	// Set Color
-	TFT_setColor(1, BLACK, -1, -1, -1);
-
-	// Filename textbox
-	//TFT_textbox_display(20, 70, 20, str_filename);
-	TFT_textbox_display(&tbx_filename);
-	TFT_textbox_display(&tbx_sensor1);
-	TFT_textbox_display(&tbx_sensor2);
-}
-void TFT_display_menu_linset(void){
-	///
-
-	/////////////// GRAPH
-	///// Print dynamic part of the Graph (data & marker)
-	//TFT_graph_stepdata(&gph_linset, &buf_acty_linset[0], DP_size, 2048.0, GRAPH_DATA1COLOR);
-	TFT_graph_XYdata(&gph_linset, &buf_acty_linset[0], DP_size, &buf_nomx_linset[0], str_nom_curLength, GRAPH_DATA1COLOR);
-
-	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_linset);
-
-	// Set button color for header
-	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	// Button - return from submenu
-	TFT_control(&btn_back);
-
-	// Data point controls
-	TFT_textbox_display(&tbx_dp);
-	TFT_control(&btn_db_last);
-	TFT_control(&btn_db_next);
-	TFT_textbox_display(&tbx_nom);
-	TFT_textbox_display(&tbx_act);
-
-	// Header label
-	TFT_label(1, &lbl_linset);
-
-}
-
-
 void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
 	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
@@ -709,6 +608,61 @@ void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 			break;
 	}
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Dashboard          --------------------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void TFT_display_static_menu1(void){
+	// Set configuration for current menu
+	TFT_setMenu(1);
+
+	/// Draw Banner and divider line on top
+	TFT_header(1, &menu_1);
+
+	// Add the static text
+	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
+	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	EVE_cmd_text_burst(360, 10, 26, 0, "X:");
+	EVE_cmd_text_burst(360, 25, 26, 0, "Y:");
+
+	// Textbox Filename
+	//TFT_textbox_static(0, 20, 70, 190, 20, "test", 50);
+}
+void TFT_display_menu1(void){
+	/// Test menu
+
+	/////////////// Display BUTTONS and Toggles
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	// Button start recording
+	TFT_control(&btn_startRec);
+
+
+	TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
+	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
+	//EVE_cmd_text_var_burst(470, 25, 26, EVE_OPT_RIGHTX, "%d", swipeDistance_Y);
+
+	//str_filename[1] = 'a';
+	//TFT_textbox_display(20, 70, 20, str_filename);
+
+	//	char c [] = "0123456789";
+	//
+	//	c[0] = (char)120;
+	//	c[1] = (char)121;
+	//	c[2] = (char)122;
+	//	c[3] = (char)123;
+	//	c[4] = (char)124;
+	//	c[5] = (char)125;
+	//	c[6] = (char)126;
+	//	c[7] = (char)127;
+	//	c[8] = (char)128;
+	//	c[9] = (char)129;
+	//	EVE_cmd_keys_burst(2, EVE_VSIZE-2-21-(24*6), EVE_HSIZE-4, 21, 17, 0, &c);
+
+
+}
 void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
 	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
@@ -750,6 +704,54 @@ void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 	//		swipeDetect = None;
 	//}
 
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Setup              --------------------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void TFT_display_static_menu_setup(void){
+	// Set configuration for current menu
+	TFT_setMenu(2);
+
+	/// Draw Banner and divider line on top
+	TFT_header(1, &menu_setup);
+
+	// Set Color
+	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+
+	/// Recording section
+	TFT_label(1, &lbl_recording);
+	// Filename
+	TFT_textbox_static(1, &tbx_filename);
+
+	/// Linearisation section
+	TFT_label(1, &lbl_linearisation);
+	TFT_textbox_static(1, &tbx_sensor1);
+	TFT_textbox_static(1, &tbx_sensor2);
+
+	/// Backlight
+	TFT_label(1, &lbl_backlight);
+}
+void TFT_display_menu_setup(void){
+	///
+
+
+	// Set button color for header
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	TFT_control(&btn_linSensor1);
+	TFT_control(&btn_linSensor2);
+	TFT_control(&btn_dimmmer);
+
+	// Set Color
+	TFT_setColor(1, BLACK, -1, -1, -1);
+
+	// Filename textbox
+	//TFT_textbox_display(20, 70, 20, str_filename);
+	TFT_textbox_display(&tbx_filename);
+	TFT_textbox_display(&tbx_sensor1);
+	TFT_textbox_display(&tbx_sensor2);
 }
 void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
@@ -798,7 +800,7 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// Prepare linSet menu for current sensor
-				prepareLinSet();
+				linset_prepare(&InputBuffer1[0], &InputBuffer1_idx);
 
 				// Change menu
 				TFT_setMenu(menu_linset.index);
@@ -821,6 +823,199 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 			break;
 	}
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		LinSet             --------------------------------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void linset_prepare(INPUT_BUFFER_SIZE_t* sensBuffer, uint16_t* sensBuffer_curIdx){
+	///
+
+	// Set pointer to referenced Sensor buffer
+	linset_sensBuffer = sensBuffer;
+	linset_sensBuffer_curIdx = sensBuffer_curIdx;
+
+	// Check if spec file exists and load current settings if possible
+	// ...
+
+	// Allocate and set the y-value array (buf_acty_linset)
+	DP_size = 3;
+	buf_acty_linset = malloc(DP_size*sizeof(float));
+	buf_acty_linset[0] = 11.0;
+	buf_acty_linset[1] = 100.0;
+	buf_acty_linset[2] = 200.0;
+
+	// Allocate and set the x-value array (buf_nomx_linset)
+	DP_size = 3;
+	buf_nomx_linset = malloc(DP_size*sizeof(INPUT_BUFFER_SIZE_t));
+	buf_nomx_linset[0] = 10.0;
+	buf_nomx_linset[1] = 2048.0;
+	buf_nomx_linset[2] = 4096.0;
+
+	// Set current DP
+	//*tbx_dp.num_src = 0;
+	//*tbx_dp.text = "0";
+
+	char str[10];
+
+	// Set actual value of current data point
+	tbx_act.src.floatSrc = &buf_acty_linset[0];
+	sprintf(&str[0], "%.2f", buf_acty_linset[0]); //%.2lf
+	strcpy(tbx_act.text, &str[0]);
+	*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
+
+	// Set nominal value of current data point
+	tbx_nom.src.intSrc = &buf_nomx_linset[0];
+	sprintf(&str[0], "%d", buf_nomx_linset[0]); //%.2lf
+	strcpy(tbx_nom.text, &str[0]);
+	*tbx_nom.text_curlen = strlen(&tbx_nom.text[0]);
+
+	//printf("prep y1: %lf", buf_acty_linset[1]);
+}
+void linset_setEditMode(uint8_t editMode){
+
+	// Set to edit mode - activate textbox for actual value and deactivate data point selection
+	if(editMode == 1){
+		// Change button appearance and activate textbox
+		btn_setchange.state = EVE_OPT_FLAT;
+		btn_setchange.text = "Save";
+		tbx_act.mytag = TBX_ACT_TAG;
+
+		// Link nominal value from current sensor to nominal textbox
+		//tbx_nom.src.intSrc = linset_sensBuffer;
+		//tbx_nom.src.intSrc = linset_sensBuffer[*linset_sensBuffer_curIdx];
+
+		// Deactivate data point selector buttons and textbox (read-only)
+		btn_db_last.mytag = 0;
+		btn_db_next.mytag = 0;
+		tbx_dp.mytag = 0;
+	}
+	// Set to view mode - deactivate textbox for actual value and activate data point selection again
+	else{
+		btn_setchange.state = 0;
+		btn_setchange.text = "Change";
+		tbx_act.mytag = 0;
+
+		// Link nominal value from data point to nominal textbox
+		//tbx_nom.src.intSrc = &buf_nomx_linset[0];
+
+		// Activate data point selector buttons and textbox (read/write)
+		btn_db_last.mytag = BTN_DP_LAST_TAG;
+		btn_db_next.mytag = BTN_DP_NEXT_TAG;
+		tbx_dp.mytag = TBX_DP_TAG;
+	}
+
+}
+
+
+uint8_t menu_shelf_datapoint(INPUT_BUFFER_SIZE_t* x_buf, float* y_buf, uint8_t buf_size, uint8_t buf_shelfIdx){
+
+
+	INPUT_BUFFER_SIZE_t curX = x_buf[buf_shelfIdx];
+
+	// Get target position of to be shelved point in x_buf
+	uint8_t target_pos = buf_shelfIdx;
+	for(uint8_t i = 0; i < buf_size; i++){
+		// Loop through till the to be shelved point is bigger than last but smaller than next (ignore the last lavue if i == 0 because it does not exist)
+		if((i == 0 || curX > x_buf[i-1]) && curX < x_buf[i]){
+			// Found target location -> save position
+			target_pos = i;
+
+			// Stop loop
+			break;
+		}
+	}
+
+	// Only move if the to be shelved point isn't already at the right spot
+	if(buf_shelfIdx != target_pos){
+		// Save values of to be shelved point
+		INPUT_BUFFER_SIZE_t shelf_x = x_buf[buf_shelfIdx];
+		float shelf_y = y_buf[buf_shelfIdx];
+
+
+		/// Move all elements between target position and current position to be shelved point forward or backward
+		// If target position is after current position - move all elements between towards the beginning
+		if(buf_shelfIdx < target_pos){
+			for(uint8_t i = buf_shelfIdx; i < target_pos; i++){
+				x_buf[i] = x_buf[i+1];
+				y_buf[i] = y_buf[i+1];
+			}
+		}
+		// If target position is before current position - move all elements between towards end
+		//else if(buf_shelfIdx > target_pos){
+		else{
+			for(uint8_t i = buf_shelfIdx; i > target_pos; i--){
+				x_buf[i] = x_buf[i-1];
+				y_buf[i] = y_buf[i-1];
+			}
+		}
+
+		// Copy the to be shelved point to target position
+		x_buf[target_pos] = shelf_x;
+		y_buf[target_pos] = shelf_y;
+	}
+
+	// Return target position (aka new index of shelf element)
+	return target_pos;
+}
+
+void TFT_display_static_menu_linset(void){
+	// Set configuration for current menu
+	TFT_setMenu(3);
+
+	// Set Color
+	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+
+	/// Write the static part of the Graph to the display list
+	TFT_graph_static(1, &gph_linset);
+
+	TFT_textbox_static(1, &tbx_dp);
+	TFT_textbox_static(1, &tbx_nom);
+	TFT_textbox_static(1, &tbx_act);
+}
+void TFT_display_menu_linset(void){
+	///
+
+	// If current data point is is edit mode - save current nominal value
+	if(tbx_act.mytag != 0){
+		*tbx_nom.src.intSrc = linset_sensBuffer[*linset_sensBuffer_curIdx];
+	}
+
+	// Sort buf_acty_linset & buf_nomx_linset based on nomx and change current datapoint if necessary
+	DP_cur = menu_shelf_datapoint(buf_nomx_linset, buf_acty_linset, DP_size, DP_cur);
+	tbx_act.src.floatSrc = &buf_acty_linset[DP_cur];
+	tbx_nom.src.intSrc = &buf_nomx_linset[DP_cur];
+
+	// Write current nominal value to nominal textbox (the numerical source of a textbox is only used to write back to it on user input, not to refresh the value from there) ToDo: YET!
+	sprintf(tbx_nom.text, "%d", *tbx_nom.src.intSrc); // float to string conversion
+
+	/////////////// GRAPH
+	///// Print dynamic part of the Graph (data & marker)
+	//TFT_graph_stepdata(&gph_linset, &buf_acty_linset[0], DP_size, 2048.0, GRAPH_DATA1COLOR);
+	TFT_graph_XYdata(&gph_linset, &buf_acty_linset[0], &buf_nomx_linset[0], DP_size, GRAPH_DATA1COLOR);
+
+	/// Draw Banner and divider line on top
+	TFT_header(1, &menu_linset);
+
+	// Set button color for header
+	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	// Button - return from submenu
+	TFT_control(&btn_back);
+	TFT_control(&btn_setchange);
+	TFT_control(&btn_db_last);
+	TFT_control(&btn_db_next);
+
+	// Data point controls
+	TFT_textbox_display(&tbx_dp);
+	TFT_textbox_display(&tbx_nom);
+	TFT_textbox_display(&tbx_act);
+
+	// Header label
+	TFT_label(1, &lbl_linset);
+
+}
+
 void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
 	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
@@ -885,9 +1080,44 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 					// Decrease currently selected data point index
 					DP_cur++;
 
+					// Add a new datapoint if the border of the array is reached
+					if(DP_cur > (DP_size-1)){
+						// Increase size of array
+						DP_size++;
+						buf_acty_linset = realloc(buf_acty_linset, DP_size*sizeof(float));
+						buf_nomx_linset = realloc(buf_nomx_linset, DP_size*sizeof(INPUT_BUFFER_SIZE_t));
+
+						// Set initial value
+						buf_acty_linset[DP_cur] = 0.0;
+						//buf_nomx_linset[DP_cur] = 4095;
+
+						// Set data point to edit mode
+						linset_setEditMode(1);
+
+						// Refresh static part of display
+						TFT_setMenu(-1);
+					}
+
 					// Let the textboxes be rewritten
 					rewriteValues = 1;
 				}
+			}
+			break;
+		case BTN_DP_SETCHANGE_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button set/change\n");
+				*toggle_lock = 42;
+
+				// Change from view to edit mode of current data point
+				if(btn_setchange.state == EVE_OPT_FLAT){
+					linset_setEditMode(0);
+				}
+				else{
+					linset_setEditMode(1);
+				}
+
+				// Refresh static part of display
+				TFT_setMenu(-1);
 			}
 			break;
 		default:
@@ -903,7 +1133,9 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 
 		// Set source pointers
 		//tbx_dp.num_src = &DP_cur;
-		tbx_act.num_src = &buf_acty_linset[DP_cur];
+		tbx_act.src.floatSrc = &buf_acty_linset[DP_cur];
+		tbx_nom.src.intSrc = &buf_nomx_linset[DP_cur];
+
 
 		char str[10];
 		// Set data point text and length
@@ -917,3 +1149,5 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 		*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
 	}
 }
+
+

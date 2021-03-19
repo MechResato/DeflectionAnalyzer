@@ -42,7 +42,7 @@ typedef struct {
 	uint32_t headerColor;
 } menu;
 
-void TFT_setMenu(uint8_t idx);
+void TFT_setMenu(int16_t idx);
 void TFT_setColor(uint8_t burst, int32_t textColor, int32_t fgColor, int32_t bgColor, int32_t gradColor);
 void TFT_header(uint8_t burst, menu* men);
 
@@ -66,7 +66,7 @@ typedef struct {
 	uint16_t font;
 	uint16_t options;
 	char* text;
-	double* num_src; 		// A pointer to the numeric source this label represents. Set to 0 if its a pure text label. If set to 1 the string in text is used to format the source
+	float* num_src; 		// A pointer to the numeric source this label represents. Set to 0 if its a pure text label. If set to 1 the string in text is used to format the source
 	uint8_t ignoreScroll;
 } label;
 void TFT_label(uint8_t burst, label* lbl);
@@ -82,7 +82,7 @@ typedef struct {
 	uint16_t h0;
 	uint16_t font;
 	uint16_t options;
-	const int8_t mytag;
+	int8_t mytag;
 	char* text;
 	uint16_t state;
 	controlTypes controlType;
@@ -92,19 +92,25 @@ void TFT_control(control* ctrl);
 
 
 /// Textbox feature
-/// Prints a label at x position and a textbox at x+labelOffsetX behind. Its connected to a text and, if num_src is not NULL, to a numerical source that all are kept up-to-date.
+/// Prints a label at x position and a textbox at x+labelOffsetX behind. Its connected to a text and, if srcType is not 0, to a numerical source that all are kept up-to-date.
 typedef struct {
 	uint16_t x;				// Beginning of left edge of the textbox .
 	uint16_t y;				// Beginning of upper edge of the textbox.
 	uint16_t width; 		// Width of the actual textbox. 11px per possible character (+some space on the left border) should be fine (A width of 190-200 is perfect for a worst case 16 character string in a textbox).
 	uint16_t labelOffsetX;	// Distance between x and the actual start of the textbox (space needed for label).
 	char* labelText;		// Text of the preceding label.
-	const int8_t mytag;		// The touch tag used for the textbox.
-	double* num_src; 	// A pointer to the numeric source this textbox represents. Set to 0 if tbx has no numeric source (pure text).
+	int8_t mytag;		// The touch tag used for the textbox.
 	char* text;				// Pointer to the text buffer or value the textbox is linked to. Must be set!
 	int8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
 	int8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
 	int8_t active;			// Marker showing if textbox is being modified by user.
+	int8_t srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(INPUT_BUFFER_SIZE_t), 2=float
+	union {					// A pointer to the numeric source this textbox represents.
+		INPUT_BUFFER_SIZE_t* intSrc;
+		float* floatSrc;
+	} src;
+	//uint16_t* srcOffset;		// Offset (index) of src. Only needed for array sources (the actual byte offset will be calculated based on srcType)
+	//float* num_src; 		// A pointer to the numeric source this textbox represents. Set to 0 if tbx has no numeric source (pure text).
 	keypadTypes keypadType;	// The type of keypad that shall be used if textbox gets active. This controls the type of characters that can be entered (see keypadTypes).
 } textbox;
 #define TEXTBOX_HEIGTH 31	// Overall height of the textbox in pixel.
@@ -125,18 +131,18 @@ typedef struct {
 	uint16_t padding; // Clearance from the outer corners (x,y) to the axes
 	char* x_label;	  // Text that will be written at the end of x Axis (like "x" or "t")
 	char* y_label;	  // Text that will be written at the top of y Axis (like "y" or "V")
-	double y_max; 	  // Maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100% of y-Axis
-	double amp_max;   // Maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% of y-Axis
-	double cx_initial;// NOT USED YET! (works for TFT_graph_stepdata but not TFT_graph_static) ToDo
-	double cx_max; 	  // Maximum represented value of x-Axis (e.g. time 2.2 Seconds), will be used at 100% of x-Axis
-	double h_grid_lines; 	// Number of horizontal grid lines
-	double v_grid_lines; 	// Number of vertical grid lines
+	float y_max; 	  // Maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100% of y-Axis
+	float amp_max;   // Maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% of y-Axis
+	float cx_initial;// NOT USED YET! (works for TFT_graph_stepdata but not TFT_graph_static) ToDo
+	float cx_max; 	  // Maximum represented value of x-Axis (e.g. time 2.2 Seconds), will be used at 100% of x-Axis
+	float h_grid_lines; 	// Number of horizontal grid lines
+	float v_grid_lines; 	// Number of vertical grid lines
 	uint8_t graphmode;		// 0 = frame-mode, 1 = roll-mode
 } graph;
 void TFT_graph_static(uint8_t burst, graph* gph);
 void TFT_graph_pixeldata(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
-void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, double cx_step, uint32_t datacolor);
-void TFT_graph_XYdata(graph* gph, double cy_buf[], uint16_t cy_buf_size, double cx_buf[], uint16_t cx_buf_size, uint32_t datacolor);
+void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor);
+void TFT_graph_XYdata(graph* gph, float cy_buf[], INPUT_BUFFER_SIZE_t cx_buf[], uint16_t buf_size, uint32_t datacolor);
 
 // General
 uint8_t TFT_init(void);
