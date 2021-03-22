@@ -28,7 +28,19 @@
 #define MAIN_BGCOLOR		0xF5F1EE
 #endif
 
-// INPUT_BUFFER_SIZE_t is defined in globals files
+// int_buffer_t and float_buffer_t is defined in globals files
+
+/// Source definition for display elements: Some Elements can be associated to a source via a pointer. This source might be an integer or an float. This is a way to achieve the possible use of both.
+enum srcTypes{srcTypeNone=0, srcTypeInt, srcTypeFloat};
+typedef enum srcTypes srcTypes;
+typedef struct {
+	srcTypes srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(int_buffer_t), 2=float
+	union {						// A pointer to the numeric source this textbox represents.
+		int_buffer_t* intSrc;
+		float_buffer_t* floatSrc;
+	};
+	uint16_t* srcOffset;		// Offset (index) of src. Only needed for array sources (the actual byte offset will be calculated based on srcType)
+} srcDefinition;
 
 // Menu definition
 typedef struct {
@@ -104,11 +116,12 @@ typedef struct {
 	int8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
 	int8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
 	int8_t active;			// Marker showing if textbox is being modified by user.
-	int8_t srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(INPUT_BUFFER_SIZE_t), 2=float
-	union {					// A pointer to the numeric source this textbox represents.
-		INPUT_BUFFER_SIZE_t* intSrc;
-		float* floatSrc;
-	} src;
+	srcDefinition numSrc;
+	//int8_t srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(int_buffer_t), 2=float
+	//union {					// A pointer to the numeric source this textbox represents.
+	//	int_buffer_t* intSrc;
+	//	float* floatSrc;
+	//} src;
 	//uint16_t* srcOffset;		// Offset (index) of src. Only needed for array sources (the actual byte offset will be calculated based on srcType)
 	//float* num_src; 		// A pointer to the numeric source this textbox represents. Set to 0 if tbx has no numeric source (pure text).
 	keypadTypes keypadType;	// The type of keypad that shall be used if textbox gets active. This controls the type of characters that can be entered (see keypadTypes).
@@ -140,9 +153,9 @@ typedef struct {
 	uint8_t graphmode;		// 0 = frame-mode, 1 = roll-mode
 } graph;
 void TFT_graph_static(uint8_t burst, graph* gph);
-void TFT_graph_pixeldata(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
-void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor);
-void TFT_graph_XYdata(graph* gph, float cy_buf[], INPUT_BUFFER_SIZE_t cx_buf[], uint16_t buf_size, uint32_t datacolor);
+void TFT_graph_pixeldata(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
+void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor);
+void TFT_graph_XYdata(graph* gph, float cy_buf[], int_buffer_t cx_buf[], uint16_t buf_size, uint32_t datacolor);
 
 // General
 uint8_t TFT_init(void);

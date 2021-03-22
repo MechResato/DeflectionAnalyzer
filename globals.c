@@ -33,7 +33,7 @@ volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
 
 // Buffer 1
 uint16_t InputBuffer1_idx = 0; // Current index in Buffer
-INPUT_BUFFER_SIZE_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
+int_buffer_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
 
 
 

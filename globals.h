@@ -13,15 +13,19 @@
 #define DEBUG_ENABLE // self implemented Debug flag
 #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
+/*  MACROS - DEFINEs */
+// These types are used to store measurement results and values throughout the program. If they need to be changed this can be done here.
+typedef uint16_t int_buffer_t;
+typedef float float_buffer_t;
+
 /*  SYSTEM VARIABLEs */
 volatile uint32_t _msCounter;
 volatile uint8_t tft_tick;
 
 /*  MEASUREMENTs */
-typedef uint16_t INPUT_BUFFER_SIZE_t;
 volatile uint32_t MeasurementCounter;
 uint16_t InputBuffer1_idx;
-extern INPUT_BUFFER_SIZE_t InputBuffer1[];
+extern int_buffer_t InputBuffer1[];
 
 /*  MENU AND USER INTERFACE */
 volatile uint8_t InputType;

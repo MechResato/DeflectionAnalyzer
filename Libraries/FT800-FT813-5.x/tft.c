@@ -608,11 +608,11 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 	// If textbox shall be deactivated - Write back content and reset scroll/keypad
 	else{
 		// If a numeric source is given, write the text back to source
-		if(tbx->srcType == 1){
-			*tbx->src.intSrc = (INPUT_BUFFER_SIZE_t)strtod(tbx->text, 0);
+		if(tbx->numSrc.srcType == srcTypeInt){
+			*tbx->numSrc.intSrc = (int_buffer_t)strtof(tbx->text, 0);
 		}
-		else if(tbx->srcType == 2){
-			*tbx->src.floatSrc = strtof(tbx->text, 0);
+		else if(tbx->numSrc.srcType == srcTypeFloat){
+			*tbx->numSrc.floatSrc = strtof(tbx->text, 0);
 		}
 
 		// Reset vertical scroll to normal
@@ -756,7 +756,7 @@ void TFT_graph_static(uint8_t burst, graph* gph){
 
 }
 
-void TFT_graph_pixeldata(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
+void TFT_graph_pixeldata(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	/// Every data-point is assumed to be at one pixel of the screen. Make this as wide as there are elements in the data-array.
 	///
@@ -824,7 +824,7 @@ void TFT_graph_pixeldata(graph* gph, INPUT_BUFFER_SIZE_t buf[], uint16_t buf_siz
 
 }
 
-void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor){
+void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///
@@ -874,7 +874,7 @@ void TFT_graph_stepdata(graph* gph, INPUT_BUFFER_SIZE_t cy_buf[], uint16_t cy_bu
 
 }
 
-void TFT_graph_XYdata(graph* gph, float cy_buf[], INPUT_BUFFER_SIZE_t cx_buf[], uint16_t buf_size, uint32_t datacolor){
+void TFT_graph_XYdata(graph* gph, float cy_buf[], int_buffer_t cx_buf[], uint16_t buf_size, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///
