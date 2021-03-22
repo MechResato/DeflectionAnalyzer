@@ -48,6 +48,9 @@ void Adc_Measurement_Handler(void){
 			break;
 	 }
 
+	// Convert raw value to adapted value and save it
+	InputBuffer1_conv[InputBuffer1_idx] = 10.0/4096.0*InputBuffer1[InputBuffer1_idx];
+
 	// Trigger next main loop (with his it is running in synch with the measurement -> change if needed!)
 	tft_tick = 42;
 

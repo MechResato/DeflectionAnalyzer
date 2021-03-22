@@ -32,14 +32,16 @@
   34              	 .global __aeabi_dmul
   35              	 .global __aeabi_dadd
   36              	 .global __aeabi_d2uiz
-  37              	 .section .text.VADC0_C0_2_IRQHandler,"ax",%progbits
-  38              	 .align 2
-  39              	 .global VADC0_C0_2_IRQHandler
-  40              	 .thumb
-  41              	 .thumb_func
-  43              	VADC0_C0_2_IRQHandler:
-  44              	.LFB485:
-  45              	 .file 1 "../measure.c"
+  37              	 .global __aeabi_i2d
+  38              	 .global __aeabi_d2f
+  39              	 .section .text.VADC0_C0_2_IRQHandler,"ax",%progbits
+  40              	 .align 2
+  41              	 .global VADC0_C0_2_IRQHandler
+  42              	 .thumb
+  43              	 .thumb_func
+  45              	VADC0_C0_2_IRQHandler:
+  46              	.LFB485:
+  47              	 .file 1 "../measure.c"
    1:../measure.c  **** /*
    2:../measure.c  ****  * measure.c
    3:../measure.c  ****  *
@@ -56,290 +58,323 @@
   14:../measure.c  **** uint32_t lastval = 0; // just for TestTriangle signal
   15:../measure.c  **** 
   16:../measure.c  **** void Adc_Measurement_Handler(void){
-  46              	 .loc 1 16 0
-  47              	 .cfi_startproc
-  48              	 
-  49              	 
-  50 0000 98B5     	 push {r3,r4,r7,lr}
-  51              	.LCFI0:
-  52              	 .cfi_def_cfa_offset 16
-  53              	 .cfi_offset 3,-16
-  54              	 .cfi_offset 4,-12
-  55              	 .cfi_offset 7,-8
-  56              	 .cfi_offset 14,-4
-  57 0002 00AF     	 add r7,sp,#0
-  58              	.LCFI1:
-  59              	 .cfi_def_cfa_register 7
+  48              	 .loc 1 16 0
+  49              	 .cfi_startproc
+  50              	 
+  51              	 
+  52 0000 98B5     	 push {r3,r4,r7,lr}
+  53              	.LCFI0:
+  54              	 .cfi_def_cfa_offset 16
+  55              	 .cfi_offset 3,-16
+  56              	 .cfi_offset 4,-12
+  57              	 .cfi_offset 7,-8
+  58              	 .cfi_offset 14,-4
+  59 0002 00AF     	 add r7,sp,#0
+  60              	.LCFI1:
+  61              	 .cfi_def_cfa_register 7
   17:../measure.c  **** 	/// Do measurements and store result in buffer. Allows to 'measure' self produced test signal base
   18:../measure.c  **** 	/// uses global/extern variables: InputType, InputBuffer1_idx, InputBuffer1_size, InputBuffer1, tf
   19:../measure.c  **** 
   20:../measure.c  **** 	// Increment current Buffer index and set back to 0 if greater than size of array
   21:../measure.c  **** 	InputBuffer1_idx++;
-  60              	 .loc 1 21 0
-  61 0004 664B     	 ldr r3,.L13+24
-  62 0006 1B88     	 ldrh r3,[r3]
-  63 0008 0133     	 adds r3,r3,#1
-  64 000a 9AB2     	 uxth r2,r3
-  65 000c 644B     	 ldr r3,.L13+24
-  66 000e 1A80     	 strh r2,[r3]
+  62              	 .loc 1 21 0
+  63 0004 764B     	 ldr r3,.L13+24
+  64 0006 1B88     	 ldrh r3,[r3]
+  65 0008 0133     	 adds r3,r3,#1
+  66 000a 9AB2     	 uxth r2,r3
+  67 000c 744B     	 ldr r3,.L13+24
+  68 000e 1A80     	 strh r2,[r3]
   22:../measure.c  **** 	if(InputBuffer1_idx >= INPUTBUFFER1_SIZE){
-  67              	 .loc 1 22 0
-  68 0010 634B     	 ldr r3,.L13+24
-  69 0012 1B88     	 ldrh r3,[r3]
-  70 0014 B3F5DC7F 	 cmp r3,#440
-  71 0018 05D3     	 bcc .L2
+  69              	 .loc 1 22 0
+  70 0010 734B     	 ldr r3,.L13+24
+  71 0012 1B88     	 ldrh r3,[r3]
+  72 0014 B3F5DC7F 	 cmp r3,#440
+  73 0018 05D3     	 bcc .L2
   23:../measure.c  **** 		//printf("fo\n");
   24:../measure.c  **** 		frameover = 1;
-  72              	 .loc 1 24 0
-  73 001a 624B     	 ldr r3,.L13+28
-  74 001c 0122     	 movs r2,#1
-  75 001e 1A70     	 strb r2,[r3]
+  74              	 .loc 1 24 0
+  75 001a 724B     	 ldr r3,.L13+28
+  76 001c 0122     	 movs r2,#1
+  77 001e 1A70     	 strb r2,[r3]
   25:../measure.c  **** 		InputBuffer1_idx = 0;
-  76              	 .loc 1 25 0
-  77 0020 5F4B     	 ldr r3,.L13+24
-  78 0022 0022     	 movs r2,#0
-  79 0024 1A80     	 strh r2,[r3]
-  80              	.L2:
+  78              	 .loc 1 25 0
+  79 0020 6F4B     	 ldr r3,.L13+24
+  80 0022 0022     	 movs r2,#0
+  81 0024 1A80     	 strh r2,[r3]
+  82              	.L2:
   26:../measure.c  **** 	}
   27:../measure.c  **** 
   28:../measure.c  **** 	/// Read next value from sensor
   29:../measure.c  **** 	 switch (InputType){
-  81              	 .loc 1 29 0
-  82 0026 604B     	 ldr r3,.L13+32
-  83 0028 1B78     	 ldrb r3,[r3]
-  84 002a DBB2     	 uxtb r3,r3
-  85 002c 032B     	 cmp r3,#3
-  86 002e 00F29F80 	 bhi .L3
-  87 0032 01A2     	 adr r2,.L5
-  88 0034 52F823F0 	 ldr pc,[r2,r3,lsl#2]
-  89              	 .p2align 2
-  90              	.L5:
-  91 0038 49000000 	 .word .L4+1
-  92 003c 61000000 	 .word .L6+1
-  93 0040 9D000000 	 .word .L7+1
-  94 0044 E3000000 	 .word .L8+1
-  95              	 .p2align 1
-  96              	.L4:
+  83              	 .loc 1 29 0
+  84 0026 704B     	 ldr r3,.L13+32
+  85 0028 1B78     	 ldrb r3,[r3]
+  86 002a DBB2     	 uxtb r3,r3
+  87 002c 032B     	 cmp r3,#3
+  88 002e 00F29F80 	 bhi .L3
+  89 0032 01A2     	 adr r2,.L5
+  90 0034 52F823F0 	 ldr pc,[r2,r3,lsl#2]
+  91              	 .p2align 2
+  92              	.L5:
+  93 0038 49000000 	 .word .L4+1
+  94 003c 61000000 	 .word .L6+1
+  95 0040 9D000000 	 .word .L7+1
+  96 0044 E3000000 	 .word .L8+1
+  97              	 .p2align 1
+  98              	.L4:
   30:../measure.c  **** 		// 0 ADC Sensor 5
   31:../measure.c  **** 		case 0:
   32:../measure.c  **** 			InputBuffer1[InputBuffer1_idx] = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A); //result
-  97              	 .loc 1 32 0
-  98 0048 554B     	 ldr r3,.L13+24
-  99 004a 1B88     	 ldrh r3,[r3]
- 100 004c 1C46     	 mov r4,r3
- 101 004e 5748     	 ldr r0,.L13+36
- 102 0050 FFF7FEFF 	 bl ADC_MEASUREMENT_GetResult
- 103 0054 0346     	 mov r3,r0
- 104 0056 1A46     	 mov r2,r3
- 105 0058 554B     	 ldr r3,.L13+40
- 106 005a 23F81420 	 strh r2,[r3,r4,lsl#1]
+  99              	 .loc 1 32 0
+ 100 0048 654B     	 ldr r3,.L13+24
+ 101 004a 1B88     	 ldrh r3,[r3]
+ 102 004c 1C46     	 mov r4,r3
+ 103 004e 6748     	 ldr r0,.L13+36
+ 104 0050 FFF7FEFF 	 bl ADC_MEASUREMENT_GetResult
+ 105 0054 0346     	 mov r3,r0
+ 106 0056 1A46     	 mov r2,r3
+ 107 0058 654B     	 ldr r3,.L13+40
+ 108 005a 23F81420 	 strh r2,[r3,r4,lsl#1]
   33:../measure.c  **** 			break;
- 107              	 .loc 1 33 0
- 108 005e 87E0     	 b .L3
- 109              	.L6:
+ 109              	 .loc 1 33 0
+ 110 005e 87E0     	 b .L3
+ 111              	.L6:
   34:../measure.c  **** 		// 1 TestImpulse
   35:../measure.c  **** 		case 1:
   36:../measure.c  **** 			if(InputBuffer1_idx % (INPUTBUFFER1_SIZE/5)) InputBuffer1[InputBuffer1_idx] = 0;
- 110              	 .loc 1 36 0
- 111 0060 4F4B     	 ldr r3,.L13+24
- 112 0062 1B88     	 ldrh r3,[r3]
- 113 0064 534A     	 ldr r2,.L13+44
- 114 0066 A2FB0312 	 umull r1,r2,r2,r3
- 115 006a 9209     	 lsrs r2,r2,#6
- 116 006c 5821     	 movs r1,#88
- 117 006e 01FB02F2 	 mul r2,r1,r2
- 118 0072 9B1A     	 subs r3,r3,r2
- 119 0074 9BB2     	 uxth r3,r3
- 120 0076 002B     	 cmp r3,#0
- 121 0078 07D0     	 beq .L9
- 122              	 .loc 1 36 0 is_stmt 0 discriminator 1
- 123 007a 494B     	 ldr r3,.L13+24
- 124 007c 1B88     	 ldrh r3,[r3]
- 125 007e 1A46     	 mov r2,r3
- 126 0080 4B4B     	 ldr r3,.L13+40
- 127 0082 0021     	 movs r1,#0
- 128 0084 23F81210 	 strh r1,[r3,r2,lsl#1]
+ 112              	 .loc 1 36 0
+ 113 0060 5F4B     	 ldr r3,.L13+24
+ 114 0062 1B88     	 ldrh r3,[r3]
+ 115 0064 634A     	 ldr r2,.L13+44
+ 116 0066 A2FB0312 	 umull r1,r2,r2,r3
+ 117 006a 9209     	 lsrs r2,r2,#6
+ 118 006c 5821     	 movs r1,#88
+ 119 006e 01FB02F2 	 mul r2,r1,r2
+ 120 0072 9B1A     	 subs r3,r3,r2
+ 121 0074 9BB2     	 uxth r3,r3
+ 122 0076 002B     	 cmp r3,#0
+ 123 0078 07D0     	 beq .L9
+ 124              	 .loc 1 36 0 is_stmt 0 discriminator 1
+ 125 007a 594B     	 ldr r3,.L13+24
+ 126 007c 1B88     	 ldrh r3,[r3]
+ 127 007e 1A46     	 mov r2,r3
+ 128 0080 5B4B     	 ldr r3,.L13+40
+ 129 0082 0021     	 movs r1,#0
+ 130 0084 23F81210 	 strh r1,[r3,r2,lsl#1]
   37:../measure.c  **** 			else InputBuffer1[InputBuffer1_idx] = 4095;
   38:../measure.c  **** 			break;
- 129              	 .loc 1 38 0 is_stmt 1 discriminator 1
- 130 0088 72E0     	 b .L3
- 131              	.L9:
+ 131              	 .loc 1 38 0 is_stmt 1 discriminator 1
+ 132 0088 72E0     	 b .L3
+ 133              	.L9:
   37:../measure.c  **** 			else InputBuffer1[InputBuffer1_idx] = 4095;
- 132              	 .loc 1 37 0
- 133 008a 454B     	 ldr r3,.L13+24
- 134 008c 1B88     	 ldrh r3,[r3]
- 135 008e 1A46     	 mov r2,r3
- 136 0090 474B     	 ldr r3,.L13+40
- 137 0092 40F6FF71 	 movw r1,#4095
- 138 0096 23F81210 	 strh r1,[r3,r2,lsl#1]
- 139              	 .loc 1 38 0
- 140 009a 69E0     	 b .L3
- 141              	.L7:
+ 134              	 .loc 1 37 0
+ 135 008a 554B     	 ldr r3,.L13+24
+ 136 008c 1B88     	 ldrh r3,[r3]
+ 137 008e 1A46     	 mov r2,r3
+ 138 0090 574B     	 ldr r3,.L13+40
+ 139 0092 40F6FF71 	 movw r1,#4095
+ 140 0096 23F81210 	 strh r1,[r3,r2,lsl#1]
+ 141              	 .loc 1 38 0
+ 142 009a 69E0     	 b .L3
+ 143              	.L7:
   39:../measure.c  **** 		// 2 TestSawtooth
   40:../measure.c  **** 		case 2:
   41:../measure.c  **** 			if(lastval < 4095) InputBuffer1[InputBuffer1_idx] = lastval+14;
- 142              	 .loc 1 41 0
- 143 009c 464B     	 ldr r3,.L13+48
- 144 009e 1B68     	 ldr r3,[r3]
- 145 00a0 40F6FE72 	 movw r2,#4094
- 146 00a4 9342     	 cmp r3,r2
- 147 00a6 0BD8     	 bhi .L11
- 148              	 .loc 1 41 0 is_stmt 0 discriminator 1
- 149 00a8 3D4B     	 ldr r3,.L13+24
- 150 00aa 1B88     	 ldrh r3,[r3]
- 151 00ac 1A46     	 mov r2,r3
- 152 00ae 424B     	 ldr r3,.L13+48
- 153 00b0 1B68     	 ldr r3,[r3]
- 154 00b2 9BB2     	 uxth r3,r3
- 155 00b4 0E33     	 adds r3,r3,#14
- 156 00b6 99B2     	 uxth r1,r3
- 157 00b8 3D4B     	 ldr r3,.L13+40
- 158 00ba 23F81210 	 strh r1,[r3,r2,lsl#1]
- 159 00be 06E0     	 b .L12
- 160              	.L11:
+ 144              	 .loc 1 41 0
+ 145 009c 564B     	 ldr r3,.L13+48
+ 146 009e 1B68     	 ldr r3,[r3]
+ 147 00a0 40F6FE72 	 movw r2,#4094
+ 148 00a4 9342     	 cmp r3,r2
+ 149 00a6 0BD8     	 bhi .L11
+ 150              	 .loc 1 41 0 is_stmt 0 discriminator 1
+ 151 00a8 4D4B     	 ldr r3,.L13+24
+ 152 00aa 1B88     	 ldrh r3,[r3]
+ 153 00ac 1A46     	 mov r2,r3
+ 154 00ae 524B     	 ldr r3,.L13+48
+ 155 00b0 1B68     	 ldr r3,[r3]
+ 156 00b2 9BB2     	 uxth r3,r3
+ 157 00b4 0E33     	 adds r3,r3,#14
+ 158 00b6 99B2     	 uxth r1,r3
+ 159 00b8 4D4B     	 ldr r3,.L13+40
+ 160 00ba 23F81210 	 strh r1,[r3,r2,lsl#1]
+ 161 00be 06E0     	 b .L12
+ 162              	.L11:
   42:../measure.c  **** 			else InputBuffer1[InputBuffer1_idx] = 0;
- 161              	 .loc 1 42 0 is_stmt 1
- 162 00c0 374B     	 ldr r3,.L13+24
- 163 00c2 1B88     	 ldrh r3,[r3]
- 164 00c4 1A46     	 mov r2,r3
- 165 00c6 3A4B     	 ldr r3,.L13+40
- 166 00c8 0021     	 movs r1,#0
- 167 00ca 23F81210 	 strh r1,[r3,r2,lsl#1]
- 168              	.L12:
+ 163              	 .loc 1 42 0 is_stmt 1
+ 164 00c0 474B     	 ldr r3,.L13+24
+ 165 00c2 1B88     	 ldrh r3,[r3]
+ 166 00c4 1A46     	 mov r2,r3
+ 167 00c6 4A4B     	 ldr r3,.L13+40
+ 168 00c8 0021     	 movs r1,#0
+ 169 00ca 23F81210 	 strh r1,[r3,r2,lsl#1]
+ 170              	.L12:
   43:../measure.c  **** 			lastval = InputBuffer1[InputBuffer1_idx];
- 169              	 .loc 1 43 0
- 170 00ce 344B     	 ldr r3,.L13+24
- 171 00d0 1B88     	 ldrh r3,[r3]
- 172 00d2 1A46     	 mov r2,r3
- 173 00d4 364B     	 ldr r3,.L13+40
- 174 00d6 33F81230 	 ldrh r3,[r3,r2,lsl#1]
- 175 00da 1A46     	 mov r2,r3
- 176 00dc 364B     	 ldr r3,.L13+48
- 177 00de 1A60     	 str r2,[r3]
+ 171              	 .loc 1 43 0
+ 172 00ce 444B     	 ldr r3,.L13+24
+ 173 00d0 1B88     	 ldrh r3,[r3]
+ 174 00d2 1A46     	 mov r2,r3
+ 175 00d4 464B     	 ldr r3,.L13+40
+ 176 00d6 33F81230 	 ldrh r3,[r3,r2,lsl#1]
+ 177 00da 1A46     	 mov r2,r3
+ 178 00dc 464B     	 ldr r3,.L13+48
+ 179 00de 1A60     	 str r2,[r3]
   44:../measure.c  **** 			break;
- 178              	 .loc 1 44 0
- 179 00e0 46E0     	 b .L3
- 180              	.L8:
+ 180              	 .loc 1 44 0
+ 181 00e0 46E0     	 b .L3
+ 182              	.L8:
   45:../measure.c  **** 		// 3 TestSine (Note: The used time variable is not perfect for this purpose)
   46:../measure.c  **** 		case 3:
   47:../measure.c  **** 			InputBuffer1[InputBuffer1_idx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)Measure
- 181              	 .loc 1 47 0
- 182 00e2 2F4B     	 ldr r3,.L13+24
- 183 00e4 1B88     	 ldrh r3,[r3]
- 184 00e6 1C46     	 mov r4,r3
- 185 00e8 344B     	 ldr r3,.L13+52
- 186 00ea 1B68     	 ldr r3,[r3]
- 187 00ec 1846     	 mov r0,r3
- 188 00ee FFF7FEFF 	 bl __aeabi_ui2d
- 189 00f2 0246     	 mov r2,r0
- 190 00f4 0B46     	 mov r3,r1
- 191 00f6 1046     	 mov r0,r2
- 192 00f8 1946     	 mov r1,r3
- 193 00fa 23A3     	 adr r3,.L13
- 194 00fc D3E90023 	 ldrd r2,[r3]
- 195 0100 FFF7FEFF 	 bl __aeabi_ddiv
- 196 0104 0246     	 mov r2,r0
- 197 0106 0B46     	 mov r3,r1
- 198 0108 1046     	 mov r0,r2
- 199 010a 1946     	 mov r1,r3
- 200 010c 20A3     	 adr r3,.L13+8
- 201 010e D3E90023 	 ldrd r2,[r3]
- 202 0112 FFF7FEFF 	 bl __aeabi_dmul
- 203 0116 0246     	 mov r2,r0
- 204 0118 0B46     	 mov r3,r1
- 205 011a 1046     	 mov r0,r2
- 206 011c 1946     	 mov r1,r3
- 207 011e FFF7FEFF 	 bl sin
- 208 0122 0246     	 mov r2,r0
- 209 0124 0B46     	 mov r3,r1
- 210 0126 1046     	 mov r0,r2
- 211 0128 1946     	 mov r1,r3
- 212 012a 4FF00002 	 mov r2,#0
- 213 012e 244B     	 ldr r3,.L13+56
- 214 0130 FFF7FEFF 	 bl __aeabi_dadd
- 215 0134 0246     	 mov r2,r0
- 216 0136 0B46     	 mov r3,r1
- 217 0138 1046     	 mov r0,r2
- 218 013a 1946     	 mov r1,r3
- 219 013c 4FF00002 	 mov r2,#0
- 220 0140 204B     	 ldr r3,.L13+60
- 221 0142 FFF7FEFF 	 bl __aeabi_dmul
- 222 0146 0246     	 mov r2,r0
- 223 0148 0B46     	 mov r3,r1
- 224 014a 1046     	 mov r0,r2
- 225 014c 1946     	 mov r1,r3
- 226 014e 12A3     	 adr r3,.L13+16
- 227 0150 D3E90023 	 ldrd r2,[r3]
- 228 0154 FFF7FEFF 	 bl __aeabi_dmul
- 229 0158 0246     	 mov r2,r0
- 230 015a 0B46     	 mov r3,r1
- 231 015c 1046     	 mov r0,r2
- 232 015e 1946     	 mov r1,r3
- 233 0160 FFF7FEFF 	 bl __aeabi_d2uiz
- 234 0164 0346     	 mov r3,r0
- 235 0166 9AB2     	 uxth r2,r3
- 236 0168 114B     	 ldr r3,.L13+40
- 237 016a 23F81420 	 strh r2,[r3,r4,lsl#1]
+ 183              	 .loc 1 47 0
+ 184 00e2 3F4B     	 ldr r3,.L13+24
+ 185 00e4 1B88     	 ldrh r3,[r3]
+ 186 00e6 1C46     	 mov r4,r3
+ 187 00e8 444B     	 ldr r3,.L13+52
+ 188 00ea 1B68     	 ldr r3,[r3]
+ 189 00ec 1846     	 mov r0,r3
+ 190 00ee FFF7FEFF 	 bl __aeabi_ui2d
+ 191 00f2 0246     	 mov r2,r0
+ 192 00f4 0B46     	 mov r3,r1
+ 193 00f6 1046     	 mov r0,r2
+ 194 00f8 1946     	 mov r1,r3
+ 195 00fa 33A3     	 adr r3,.L13
+ 196 00fc D3E90023 	 ldrd r2,[r3]
+ 197 0100 FFF7FEFF 	 bl __aeabi_ddiv
+ 198 0104 0246     	 mov r2,r0
+ 199 0106 0B46     	 mov r3,r1
+ 200 0108 1046     	 mov r0,r2
+ 201 010a 1946     	 mov r1,r3
+ 202 010c 30A3     	 adr r3,.L13+8
+ 203 010e D3E90023 	 ldrd r2,[r3]
+ 204 0112 FFF7FEFF 	 bl __aeabi_dmul
+ 205 0116 0246     	 mov r2,r0
+ 206 0118 0B46     	 mov r3,r1
+ 207 011a 1046     	 mov r0,r2
+ 208 011c 1946     	 mov r1,r3
+ 209 011e FFF7FEFF 	 bl sin
+ 210 0122 0246     	 mov r2,r0
+ 211 0124 0B46     	 mov r3,r1
+ 212 0126 1046     	 mov r0,r2
+ 213 0128 1946     	 mov r1,r3
+ 214 012a 4FF00002 	 mov r2,#0
+ 215 012e 344B     	 ldr r3,.L13+56
+ 216 0130 FFF7FEFF 	 bl __aeabi_dadd
+ 217 0134 0246     	 mov r2,r0
+ 218 0136 0B46     	 mov r3,r1
+ 219 0138 1046     	 mov r0,r2
+ 220 013a 1946     	 mov r1,r3
+ 221 013c 4FF00002 	 mov r2,#0
+ 222 0140 304B     	 ldr r3,.L13+60
+ 223 0142 FFF7FEFF 	 bl __aeabi_dmul
+ 224 0146 0246     	 mov r2,r0
+ 225 0148 0B46     	 mov r3,r1
+ 226 014a 1046     	 mov r0,r2
+ 227 014c 1946     	 mov r1,r3
+ 228 014e 22A3     	 adr r3,.L13+16
+ 229 0150 D3E90023 	 ldrd r2,[r3]
+ 230 0154 FFF7FEFF 	 bl __aeabi_dmul
+ 231 0158 0246     	 mov r2,r0
+ 232 015a 0B46     	 mov r3,r1
+ 233 015c 1046     	 mov r0,r2
+ 234 015e 1946     	 mov r1,r3
+ 235 0160 FFF7FEFF 	 bl __aeabi_d2uiz
+ 236 0164 0346     	 mov r3,r0
+ 237 0166 9AB2     	 uxth r2,r3
+ 238 0168 214B     	 ldr r3,.L13+40
+ 239 016a 23F81420 	 strh r2,[r3,r4,lsl#1]
   48:../measure.c  **** 			break;
- 238              	 .loc 1 48 0
- 239 016e 00BF     	 nop
- 240              	.L3:
+ 240              	 .loc 1 48 0
+ 241 016e 00BF     	 nop
+ 242              	.L3:
   49:../measure.c  **** 	 }
   50:../measure.c  **** 
-  51:../measure.c  **** 	// Trigger next main loop (with his it is running in synch with the measurement -> change if neede
-  52:../measure.c  **** 	tft_tick = 42;
- 241              	 .loc 1 52 0
- 242 0170 154B     	 ldr r3,.L13+64
- 243 0172 2A22     	 movs r2,#42
- 244 0174 1A70     	 strb r2,[r3]
+  51:../measure.c  **** 	// Convert raw value to adapted value and save it
+  52:../measure.c  **** 	InputBuffer1_conv[InputBuffer1_idx] = 10.0/4096.0*InputBuffer1[InputBuffer1_idx];
+ 243              	 .loc 1 52 0
+ 244 0170 1B4B     	 ldr r3,.L13+24
+ 245 0172 1B88     	 ldrh r3,[r3]
+ 246 0174 1C46     	 mov r4,r3
+ 247 0176 1A4B     	 ldr r3,.L13+24
+ 248 0178 1B88     	 ldrh r3,[r3]
+ 249 017a 1A46     	 mov r2,r3
+ 250 017c 1C4B     	 ldr r3,.L13+40
+ 251 017e 33F81230 	 ldrh r3,[r3,r2,lsl#1]
+ 252 0182 1846     	 mov r0,r3
+ 253 0184 FFF7FEFF 	 bl __aeabi_i2d
+ 254 0188 0246     	 mov r2,r0
+ 255 018a 0B46     	 mov r3,r1
+ 256 018c 1046     	 mov r0,r2
+ 257 018e 1946     	 mov r1,r3
+ 258 0190 4FF00002 	 mov r2,#0
+ 259 0194 1C4B     	 ldr r3,.L13+64
+ 260 0196 FFF7FEFF 	 bl __aeabi_dmul
+ 261 019a 0246     	 mov r2,r0
+ 262 019c 0B46     	 mov r3,r1
+ 263 019e 1046     	 mov r0,r2
+ 264 01a0 1946     	 mov r1,r3
+ 265 01a2 FFF7FEFF 	 bl __aeabi_d2f
+ 266 01a6 0146     	 mov r1,r0
+ 267 01a8 184A     	 ldr r2,.L13+68
+ 268 01aa A300     	 lsls r3,r4,#2
+ 269 01ac 1344     	 add r3,r3,r2
+ 270 01ae 1960     	 str r1,[r3]
   53:../measure.c  **** 
-  54:../measure.c  **** 	// Increase count of executed measurements
-  55:../measure.c  **** 	MeasurementCounter++;
- 245              	 .loc 1 55 0
- 246 0176 114B     	 ldr r3,.L13+52
- 247 0178 1B68     	 ldr r3,[r3]
- 248 017a 0133     	 adds r3,r3,#1
- 249 017c 0F4A     	 ldr r2,.L13+52
- 250 017e 1360     	 str r3,[r2]
-  56:../measure.c  **** }
- 251              	 .loc 1 56 0
- 252 0180 98BD     	 pop {r3,r4,r7,pc}
- 253              	.L14:
- 254 0182 00BFAFF3 	 .align 3
- 254      0080
- 255              	.L13:
- 256 0188 00000000 	 .word 0
- 257 018c 0070A740 	 .word 1084715008
- 258 0190 A5C226FA 	 .word -98123099
- 259 0194 E66A5240 	 .word 1079143142
- 260 0198 00000000 	 .word 0
- 261 019c 00FEAF40 	 .word 1085275648
- 262 01a0 00000000 	 .word InputBuffer1_idx
- 263 01a4 00000000 	 .word frameover
- 264 01a8 00000000 	 .word InputType
- 265 01ac 00000000 	 .word ADC_MEASUREMENT_Channel_A_handle
- 266 01b0 00000000 	 .word InputBuffer1
- 267 01b4 A38B2EBA 	 .word -1171354717
- 268 01b8 00000000 	 .word lastval
- 269 01bc 00000000 	 .word MeasurementCounter
- 270 01c0 0000F03F 	 .word 1072693248
- 271 01c4 0000E03F 	 .word 1071644672
- 272 01c8 00000000 	 .word tft_tick
- 273              	 .cfi_endproc
- 274              	.LFE485:
- 276 01cc AFF30080 	 .text
- 277              	.Letext0:
- 278              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 279              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 280              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
- 281              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 282              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
- 283              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/ADC_MEASUREMENT/adc_measurement.h"
- 284              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
- 285              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 286              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
- 287              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
- 288              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/ADC_MEASUREMENT/ADC_MEASUREMENT_Extern.h"
+  54:../measure.c  **** 	// Trigger next main loop (with his it is running in synch with the measurement -> change if neede
+  55:../measure.c  **** 	tft_tick = 42;
+ 271              	 .loc 1 55 0
+ 272 01b0 174B     	 ldr r3,.L13+72
+ 273 01b2 2A22     	 movs r2,#42
+ 274 01b4 1A70     	 strb r2,[r3]
+  56:../measure.c  **** 
+  57:../measure.c  **** 	// Increase count of executed measurements
+  58:../measure.c  **** 	MeasurementCounter++;
+ 275              	 .loc 1 58 0
+ 276 01b6 114B     	 ldr r3,.L13+52
+ 277 01b8 1B68     	 ldr r3,[r3]
+ 278 01ba 0133     	 adds r3,r3,#1
+ 279 01bc 0F4A     	 ldr r2,.L13+52
+ 280 01be 1360     	 str r3,[r2]
+  59:../measure.c  **** }
+ 281              	 .loc 1 59 0
+ 282 01c0 98BD     	 pop {r3,r4,r7,pc}
+ 283              	.L14:
+ 284 01c2 00BFAFF3 	 .align 3
+ 284      0080
+ 285              	.L13:
+ 286 01c8 00000000 	 .word 0
+ 287 01cc 0070A740 	 .word 1084715008
+ 288 01d0 A5C226FA 	 .word -98123099
+ 289 01d4 E66A5240 	 .word 1079143142
+ 290 01d8 00000000 	 .word 0
+ 291 01dc 00FEAF40 	 .word 1085275648
+ 292 01e0 00000000 	 .word InputBuffer1_idx
+ 293 01e4 00000000 	 .word frameover
+ 294 01e8 00000000 	 .word InputType
+ 295 01ec 00000000 	 .word ADC_MEASUREMENT_Channel_A_handle
+ 296 01f0 00000000 	 .word InputBuffer1
+ 297 01f4 A38B2EBA 	 .word -1171354717
+ 298 01f8 00000000 	 .word lastval
+ 299 01fc 00000000 	 .word MeasurementCounter
+ 300 0200 0000F03F 	 .word 1072693248
+ 301 0204 0000E03F 	 .word 1071644672
+ 302 0208 0000643F 	 .word 1063518208
+ 303 020c 00000000 	 .word InputBuffer1_conv
+ 304 0210 00000000 	 .word tft_tick
+ 305              	 .cfi_endproc
+ 306              	.LFE485:
+ 308 0214 AFF30080 	 .text
+ 309              	.Letext0:
+ 310              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 311              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 312              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/XMC4700.h"
+ 313              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 314              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_vadc.h"
+ 315              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/ADC_MEASUREMENT/adc_measurement.h"
+ 316              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
+ 317              	 .file 9 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 318              	 .file 10 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 319              	 .file 11 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 320              	 .file 12 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/ADC_MEASUREMENT/ADC_MEASUREMENT_Extern.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 measure.c
                             *COM*:00000004 _msCounter
@@ -350,13 +385,13 @@ DEFINED SYMBOLS
                             *COM*:00000001 frameover
     {standard input}:30     .bss.lastval:00000000 lastval
     {standard input}:27     .bss.lastval:00000000 $d
-    {standard input}:38     .text.VADC0_C0_2_IRQHandler:00000000 $t
-    {standard input}:43     .text.VADC0_C0_2_IRQHandler:00000000 VADC0_C0_2_IRQHandler
-    {standard input}:91     .text.VADC0_C0_2_IRQHandler:00000038 $d
-    {standard input}:95     .text.VADC0_C0_2_IRQHandler:00000048 $t
-    {standard input}:256    .text.VADC0_C0_2_IRQHandler:00000188 $d
+    {standard input}:40     .text.VADC0_C0_2_IRQHandler:00000000 $t
+    {standard input}:45     .text.VADC0_C0_2_IRQHandler:00000000 VADC0_C0_2_IRQHandler
+    {standard input}:93     .text.VADC0_C0_2_IRQHandler:00000038 $d
+    {standard input}:97     .text.VADC0_C0_2_IRQHandler:00000048 $t
+    {standard input}:286    .text.VADC0_C0_2_IRQHandler:000001c8 $d
                      .debug_frame:00000010 $d
-    {standard input}:276    .text.VADC0_C0_2_IRQHandler:000001cc $t
+    {standard input}:308    .text.VADC0_C0_2_IRQHandler:00000214 $t
 
 UNDEFINED SYMBOLS
 __aeabi_ui2d
@@ -364,7 +399,10 @@ __aeabi_ddiv
 __aeabi_dmul
 __aeabi_dadd
 __aeabi_d2uiz
+__aeabi_i2d
+__aeabi_d2f
 ADC_MEASUREMENT_GetResult
 sin
 ADC_MEASUREMENT_Channel_A_handle
 InputBuffer1
+InputBuffer1_conv

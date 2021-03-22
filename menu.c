@@ -155,13 +155,30 @@ label lbl_DLsize = {
 		.x = 360,		.y = 10,
 		.font = 26,		.options = 0,	.text = "DL-size:",
 		.ignoreScroll = 1,
+		.numSrc.srcType = srcTypeNone
+};
+label lbl_DLsize_val = {
+		.x = 470,		.y = 10,
+		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d",
+		.ignoreScroll = 1,
+		.numSrc.srcType = srcTypeInt, .numSrc.intSrc = &display_list_size, .numSrc.srcOffset = NULL
 };
 
 label lbl_sensor = {
 		.x = 360,		.y = 25,
 		.font = 26,		.options = 0,	.text = "Sensor:",
-		.ignoreScroll = 1
+		.ignoreScroll = 1,
+		.numSrc.srcType = srcTypeNone
 };
+label lbl_sensor_val = {
+		.x = 470,		.y = 25,
+		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d.%.2d",
+		.ignoreScroll = 1,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&InputBuffer1_conv,	.numSrc.srcOffset = &InputBuffer1_idx,
+		.fracExp = 2
+};
+
 
 
 // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be to fill the whole main area
@@ -550,13 +567,15 @@ void TFT_display_menu0(void){
 
 
 	/////////////// Debug Values
-	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
+	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
+	TFT_label(1, &lbl_DLsize_val);
 
 	// Write current sensor value with unit
-	char buffer[32]; // buffe.ouble to string conversion
-	sprintf(buffer, "%.2lf", (gph_monitor.amp_max/gph_monitor.y_max)*InputBuffer1[InputBuffer1_idx]); // float to string conversion
-	strcat(buffer, " V"); //unit_Sensor
-	EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
+	//char buffer[32]; // buffe.ouble to string conversion
+	//sprintf(buffer, "%.2lf", (gph_monitor.amp_max/gph_monitor.y_max)*InputBuffer1[InputBuffer1_idx]); // float to string conversion
+	//strcat(buffer, " V"); //unit_Sensor
+	//EVE_cmd_text_burst(470, 25, 26, EVE_OPT_RIGHTX, buffer);
+	TFT_label(1, &lbl_sensor_val);
 
 
 

@@ -33,6 +33,7 @@
 /// Source definition for display elements: Some Elements can be associated to a source via a pointer. This source might be an integer or an float. This is a way to achieve the possible use of both.
 enum srcTypes{srcTypeNone=0, srcTypeInt, srcTypeFloat};
 typedef enum srcTypes srcTypes;
+//#define SRC_MAXSIZE 4 	// The size in bytes of the biggest value used in union below! This will be used to compare
 typedef struct {
 	srcTypes srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(int_buffer_t), 2=float
 	union {						// A pointer to the numeric source this textbox represents.
@@ -40,7 +41,14 @@ typedef struct {
 		float_buffer_t* floatSrc;
 	};
 	uint16_t* srcOffset;		// Offset (index) of src. Only needed for array sources (the actual byte offset will be calculated based on srcType)
+	//char lastVal[SRC_MAXSIZE];
 } srcDefinition;
+
+/// Code to only refresh text if needed - might or might not be used in the future
+// && memcmp(lbl->numSrc.intSrc, lbl->numSrc.lastVal, INT_BUFFER_SIZE) != 0
+// Save current value
+//memcpy(lbl->numSrc.lastVal, lbl->numSrc.intSrc, INT_BUFFER_SIZE);
+
 
 // Menu definition
 typedef struct {
@@ -78,7 +86,9 @@ typedef struct {
 	uint16_t font;
 	uint16_t options;
 	char* text;
-	float* num_src; 		// A pointer to the numeric source this label represents. Set to 0 if its a pure text label. If set to 1 the string in text is used to format the source
+	//float* num_src; 		// A pointer to the numeric source this label represents. Set to 0 if its a pure text label. If set to 1 the string in text is used to format the source
+	srcDefinition numSrc;	// A struct containing a pointer to the numeric source this label represents. See srcDefinition for more info.
+	uint8_t fracExp;		// Determines how many fractional digits are shown when using a float source e.g. 2->2digits, 3->3digits.  NOTE: You also need to write the format specifier to the text field (e.g. for 2 digits "%d.%.2d")
 	uint8_t ignoreScroll;
 } label;
 void TFT_label(uint8_t burst, label* lbl);

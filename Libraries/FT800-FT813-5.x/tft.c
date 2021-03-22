@@ -102,8 +102,8 @@ uint8_t textbox_cursor_pos = 0;
 // Array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode.
 static void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
 static void (*EVE_cmd_text__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*) = {EVE_cmd_text, EVE_cmd_text_burst};
+static void (*EVE_cmd_text_var__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, const char*, uint8_t, ...) = {EVE_cmd_text_var, EVE_cmd_text_var_burst};
 static void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
-
 
 
 
@@ -295,13 +295,31 @@ void TFT_label(uint8_t burst, label* lbl){
 		// Do not recognize touches on label
 		(*EVE_cmd_dl__fptr_arr[burst])(TAG(0));
 
-		// If label is a number related one, convert number according to text and print string
-		// ToDo: This would be much more efficient if we compare the current source value with a "last value" and only convert if possible (compare is cheaper than sprintf). Also this doesn't have to be refreshed every frame
-		if(lbl->num_src != 0){
-			sprintf(str_buf, lbl->text, *lbl->num_src); // float to string conversion
-			(*EVE_cmd_text__fptr_arr[burst])(lbl->x, curY, lbl->font, lbl->options, str_buf);
+		// If label is a number related one (srcType not 0 = srcTypeNone), convert number according to text and print string
+		// Note: This could be more efficient if we only convert when needed and/or lower the refresh rate (store calculated values).
+		if(lbl->numSrc.srcType != srcTypeNone){
+			/// If a numerical source is assigned to the textbox, refresh the text
+			// ... for integer source
+			if(lbl->numSrc.srcType == srcTypeInt)
+				// If the offset is not given use integer directly, else use offset to determine which value is to be used
+				if(lbl->numSrc.srcOffset == NULL)
+					(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, 26, EVE_OPT_FORMAT | lbl->options, lbl->text, 1 ,(int32_t)*lbl->numSrc.intSrc);
+				else
+					(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, 26, EVE_OPT_FORMAT | lbl->options, lbl->text, 1 ,(int32_t)( lbl->numSrc.intSrc[*lbl->numSrc.srcOffset]) );
+			// ... for floating source
+			else if(lbl->numSrc.srcType == srcTypeFloat){
+				// Split float value into integral/fractional part and print them according to lbl->text
+				float intPart, fracPart;
+				/// If the offset is not given use floatSrc directly, else use offset to determine which value is to be used
+				if(lbl->numSrc.srcOffset == NULL)
+					fracPart = modff( *lbl->numSrc.floatSrc, &intPart);
+				else
+					fracPart = modff(lbl->numSrc.floatSrc[*lbl->numSrc.srcOffset], &intPart);
+				// Print the string while using text as format and raising the fraction to the power of 10 given by fracExp
+				(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, 26, EVE_OPT_FORMAT | lbl->options, lbl->text, 2 ,(int16_t)intPart, (int16_t)(abs( fracPart*(pow10(lbl->fracExp)) ))); //"%d.%.2d"
+			}
 		}
-		// Print pure text
+		// No source given -> print pure text
 		else{
 			(*EVE_cmd_text__fptr_arr[burst])(lbl->x, curY, lbl->font, lbl->options, lbl->text);
 		}
@@ -553,9 +571,22 @@ void TFT_textbox_display(textbox* tbx){
 			// Write buffer as text
 			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H,curY, 26, 0, str_buf);
 		}
+		// textbox is inactive
 		else{
-			// Write current text
-			EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H,curY, 26, 0, tbx->text);
+			// If a numerical source is assigned to the textbox, refresh the text every time
+			if(tbx->numSrc.srcType != srcTypeNone){
+				if(tbx->numSrc.srcType == srcTypeInt)
+					sprintf(str_buf, tbx->text, *tbx->numSrc.intSrc); // int to string conversion
+				else if(tbx->numSrc.srcType == srcTypeFloat)
+					sprintf(str_buf, tbx->text, *tbx->numSrc.floatSrc); // float to string conversion
+
+				// Write buffer
+				EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, 0, str_buf);
+			}
+			else{
+				// Write current text
+				EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, 0, tbx->text);
+			}
 		}
 
 		/// Reset tag
@@ -590,7 +621,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 	/// If called with an already active textbox, this changes the cursor position.
 	/// If called with an active textbox and active=0 this writes the input back to the source (if numeric source is linked), resets the scroll and closes the keypad.
 
-	// If textbox shall be active but isnt - set scroll, activate keypad and set cursor
+	// If textbox shall be active but isn't - set scroll, activate keypad and set cursor
 	if(active == 1 && tbx->active == 0){
 		// Set vertical scroll so that the textbox can be seen
 		TFT_cur_ScrollV = tbx->y - KEYPAD_ACTIVE_TARGET_HEIGTH;
