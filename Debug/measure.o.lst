@@ -179,7 +179,7 @@
  143              	.L7:
   39:../measure.c  **** 		// 2 TestSawtooth
   40:../measure.c  **** 		case 2:
-  41:../measure.c  **** 			if(lastval < 4095) InputBuffer1[InputBuffer1_idx] = lastval+14;
+  41:../measure.c  **** 			if(lastval < 4095) InputBuffer1[InputBuffer1_idx] = lastval+7;
  144              	 .loc 1 41 0
  145 009c 564B     	 ldr r3,.L13+48
  146 009e 1B68     	 ldr r3,[r3]
@@ -193,7 +193,7 @@
  154 00ae 524B     	 ldr r3,.L13+48
  155 00b0 1B68     	 ldr r3,[r3]
  156 00b2 9BB2     	 uxth r3,r3
- 157 00b4 0E33     	 adds r3,r3,#14
+ 157 00b4 0733     	 adds r3,r3,#7
  158 00b6 99B2     	 uxth r1,r3
  159 00b8 4D4B     	 ldr r3,.L13+40
  160 00ba 23F81210 	 strh r1,[r3,r2,lsl#1]
@@ -222,7 +222,7 @@
  180              	 .loc 1 44 0
  181 00e0 46E0     	 b .L3
  182              	.L8:
-  45:../measure.c  **** 		// 3 TestSine (Note: The used time variable is not perfect for this purpose)
+  45:../measure.c  **** 		// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
   46:../measure.c  **** 		case 3:
   47:../measure.c  **** 			InputBuffer1[InputBuffer1_idx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)Measure
  183              	 .loc 1 47 0

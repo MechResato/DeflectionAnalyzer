@@ -36,6 +36,7 @@ Dave/Generated/TIMER \
 Libraries/FT800-FT813-5.x \
 Libraries/Newlib \
 Libraries/XMCLib/src \
+Libraries/polyfit \
 Startup \
 . \
 

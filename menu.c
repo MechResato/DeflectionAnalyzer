@@ -14,6 +14,7 @@
 #include <globals.h>
 #include "FT800-FT813-5.x/EVE.h"
 #include "FT800-FT813-5.x/tft.h"
+#include "polyfit/polyfit.h"
 #include "record.h"
 #include "menu.h"
 
@@ -172,7 +173,7 @@ label lbl_sensor = {
 };
 label lbl_sensor_val = {
 		.x = 470,		.y = 25,
-		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d.%.2d",
+		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d.%.2d V",
 		.ignoreScroll = 1,
 		.numSrc.srcType = srcTypeFloat,
 		.numSrc.floatSrc = (float_buffer_t*)&InputBuffer1_conv,	.numSrc.srcOffset = &InputBuffer1_idx,
@@ -189,8 +190,8 @@ graph gph_monitor = {
 	.width = (0 + EVE_HSIZE - 10 - (2*G_PADDING) - 10),			   			// actual width of the data area, therefore x and the paddings left and right must me accommodated to "fill" the whole main area. Additional 10 px from right to leave some room (for 480x272: 480-10-20-10=440)
 	.height = (0 + EVE_VSIZE - (M_0_UPPERBOND + 15) - (2*G_PADDING) - 10), 	// actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
 	.padding = G_PADDING,
-	.x_label = "V",
-	.y_label = "t",
+	.x_label = "t",
+	.y_label = "V",
 	.y_max = 4095.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
 	.amp_max = 10.0, 		// volts - used at print of vertical grid value labels
 	.cx_max = 2.2,    		// seconds - used at print of horizontal grid value labels
@@ -254,7 +255,7 @@ textbox tbx_filename = {
 
 label lbl_linearisation = {
 		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
-		.font = 27,		.options = 0,		.text = "Linearisation",
+		.font = 27,		.options = 0,		.text = "Curve fit",
 		.ignoreScroll = 0
 };
 
@@ -365,6 +366,21 @@ textbox tbx_hour = {
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void linset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx);
 void linset_setEditMode(uint8_t editMode);
+
+// Size and current index of all data point related arrays
+uint8_t DP_size = 3;
+uint8_t DP_cur = 0;
+// The pointers the the x and y value arrays to be allocated by malloc and resized by realloc and used by the textboxes and graph
+float* buf_acty_linset;
+float* buf_nomx_linset;
+// Pointers to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function
+int_buffer_t* linset_sensBuffer;
+uint16_t* linset_sensBuffer_curIdx;
+// Array to store the coefficients for the fitted polynomial and the state of the fit (0=OK everything else is error)
+uint8_t fit_order = 2;
+float coefficients[4] = {0,0,0,0}; //{25.0, -0.0235162665374, 0.00001617208884, 0, 0};
+uint8_t fit_result = 0;
+
 #define BTN_BACK_TAG 10
 control btn_back = {
 	.x = EVE_HSIZE-45,	.y = 5,
@@ -376,11 +392,26 @@ control btn_back = {
 };
 
 label lbl_linset = {
-		.x = 20,		.y = 7,
-		.font = 27,		.options = 0,		.text = "Linearisation record - Sensor",
+		.x = 20,		.y = 9,
+		.font = 27,		.options = 0,		.text = "Curve fit - Sensor 0",
 		.ignoreScroll = 0
 };
 
+label lbl_fitorder = {
+		.x = M_COL_3 + 40,		.y = 9 + FONT_COMP,
+		.font = 26,		.options = 0,		.text = "Function",
+		.ignoreScroll = 0
+};
+
+#define BTN_ORDER_TAG 14
+control btn_order = {
+	.x = M_COL_3 + 40 + 60 ,	.y = 5,
+	.w0 = 60, 	.h0 = 30,
+	.mytag = BTN_ORDER_TAG,	.font = 26, .options = 0, .state = 0,
+	.text = "Square",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
 
 #define G_PADDING 10 //
 graph gph_linset = {
@@ -397,7 +428,7 @@ graph gph_linset = {
 	.cx_max = 4096,    		// seconds - used at print of horizontal grid value labels
 	.h_grid_lines = 4.0, 	// number of grey horizontal grid lines
 	.v_grid_lines = 2.0, 	// number of grey vertical grid lines
-	.graphmode = 1
+	.graphmode = 1,
 };
 
 #define BTN_DP_LAST_TAG 11
@@ -418,17 +449,18 @@ control btn_db_next = {
 	.controlType = Button,
 	.ignoreScroll = 0
 };
+#define BTN_DP_SETCHANGE_TAG 13
+control btn_setchange = {
+	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8 + 50 + 60 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 50, 	.h0 = 30,
+	.mytag = BTN_DP_SETCHANGE_TAG,	.font = 26, .options = 0, .state = 0,
+	.text = "Change",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
 
-//float buf_acty_linset[3] = { 0, 50, 200}; // all elements 0. TODO - change this to a pointer and let array be created dynamically on heap
-uint8_t DP_size = 3;
-uint8_t DP_cur = 0;
-//uint8_t DP_last = 254;
 
-float* buf_acty_linset;
-int_buffer_t* buf_nomx_linset;
-
-int_buffer_t* linset_sensBuffer;
-uint16_t* linset_sensBuffer_curIdx;
+/// Textboxes
 
 #define STR_DP_MAXLEN 3
 char str_dp[STR_DP_MAXLEN] = "0";
@@ -467,10 +499,11 @@ textbox tbx_nom = {
 	.text_curlen = &str_nom_curLength,
 	.keypadType = Numeric,
 	.active = 0,
-	.numSrc.srcType = srcTypeInt,
-	.numSrc.intSrc = NULL,
+	.numSrc.srcType = srcTypeFloat,
+	.numSrc.floatSrc = NULL,
 	.numSrc.srcOffset = NULL,
-	.numSrcFormat = "%d"
+	.numSrcFormat = "%d.%.0d",
+	.fracExp = 1
 };
 #define STR_ACT_MAXLEN 10
 char str_act[STR_ACT_MAXLEN] = "";
@@ -494,18 +527,8 @@ textbox tbx_act = {
 	.numSrcFormat = "%d.%.2d",
 	.fracExp = 2
 };
-#define BTN_DP_SETCHANGE_TAG 13
-control btn_setchange = {
-	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8 + 50 + 60 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.w0 = 50, 	.h0 = 30,
-	.mytag = BTN_DP_SETCHANGE_TAG,	.font = 26, .options = 0, .state = 0,
-	.text = "Change",
-	.controlType = Button,
-	.ignoreScroll = 0
-};
-
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//		End of Elements definition         ----------------------------------------------------------------------------------------------------------------------------------
+//		End of Element definition         ----------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -775,7 +798,7 @@ void TFT_display_static_menu_setup(void){
 	// Filename
 	TFT_textbox_static(1, &tbx_filename);
 
-	/// Linearisation section
+	/// Sensor curve fit section
 	TFT_label(1, &lbl_linearisation);
 	TFT_textbox_static(1, &tbx_sensor1);
 	TFT_textbox_static(1, &tbx_sensor2);
@@ -907,51 +930,47 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void linset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx){
-	///
+	/// Prepares the linearisation settings menu to use the current sensor and reads current configuration if available
 
-	// Set pointer to referenced Sensor buffer
+
+	// Store pointer to referenced Sensor buffer
 	linset_sensBuffer = sensBuffer;
 	linset_sensBuffer_curIdx = sensBuffer_curIdx;
 
 	// Check if spec file exists and load current settings if possible
-	// ...
+	// ... TODO
 
-	// Allocate and set the y-value array (buf_acty_linset)
+	// Allocate and set the y-value array
 	DP_size = 3;
 	buf_acty_linset = malloc(DP_size*sizeof(float));
 	buf_acty_linset[0] = 11.0;
 	buf_acty_linset[1] = 100.0;
 	buf_acty_linset[2] = 200.0;
 
-	// Allocate and set the x-value array (buf_nomx_linset)
-	buf_nomx_linset = malloc(DP_size*sizeof(int_buffer_t));
+	// Allocate and set the x-value array
+	buf_nomx_linset = malloc(DP_size*sizeof(float));
 	buf_nomx_linset[0] = 10.0;
 	buf_nomx_linset[1] = 2048.0;
 	buf_nomx_linset[2] = 4096.0;
 
+	// Link actual value array to corresponding textbox
+	tbx_act.numSrc.floatSrc = &buf_acty_linset[0];
+	tbx_act.numSrc.srcOffset = (uint16_t*)&DP_cur;
+
+	// Link actual value array to corresponding textbox
+	tbx_nom.numSrc.floatSrc = &buf_nomx_linset[0];
+	tbx_nom.numSrc.srcOffset = (uint16_t*)&DP_cur;
+
+	// Determine fitted polynomial for the first time
+	fit_result = polyfit(buf_nomx_linset, buf_acty_linset, DP_size, fit_order, coefficients);
+
 	// Set current DP
 	//*tbx_dp.num_src = 0;
 	//*tbx_dp.text = "0";
-
-	//char str[10];
-
-	// Set actual value of current data point
-	tbx_act.numSrc.floatSrc = &buf_acty_linset[0];
-	tbx_act.numSrc.srcOffset = (uint16_t*)&DP_cur;
-	//sprintf(&str[0], "%.2f", buf_acty_linset[0]); //%.2lf
-	//strcpy(tbx_act.text, &str[0]);
-	//*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
-
-	// Set nominal value of current data point
-	tbx_nom.numSrc.intSrc = &buf_nomx_linset[0];
-	tbx_nom.numSrc.srcOffset = (uint16_t*)&DP_cur;
-	//sprintf(&str[0], "%d", buf_nomx_linset[0]); //%.2lf
-	//strcpy(tbx_nom.text, &str[0]);
-	//*tbx_nom.text_curlen = strlen(&tbx_nom.text[0]);
-
-	//printf("prep y1: %lf", buf_acty_linset[1]);
 }
 void linset_setEditMode(uint8_t editMode){
+	/// Changes the GUI to data point editing mode and back (disable/enable of textboxes and buttons)
+
 
 	// Set to edit mode - activate textbox for actual value and deactivate data point selection
 	if(editMode == 1){
@@ -960,139 +979,66 @@ void linset_setEditMode(uint8_t editMode){
 		btn_setchange.text = "Save";
 		tbx_act.mytag = TBX_ACT_TAG;
 
-		// Link nominal value from current sensor to nominal textbox
-		//tbx_nom.numSrc.intSrc = linset_sensBuffer;
-		//tbx_nom.numSrc.intSrc = linset_sensBuffer[*linset_sensBuffer_curIdx];
-
 		// Deactivate data point selector buttons and textbox (read-only)
 		btn_db_last.mytag = 0;
 		btn_db_next.mytag = 0;
-		//tbx_dp.mytag = 0;
 	}
 	// Set to view mode - deactivate textbox for actual value and activate data point selection again
 	else{
+		// Change button appearance and deactivate textbox
 		btn_setchange.state = 0;
 		btn_setchange.text = "Change";
 		tbx_act.mytag = 0;
 
-		// Link nominal value from data point to nominal textbox
-		//tbx_nom.numSrc.intSrc = &buf_nomx_linset[0];
-
 		// Activate data point selector buttons and textbox (read/write)
 		btn_db_last.mytag = BTN_DP_LAST_TAG;
 		btn_db_next.mytag = BTN_DP_NEXT_TAG;
-		//tbx_dp.mytag = TBX_DP_TAG;
+
+		/// Set graph boundaries
+		// Get biggest y-value
+		float cur_y_max = 0;
+		for(uint8_t i = 0; i <= DP_size; i++)
+			if(buf_acty_linset[i] > cur_y_max)
+				cur_y_max = buf_acty_linset[i];
+
+		// Set biggest y-value as graph
+		gph_linset.y_max = gph_linset.amp_max = cur_y_max;
+
+		// Refresh static part of display (e.g. to show new textbox background when one changes from read-only to read-write)
+		//TFT_setMenu(-1);
 	}
 
 }
 
-//
-////uint8_t menu_shelf_datapoint(int_buffer_t* x_buf, float* y_buf, uint8_t buf_size, uint8_t buf_shelfIdx){
-//uint8_t menu_shelf_datapoint(srcDefinition* x_buf_obj, void* y_buf, uint8_t y_buf_size, uint8_t buf_size, uint8_t buf_shelfIdx){
-//
-//
-//	uint8_t target_pos = buf_shelfIdx;
-//	// ToDo: Idee - die größe der werte in bytes als paramter angeben, für das zwischenspeichern der werte memcpy verwenden
-//	// Für das finden der target position wirds schwieriger da hier ein vergleich stattfindet. Möglichkeit: lop doppelt
-//
-//	//void* x_buf;
-//	if(x_buf_obj->srcType == srcTypeInt){
-//		int_buffer_t* x_buf = x_buf_obj->intSrc;
-//
-//		int_buffer_t curX = x_buf_obj->intSrc[buf_shelfIdx];
-//
-//		// Get target position of to be shelved point in x_buf
-//		for(uint8_t i = 0; i < buf_size; i++){
-//			// Loop through till the to be shelved point is bigger than last but smaller than next (ignore the last lavue if i == 0 because it does not exist)
-//			if((i == 0 || curX > x_buf[i-1]) && curX < x_buf[i]){
-//				// Found target location -> save position
-//				target_pos = i;
-//
-//				// Stop loop
-//				break;
-//			}
-//		}
-//
-//	}
-//	else if(x_buf_obj->srcType == srcTypeFloat){
-//		float_buffer_t* x_buf = x_buf_obj->floatSrc;
-//
-//		float_buffer_t curX = x_buf_obj->intSrc[buf_shelfIdx];
-//
-//		// Get target position of to be shelved point in x_buf
-//		for(uint8_t i = 0; i < buf_size; i++){
-//			// Loop through till the to be shelved point is bigger than last but smaller than next (ignore the last lavue if i == 0 because it does not exist)
-//			if((i == 0 || curX > x_buf[i-1]) && curX < x_buf[i]){
-//				// Found target location -> save position
-//				target_pos = i;
-//
-//				// Stop loop
-//				break;
-//			}
-//		}
-//	}
-//
-//	// Allocate space for the biggest possible datatype (float=4 byte = 4*char)
-//	char membuf_x[4] = {0,0,0,0};
-//	char membuf_y[4] = {0,0,0,0};
-//
-//	// Only move if the to be shelved point isn't already at the right spot
-//	if(buf_shelfIdx != target_pos){
-//		// Save values of to be shelved point
-//		if(x_buf_obj->srcType == srcTypeInt)
-//			memcpy(membuf_x, x_buf_obj->intSrc, sizeof(int_buffer_t));
-//		else if(x_buf_obj->srcType == srcTypeFloat)
-//			memcpy(membuf_x, x_buf_obj->floatSrc, sizeof(float_buffer_t));
-//
-//
-//		memcpy(membuf_y, y_buf, y_buf_size);
-//		//int_buffer_t shelf_x = x_buf[buf_shelfIdx];
-//		//float shelf_y = y_buf[buf_shelfIdx];
-//
-//
-//		/// Move all elements between target position and current position to be shelved point forward or backward
-//		// If target position is after current position - move all elements between towards the beginning
-//		if(buf_shelfIdx < target_pos){
-//			for(uint8_t i = buf_shelfIdx; i < target_pos; i++){
-//				//x_buf[i] = x_buf[i+1];
-//				if(x_buf_obj->srcType == srcTypeInt)
-//					memcpy(&x_buf[i], x_buf[i+1], sizeof(int_buffer_t));
-//				else if(x_buf_obj->srcType == srcTypeFloat)
-//					memcpy(&x_buf[i], x_buf[i+1], sizeof(float_buffer_t));
-//
-//				//y_buf[i] = y_buf[i+1];
-//				memcpy((char*)&y_buf[i], (char*)&y_buf[i+1], y_buf_size);
-//			}
-//		}
-//		// If target position is before current position - move all elements between towards end
-//		//else if(buf_shelfIdx > target_pos){
-//		else{
-//			for(uint8_t i = buf_shelfIdx; i > target_pos; i--){
-//				x_buf[i] = x_buf[i-1];
-//				y_buf[i] = y_buf[i-1];
-//			}
-//		}
-//
-//		// Copy the to be shelved point to target position
-//		x_buf[target_pos] = shelf_x;
-//		y_buf[target_pos] = shelf_y;
-//	}
-//
-//	// Return target position (aka new index of shelf element)
-//	return target_pos;
-//}
+uint8_t menu_shelf_datapoint(float* x_buf, float* y_buf, uint8_t buf_size, uint8_t buf_cur_idx){
+	/// Takes two arrays of corresponding x/y-values and moves the current data point so that its x coordinate is between a smaller and a bigger one.
+	/// If the current data point is the only unsorted one, this will result in a sorted list (make sure this is the case)!
+	/// First the new target position is determined by iterating through and checking the value of the last and next point. Then the points between the current and target position are shifted forth/back before the current point is copied to its target.
+	///
+	///	Input:	x_buf, y_buf	Pointers to the float buffers of x and y (must be equal in size and corresponding)
+	///			buf_size		Number of elements in the buffers
+	///			buf_cur_idx		Index of the current point, which will be moved to its rightful place
+	///
+	/// Output:	target_pos		The new position of the current data point. Returns buf_cur_idx if the point is already at the right position.
 
 
-uint8_t menu_shelf_datapoint(int_buffer_t* x_buf, float* y_buf, uint8_t buf_size, uint8_t buf_shelfIdx){
-	int_buffer_t curX = x_buf[buf_shelfIdx];
+	// Set return value to current position
+	uint8_t target_pos = buf_cur_idx;
 
 	// Get target position of to be shelved point in x_buf
-	uint8_t target_pos = buf_shelfIdx;
 	for(uint8_t i = 0; i < buf_size; i++){
-		// Loop through till the to be shelved point is bigger than last but smaller than next (ignore the last lavue if i == 0 because it does not exist)
-		if((i == 0 || curX > x_buf[i-1]) && curX < x_buf[i]){
+		// Loop through till the to be shelved point is bigger than last but smaller than next (ignore the last value if i == 0 because it does not exist)
+		if((i == 0 || x_buf[buf_cur_idx] > x_buf[i-1]) && x_buf[buf_cur_idx] < x_buf[i]){
 			// Found target location -> save position
 			target_pos = i;
+
+			// Stop loop
+			break;
+		}
+		// Special check for the last value in array
+		else if(i == buf_size-1 && x_buf[buf_cur_idx] > x_buf[i]){
+			// Found target location -> save position
+			target_pos = buf_size-1;
 
 			// Stop loop
 			break;
@@ -1100,24 +1046,22 @@ uint8_t menu_shelf_datapoint(int_buffer_t* x_buf, float* y_buf, uint8_t buf_size
 	}
 
 	// Only move if the to be shelved point isn't already at the right spot
-	if(buf_shelfIdx != target_pos){
+	if(buf_cur_idx != target_pos){
 		// Save values of to be shelved point
-		int_buffer_t shelf_x = x_buf[buf_shelfIdx];
-		float shelf_y = y_buf[buf_shelfIdx];
-
+		float shelf_x = x_buf[buf_cur_idx];
+		float shelf_y = y_buf[buf_cur_idx];
 
 		/// Move all elements between target position and current position to be shelved point forward or backward
 		// If target position is after current position - move all elements between towards the beginning
-		if(buf_shelfIdx < target_pos){
-			for(uint8_t i = buf_shelfIdx; i < target_pos; i++){
+		if(buf_cur_idx < target_pos){
+			for(uint8_t i = buf_cur_idx; i < target_pos; i++){
 				x_buf[i] = x_buf[i+1];
 				y_buf[i] = y_buf[i+1];
 			}
 		}
 		// If target position is before current position - move all elements between towards end
-		//else if(buf_shelfIdx > target_pos){
-		else{
-			for(uint8_t i = buf_shelfIdx; i > target_pos; i--){
+		else{ //else if(buf_cur_idx > target_pos){
+			for(uint8_t i = buf_cur_idx; i > target_pos; i--){
 				x_buf[i] = x_buf[i-1];
 				y_buf[i] = y_buf[i-1];
 			}
@@ -1149,18 +1093,18 @@ void TFT_display_static_menu_linset(void){
 void TFT_display_menu_linset(void){
 	///
 
-	// If current data point is is edit mode - save current nominal value
+
+	// If current data point is is edit mode
 	if(tbx_act.mytag != 0){
-		tbx_nom.numSrc.intSrc[*tbx_nom.numSrc.srcOffset] = linset_sensBuffer[*linset_sensBuffer_curIdx];
+		// Save current nominal value
+		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)linset_sensBuffer[*linset_sensBuffer_curIdx];
+
+		// Sort buf_acty_linset & buf_nomx_linset based on nomx and change current datapoint if necessary
+		DP_cur = menu_shelf_datapoint(buf_nomx_linset, buf_acty_linset, DP_size, DP_cur);
+
+		// Determine fitted polynomial
+		fit_result = polyfit(buf_nomx_linset, buf_acty_linset, DP_size, fit_order, coefficients);
 	}
-
-	// Sort buf_acty_linset & buf_nomx_linset based on nomx and change current datapoint if necessary
-	//DP_cur = menu_shelf_datapoint(buf_nomx_linset, buf_acty_linset, DP_size, DP_cur);
-	//tbx_act.numSrc.floatSrc = &buf_acty_linset[DP_cur];
-	//tbx_nom.numSrc.intSrc = &buf_nomx_linset[DP_cur];
-
-	// Write current nominal value to nominal textbox (the numerical source of a textbox is only used to write back to it on user input, not to refresh the value from there) ToDo: YET!
-	//sprintf(tbx_nom.text, "%d", *tbx_nom.numSrc.intSrc); // float to string conversion
 
 	// Change "right" button to "new" if on the edge of points
 	if(DP_cur >= DP_size-1)
@@ -1171,16 +1115,20 @@ void TFT_display_menu_linset(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	//TFT_graph_stepdata(&gph_linset, &buf_acty_linset[0], DP_size, 2048.0, GRAPH_DATA1COLOR);
-	TFT_graph_XYdata(&gph_linset, &buf_acty_linset[0], &buf_nomx_linset[0], DP_size, GRAPH_DATA1COLOR);
+	// Current data points and trace
+	TFT_graph_XYdata(&gph_linset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size, (int16_t*)&DP_cur, graphLine, GRAPH_DATA2COLORLIGHT);
+	TFT_graph_XYdata(&gph_linset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size, (int16_t*)&DP_cur, graphPoint, GRAPH_DATA2COLOR);
+	// Fitted curve
+	TFT_graph_function(&gph_linset, &coefficients[0], fit_order, 2, graphLine, GRAPH_DATA1COLOR);
 
 	/// Draw Banner and divider line on top
 	TFT_header(1, &menu_linset);
 
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	// Button - return from submenu
-	TFT_control(&btn_back);
+	// Buttons
+	TFT_control(&btn_back); //	 - return from submenu
+	TFT_control(&btn_order); //	 - change curve fit function
 	TFT_control(&btn_setchange);
 	TFT_control(&btn_db_last);
 	TFT_control(&btn_db_next);
@@ -1190,18 +1138,16 @@ void TFT_display_menu_linset(void){
 	TFT_textbox_display(&tbx_nom);
 	TFT_textbox_display(&tbx_act);
 
-	// Header label
+	// Header labels
 	TFT_label(1, &lbl_linset);
+	TFT_label(1, &lbl_fitorder);
 
 }
-
 void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
 	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
 	/// ToDo: This menu is not finished! (dynamic allocation of data points array, ...)
 
-	//
-	uint8_t rewriteValues = 0;
 
 	// Determine which tag was touched
 	switch(tag)
@@ -1214,6 +1160,38 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 
 				// Change menu
 				TFT_setMenu(menu_setup.index);
+			}
+			break;
+		case BTN_ORDER_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button order\n");
+				*toggle_lock = 42;
+
+				// Change polynomial order
+				fit_order++;
+				if (fit_order > 3)
+					fit_order = 1;
+
+				// Change button name accordingly
+				switch (fit_order) {
+					case 1:
+						btn_order.text = "Linear";
+						break;
+					case 2:
+						btn_order.text = "Square";
+						break;
+					case 3:
+						btn_order.text = "Cubic";
+						break;
+					default:
+						break;
+				}
+
+				// TODO: Warn user if there are to less points for selected function
+				// ...
+
+				// Determine fitted polynomial after order change
+				fit_result = polyfit(buf_nomx_linset, buf_acty_linset, DP_size, fit_order, coefficients);
 			}
 			break;
 		case TBX_DP_TAG:
@@ -1243,9 +1221,6 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 				if(DP_cur > 0){
 					// Decrease currently selected data point index
 					DP_cur--;
-
-					// Let the textboxes be rewritten
-					rewriteValues = 1;
 				}
 			}
 			break;
@@ -1259,29 +1234,34 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 					// Decrease currently selected data point index
 					DP_cur++;
 
-					// Add a new datapoint if the border of the array is reached
+					// Add a new data-point if the border of the array is reached
 					if(DP_cur > (DP_size-1)){
 						// Increase size of array
 						DP_size++;
 						buf_acty_linset = realloc(buf_acty_linset, DP_size*sizeof(float_buffer_t));
-						buf_nomx_linset = realloc(buf_nomx_linset, DP_size*sizeof(int_buffer_t));
+						buf_nomx_linset = realloc(buf_nomx_linset, DP_size*sizeof(float_buffer_t));
+						tbx_act.numSrc.floatSrc = &buf_acty_linset[0];
+						tbx_nom.numSrc.floatSrc = &buf_nomx_linset[0];
 
-						// Set initial value
-						if(DP_cur > 0)
+						/// Set initial value's
+						// Set initial x value to current sensor value
+						buf_nomx_linset[DP_cur] = (float)linset_sensBuffer[*linset_sensBuffer_curIdx];//buf_acty_linset[DP_cur+1];
+						// If an OK fit is available set initial y-value to the one corresponding to the curretn sensor value
+						if(fit_result >= 0)
+							buf_acty_linset[DP_cur] = poly_calc(buf_nomx_linset[DP_cur], &coefficients[0], fit_order);
+						// If no OK fit is available but the new value is after an other one, use the previous y value as initial value
+						else if(DP_cur >= 1)
 							buf_acty_linset[DP_cur] = buf_acty_linset[DP_cur-1];
+						// If there is no previous y value use first one
 						else
-							buf_acty_linset[DP_cur] = buf_acty_linset[DP_cur+1];
-						buf_nomx_linset[DP_cur] = 42;
+							buf_acty_linset[DP_cur] = buf_acty_linset[DP_cur];
 
 						// Set data point to edit mode
 						linset_setEditMode(1);
 
-						// Refresh static part of display
+						// Refresh static part of display (e.g. to show new textboxbackground when one changes from read-only to read-write)
 						TFT_setMenu(-1);
 					}
-
-					// Let the textboxes be rewritten
-					rewriteValues = 1;
 				}
 			}
 			break;
@@ -1291,14 +1271,12 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 				*toggle_lock = 42;
 
 				// Change from view to edit mode of current data point
-				if(btn_setchange.state == EVE_OPT_FLAT){
+				if(btn_setchange.state == EVE_OPT_FLAT)
 					linset_setEditMode(0);
-				}
-				else{
+				else
 					linset_setEditMode(1);
-				}
 
-				// Refresh static part of display
+				// Refresh static part of display (e.g. to show new textboxbackground when one changes from read-only to read-write)
 				TFT_setMenu(-1);
 			}
 			break;
@@ -1306,29 +1284,6 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 			TFT_textbox_touch(&tbx_act);
 			//TFT_textbox_touch(&tbx_dp); // TODO: Commented out because there needs to be an border check before this is useful
 			break;
-	}
-
-	// IF requested by keypress - rewrite the values referenced with the textboxes DP and actual
-	if(rewriteValues){
-		// Reset trigger and crate a string buffer
-		rewriteValues = 0;
-
-		// Set source pointers
-		//tbx_dp.num_src = &DP_cur;
-		//tbx_act.numSrc.floatSrc = &buf_acty_linset[DP_cur];
-		//tbx_nom.numSrc.intSrc = &buf_nomx_linset[DP_cur];
-
-
-		//char str[10];
-		//// Set data point text and length
-		//sprintf(&str[0], "%d", DP_cur); //%.2lf
-		//strcpy(tbx_dp.text, &str[0]);
-		//*tbx_dp.text_curlen = strlen(&tbx_dp.text[0]);
-		//
-		//// Set actual value text and length
-		//sprintf(&str[0], "%.2lf", buf_acty_linset[DP_cur]); //%.2lf
-		//strcpy(tbx_act.text, &str[0]);
-		//*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
 	}
 }
 

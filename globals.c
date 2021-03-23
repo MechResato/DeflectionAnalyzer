@@ -6,6 +6,7 @@
  */
 
 #include <DAVE.h>
+#include <math.h>
 #include <globals.h>
 
 /*  MACROS - DEFINEs */
@@ -40,7 +41,7 @@ float_buffer_t InputBuffer1_conv[INPUTBUFFER1_SIZE] = { 0.0 }; // all elements 0
 
 ///*  MENU AND USER INTERFACE */
 // Input signal type used for measurement and GUI display
-volatile uint8_t InputType = 0; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+volatile uint8_t InputType = 2; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
 
 
 
@@ -61,4 +62,13 @@ void delay_ms(uint32_t ms){
 	uint32_t targetMicroSec = SYSTIMER_GetTime() + (ms*1000);
 	while(targetMicroSec > SYSTIMER_GetTime())
 		__NOP(); // do nothing
+}
+
+
+float poly_calc (float c_x, float* f_coefficients, uint8_t order){
+	register float result = 0;
+	for(uint8_t i = 0; i < order+1; i++){
+		result += f_coefficients[i] * powf(c_x, i);
+	}
+	return result;
 }

@@ -25,7 +25,7 @@
 #define MAIN_BTNCOLOR		0xEAA92B
 #endif
 #ifndef MAIN_BGCOLOR
-#define MAIN_BGCOLOR		0xF5F1EE
+#define MAIN_BGCOLOR		0xfdf9f6
 #endif
 
 // Function to convert a float to int16 with rounding // https://stackoverflow.com/questions/24723180/c-convert-floating-point-to-int
@@ -126,12 +126,12 @@ typedef struct {
 	uint16_t width; 		// Width of the actual textbox. 11px per possible character (+some space on the left border) should be fine (A width of 190-200 is perfect for a worst case 16 character string in a textbox).
 	uint16_t labelOffsetX;	// Distance between x and the actual start of the textbox (space needed for label).
 	char* labelText;		// Text of the preceding label.
-	int8_t mytag;		// The touch tag used for the textbox.
+	int8_t mytag;			// The touch tag used for the textbox.
 	char* text;				// Pointer to the text buffer or value the textbox is linked to. Must be set!
 	int8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
 	int8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
 	int8_t active;			// Marker showing if textbox is being modified by user.
-	char* numSrcFormat;		// Format used when converting the referenced numeric source to text (at display and at setStatus). Must be set if an numeric source is used!
+	char* numSrcFormat;		// Format used when converting the referenced numeric source to text (at display and at setStatus). Must be set if an numeric source is used and must contain one %d for integer and two for float source (e.g."%d.%.2d")!
 	uint8_t fracExp;		// Determines how many fractional digits are shown when using a float source e.g. 2->2digits, 3->3digits.  NOTE: You also need to write the format specifier to the text field (e.g. for 2 digits "%d.%.2d")
 	srcDefinition numSrc;
 	//int8_t srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(int_buffer_t), 2=float
@@ -153,10 +153,12 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos);
 
 
 // Graph feature
+enum graphTypes{graphLine=0, graphPoint};
+typedef enum graphTypes graphTypes;
 typedef struct {
 	uint16_t x; 	  // Beginning of left edge of the graph in full pixels (Note that the vertical axis starts at "x+padding" and that some grid values might be at a position prior to x).
 	uint16_t y; 	  // Beginning of upper edge of the graph in full pixels (Note that this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y).
-	uint16_t width;   // Width of the actual graph data area in full Pixels
+	uint16_t width;   // Width of the actual graph data area in full pixels.  WARNING: This affects correctness of x-axis scale! Convention: Always use a even width and exponents of 2 as step_divider (e.g. 200px or 440px with 2, 4, 8, ...)
 	uint16_t height;  // Height of the actual graph data area in full Pixels
 	uint16_t padding; // Clearance from the outer corners (x,y) to the axes
 	char* x_label;	  // Text that will be written at the end of x Axis (like "x" or "t")
@@ -172,7 +174,8 @@ typedef struct {
 void TFT_graph_static(uint8_t burst, graph* gph);
 void TFT_graph_pixeldata(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
 void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor);
-void TFT_graph_XYdata(graph* gph, float cy_buf[], int_buffer_t cx_buf[], uint16_t buf_size, uint32_t datacolor);
+void TFT_graph_XYdata(graph* gph, float cy_buf[], float cx_buf[], uint16_t buf_size, int16_t *buf_curidx, graphTypes gphTyp, uint32_t datacolor);
+void TFT_graph_function(graph* gph, float* f_coefficients, uint8_t order, uint16_t step_divider, graphTypes gphTyp, uint32_t datacolor);
 
 // General
 uint8_t TFT_init(void);

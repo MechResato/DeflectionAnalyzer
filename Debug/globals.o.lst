@@ -32,9 +32,9 @@
   38              	InputBuffer1_idx:
   39 0000 0000     	 .space 2
   40              	 .global InputType
-  41              	 .section .bss.InputType,"aw",%nobits
+  41              	 .section .data.InputType,"aw",%progbits
   44              	InputType:
-  45 0000 00       	 .space 1
+  45 0000 02       	 .byte 2
   46              	 .global frameover
   47              	 .section .bss.frameover,"aw",%nobits
   50              	frameover:
@@ -73,56 +73,57 @@
    6:../globals.c  ****  */
    7:../globals.c  **** 
    8:../globals.c  **** #include <DAVE.h>
-   9:../globals.c  **** #include <globals.h>
-  10:../globals.c  **** 
-  11:../globals.c  **** /*  MACROS - DEFINEs */
-  12:../globals.c  **** #define DEBUG_ENABLE // self implemented Debug flag
-  13:../globals.c  **** #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage      
-  14:../globals.c  **** 
-  15:../globals.c  **** /* DEBUG */
-  16:../globals.c  **** #if defined (DEBUG_ENABLE)
-  17:../globals.c  **** 	extern void initialise_monitor_handles(void);
-  18:../globals.c  **** #else
-  19:../globals.c  **** 	#define printf(...) { ; }
-  20:../globals.c  **** #endif
-  21:../globals.c  **** 
+   9:../globals.c  **** #include <math.h>
+  10:../globals.c  **** #include <globals.h>
+  11:../globals.c  **** 
+  12:../globals.c  **** /*  MACROS - DEFINEs */
+  13:../globals.c  **** #define DEBUG_ENABLE // self implemented Debug flag
+  14:../globals.c  **** #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage      
+  15:../globals.c  **** 
+  16:../globals.c  **** /* DEBUG */
+  17:../globals.c  **** #if defined (DEBUG_ENABLE)
+  18:../globals.c  **** 	extern void initialise_monitor_handles(void);
+  19:../globals.c  **** #else
+  20:../globals.c  **** 	#define printf(...) { ; }
+  21:../globals.c  **** #endif
   22:../globals.c  **** 
   23:../globals.c  **** 
-  24:../globals.c  **** ///*  SYSTEM VARIABLEs */
-  25:../globals.c  **** // Counter used for function delay_ms
-  26:../globals.c  **** //volatile uint32_t _msCounter = 0;
-  27:../globals.c  **** volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measuremen
-  28:../globals.c  **** 
+  24:../globals.c  **** 
+  25:../globals.c  **** ///*  SYSTEM VARIABLEs */
+  26:../globals.c  **** // Counter used for function delay_ms
+  27:../globals.c  **** //volatile uint32_t _msCounter = 0;
+  28:../globals.c  **** volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measuremen
   29:../globals.c  **** 
   30:../globals.c  **** 
-  31:../globals.c  **** ///*  MEASUREMENTs */
-  32:../globals.c  **** volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
-  33:../globals.c  **** 
-  34:../globals.c  **** // Buffer 1
-  35:../globals.c  **** uint16_t InputBuffer1_idx = 0; // Current index in Buffer
-  36:../globals.c  **** int_buffer_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
-  37:../globals.c  **** float_buffer_t InputBuffer1_conv[INPUTBUFFER1_SIZE] = { 0.0 }; // all elements 0
-  38:../globals.c  **** 
+  31:../globals.c  **** 
+  32:../globals.c  **** ///*  MEASUREMENTs */
+  33:../globals.c  **** volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
+  34:../globals.c  **** 
+  35:../globals.c  **** // Buffer 1
+  36:../globals.c  **** uint16_t InputBuffer1_idx = 0; // Current index in Buffer
+  37:../globals.c  **** int_buffer_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
+  38:../globals.c  **** float_buffer_t InputBuffer1_conv[INPUTBUFFER1_SIZE] = { 0.0 }; // all elements 0
   39:../globals.c  **** 
   40:../globals.c  **** 
-  41:../globals.c  **** ///*  MENU AND USER INTERFACE */
-  42:../globals.c  **** // Input signal type used for measurement and GUI display
-  43:../globals.c  **** volatile uint8_t InputType = 0; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
-  44:../globals.c  **** 
+  41:../globals.c  **** 
+  42:../globals.c  **** ///*  MENU AND USER INTERFACE */
+  43:../globals.c  **** // Input signal type used for measurement and GUI display
+  44:../globals.c  **** volatile uint8_t InputType = 2; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
   45:../globals.c  **** 
   46:../globals.c  **** 
-  47:../globals.c  **** ///* DEBUG */
-  48:../globals.c  **** // Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debugc
-  49:../globals.c  **** volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
-  50:../globals.c  **** 
+  47:../globals.c  **** 
+  48:../globals.c  **** ///* DEBUG */
+  49:../globals.c  **** // Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debugc
+  50:../globals.c  **** volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
   51:../globals.c  **** 
   52:../globals.c  **** 
-  53:../globals.c  **** ///*  FUNCTIONS -----------------------------------------------------------------------------------
-  54:../globals.c  **** //void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
-  55:../globals.c  **** //	_msCounter++;
-  56:../globals.c  **** //}
-  57:../globals.c  **** void delay_ms(uint32_t ms){
-  75              	 .loc 1 57 0
+  53:../globals.c  **** 
+  54:../globals.c  **** ///*  FUNCTIONS -----------------------------------------------------------------------------------
+  55:../globals.c  **** //void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
+  56:../globals.c  **** //	_msCounter++;
+  57:../globals.c  **** //}
+  58:../globals.c  **** void delay_ms(uint32_t ms){
+  75              	 .loc 1 58 0
   76              	 .cfi_startproc
   77              	 
   78              	 
@@ -138,11 +139,11 @@
   88              	.LCFI2:
   89              	 .cfi_def_cfa_register 7
   90 0006 7860     	 str r0,[r7,#4]
-  58:../globals.c  **** 	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
-  59:../globals.c  **** 	//uint32_t now = SYSTIMER_GetTickCount();
-  60:../globals.c  **** 	//while(now+ms > SYSTIMER_GetTickCount())
-  61:../globals.c  **** 	uint32_t targetMicroSec = SYSTIMER_GetTime() + (ms*1000);
-  91              	 .loc 1 61 0
+  59:../globals.c  **** 	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
+  60:../globals.c  **** 	//uint32_t now = SYSTIMER_GetTickCount();
+  61:../globals.c  **** 	//while(now+ms > SYSTIMER_GetTickCount())
+  62:../globals.c  **** 	uint32_t targetMicroSec = SYSTIMER_GetTime() + (ms*1000);
+  91              	 .loc 1 62 0
   92 0008 FFF7FEFF 	 bl SYSTIMER_GetTime
   93 000c 0146     	 mov r1,r0
   94 000e 7B68     	 ldr r3,[r7,#4]
@@ -150,26 +151,26 @@
   96 0014 02FB03F3 	 mul r3,r2,r3
   97 0018 0B44     	 add r3,r3,r1
   98 001a FB60     	 str r3,[r7,#12]
-  62:../globals.c  **** 	while(targetMicroSec > SYSTIMER_GetTime())
-  99              	 .loc 1 62 0
+  63:../globals.c  **** 	while(targetMicroSec > SYSTIMER_GetTime())
+  99              	 .loc 1 63 0
  100 001c 00E0     	 b .L2
  101              	.L3:
-  63:../globals.c  **** 		__NOP(); // do nothing
- 102              	 .loc 1 63 0
+  64:../globals.c  **** 		__NOP(); // do nothing
+ 102              	 .loc 1 64 0
  103              	
  104 001e 00BF     	 nop
  105              	
  106              	 .thumb
  107              	.L2:
-  62:../globals.c  **** 	while(targetMicroSec > SYSTIMER_GetTime())
- 108              	 .loc 1 62 0
+  63:../globals.c  **** 	while(targetMicroSec > SYSTIMER_GetTime())
+ 108              	 .loc 1 63 0
  109 0020 FFF7FEFF 	 bl SYSTIMER_GetTime
  110 0024 0246     	 mov r2,r0
  111 0026 FB68     	 ldr r3,[r7,#12]
  112 0028 9A42     	 cmp r2,r3
  113 002a F8D3     	 bcc .L3
-  64:../globals.c  **** }
- 114              	 .loc 1 64 0
+  65:../globals.c  **** }
+ 114              	 .loc 1 65 0
  115 002c 1037     	 adds r7,r7,#16
  116              	.LCFI3:
  117              	 .cfi_def_cfa_offset 8
@@ -180,15 +181,115 @@
  122 0030 80BD     	 pop {r7,pc}
  123              	 .cfi_endproc
  124              	.LFE485:
- 126 0032 00BF     	 .text
- 127              	.Letext0:
- 128              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 129              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 130              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
- 131              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
- 132              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
- 133              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
- 134              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
+ 126 0032 00BF     	 .section .text.poly_calc,"ax",%progbits
+ 127              	 .align 2
+ 128              	 .global poly_calc
+ 129              	 .thumb
+ 130              	 .thumb_func
+ 132              	poly_calc:
+ 133              	.LFB486:
+  66:../globals.c  **** 
+  67:../globals.c  **** 
+  68:../globals.c  **** float poly_calc (float c_x, float* f_coefficients, uint8_t order){
+ 134              	 .loc 1 68 0
+ 135              	 .cfi_startproc
+ 136              	 
+ 137              	 
+ 138 0000 80B5     	 push {r7,lr}
+ 139              	.LCFI5:
+ 140              	 .cfi_def_cfa_offset 8
+ 141              	 .cfi_offset 7,-8
+ 142              	 .cfi_offset 14,-4
+ 143 0002 2DED028B 	 fstmfdd sp!,{d8}
+ 144              	.LCFI6:
+ 145              	 .cfi_def_cfa_offset 16
+ 146              	 .cfi_offset 80,-16
+ 147              	 .cfi_offset 81,-12
+ 148 0006 86B0     	 sub sp,sp,#24
+ 149              	.LCFI7:
+ 150              	 .cfi_def_cfa_offset 40
+ 151 0008 00AF     	 add r7,sp,#0
+ 152              	.LCFI8:
+ 153              	 .cfi_def_cfa_register 7
+ 154 000a F860     	 str r0,[r7,#12]
+ 155 000c B960     	 str r1,[r7,#8]
+ 156 000e 1346     	 mov r3,r2
+ 157 0010 FB71     	 strb r3,[r7,#7]
+  69:../globals.c  **** 	register float result = 0;
+ 158              	 .loc 1 69 0
+ 159 0012 9FED158A 	 flds s16,.L8
+ 160              	.LBB2:
+  70:../globals.c  **** 	for(uint8_t i = 0; i < order+1; i++){
+ 161              	 .loc 1 70 0
+ 162 0016 0023     	 movs r3,#0
+ 163 0018 FB75     	 strb r3,[r7,#23]
+ 164 001a 18E0     	 b .L5
+ 165              	.L6:
+  71:../globals.c  **** 		result += f_coefficients[i] * powf(c_x, i);
+ 166              	 .loc 1 71 0 discriminator 3
+ 167 001c FB7D     	 ldrb r3,[r7,#23]
+ 168 001e 9B00     	 lsls r3,r3,#2
+ 169 0020 BA68     	 ldr r2,[r7,#8]
+ 170 0022 1344     	 add r3,r3,r2
+ 171 0024 D3ED008A 	 flds s17,[r3]
+ 172 0028 FB7D     	 ldrb r3,[r7,#23]
+ 173 002a 07EE903A 	 fmsr s15,r3
+ 174 002e F8EE677A 	 fuitos s15,s15
+ 175 0032 F868     	 ldr r0,[r7,#12]
+ 176 0034 17EE901A 	 fmrs r1,s15
+ 177 0038 FFF7FEFF 	 bl powf
+ 178 003c 07EE900A 	 fmsr s15,r0
+ 179 0040 68EEA77A 	 fmuls s15,s17,s15
+ 180 0044 38EE278A 	 fadds s16,s16,s15
+  70:../globals.c  **** 	for(uint8_t i = 0; i < order+1; i++){
+ 181              	 .loc 1 70 0 discriminator 3
+ 182 0048 FB7D     	 ldrb r3,[r7,#23]
+ 183 004a 0133     	 adds r3,r3,#1
+ 184 004c FB75     	 strb r3,[r7,#23]
+ 185              	.L5:
+  70:../globals.c  **** 	for(uint8_t i = 0; i < order+1; i++){
+ 186              	 .loc 1 70 0 is_stmt 0 discriminator 1
+ 187 004e FA7D     	 ldrb r2,[r7,#23]
+ 188 0050 FB79     	 ldrb r3,[r7,#7]
+ 189 0052 0133     	 adds r3,r3,#1
+ 190 0054 9A42     	 cmp r2,r3
+ 191 0056 E1DB     	 blt .L6
+ 192              	.LBE2:
+  72:../globals.c  **** 	}
+  73:../globals.c  **** 	return result;
+ 193              	 .loc 1 73 0 is_stmt 1
+ 194 0058 18EE103A 	 fmrs r3,s16
+  74:../globals.c  **** }
+ 195              	 .loc 1 74 0
+ 196 005c 1846     	 mov r0,r3
+ 197 005e 1837     	 adds r7,r7,#24
+ 198              	.LCFI9:
+ 199              	 .cfi_def_cfa_offset 16
+ 200 0060 BD46     	 mov sp,r7
+ 201              	.LCFI10:
+ 202              	 .cfi_def_cfa_register 13
+ 203              	 
+ 204 0062 BDEC028B 	 fldmfdd sp!,{d8}
+ 205              	.LCFI11:
+ 206              	 .cfi_restore 80
+ 207              	 .cfi_restore 81
+ 208              	 .cfi_def_cfa_offset 8
+ 209 0066 80BD     	 pop {r7,pc}
+ 210              	.L9:
+ 211              	 .align 2
+ 212              	.L8:
+ 213 0068 00000000 	 .word 0
+ 214              	 .cfi_endproc
+ 215              	.LFE486:
+ 217              	 .text
+ 218              	.Letext0:
+ 219              	 .file 2 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 220              	 .file 3 "c:\\workspaces\\dave_4-4-2_64bit_2018-02-23\\dave-ide-4.4.2-64bit\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 221              	 .file 4 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_usic.h"
+ 222              	 .file 5 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h"
+ 223              	 .file 6 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 224              	 .file 7 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Include/core_cm4.h"
+ 225              	 .file 8 "C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/CMSIS/Infineon/XMC4700_series/Include/system_XMC4700.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 globals.c
                             *COM*:00000004 _msCounter
@@ -198,8 +299,7 @@ DEFINED SYMBOLS
     {standard input}:28     .bss.MeasurementCounter:00000000 $d
     {standard input}:38     .bss.InputBuffer1_idx:00000000 InputBuffer1_idx
     {standard input}:35     .bss.InputBuffer1_idx:00000000 $d
-    {standard input}:44     .bss.InputType:00000000 InputType
-    {standard input}:45     .bss.InputType:00000000 $d
+    {standard input}:44     .data.InputType:00000000 InputType
     {standard input}:50     .bss.frameover:00000000 frameover
     {standard input}:51     .bss.frameover:00000000 $d
     {standard input}:57     .bss.InputBuffer1:00000000 InputBuffer1
@@ -208,7 +308,11 @@ DEFINED SYMBOLS
     {standard input}:61     .bss.InputBuffer1_conv:00000000 $d
     {standard input}:67     .text.delay_ms:00000000 $t
     {standard input}:72     .text.delay_ms:00000000 delay_ms
+    {standard input}:127    .text.poly_calc:00000000 $t
+    {standard input}:132    .text.poly_calc:00000000 poly_calc
+    {standard input}:213    .text.poly_calc:00000068 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
 SYSTIMER_GetTime
+powf

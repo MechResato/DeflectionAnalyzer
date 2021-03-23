@@ -147,8 +147,9 @@ Project Link: [https://github.com/MechResato/DeflectionAnalyzer](https://github.
 <!-- ACKNOWLEDGEMENTS & RESOURCES -->
 ## Acknowledgements and Resources
 
-* [othneildrew - Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 * [RudolphRiedel - FT800-FT813](https://github.com/RudolphRiedel/FT800-FT813)
+* [Nate Domin - polyfit](https://github.com/natedomin/polyfit)
+* [othneildrew - Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 * Stefan Reinmüller - For contribution while implementing the TFT Library and the design of the custom mainboard
 
 

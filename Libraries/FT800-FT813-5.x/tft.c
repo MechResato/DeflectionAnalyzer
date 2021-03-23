@@ -717,6 +717,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos){
 
 
 
+
 void TFT_graph_static(uint8_t burst, graph* gph){
 	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
@@ -963,7 +964,7 @@ void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size,
 
 }
 
-void TFT_graph_XYdata(graph* gph, float cy_buf[], int_buffer_t cx_buf[], uint16_t buf_size, uint32_t datacolor){
+void TFT_graph_XYdata(graph* gph, float cy_buf[], float cx_buf[], uint16_t buf_size, int16_t *buf_curidx, graphTypes gphTyp, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///
@@ -984,23 +985,44 @@ void TFT_graph_XYdata(graph* gph, float cy_buf[], int_buffer_t cx_buf[], uint16_
 	// Determine current position (with scroll value)
 	uint16_t curY = gph->y - TFT_cur_ScrollV;
 
-
-	// Convert coordinate x_step to actual pixels per step
-	//uint16_t cx_step_px = gph->width / (gph->cx_max - gph->cx_initial) * cx_step;
-
-	/// Display current DATA as line strip in frame or roll mode
+	/// Display current DATA as line strip or as points based on graph type
 	EVE_cmd_dl_burst(DL_COLOR_RGB | datacolor);
-	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	switch(gphTyp){
+		case graphLine:
+			EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+			break;
+		case graphPoint:
+			EVE_cmd_dl_burst(POINT_SIZE(3*16)); // Size is in 1/16 pixel
+			EVE_cmd_dl_burst(DL_BEGIN | EVE_POINTS);
+			break;
+	}
+
 	/// Display graph
 	// Print values in the order they are stored
 	uint16_t cx_cur = 0;
 	uint16_t cy_cur = 0;
 	for (int i = 0; i < buf_size; i++) {
 		//
-		cx_cur = gph->width / (gph->cx_max - gph->cx_initial) * cx_buf[i];
-		cy_cur = gph->height - (uint16_t)(( ((float)cy_buf[i]) / ((float)gph->y_max) )*(float)(gph->height));
+		cx_cur = FLOAT_TO_INT16((float)gph->width / (gph->cx_max - gph->cx_initial) * cx_buf[i]);
+		cy_cur = gph->height - FLOAT_TO_INT16(( (cy_buf[i]) / (gph->y_max) )*(float)(gph->height));
 
 		// Write point
+		EVE_cmd_dl_burst(
+			VERTEX2F(
+				gph->x + gph->padding + cx_cur,
+				  curY + gph->padding + cy_cur
+			)
+		);
+	}
+
+	// Mark current point if graph mode point and index is given
+	if(gphTyp == graphPoint && *buf_curidx != -1){
+		EVE_cmd_dl_burst(DL_COLOR_RGB | RED);
+		EVE_cmd_dl_burst(POINT_SIZE(4*16)); // Size is in 1/16 pixel
+		cx_cur = FLOAT_TO_INT16((float)gph->width / (gph->cx_max - gph->cx_initial) * cx_buf[*buf_curidx]);
+		cy_cur = gph->height - FLOAT_TO_INT16(( (cy_buf[*buf_curidx]) / (gph->y_max) )*(float)(gph->height));
+
+		// Print current point
 		EVE_cmd_dl_burst(
 			VERTEX2F(
 				gph->x + gph->padding + cx_cur,
@@ -1014,6 +1036,82 @@ void TFT_graph_XYdata(graph* gph, float cy_buf[], int_buffer_t cx_buf[], uint16_
 	/////////////// GRAPH END
 
 }
+
+void TFT_graph_function(graph* gph, float* f_coefficients, uint8_t order, uint16_t step_divider, graphTypes gphTyp, uint32_t datacolor){
+	/// Write the dynamic parts of an Graph to the TFT (data based on polynomial function coefficients). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
+	/// WARNING!: Width must be divisible by step_divider! Otherwise the x-axis scale will be incorrect due to lost fractional pixel!!!
+	///			  Convention: Always use a even width and exponents of 2 as step_divider (e.g. 200px or 440px with 2, 4, 8, ...)
+	///
+	///  gph			... The corresponding graph object
+	///  f_coefficients	... A float array of coefficients (^0 to ^n) used as polynomial
+	///  order			... Order/size of polynomial/f_coefficients
+	///  datacolor 		... 24bit color (as 32 bit integer with leading 0's) used for the dataline
+	///
+	///  x		...	beginning of left edge of the graph (Note that the vertical axis starts at "x+padding" and that some Grid values might be at a position prior to x). In full Pixels
+	///  y		... beginning of upper edge of the graph (Note this is the position of the axis-arrow point and that the horizontal axis label might be at a position prior to y). In full Pixels
+	///  width	... width of the actual graph data area in full Pixels
+	///  height	... height of the actual graph data area in full Pixels
+	///  padding	 ... clearance from the outer corners (x,y) to the axes
+	///  y_max   	 ... maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100%
+	///  y_buf[] 	 ... Array of data values
+	///  y_buf_size	 ... size of array of data values
+
+
+
+	// Determine current position (with scroll value)
+	uint16_t curY = gph->y - TFT_cur_ScrollV;
+
+	// Calculate actual pixels per step
+	float steps = gph->width/step_divider;
+	float cx_step = (gph->cx_max - gph->cx_initial) / steps;
+	uint16_t cx_step_px = gph->width / steps;
+
+	/// Display current DATA as line strip or as points based on graph type
+	EVE_cmd_dl_burst(DL_COLOR_RGB | datacolor);
+	switch(gphTyp){
+		case graphLine:
+			EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+			break;
+		case graphPoint:
+			EVE_cmd_dl_burst(POINT_SIZE(5*16)); // Size is in 1/16 pixel
+			EVE_cmd_dl_burst(DL_BEGIN | EVE_POINTS);
+			break;
+	}
+
+	/// Display graph
+	// Print values in the order they are stored
+	uint16_t cx_cur = 0;
+	uint16_t cy_cur = 0;
+	uint16_t tft_x_cur = 0;
+	uint16_t tft_y_cur = 0;
+	for (int i = 0; i < steps+1; i++) {
+		// Calculate relative coordinates
+		cx_cur = cx_step_px * i;
+		cy_cur = gph->height - FLOAT_TO_INT16( (gph->height / (gph->y_max)) * poly_calc(cx_step*i, f_coefficients, order) );
+
+		// Calculate absolute coordinates
+		tft_x_cur = gph->x + gph->padding + cx_cur;
+		tft_y_cur = curY + gph->padding + cy_cur;
+
+		// Only print point if it is inside the graph and inside the TFT area
+		if((cy_cur > 0 && cy_cur < gph->height) && (tft_y_cur > TFT_UpperBond && tft_y_cur < EVE_VSIZE) ){
+			// Write point
+			EVE_cmd_dl_burst(
+				VERTEX2F(
+					tft_x_cur,
+					tft_y_cur
+				)
+			);
+		}
+
+	}
+
+	// End EVE_LINE_STRIP and therefore DATA
+	EVE_cmd_dl_burst(DL_END);
+	/////////////// GRAPH END
+
+}
+
 
 
 

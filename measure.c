@@ -38,11 +38,11 @@ void Adc_Measurement_Handler(void){
 			break;
 		// 2 TestSawtooth
 		case 2:
-			if(lastval < 4095) InputBuffer1[InputBuffer1_idx] = lastval+14;
+			if(lastval < 4095) InputBuffer1[InputBuffer1_idx] = lastval+7;
 			else InputBuffer1[InputBuffer1_idx] = 0;
 			lastval = InputBuffer1[InputBuffer1_idx];
 			break;
-		// 3 TestSine (Note: The used time variable is not perfect for this purpose)
+		// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
 		case 3:
 			InputBuffer1[InputBuffer1_idx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)MeasurementCounter/3000))))*4095.0);
 			break;

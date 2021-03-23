@@ -54,5 +54,6 @@ volatile uint8_t frameover;
 void SysTick_Handler(); // Interrupt Routine - used for delay_ms
 void delay_ms(uint32_t ms); // Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
 
+float poly_calc (float c_x, float* f_coefficients, uint8_t order);
 
 #endif /* GLOBALS_H_ */
