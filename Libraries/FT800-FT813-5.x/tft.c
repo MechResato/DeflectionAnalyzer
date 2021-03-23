@@ -316,7 +316,7 @@ void TFT_label(uint8_t burst, label* lbl){
 				else
 					fracPart = modff(lbl->numSrc.floatSrc[*lbl->numSrc.srcOffset], &intPart);
 				// Print the string while using text as format and raising the fraction to the power of 10 given by fracExp
-				(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, 26, EVE_OPT_FORMAT | lbl->options, lbl->text, 2 ,(int16_t)intPart, (int16_t)(abs( fracPart*(pow10(lbl->fracExp)) ))); //"%d.%.2d"
+				(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, 26, EVE_OPT_FORMAT | lbl->options, lbl->text, 2 ,FLOAT_TO_INT16(intPart), FLOAT_TO_INT16(fabsf( fracPart*(pow10f((float)lbl->fracExp)))) ); //"%d.%.2d"
 			}
 		}
 		// No source given -> print pure text
@@ -514,6 +514,7 @@ void TFT_textbox_touch(textbox* tbx){
 
 }
 
+
 void TFT_textbox_display(textbox* tbx){
 	/// Write the dynamic parts of an textbox to the TFT (text & cursor). Used at recurring display list build in TFT_display()
 	///
@@ -573,20 +574,36 @@ void TFT_textbox_display(textbox* tbx){
 		}
 		// textbox is inactive
 		else{
-			// If a numerical source is assigned to the textbox, refresh the text every time
+			// If textbox is a number related one (srcType not 0 = srcTypeNone), convert number according to text and print string
+			// Note: This could be more efficient if we only convert when needed and/or lower the refresh rate (store calculated values).
 			if(tbx->numSrc.srcType != srcTypeNone){
+				/// If a numerical source is assigned to the textbox, refresh the text
+				// ... for integer source
 				if(tbx->numSrc.srcType == srcTypeInt)
-					sprintf(str_buf, tbx->text, *tbx->numSrc.intSrc); // int to string conversion
-				else if(tbx->numSrc.srcType == srcTypeFloat)
-					sprintf(str_buf, tbx->text, *tbx->numSrc.floatSrc); // float to string conversion
-
-				// Write buffer
-				EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, 0, str_buf);
+					// If the offset is not given, use integer directly, else use offset to determine which value is to be used
+					if(tbx->numSrc.srcOffset == NULL){
+						EVE_cmd_text_var_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, EVE_OPT_FORMAT, tbx->numSrcFormat, 1 ,(int32_t)*tbx->numSrc.intSrc);
+					}
+					else
+						EVE_cmd_text_var_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, EVE_OPT_FORMAT, tbx->numSrcFormat, 1 ,(int32_t)( tbx->numSrc.intSrc[*tbx->numSrc.srcOffset]) );
+				// ... for floating source
+				else if(tbx->numSrc.srcType == srcTypeFloat){
+					// Split float value into integral/fractional part and print them according to tbx->text
+					float intPart, fracPart;
+					/// If the offset is not given, use floatSrc directly, else use offset to determine which value is to be used
+					if(tbx->numSrc.srcOffset == NULL)
+						fracPart = modff(*tbx->numSrc.floatSrc, &intPart);
+					else
+						fracPart = modff(tbx->numSrc.floatSrc[*tbx->numSrc.srcOffset], &intPart);
+					// Print the string while using text as format and raising the fraction to the power of 10 given by fracExp
+					EVE_cmd_text_var_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, EVE_OPT_FORMAT, tbx->numSrcFormat, 2 ,FLOAT_TO_INT16(intPart), FLOAT_TO_INT16(fabsf( fracPart*(pow10f((float)tbx->fracExp)))) ); //"%d.%.2d"
+				}
 			}
+			// No source given -> print pure text
 			else{
-				// Write current text
 				EVE_cmd_text_burst(tbx->x + tbx->labelOffsetX + TEXTBOX_PAD_H, curY, 26, 0, tbx->text);
 			}
+
 		}
 
 		/// Reset tag
@@ -600,6 +617,7 @@ static void TFT_textbox_setCursor(const textbox* tbx, int16_t position){
 	/// -1	... Set to end
 	/// 0	...	Set to begin
 	/// x	... Set to position x if "x <= len"
+	/// TODO: interpret e.g. -4 as 4th char from behind
 
 	// Set cursor based on parameter position
 	switch (position) {
@@ -615,14 +633,44 @@ static void TFT_textbox_setCursor(const textbox* tbx, int16_t position){
 	}
 }
 
-void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
+void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos){
 	/// Controls the state of an textbox (open, set cursor & close). Meant to be called by an menu specific TFT_touch_[menu]() on touch of the textbox tag.
 	/// If called with an inactive textbox and active=1 this opens the wanted keypad and sets the scroll so the textbox is visible above the keypad.
 	/// If called with an already active textbox, this changes the cursor position.
 	/// If called with an active textbox and active=0 this writes the input back to the source (if numeric source is linked), resets the scroll and closes the keypad.
 
+
 	// If textbox shall be active but isn't - set scroll, activate keypad and set cursor
 	if(active == 1 && tbx->active == 0){
+		/// If a numeric source is given, write the source to the text (so it can be edited as text)
+		// Integer source
+		if(tbx->numSrc.srcType == srcTypeInt){
+			// If the offset is not given, use integer directly, else use offset to determine which value is to be used
+			if(tbx->numSrc.srcOffset == NULL)
+				sprintf(tbx->text, tbx->numSrcFormat, *tbx->numSrc.intSrc); // string to integer conversion
+			else
+				sprintf(tbx->text, tbx->numSrcFormat, tbx->numSrc.intSrc[*tbx->numSrc.srcOffset]); // string to integer conversion with offset
+
+			// Refresh text length
+			*tbx->text_curlen = strlen(tbx->text);
+		}
+		// Fractional source
+		else if(tbx->numSrc.srcType == srcTypeFloat){
+			// Split float value into integral/fractional part and print them according to tbx->text
+			float intPart, fracPart;
+			/// If the offset is not given, use floatSrc directly, else use offset to determine which value is to be used
+			if(tbx->numSrc.srcOffset == NULL)
+				fracPart = modff( *tbx->numSrc.floatSrc, &intPart);
+			else
+				fracPart = modff(tbx->numSrc.floatSrc[*tbx->numSrc.srcOffset], &intPart);
+			// Print the string while using text as format and raising the fraction to the power of 10 given by fracExp
+			sprintf(tbx->text, tbx->numSrcFormat, FLOAT_TO_INT16(intPart), FLOAT_TO_INT16(fabsf( fracPart*(pow10f((float)tbx->fracExp)))) ); // string to integer conversion
+			//,FLOAT_TO_INT16(intPart), FLOAT_TO_INT16(fabsf( fracPart*(pow10f((float)tbx->fracExp)))) ); //"%d.%.2d"
+
+			// Refresh text length
+			*tbx->text_curlen = strlen(tbx->text);
+		}
+
 		// Set vertical scroll so that the textbox can be seen
 		TFT_cur_ScrollV = tbx->y - KEYPAD_ACTIVE_TARGET_HEIGTH;
 		tbx->active = 1;
@@ -638,12 +686,20 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 	}
 	// If textbox shall be deactivated - Write back content and reset scroll/keypad
 	else{
-		// If a numeric source is given, write the text back to source
+		// If a numeric source is given, write the text back to source (save)
 		if(tbx->numSrc.srcType == srcTypeInt){
-			*tbx->numSrc.intSrc = (int_buffer_t)strtof(tbx->text, 0);
+			if(tbx->numSrc.srcOffset == NULL)
+				*tbx->numSrc.intSrc = FLOAT_TO_INT16(atoff(tbx->text));//strtof(tbx->text, 0);
+			else
+				tbx->numSrc.intSrc[*tbx->numSrc.srcOffset] = FLOAT_TO_INT16(atoff(tbx->text));//strtof(tbx->text, 0);
+
 		}
 		else if(tbx->numSrc.srcType == srcTypeFloat){
-			*tbx->numSrc.floatSrc = strtof(tbx->text, 0);
+			if(tbx->numSrc.srcOffset == NULL)
+				*tbx->numSrc.floatSrc = atoff(tbx->text); //strtof(tbx->text, 0);  //(float_buffer_t)
+			else
+				tbx->numSrc.floatSrc[*tbx->numSrc.srcOffset] = atoff(tbx->text);
+
 		}
 
 		// Reset vertical scroll to normal
@@ -653,6 +709,8 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos){
 		// Deactivate Keypad and set cursor to end
 		keypad_close();
 	}
+
+
 }
 
 
@@ -1371,6 +1429,7 @@ void TFT_display(void)
 			EVE_cmd_dl_burst(TAG(0));
 			// Show different keypads based on type
 			int8_t showShiftKey;
+			int8_t showSpaceKey;
 			switch (keypadType) {
 				case Filename:
 					// keypadType = Filename
@@ -1387,6 +1446,7 @@ void TFT_display(void)
 						EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "ZXCVBNM#-");
 					}
 					showShiftKey = 1;
+					showSpaceKey = 1;
 					break;
 				case Numeric:
 					// keypadType = Numeric
@@ -1396,6 +1456,7 @@ void TFT_display(void)
 					EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 138+138+4, 29, 26, keypadCurrentKey, "0");
 					EVE_cmd_keys_burst(2+138+4+138+4-1, EVE_VSIZE-2-29-(32*1), 138+1, 29, 26, keypadCurrentKey, ".");
 					showShiftKey = 0;
+					showSpaceKey = 0;
 					break;
 				default:
 					// keypadType = Standard
@@ -1412,6 +1473,7 @@ void TFT_display(void)
 						EVE_cmd_keys_burst(2+50+4, EVE_VSIZE-2-29-(32*1), EVE_HSIZE-4-50-4, 29, 26, keypadCurrentKey, "ZXCVBNM:-");
 					}
 					showShiftKey = 1;
+					showSpaceKey = 1;
 					break;
 			}
 
@@ -1420,9 +1482,10 @@ void TFT_display(void)
 			EVE_cmd_fgcolor_burst(keypadControlKeyFgColor); //MAIN_BTNCTSCOLOR
 			EVE_cmd_bgcolor_burst(keypadControlKeyBgColor); //MAIN_BTNCOLOR
 
-			// Space, Left/Right and Shift Key
-			EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 26, keypadCurrentKey, " ");
+			// Left/Right, Space and Shift Key
 			EVE_cmd_keys_burst(2, EVE_VSIZE-2-29, 90, 29, 26, keypadCurrentKey, "<>");
+			if(showSpaceKey == 1)
+				EVE_cmd_keys_burst(2+30+4+60, EVE_VSIZE-2-29, 288, 29, 26, keypadCurrentKey, " ");
 			if(showShiftKey == 1)
 				EVE_cmd_keys_burst(2, EVE_VSIZE-2-29-(32*1), 50, 29, 26, keypadCurrentKey, "^");
 

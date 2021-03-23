@@ -28,6 +28,11 @@
 #define MAIN_BGCOLOR		0xF5F1EE
 #endif
 
+// Function to convert a float to int16 with rounding // https://stackoverflow.com/questions/24723180/c-convert-floating-point-to-int
+#ifndef FLOAT_TO_INT16
+#define FLOAT_TO_INT16(x) ((x)>=0?(int16_t)((x)+0.5):(int16_t)((x)-0.5))
+#endif
+
 // int_buffer_t and float_buffer_t is defined in globals files
 
 /// Source definition for display elements: Some Elements can be associated to a source via a pointer. This source might be an integer or an float. This is a way to achieve the possible use of both.
@@ -126,6 +131,8 @@ typedef struct {
 	int8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
 	int8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
 	int8_t active;			// Marker showing if textbox is being modified by user.
+	char* numSrcFormat;		// Format used when converting the referenced numeric source to text (at display and at setStatus). Must be set if an numeric source is used!
+	uint8_t fracExp;		// Determines how many fractional digits are shown when using a float source e.g. 2->2digits, 3->3digits.  NOTE: You also need to write the format specifier to the text field (e.g. for 2 digits "%d.%.2d")
 	srcDefinition numSrc;
 	//int8_t srcType;			// Type of the src union. 0=none (pure text tbx), 1=integer(int_buffer_t), 2=float
 	//union {					// A pointer to the numeric source this textbox represents.
@@ -142,7 +149,7 @@ typedef struct {
 void TFT_textbox_static(uint8_t burst, textbox* tbx);
 void TFT_textbox_touch(textbox* tbx);
 void TFT_textbox_display(textbox* tbx);
-void TFT_textbox_setStatus(textbox* tbx, uint8_t active, uint8_t cursorPos);
+void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos);
 
 
 // Graph feature

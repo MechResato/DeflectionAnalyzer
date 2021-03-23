@@ -330,6 +330,30 @@ control btn_dimmmer = {
 	.ignoreScroll = 0
 };
 
+int_buffer_t hour_val[4] = {1, 22, 333, 444};
+uint8_t hour_val_idx = 0;
+#define STR_HOUR_MAXLEN 10
+char str_hour[STR_HOUR_MAXLEN] = "12";
+int8_t str_hour_curLength = 2;
+#define TBX_HOUR_TAG 25
+textbox tbx_hour = {
+	.x = M_COL_2,
+	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4),
+	.width = 50,
+	.labelOffsetX = 50,
+	.labelText = "Hour:",
+	.mytag = TBX_HOUR_TAG,
+	.text = str_hour,
+	.text_maxlen = STR_HOUR_MAXLEN,
+	.text_curlen = &str_hour_curLength,
+	.keypadType = Numeric,
+	.active = 0,
+	.numSrcFormat = "%d",
+	//.fracExp = 2,
+	.numSrc.srcType = srcTypeInt,
+	.numSrc.intSrc = (int_buffer_t*)&hour_val[0],
+	.numSrc.srcOffset = (uint16_t*)&hour_val_idx
+};
 
 
 
@@ -407,7 +431,7 @@ int_buffer_t* linset_sensBuffer;
 uint16_t* linset_sensBuffer_curIdx;
 
 #define STR_DP_MAXLEN 3
-char str_dp[STR_S2_LINSPEC_MAXLEN] = "0";
+char str_dp[STR_DP_MAXLEN] = "0";
 int8_t str_dp_curLength = 1;
 #define TBX_DP_TAG 24
 textbox tbx_dp = {
@@ -416,13 +440,16 @@ textbox tbx_dp = {
 	.width = 36,
 	.labelOffsetX = 75,
 	.labelText = "Data Point:",
-	.mytag = TBX_DP_TAG,
+	.mytag = 0, //TBX_DP_TAG, // Todo: Made read-only because there needs to be an border check before this is useful
 	.text = str_dp,
 	.text_maxlen = STR_DP_MAXLEN,
 	.text_curlen = &str_dp_curLength,
 	.keypadType = Numeric,
 	.active = 0,
-	.numSrc.srcType = srcTypeNone
+	.numSrc.srcType = srcTypeInt,
+	.numSrc.intSrc = (int_buffer_t*)&DP_cur,
+	.numSrc.srcOffset = NULL,
+	.numSrcFormat = "%d"
 };
 #define STR_NOM_MAXLEN 10
 char str_nom[STR_NOM_MAXLEN] = "4095";
@@ -441,8 +468,9 @@ textbox tbx_nom = {
 	.keypadType = Numeric,
 	.active = 0,
 	.numSrc.srcType = srcTypeInt,
-	.numSrc.intSrc = 0,
-	.numSrc.srcOffset = 0
+	.numSrc.intSrc = NULL,
+	.numSrc.srcOffset = NULL,
+	.numSrcFormat = "%d"
 };
 #define STR_ACT_MAXLEN 10
 char str_act[STR_ACT_MAXLEN] = "";
@@ -461,8 +489,10 @@ textbox tbx_act = {
 	.keypadType = Numeric,
 	.active = 0,
 	.numSrc.srcType = srcTypeFloat,
-	.numSrc.intSrc = 0,
-	.numSrc.srcOffset = 0
+	.numSrc.intSrc = NULL,
+	.numSrc.srcOffset = NULL,
+	.numSrcFormat = "%d.%.2d",
+	.fracExp = 2
 };
 #define BTN_DP_SETCHANGE_TAG 13
 control btn_setchange = {
@@ -750,6 +780,9 @@ void TFT_display_static_menu_setup(void){
 	TFT_textbox_static(1, &tbx_sensor1);
 	TFT_textbox_static(1, &tbx_sensor2);
 
+	// RTC
+	TFT_textbox_static(1, &tbx_hour);
+
 	/// Backlight
 	TFT_label(1, &lbl_backlight);
 }
@@ -771,6 +804,7 @@ void TFT_display_menu_setup(void){
 	TFT_textbox_display(&tbx_filename);
 	TFT_textbox_display(&tbx_sensor1);
 	TFT_textbox_display(&tbx_sensor2);
+	TFT_textbox_display(&tbx_hour);
 }
 void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// ...
@@ -825,20 +859,44 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				TFT_setMenu(menu_linset.index);
 			}
 			break;
+		case BTN_LINSENSOR2_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button LinS1\n");
+				*toggle_lock = 42;
+
+				hour_val_idx++;
+				if(hour_val_idx > 3) hour_val_idx = 0;
+
+				// Prepare linSet menu for current sensor
+				//linset_prepare(&InputBuffer1[0], &InputBuffer1_idx);
+
+				// Change menu
+				//TFT_setMenu(menu_linset.index);
+			}
+			break;
 		case TBX_SENSOR2_TAG:
 			if(*toggle_lock == 0) {
 				printf("Textbox S2\n");
 				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
-				TFT_textbox_setStatus(&tbx_sensor2, 1, *(tbx_sensor2.text_curlen));
+				TFT_textbox_setStatus(&tbx_sensor2, 1, -1);
 			}
 			break;
+		case TBX_HOUR_TAG:
+			if(*toggle_lock == 0) {
+				printf("Textbox Hour\n");
+				*toggle_lock = 42;
+
+				// Activate Keypad and set cursor to end
+				TFT_textbox_setStatus(&tbx_hour, 1, -1);
+			}
 		default:
 			//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
 			TFT_textbox_touch(&tbx_filename);
 			TFT_textbox_touch(&tbx_sensor1);
 			TFT_textbox_touch(&tbx_sensor2);
+			TFT_textbox_touch(&tbx_hour);
 			break;
 	}
 }
@@ -866,7 +924,6 @@ void linset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx){
 	buf_acty_linset[2] = 200.0;
 
 	// Allocate and set the x-value array (buf_nomx_linset)
-	DP_size = 3;
 	buf_nomx_linset = malloc(DP_size*sizeof(int_buffer_t));
 	buf_nomx_linset[0] = 10.0;
 	buf_nomx_linset[1] = 2048.0;
@@ -876,19 +933,21 @@ void linset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx){
 	//*tbx_dp.num_src = 0;
 	//*tbx_dp.text = "0";
 
-	char str[10];
+	//char str[10];
 
 	// Set actual value of current data point
 	tbx_act.numSrc.floatSrc = &buf_acty_linset[0];
-	sprintf(&str[0], "%.2f", buf_acty_linset[0]); //%.2lf
-	strcpy(tbx_act.text, &str[0]);
-	*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
+	tbx_act.numSrc.srcOffset = (uint16_t*)&DP_cur;
+	//sprintf(&str[0], "%.2f", buf_acty_linset[0]); //%.2lf
+	//strcpy(tbx_act.text, &str[0]);
+	//*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
 
 	// Set nominal value of current data point
 	tbx_nom.numSrc.intSrc = &buf_nomx_linset[0];
-	sprintf(&str[0], "%d", buf_nomx_linset[0]); //%.2lf
-	strcpy(tbx_nom.text, &str[0]);
-	*tbx_nom.text_curlen = strlen(&tbx_nom.text[0]);
+	tbx_nom.numSrc.srcOffset = (uint16_t*)&DP_cur;
+	//sprintf(&str[0], "%d", buf_nomx_linset[0]); //%.2lf
+	//strcpy(tbx_nom.text, &str[0]);
+	//*tbx_nom.text_curlen = strlen(&tbx_nom.text[0]);
 
 	//printf("prep y1: %lf", buf_acty_linset[1]);
 }
@@ -908,7 +967,7 @@ void linset_setEditMode(uint8_t editMode){
 		// Deactivate data point selector buttons and textbox (read-only)
 		btn_db_last.mytag = 0;
 		btn_db_next.mytag = 0;
-		tbx_dp.mytag = 0;
+		//tbx_dp.mytag = 0;
 	}
 	// Set to view mode - deactivate textbox for actual value and activate data point selection again
 	else{
@@ -922,7 +981,7 @@ void linset_setEditMode(uint8_t editMode){
 		// Activate data point selector buttons and textbox (read/write)
 		btn_db_last.mytag = BTN_DP_LAST_TAG;
 		btn_db_next.mytag = BTN_DP_NEXT_TAG;
-		tbx_dp.mytag = TBX_DP_TAG;
+		//tbx_dp.mytag = TBX_DP_TAG;
 	}
 
 }
@@ -1092,17 +1151,22 @@ void TFT_display_menu_linset(void){
 
 	// If current data point is is edit mode - save current nominal value
 	if(tbx_act.mytag != 0){
-		*tbx_nom.numSrc.intSrc = linset_sensBuffer[*linset_sensBuffer_curIdx];
+		tbx_nom.numSrc.intSrc[*tbx_nom.numSrc.srcOffset] = linset_sensBuffer[*linset_sensBuffer_curIdx];
 	}
 
 	// Sort buf_acty_linset & buf_nomx_linset based on nomx and change current datapoint if necessary
-	DP_cur = menu_shelf_datapoint(buf_nomx_linset, buf_acty_linset, DP_size, DP_cur);
-	tbx_act.numSrc.floatSrc = &buf_acty_linset[DP_cur];
-	tbx_nom.numSrc.intSrc = &buf_nomx_linset[DP_cur];
+	//DP_cur = menu_shelf_datapoint(buf_nomx_linset, buf_acty_linset, DP_size, DP_cur);
+	//tbx_act.numSrc.floatSrc = &buf_acty_linset[DP_cur];
+	//tbx_nom.numSrc.intSrc = &buf_nomx_linset[DP_cur];
 
 	// Write current nominal value to nominal textbox (the numerical source of a textbox is only used to write back to it on user input, not to refresh the value from there) ToDo: YET!
-	sprintf(tbx_nom.text, "%d", *tbx_nom.numSrc.intSrc); // float to string conversion
+	//sprintf(tbx_nom.text, "%d", *tbx_nom.numSrc.intSrc); // float to string conversion
 
+	// Change "right" button to "new" if on the edge of points
+	if(DP_cur >= DP_size-1)
+		btn_db_next.text = "+";
+	else
+		btn_db_next.text = ">";
 
 
 	/////////////// GRAPH
@@ -1158,7 +1222,7 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
-				TFT_textbox_setStatus(&tbx_dp, 1, *(tbx_dp.text_curlen));
+				TFT_textbox_setStatus(&tbx_dp, 1, -1);
 			}
 			break;
 		case TBX_ACT_TAG:
@@ -1167,7 +1231,7 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 				*toggle_lock = 42;
 
 				// Activate Keypad and set cursor to end
-				TFT_textbox_setStatus(&tbx_act, 1, *(tbx_act.text_curlen));
+				TFT_textbox_setStatus(&tbx_act, 1,-1);
 			}
 			break;
 		case BTN_DP_LAST_TAG:
@@ -1199,12 +1263,15 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 					if(DP_cur > (DP_size-1)){
 						// Increase size of array
 						DP_size++;
-						buf_acty_linset = realloc(buf_acty_linset, DP_size*sizeof(float));
+						buf_acty_linset = realloc(buf_acty_linset, DP_size*sizeof(float_buffer_t));
 						buf_nomx_linset = realloc(buf_nomx_linset, DP_size*sizeof(int_buffer_t));
 
 						// Set initial value
-						buf_acty_linset[DP_cur] = 0.0;
-						//buf_nomx_linset[DP_cur] = 4095;
+						if(DP_cur > 0)
+							buf_acty_linset[DP_cur] = buf_acty_linset[DP_cur-1];
+						else
+							buf_acty_linset[DP_cur] = buf_acty_linset[DP_cur+1];
+						buf_nomx_linset[DP_cur] = 42;
 
 						// Set data point to edit mode
 						linset_setEditMode(1);
@@ -1237,7 +1304,7 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 			break;
 		default:
 			TFT_textbox_touch(&tbx_act);
-			TFT_textbox_touch(&tbx_dp);
+			//TFT_textbox_touch(&tbx_dp); // TODO: Commented out because there needs to be an border check before this is useful
 			break;
 	}
 
@@ -1248,20 +1315,20 @@ void TFT_touch_menu_linset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInPro
 
 		// Set source pointers
 		//tbx_dp.num_src = &DP_cur;
-		tbx_act.numSrc.floatSrc = &buf_acty_linset[DP_cur];
-		tbx_nom.numSrc.intSrc = &buf_nomx_linset[DP_cur];
+		//tbx_act.numSrc.floatSrc = &buf_acty_linset[DP_cur];
+		//tbx_nom.numSrc.intSrc = &buf_nomx_linset[DP_cur];
 
 
-		char str[10];
-		// Set data point text and length
-		sprintf(&str[0], "%d", DP_cur); //%.2lf
-		strcpy(tbx_dp.text, &str[0]);
-		*tbx_dp.text_curlen = strlen(&tbx_dp.text[0]);
-
-		// Set actual value text and length
-		sprintf(&str[0], "%.2lf", buf_acty_linset[DP_cur]); //%.2lf
-		strcpy(tbx_act.text, &str[0]);
-		*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
+		//char str[10];
+		//// Set data point text and length
+		//sprintf(&str[0], "%d", DP_cur); //%.2lf
+		//strcpy(tbx_dp.text, &str[0]);
+		//*tbx_dp.text_curlen = strlen(&tbx_dp.text[0]);
+		//
+		//// Set actual value text and length
+		//sprintf(&str[0], "%.2lf", buf_acty_linset[DP_cur]); //%.2lf
+		//strcpy(tbx_act.text, &str[0]);
+		//*tbx_act.text_curlen = strlen(&tbx_act.text[0]);
 	}
 }
 
