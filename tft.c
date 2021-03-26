@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <globals.h>
-#include "EVE.h"
+#include "Libraries/FT800-FT813-5.x/EVE.h"
 #include "tft_data.h"
 #include "menu.h"
 #include "tft.h"

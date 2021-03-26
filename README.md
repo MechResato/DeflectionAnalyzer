@@ -81,7 +81,9 @@
 The currently here growing project acts as a storage for a theses and is still under construction (estimated finalization May 2021). The main goals of the project are:
 * [Design of an detachable Platform used to analyze motorcycle suspensions]
 * [Highly modular code structure to be reused in various situations]
-* [Creation of an reusable embedded system platform with sensor/bus input (CAN, I2C, SPI, 0-10V, ...) as well as output via TFT and logging on an SD-Card]
+* [Creation of an reusable embedded system platform with sensor/bus input (CAN, I2C, SPI, 0-5V, ...) as well as output via TFT and logging on an SD-Card]
+
+Preview Video: [https://www.youtube.com/watch?v=uU-0lam_NbY](https://www.youtube.com/watch?v=uU-0lam_NbY)
 
 ### Hardware
 * [Microcontroller Board: Infineon XMC4700 Relax Kit](https://www.infineon.com/cms/de/product/evaluation-boards/kit_xmc47_relax_v1/)

@@ -5,7 +5,7 @@
  *      Author: Admin
  */
 
-#include "FT800-FT813-5.x/tft.h"
+#include <tft.h>
 
 #ifndef MENU_H_
 #define MENU_H_

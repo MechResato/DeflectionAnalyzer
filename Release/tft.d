@@ -1,4 +1,5 @@
-main.o main.d main.o: ../main.c \
+tft.o tft.d tft.o: ../tft.c \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_common.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Libraries/XMCLib/inc/xmc_device.h \
@@ -74,9 +75,13 @@ main.o main.d main.o: ../main.c \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/SDMMC_BLOCK/SDMMC_BLOCK.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/RTC/rtc.h \
  C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/FATFS/fatfs_extern.h \
- C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h \
- C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/measure.h \
- C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/tft.h
+ ../Libraries/FT800-FT813-5.x/EVE.h \
+ ../Libraries/FT800-FT813-5.x/EVE_target.h \
+ ../Libraries/FT800-FT813-5.x/EVE_config.h \
+ ../Libraries/FT800-FT813-5.x/EVE_commands.h ../tft_data.h ../menu.h \
+ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/tft.h ../tft.h
+
+C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h:
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/DAVE.h:
 
@@ -228,8 +233,18 @@ C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/RTC/rtc.h:
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/Dave/Generated/FATFS/fatfs_extern.h:
 
-C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/globals.h:
+../Libraries/FT800-FT813-5.x/EVE.h:
 
-C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/measure.h:
+../Libraries/FT800-FT813-5.x/EVE_target.h:
+
+../Libraries/FT800-FT813-5.x/EVE_config.h:
+
+../Libraries/FT800-FT813-5.x/EVE_commands.h:
+
+../tft_data.h:
+
+../menu.h:
 
 C:/Workspaces/DAVE-4.4.2-64Bit_WS/DeflectionAnalyzer/tft.h:
+
+../tft.h:

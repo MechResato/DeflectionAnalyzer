@@ -2,7 +2,7 @@
  * menu.c
  *
  *  Created on: 25 Feb 2021
- *      Author: Admin
+ *      Author: Rene Santeler
  */
 
 #include <stdint.h>
@@ -11,9 +11,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <DAVE.h>
-#include <globals.h>
+#include "globals.h"
+#include "tft.h"
 #include "FT800-FT813-5.x/EVE.h"
-#include "FT800-FT813-5.x/tft.h"
 #include "polyfit/polyfit.h"
 #include "record.h"
 #include "menu.h"

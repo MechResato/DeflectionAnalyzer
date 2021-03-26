@@ -8,21 +8,27 @@ C_SRCS += \
 ../main.c \
 ../measure.c \
 ../menu.c \
-../record.c 
+../record.c \
+../tft.c \
+../tft_data.c 
 
 OBJS += \
 ./globals.o \
 ./main.o \
 ./measure.o \
 ./menu.o \
-./record.o 
+./record.o \
+./tft.o \
+./tft_data.o 
 
 C_DEPS += \
 ./globals.d \
 ./main.d \
 ./measure.d \
 ./menu.d \
-./record.d 
+./record.d \
+./tft.d \
+./tft_data.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

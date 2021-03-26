@@ -5,21 +5,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Libraries/FT800-FT813-5.x/EVE_commands.c \
-../Libraries/FT800-FT813-5.x/EVE_target.c \
-../Libraries/FT800-FT813-5.x/tft.c \
-../Libraries/FT800-FT813-5.x/tft_data.c 
+../Libraries/FT800-FT813-5.x/EVE_target.c 
 
 OBJS += \
 ./Libraries/FT800-FT813-5.x/EVE_commands.o \
-./Libraries/FT800-FT813-5.x/EVE_target.o \
-./Libraries/FT800-FT813-5.x/tft.o \
-./Libraries/FT800-FT813-5.x/tft_data.o 
+./Libraries/FT800-FT813-5.x/EVE_target.o 
 
 C_DEPS += \
 ./Libraries/FT800-FT813-5.x/EVE_commands.d \
-./Libraries/FT800-FT813-5.x/EVE_target.d \
-./Libraries/FT800-FT813-5.x/tft.d \
-./Libraries/FT800-FT813-5.x/tft_data.d 
+./Libraries/FT800-FT813-5.x/EVE_target.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

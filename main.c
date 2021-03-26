@@ -12,8 +12,8 @@
 #include <stdint.h>
 #include <math.h>
 #include <globals.h>
-#include <FT800-FT813-5.x/tft.h> // Implementation of display communication using the EVE Library of Rudolph Riedel
 #include <measure.h>
+#include <tft.h> // Implementation of display communication using the EVE Library of Rudolph Riedel
 
 // This file is kept as clean as possible. All variables and functions used by more than one component are stated in the 'globals' files.
 // See "globals" for details on how everything works together
