@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <DAVE.h>
+#include "globals.h"
 
 
 FATFS fs; /* File system object (volume work area) */
@@ -18,24 +19,27 @@ FIL fil; /* File object */
 
 void record_buffer(void)
 {
+	// Example from Infineon for test purpose. TODO
+
 	FRESULT res; /* API result code */
 	UINT bw,br; /* Bytes written */
-	char buff[20];
+	char buff[25];
 
 	/* Register work area */
 	res = f_mount(&fs, "0:", 1);
 	if (res == FR_OK)
 	{
 		/* Create a new directory */
-		res = f_mkdir("XMC4500");
+		res = f_mkdir("Record");
 		if ((res == FR_OK) || (res == FR_EXIST))
 		{
 			/* Create a file as new */
-			res = f_open(&fil, "XMC4500/hello.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+			res = f_open(&fil, "Record/log.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
 			if ((res == FR_OK) || (res == FR_EXIST))
 			{
 				/* Write a message */
-				res = f_write(&fil, "Hello, World!\r\n", 15, &bw);
+				sprintf(buff,"Current value %d\n", InputBuffer1[InputBuffer1_idx]);
+				res = f_write(&fil, buff, 15, &bw);
 				if (res == FR_OK )
 				{
 					res = f_lseek(&fil, 0);

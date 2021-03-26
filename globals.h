@@ -10,7 +10,7 @@
 #define GLOBALS_H_
 
 /*  MACROS - DEFINEs */
-#define DEBUG_ENABLE // self implemented Debug flag
+//#define DEBUG_ENABLE // self implemented Debug flag
 #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
 // Function to convert a float to int16 with rounding // https://stackoverflow.com/questions/24723180/c-convert-floating-point-to-int
@@ -34,6 +34,8 @@ volatile uint32_t MeasurementCounter;
 uint16_t InputBuffer1_idx;
 extern int_buffer_t InputBuffer1[];
 extern float_buffer_t InputBuffer1_conv[];
+extern uint8_t s1_fit_order;
+extern float s1_coefficients[4];
 
 /*  MENU AND USER INTERFACE */
 volatile uint8_t InputType;

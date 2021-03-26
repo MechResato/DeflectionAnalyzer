@@ -1,0 +1,2571 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "menu.c"
+  16              	 .section .text.TFT_display_static_menu0,"ax",%progbits
+  17              	 .align 1
+  18              	 .global TFT_display_static_menu0
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	TFT_display_static_menu0:
+  23              	 
+  24              	 
+  25 0000 07B5     	 push {r0,r1,r2,lr}
+  26 0002 0020     	 movs r0,#0
+  27 0004 FFF7FEFF 	 bl TFT_setMenu
+  28 0008 0120     	 movs r0,#1
+  29 000a 0E49     	 ldr r1,.L2
+  30 000c FFF7FEFF 	 bl TFT_header
+  31 0010 0D4B     	 ldr r3,.L2+4
+  32 0012 0093     	 str r3,[sp]
+  33 0014 03F50513 	 add r3,r3,#2179072
+  34 0018 0C4A     	 ldr r2,.L2+8
+  35 001a 0D49     	 ldr r1,.L2+12
+  36 001c 03F65433 	 addw r3,r3,#2900
+  37 0020 0120     	 movs r0,#1
+  38 0022 FFF7FEFF 	 bl TFT_setColor
+  39 0026 0120     	 movs r0,#1
+  40 0028 0A49     	 ldr r1,.L2+16
+  41 002a FFF7FEFF 	 bl TFT_label
+  42 002e 0120     	 movs r0,#1
+  43 0030 0949     	 ldr r1,.L2+20
+  44 0032 FFF7FEFF 	 bl TFT_label
+  45 0036 0949     	 ldr r1,.L2+24
+  46 0038 0120     	 movs r0,#1
+  47 003a 03B0     	 add sp,sp,#12
+  48              	 
+  49 003c 5DF804EB 	 ldr lr,[sp],#4
+  50 0040 FFF7FEBF 	 b TFT_graph_static
+  51              	.L3:
+  52              	 .align 2
+  53              	.L2:
+  54 0044 00000000 	 .word .LANCHOR0
+  55 0048 124B8C00 	 .word 9194258
+  56 004c 2BA9EA00 	 .word 15378731
+  57 0050 29CDF300 	 .word 15977769
+  58 0054 00000000 	 .word .LANCHOR1
+  59 0058 00000000 	 .word .LANCHOR2
+  60 005c 00000000 	 .word .LANCHOR3
+  62              	 .section .text.TFT_display_static_menu1,"ax",%progbits
+  63              	 .align 1
+  64              	 .global TFT_display_static_menu1
+  65              	 .thumb
+  66              	 .thumb_func
+  68              	TFT_display_static_menu1:
+  69              	 
+  70              	 
+  71 0000 07B5     	 push {r0,r1,r2,lr}
+  72 0002 0120     	 movs r0,#1
+  73 0004 FFF7FEFF 	 bl TFT_setMenu
+  74 0008 1749     	 ldr r1,.L5
+  75 000a 0120     	 movs r0,#1
+  76 000c FFF7FEFF 	 bl TFT_header
+  77 0010 4FF04070 	 mov r0,#50331648
+  78 0014 FFF7FEFF 	 bl EVE_cmd_dl_burst
+  79 0018 1448     	 ldr r0,.L5+4
+  80 001a FFF7FEFF 	 bl EVE_cmd_dl_burst
+  81 001e 144B     	 ldr r3,.L5+8
+  82 0020 0093     	 str r3,[sp]
+  83 0022 4FF4B470 	 mov r0,#360
+  84 0026 0A21     	 movs r1,#10
+  85 0028 1A22     	 movs r2,#26
+  86 002a 0023     	 movs r3,#0
+  87 002c FFF7FEFF 	 bl EVE_cmd_text_burst
+  88 0030 104B     	 ldr r3,.L5+12
+  89 0032 0093     	 str r3,[sp]
+  90 0034 4FF4B470 	 mov r0,#360
+  91 0038 1921     	 movs r1,#25
+  92 003a 1A22     	 movs r2,#26
+  93 003c 0023     	 movs r3,#0
+  94 003e FFF7FEFF 	 bl EVE_cmd_text_burst
+  95 0042 0D4B     	 ldr r3,.L5+16
+  96 0044 0093     	 str r3,[sp]
+  97 0046 03F50513 	 add r3,r3,#2179072
+  98 004a 0120     	 movs r0,#1
+  99 004c 0021     	 movs r1,#0
+ 100 004e 0B4A     	 ldr r2,.L5+20
+ 101 0050 03F65433 	 addw r3,r3,#2900
+ 102 0054 FFF7FEFF 	 bl TFT_setColor
+ 103 0058 0949     	 ldr r1,.L5+24
+ 104 005a 0120     	 movs r0,#1
+ 105 005c 03B0     	 add sp,sp,#12
+ 106              	 
+ 107 005e 5DF804EB 	 ldr lr,[sp],#4
+ 108 0062 FFF7FEBF 	 b TFT_label
+ 109              	.L6:
+ 110 0066 00BF     	 .align 2
+ 111              	.L5:
+ 112 0068 00000000 	 .word .LANCHOR4
+ 113 006c 29CDF304 	 .word 83086633
+ 114 0070 00000000 	 .word .LC0
+ 115 0074 03000000 	 .word .LC1
+ 116 0078 124B8C00 	 .word 9194258
+ 117 007c 2BA9EA00 	 .word 15378731
+ 118 0080 00000000 	 .word .LANCHOR5
+ 120              	 .section .text.TFT_display_menu1,"ax",%progbits
+ 121              	 .align 1
+ 122              	 .global TFT_display_menu1
+ 123              	 .thumb
+ 124              	 .thumb_func
+ 126              	TFT_display_menu1:
+ 127              	 
+ 128              	 
+ 129 0000 73B5     	 push {r0,r1,r4,r5,r6,lr}
+ 130 0002 164D     	 ldr r5,.L8
+ 131 0004 164C     	 ldr r4,.L8+4
+ 132 0006 174E     	 ldr r6,.L8+8
+ 133 0008 1749     	 ldr r1,.L8+12
+ 134 000a 0096     	 str r6,[sp]
+ 135 000c 2A46     	 mov r2,r5
+ 136 000e 2346     	 mov r3,r4
+ 137 0010 0120     	 movs r0,#1
+ 138 0012 FFF7FEFF 	 bl TFT_setColor
+ 139 0016 1548     	 ldr r0,.L8+16
+ 140 0018 FFF7FEFF 	 bl TFT_control
+ 141 001c 2A46     	 mov r2,r5
+ 142 001e 2346     	 mov r3,r4
+ 143 0020 0096     	 str r6,[sp]
+ 144 0022 0120     	 movs r0,#1
+ 145 0024 1249     	 ldr r1,.L8+20
+ 146 0026 FFF7FEFF 	 bl TFT_setColor
+ 147 002a 124B     	 ldr r3,.L8+24
+ 148 002c 1B68     	 ldr r3,[r3]
+ 149 002e 0093     	 str r3,[sp]
+ 150 0030 4FF4EB70 	 mov r0,#470
+ 151 0034 0A21     	 movs r1,#10
+ 152 0036 1A22     	 movs r2,#26
+ 153 0038 4FF41063 	 mov r3,#2304
+ 154 003c FFF7FEFF 	 bl EVE_cmd_number_burst
+ 155 0040 0D4B     	 ldr r3,.L8+28
+ 156 0042 1B68     	 ldr r3,[r3]
+ 157 0044 0093     	 str r3,[sp]
+ 158 0046 4FF4EB70 	 mov r0,#470
+ 159 004a 1921     	 movs r1,#25
+ 160 004c 1A22     	 movs r2,#26
+ 161 004e 4FF41063 	 mov r3,#2304
+ 162 0052 FFF7FEFF 	 bl EVE_cmd_number_burst
+ 163 0056 02B0     	 add sp,sp,#8
+ 164              	 
+ 165 0058 70BD     	 pop {r4,r5,r6,pc}
+ 166              	.L9:
+ 167 005a 00BF     	 .align 2
+ 168              	.L8:
+ 169 005c 2BA9EA00 	 .word 15378731
+ 170 0060 6696AD00 	 .word 11376230
+ 171 0064 124B8C00 	 .word 9194258
+ 172 0068 EEF8FF00 	 .word 16775406
+ 173 006c 00000000 	 .word .LANCHOR6
+ 174 0070 29CDF300 	 .word 15977769
+ 175 0074 00000000 	 .word swipeDistance_X
+ 176 0078 00000000 	 .word swipeDistance_Y
+ 178              	 .section .text.TFT_display_static_menu_setup,"ax",%progbits
+ 179              	 .align 1
+ 180              	 .global TFT_display_static_menu_setup
+ 181              	 .thumb
+ 182              	 .thumb_func
+ 184              	TFT_display_static_menu_setup:
+ 185              	 
+ 186              	 
+ 187 0000 07B5     	 push {r0,r1,r2,lr}
+ 188 0002 0220     	 movs r0,#2
+ 189 0004 FFF7FEFF 	 bl TFT_setMenu
+ 190 0008 0120     	 movs r0,#1
+ 191 000a 1849     	 ldr r1,.L11
+ 192 000c FFF7FEFF 	 bl TFT_header
+ 193 0010 174B     	 ldr r3,.L11+4
+ 194 0012 0093     	 str r3,[sp]
+ 195 0014 03F50513 	 add r3,r3,#2179072
+ 196 0018 164A     	 ldr r2,.L11+8
+ 197 001a 03F65433 	 addw r3,r3,#2900
+ 198 001e 0120     	 movs r0,#1
+ 199 0020 0021     	 movs r1,#0
+ 200 0022 FFF7FEFF 	 bl TFT_setColor
+ 201 0026 0120     	 movs r0,#1
+ 202 0028 1349     	 ldr r1,.L11+12
+ 203 002a FFF7FEFF 	 bl TFT_label
+ 204 002e 0120     	 movs r0,#1
+ 205 0030 1249     	 ldr r1,.L11+16
+ 206 0032 FFF7FEFF 	 bl TFT_textbox_static
+ 207 0036 0120     	 movs r0,#1
+ 208 0038 1149     	 ldr r1,.L11+20
+ 209 003a FFF7FEFF 	 bl TFT_label
+ 210 003e 0120     	 movs r0,#1
+ 211 0040 1049     	 ldr r1,.L11+24
+ 212 0042 FFF7FEFF 	 bl TFT_textbox_static
+ 213 0046 0120     	 movs r0,#1
+ 214 0048 0F49     	 ldr r1,.L11+28
+ 215 004a FFF7FEFF 	 bl TFT_textbox_static
+ 216 004e 0120     	 movs r0,#1
+ 217 0050 0E49     	 ldr r1,.L11+32
+ 218 0052 FFF7FEFF 	 bl TFT_label
+ 219 0056 0120     	 movs r0,#1
+ 220 0058 0D49     	 ldr r1,.L11+36
+ 221 005a FFF7FEFF 	 bl TFT_textbox_static
+ 222 005e 0D49     	 ldr r1,.L11+40
+ 223 0060 0120     	 movs r0,#1
+ 224 0062 03B0     	 add sp,sp,#12
+ 225              	 
+ 226 0064 5DF804EB 	 ldr lr,[sp],#4
+ 227 0068 FFF7FEBF 	 b TFT_label
+ 228              	.L12:
+ 229              	 .align 2
+ 230              	.L11:
+ 231 006c 00000000 	 .word .LANCHOR7
+ 232 0070 124B8C00 	 .word 9194258
+ 233 0074 2BA9EA00 	 .word 15378731
+ 234 0078 00000000 	 .word .LANCHOR8
+ 235 007c 00000000 	 .word .LANCHOR9
+ 236 0080 00000000 	 .word .LANCHOR10
+ 237 0084 00000000 	 .word .LANCHOR11
+ 238 0088 00000000 	 .word .LANCHOR12
+ 239 008c 00000000 	 .word .LANCHOR13
+ 240 0090 00000000 	 .word .LANCHOR14
+ 241 0094 00000000 	 .word .LANCHOR15
+ 243              	 .section .text.TFT_display_static_menu_curveset,"ax",%progbits
+ 244              	 .align 1
+ 245              	 .global TFT_display_static_menu_curveset
+ 246              	 .thumb
+ 247              	 .thumb_func
+ 249              	TFT_display_static_menu_curveset:
+ 250              	 
+ 251              	 
+ 252 0000 07B5     	 push {r0,r1,r2,lr}
+ 253 0002 0320     	 movs r0,#3
+ 254 0004 FFF7FEFF 	 bl TFT_setMenu
+ 255 0008 0E4B     	 ldr r3,.L14
+ 256 000a 0093     	 str r3,[sp]
+ 257 000c 03F50513 	 add r3,r3,#2179072
+ 258 0010 0D4A     	 ldr r2,.L14+4
+ 259 0012 03F65433 	 addw r3,r3,#2900
+ 260 0016 0120     	 movs r0,#1
+ 261 0018 0021     	 movs r1,#0
+ 262 001a FFF7FEFF 	 bl TFT_setColor
+ 263 001e 0120     	 movs r0,#1
+ 264 0020 0A49     	 ldr r1,.L14+8
+ 265 0022 FFF7FEFF 	 bl TFT_graph_static
+ 266 0026 0120     	 movs r0,#1
+ 267 0028 0949     	 ldr r1,.L14+12
+ 268 002a FFF7FEFF 	 bl TFT_textbox_static
+ 269 002e 0120     	 movs r0,#1
+ 270 0030 0849     	 ldr r1,.L14+16
+ 271 0032 FFF7FEFF 	 bl TFT_textbox_static
+ 272 0036 0849     	 ldr r1,.L14+20
+ 273 0038 0120     	 movs r0,#1
+ 274 003a 03B0     	 add sp,sp,#12
+ 275              	 
+ 276 003c 5DF804EB 	 ldr lr,[sp],#4
+ 277 0040 FFF7FEBF 	 b TFT_textbox_static
+ 278              	.L15:
+ 279              	 .align 2
+ 280              	.L14:
+ 281 0044 124B8C00 	 .word 9194258
+ 282 0048 2BA9EA00 	 .word 15378731
+ 283 004c 00000000 	 .word .LANCHOR16
+ 284 0050 00000000 	 .word .LANCHOR17
+ 285 0054 00000000 	 .word .LANCHOR18
+ 286 0058 00000000 	 .word .LANCHOR19
+ 288              	 .section .text.TFT_display_menu_setup,"ax",%progbits
+ 289              	 .align 1
+ 290              	 .global TFT_display_menu_setup
+ 291              	 .thumb
+ 292              	 .thumb_func
+ 294              	TFT_display_menu_setup:
+ 295              	 
+ 296              	 
+ 297 0000 07B5     	 push {r0,r1,r2,lr}
+ 298 0002 154B     	 ldr r3,.L17
+ 299 0004 0093     	 str r3,[sp]
+ 300 0006 03F50513 	 add r3,r3,#2179072
+ 301 000a 1449     	 ldr r1,.L17+4
+ 302 000c 144A     	 ldr r2,.L17+8
+ 303 000e 03F65433 	 addw r3,r3,#2900
+ 304 0012 0120     	 movs r0,#1
+ 305 0014 FFF7FEFF 	 bl TFT_setColor
+ 306 0018 1248     	 ldr r0,.L17+12
+ 307 001a FFF7FEFF 	 bl TFT_control
+ 308 001e 1248     	 ldr r0,.L17+16
+ 309 0020 FFF7FEFF 	 bl TFT_control
+ 310 0024 1148     	 ldr r0,.L17+20
+ 311 0026 FFF7FEFF 	 bl TFT_control
+ 312 002a 4FF0FF32 	 mov r2,#-1
+ 313 002e 0092     	 str r2,[sp]
+ 314 0030 0021     	 movs r1,#0
+ 315 0032 1346     	 mov r3,r2
+ 316 0034 0120     	 movs r0,#1
+ 317 0036 FFF7FEFF 	 bl TFT_setColor
+ 318 003a 0D48     	 ldr r0,.L17+24
+ 319 003c FFF7FEFF 	 bl TFT_textbox_display
+ 320 0040 0C48     	 ldr r0,.L17+28
+ 321 0042 FFF7FEFF 	 bl TFT_textbox_display
+ 322 0046 0C48     	 ldr r0,.L17+32
+ 323 0048 FFF7FEFF 	 bl TFT_textbox_display
+ 324 004c 0B48     	 ldr r0,.L17+36
+ 325 004e 03B0     	 add sp,sp,#12
+ 326              	 
+ 327 0050 5DF804EB 	 ldr lr,[sp],#4
+ 328 0054 FFF7FEBF 	 b TFT_textbox_display
+ 329              	.L18:
+ 330              	 .align 2
+ 331              	.L17:
+ 332 0058 124B8C00 	 .word 9194258
+ 333 005c EEF8FF00 	 .word 16775406
+ 334 0060 2BA9EA00 	 .word 15378731
+ 335 0064 00000000 	 .word .LANCHOR20
+ 336 0068 00000000 	 .word .LANCHOR21
+ 337 006c 00000000 	 .word .LANCHOR22
+ 338 0070 00000000 	 .word .LANCHOR9
+ 339 0074 00000000 	 .word .LANCHOR11
+ 340 0078 00000000 	 .word .LANCHOR12
+ 341 007c 00000000 	 .word .LANCHOR14
+ 343              	 .section .text.TFT_touch_menu0,"ax",%progbits
+ 344              	 .align 1
+ 345              	 .global TFT_touch_menu0
+ 346              	 .thumb
+ 347              	 .thumb_func
+ 349              	TFT_touch_menu0:
+ 350              	 
+ 351              	 
+ 352              	 
+ 353 0000 0C28     	 cmp r0,#12
+ 354 0002 02D0     	 beq .L21
+ 355 0004 0D28     	 cmp r0,#13
+ 356 0006 18D0     	 beq .L22
+ 357 0008 7047     	 bx lr
+ 358              	.L21:
+ 359 000a 0A78     	 ldrb r2,[r1]
+ 360 000c 002A     	 cmp r2,#0
+ 361 000e 56D1     	 bne .L19
+ 362 0010 2A23     	 movs r3,#42
+ 363 0012 0B70     	 strb r3,[r1]
+ 364 0014 2A4B     	 ldr r3,.L33
+ 365 0016 2B49     	 ldr r1,.L33+4
+ 366 0018 988A     	 ldrh r0,[r3,#20]
+ 367 001a 40B9     	 cbnz r0,.L23
+ 368 001c 4FF6FF72 	 movw r2,#65535
+ 369 0020 9A82     	 strh r2,[r3,#20]
+ 370 0022 294A     	 ldr r2,.L33+8
+ 371 0024 1A61     	 str r2,[r3,#16]
+ 372 0026 0123     	 movs r3,#1
+ 373 0028 81F82C30 	 strb r3,[r1,#44]
+ 374 002c 7047     	 bx lr
+ 375              	.L23:
+ 376 002e 2748     	 ldr r0,.L33+12
+ 377 0030 9A82     	 strh r2,[r3,#20]
+ 378 0032 1861     	 str r0,[r3,#16]
+ 379 0034 81F82C20 	 strb r2,[r1,#44]
+ 380 0038 7047     	 bx lr
+ 381              	.L22:
+ 382 003a 0A78     	 ldrb r2,[r1]
+ 383 003c 002A     	 cmp r2,#0
+ 384 003e 3ED1     	 bne .L19
+ 385 0040 2A23     	 movs r3,#42
+ 386 0042 0B70     	 strb r3,[r1]
+ 387 0044 224B     	 ldr r3,.L33+16
+ 388 0046 1978     	 ldrb r1,[r3]
+ 389 0048 01B9     	 cbnz r1,.L24
+ 390 004a 0422     	 movs r2,#4
+ 391              	.L24:
+ 392 004c 1A70     	 strb r2,[r3]
+ 393 004e 1978     	 ldrb r1,[r3]
+ 394 0050 1F4A     	 ldr r2,.L33+16
+ 395 0052 204B     	 ldr r3,.L33+20
+ 396 0054 81B9     	 cbnz r1,.L26
+ 397 0056 204A     	 ldr r2,.L33+24
+ 398 0058 1A61     	 str r2,[r3,#16]
+ 399 005a 204B     	 ldr r3,.L33+28
+ 400 005c 204A     	 ldr r2,.L33+32
+ 401 005e 9A60     	 str r2,[r3,#8]
+ 402 0060 2049     	 ldr r1,.L33+36
+ 403 0062 1961     	 str r1,[r3,#16]
+ 404 0064 0122     	 movs r2,#1
+ 405 0066 1A76     	 strb r2,[r3,#24]
+ 406 0068 1A73     	 strb r2,[r3,#12]
+ 407 006a 164B     	 ldr r3,.L33+4
+ 408 006c 1E4A     	 ldr r2,.L33+40
+ 409 006e 9A61     	 str r2,[r3,#24]
+ 410 0070 1E4A     	 ldr r2,.L33+44
+ 411 0072 5A61     	 str r2,[r3,#20]
+ 412 0074 1E4A     	 ldr r2,.L33+48
+ 413 0076 1DE0     	 b .L31
+ 414              	.L26:
+ 415 0078 1178     	 ldrb r1,[r2]
+ 416 007a 0129     	 cmp r1,#1
+ 417 007c 01D1     	 bne .L28
+ 418 007e 1D4A     	 ldr r2,.L33+52
+ 419 0080 18E0     	 b .L31
+ 420              	.L28:
+ 421 0082 1178     	 ldrb r1,[r2]
+ 422 0084 0229     	 cmp r1,#2
+ 423 0086 01D1     	 bne .L29
+ 424 0088 1B4A     	 ldr r2,.L33+56
+ 425 008a 13E0     	 b .L31
+ 426              	.L29:
+ 427 008c 1278     	 ldrb r2,[r2]
+ 428 008e 032A     	 cmp r2,#3
+ 429 0090 01D1     	 bne .L30
+ 430 0092 1A4A     	 ldr r2,.L33+60
+ 431 0094 0EE0     	 b .L31
+ 432              	.L30:
+ 433 0096 1A4A     	 ldr r2,.L33+64
+ 434 0098 1A61     	 str r2,[r3,#16]
+ 435 009a 104B     	 ldr r3,.L33+28
+ 436 009c 194A     	 ldr r2,.L33+68
+ 437 009e 9A60     	 str r2,[r3,#8]
+ 438 00a0 1949     	 ldr r1,.L33+72
+ 439 00a2 1961     	 str r1,[r3,#16]
+ 440 00a4 0222     	 movs r2,#2
+ 441 00a6 1A76     	 strb r2,[r3,#24]
+ 442 00a8 1A73     	 strb r2,[r3,#12]
+ 443 00aa 064B     	 ldr r3,.L33+4
+ 444 00ac 174A     	 ldr r2,.L33+76
+ 445 00ae 9A61     	 str r2,[r3,#24]
+ 446 00b0 5A61     	 str r2,[r3,#20]
+ 447 00b2 174A     	 ldr r2,.L33+80
+ 448              	.L31:
+ 449 00b4 1A61     	 str r2,[r3,#16]
+ 450 00b6 4FF0FF30 	 mov r0,#-1
+ 451 00ba FFF7FEBF 	 b TFT_setMenu
+ 452              	.L19:
+ 453 00be 7047     	 bx lr
+ 454              	.L34:
+ 455              	 .align 2
+ 456              	.L33:
+ 457 00c0 00000000 	 .word .LANCHOR23
+ 458 00c4 00000000 	 .word .LANCHOR3
+ 459 00c8 06000000 	 .word .LC2
+ 460 00cc 0B000000 	 .word .LC3
+ 461 00d0 00000000 	 .word InputType
+ 462 00d4 00000000 	 .word .LANCHOR24
+ 463 00d8 11000000 	 .word .LC4
+ 464 00dc 00000000 	 .word .LANCHOR25
+ 465 00e0 16000000 	 .word .LC5
+ 466 00e4 00000000 	 .word InputBuffer1
+ 467 00e8 6666A640 	 .word 1084647014
+ 468 00ec 00F07F45 	 .word 1166012416
+ 469 00f0 19000000 	 .word .LC6
+ 470 00f4 1B000000 	 .word .LC7
+ 471 00f8 1F000000 	 .word .LC8
+ 472 00fc 23000000 	 .word .LC9
+ 473 0100 28000000 	 .word .LC10
+ 474 0104 30000000 	 .word .LC11
+ 475 0108 00000000 	 .word InputBuffer1_conv
+ 476 010c 00008C42 	 .word 1116471296
+ 477 0110 3B000000 	 .word .LC12
+ 479              	 .section .text.TFT_display_menu0,"ax",%progbits
+ 480              	 .align 1
+ 481              	 .global TFT_display_menu0
+ 482              	 .thumb
+ 483              	 .thumb_func
+ 485              	TFT_display_menu0:
+ 486              	 
+ 487              	 
+ 488 0000 07B5     	 push {r0,r1,r2,lr}
+ 489 0002 184B     	 ldr r3,.L38
+ 490 0004 0093     	 str r3,[sp]
+ 491 0006 03F50513 	 add r3,r3,#2179072
+ 492 000a 03F65433 	 addw r3,r3,#2900
+ 493 000e 164A     	 ldr r2,.L38+4
+ 494 0010 1649     	 ldr r1,.L38+8
+ 495 0012 0120     	 movs r0,#1
+ 496 0014 FFF7FEFF 	 bl TFT_setColor
+ 497 0018 1548     	 ldr r0,.L38+12
+ 498 001a FFF7FEFF 	 bl TFT_control
+ 499 001e 1548     	 ldr r0,.L38+16
+ 500 0020 FFF7FEFF 	 bl TFT_control
+ 501 0024 0120     	 movs r0,#1
+ 502 0026 1449     	 ldr r1,.L38+20
+ 503 0028 FFF7FEFF 	 bl TFT_label
+ 504 002c 0120     	 movs r0,#1
+ 505 002e 1349     	 ldr r1,.L38+24
+ 506 0030 FFF7FEFF 	 bl TFT_label
+ 507 0034 124B     	 ldr r3,.L38+28
+ 508 0036 1348     	 ldr r0,.L38+32
+ 509 0038 1B78     	 ldrb r3,[r3]
+ 510 003a 042B     	 cmp r3,#4
+ 511 003c 43F69E73 	 movw r3,#16286
+ 512 0040 0093     	 str r3,[sp]
+ 513 0042 06D1     	 bne .L36
+ 514 0044 1049     	 ldr r1,.L38+36
+ 515 0046 114B     	 ldr r3,.L38+40
+ 516 0048 4FF4DC72 	 mov r2,#440
+ 517 004c FFF7FEFF 	 bl TFT_graph_pixeldata_f
+ 518 0050 05E0     	 b .L35
+ 519              	.L36:
+ 520 0052 0F49     	 ldr r1,.L38+44
+ 521 0054 0D4B     	 ldr r3,.L38+40
+ 522 0056 4FF4DC72 	 mov r2,#440
+ 523 005a FFF7FEFF 	 bl TFT_graph_pixeldata_i
+ 524              	.L35:
+ 525 005e 03B0     	 add sp,sp,#12
+ 526              	 
+ 527 0060 5DF804FB 	 ldr pc,[sp],#4
+ 528              	.L39:
+ 529              	 .align 2
+ 530              	.L38:
+ 531 0064 124B8C00 	 .word 9194258
+ 532 0068 2BA9EA00 	 .word 15378731
+ 533 006c EEF8FF00 	 .word 16775406
+ 534 0070 00000000 	 .word .LANCHOR24
+ 535 0074 00000000 	 .word .LANCHOR23
+ 536 0078 00000000 	 .word .LANCHOR26
+ 537 007c 00000000 	 .word .LANCHOR25
+ 538 0080 00000000 	 .word InputType
+ 539 0084 00000000 	 .word .LANCHOR3
+ 540 0088 00000000 	 .word InputBuffer1_conv
+ 541 008c 00000000 	 .word InputBuffer1_idx
+ 542 0090 00000000 	 .word InputBuffer1
+ 544              	 .section .text.TFT_touch_menu1,"ax",%progbits
+ 545              	 .align 1
+ 546              	 .global TFT_touch_menu1
+ 547              	 .thumb
+ 548              	 .thumb_func
+ 550              	TFT_touch_menu1:
+ 551              	 
+ 552              	 
+ 553              	 
+ 554 0000 0A28     	 cmp r0,#10
+ 555 0002 05D1     	 bne .L40
+ 556 0004 0B78     	 ldrb r3,[r1]
+ 557 0006 1BB9     	 cbnz r3,.L40
+ 558 0008 2A23     	 movs r3,#42
+ 559 000a 0B70     	 strb r3,[r1]
+ 560 000c FFF7FEBF 	 b record_buffer
+ 561              	.L40:
+ 562 0010 7047     	 bx lr
+ 564              	 .section .text.curveset_setEditMode.part.3,"ax",%progbits
+ 565              	 .align 1
+ 566              	 .thumb
+ 567              	 .thumb_func
+ 569              	curveset_setEditMode.part.3:
+ 570              	 
+ 571              	 
+ 572              	 
+ 573 0000 074B     	 ldr r3,.L44
+ 574 0002 4FF48072 	 mov r2,#256
+ 575 0006 9A82     	 strh r2,[r3,#20]
+ 576 0008 064A     	 ldr r2,.L44+4
+ 577 000a 1A61     	 str r2,[r3,#16]
+ 578 000c 064B     	 ldr r3,.L44+8
+ 579 000e 1A22     	 movs r2,#26
+ 580 0010 1A73     	 strb r2,[r3,#12]
+ 581 0012 064A     	 ldr r2,.L44+12
+ 582 0014 0023     	 movs r3,#0
+ 583 0016 1373     	 strb r3,[r2,#12]
+ 584 0018 054A     	 ldr r2,.L44+16
+ 585 001a 1373     	 strb r3,[r2,#12]
+ 586 001c 7047     	 bx lr
+ 587              	.L45:
+ 588 001e 00BF     	 .align 2
+ 589              	.L44:
+ 590 0020 00000000 	 .word .LANCHOR27
+ 591 0024 3E000000 	 .word .LC13
+ 592 0028 00000000 	 .word .LANCHOR19
+ 593 002c 00000000 	 .word .LANCHOR28
+ 594 0030 00000000 	 .word .LANCHOR29
+ 596              	 .section .text.TFT_display_get_values,"ax",%progbits
+ 597              	 .align 1
+ 598              	 .global TFT_display_get_values
+ 599              	 .thumb
+ 600              	 .thumb_func
+ 602              	TFT_display_get_values:
+ 603              	 
+ 604              	 
+ 605 0000 08B5     	 push {r3,lr}
+ 606 0002 0548     	 ldr r0,.L47
+ 607 0004 FFF7FEFF 	 bl EVE_memRead16
+ 608 0008 044B     	 ldr r3,.L47+4
+ 609 000a 1880     	 strh r0,[r3]
+ 610 000c 0448     	 ldr r0,.L47+8
+ 611 000e FFF7FEFF 	 bl EVE_memRead32
+ 612 0012 044B     	 ldr r3,.L47+12
+ 613 0014 1860     	 str r0,[r3]
+ 614 0016 08BD     	 pop {r3,pc}
+ 615              	.L48:
+ 616              	 .align 2
+ 617              	.L47:
+ 618 0018 00213000 	 .word 3154176
+ 619 001c 00000000 	 .word .LANCHOR30
+ 620 0020 00903000 	 .word 3182592
+ 621 0024 00000000 	 .word .LANCHOR31
+ 623              	 .section .text.curveset_prepare,"ax",%progbits
+ 624              	 .align 1
+ 625              	 .global curveset_prepare
+ 626              	 .thumb
+ 627              	 .thumb_func
+ 629              	curveset_prepare:
+ 630              	 
+ 631              	 
+ 632 0000 194B     	 ldr r3,.L50
+ 633 0002 37B5     	 push {r0,r1,r2,r4,r5,lr}
+ 634 0004 1860     	 str r0,[r3]
+ 635 0006 194B     	 ldr r3,.L50+4
+ 636 0008 1960     	 str r1,[r3]
+ 637 000a 194B     	 ldr r3,.L50+8
+ 638 000c 0325     	 movs r5,#3
+ 639 000e 0C20     	 movs r0,#12
+ 640 0010 1D80     	 strh r5,[r3]
+ 641 0012 FFF7FEFF 	 bl malloc
+ 642 0016 174B     	 ldr r3,.L50+12
+ 643 0018 1860     	 str r0,[r3]
+ 644 001a 0023     	 movs r3,#0
+ 645 001c 0360     	 str r3,[r0]
+ 646 001e 164B     	 ldr r3,.L50+16
+ 647 0020 4360     	 str r3,[r0,#4]
+ 648 0022 164B     	 ldr r3,.L50+20
+ 649 0024 8360     	 str r3,[r0,#8]
+ 650 0026 0446     	 mov r4,r0
+ 651 0028 0C20     	 movs r0,#12
+ 652 002a FFF7FEFF 	 bl malloc
+ 653 002e 144A     	 ldr r2,.L50+24
+ 654 0030 1449     	 ldr r1,.L50+28
+ 655 0032 1060     	 str r0,[r2]
+ 656 0034 144A     	 ldr r2,.L50+32
+ 657 0036 0260     	 str r2,[r0]
+ 658 0038 4FF08A42 	 mov r2,#1157627904
+ 659 003c 4260     	 str r2,[r0,#4]
+ 660 003e 4FF08B42 	 mov r2,#1166016512
+ 661 0042 8260     	 str r2,[r0,#8]
+ 662 0044 114A     	 ldr r2,.L50+36
+ 663 0046 124B     	 ldr r3,.L50+40
+ 664 0048 D462     	 str r4,[r2,#44]
+ 665 004a 1163     	 str r1,[r2,#48]
+ 666 004c 114A     	 ldr r2,.L50+44
+ 667 004e 1B78     	 ldrb r3,[r3]
+ 668 0050 1163     	 str r1,[r2,#48]
+ 669 0052 D062     	 str r0,[r2,#44]
+ 670 0054 104A     	 ldr r2,.L50+48
+ 671 0056 0092     	 str r2,[sp]
+ 672 0058 2146     	 mov r1,r4
+ 673 005a 2A46     	 mov r2,r5
+ 674 005c FFF7FEFF 	 bl polyfit
+ 675 0060 0E4B     	 ldr r3,.L50+52
+ 676 0062 1870     	 strb r0,[r3]
+ 677 0064 03B0     	 add sp,sp,#12
+ 678              	 
+ 679 0066 30BD     	 pop {r4,r5,pc}
+ 680              	.L51:
+ 681              	 .align 2
+ 682              	.L50:
+ 683 0068 00000000 	 .word curveset_sensBuffer
+ 684 006c 00000000 	 .word curveset_sensBuffer_curIdx
+ 685 0070 00000000 	 .word .LANCHOR32
+ 686 0074 00000000 	 .word buf_acty_curveset
+ 687 0078 0000C842 	 .word 1120403456
+ 688 007c 00004843 	 .word 1128792064
+ 689 0080 00000000 	 .word buf_nomx_curveset
+ 690 0084 00000000 	 .word .LANCHOR33
+ 691 0088 00002041 	 .word 1092616192
+ 692 008c 00000000 	 .word .LANCHOR19
+ 693 0090 00000000 	 .word .LANCHOR34
+ 694 0094 00000000 	 .word .LANCHOR18
+ 695 0098 00000000 	 .word .LANCHOR35
+ 696 009c 00000000 	 .word .LANCHOR36
+ 698              	 .section .text.TFT_touch_menu_setup,"ax",%progbits
+ 699              	 .align 1
+ 700              	 .global TFT_touch_menu_setup
+ 701              	 .thumb
+ 702              	 .thumb_func
+ 704              	TFT_touch_menu_setup:
+ 705              	 
+ 706              	 
+ 707 0000 0A38     	 subs r0,r0,#10
+ 708 0002 08B5     	 push {r3,lr}
+ 709 0004 0F28     	 cmp r0,#15
+ 710 0006 5ED8     	 bhi .L53
+ 711 0008 DFE800F0 	 tbb [pc,r0]
+ 712              	.L55:
+ 713 000c 08       	 .byte (.L54-.L55)/2
+ 714 000d 5D       	 .byte (.L53-.L55)/2
+ 715 000e 5D       	 .byte (.L53-.L55)/2
+ 716 000f 5D       	 .byte (.L53-.L55)/2
+ 717 0010 5D       	 .byte (.L53-.L55)/2
+ 718 0011 5D       	 .byte (.L53-.L55)/2
+ 719 0012 5D       	 .byte (.L53-.L55)/2
+ 720 0013 5D       	 .byte (.L53-.L55)/2
+ 721 0014 5D       	 .byte (.L53-.L55)/2
+ 722 0015 5D       	 .byte (.L53-.L55)/2
+ 723 0016 1D       	 .byte (.L56-.L55)/2
+ 724 0017 29       	 .byte (.L57-.L55)/2
+ 725 0018 37       	 .byte (.L58-.L55)/2
+ 726 0019 4A       	 .byte (.L59-.L55)/2
+ 727 001a 45       	 .byte (.L60-.L55)/2
+ 728 001b 53       	 .byte (.L61-.L55)/2
+ 729              	 .p2align 1
+ 730              	.L54:
+ 731 001c 0A78     	 ldrb r2,[r1]
+ 732 001e 002A     	 cmp r2,#0
+ 733 0020 5FD1     	 bne .L52
+ 734 0022 2A23     	 movs r3,#42
+ 735 0024 0B70     	 strb r3,[r1]
+ 736 0026 2F4B     	 ldr r3,.L66
+ 737 0028 998A     	 ldrh r1,[r3,#20]
+ 738 002a 29B9     	 cbnz r1,.L63
+ 739 002c 4FF48072 	 mov r2,#256
+ 740 0030 9A82     	 strh r2,[r3,#20]
+ 741 0032 2D48     	 ldr r0,.L66+4
+ 742 0034 0121     	 movs r1,#1
+ 743 0036 02E0     	 b .L64
+ 744              	.L63:
+ 745 0038 2B48     	 ldr r0,.L66+4
+ 746 003a 9A82     	 strh r2,[r3,#20]
+ 747 003c 8021     	 movs r1,#128
+ 748              	.L64:
+ 749 003e BDE80840 	 pop {r3,lr}
+ 750 0042 FFF7FEBF 	 b EVE_memWrite8
+ 751              	.L56:
+ 752 0046 0B78     	 ldrb r3,[r1]
+ 753 0048 002B     	 cmp r3,#0
+ 754 004a 4AD1     	 bne .L52
+ 755 004c 2A23     	 movs r3,#42
+ 756 004e 2748     	 ldr r0,.L66+8
+ 757 0050 0B70     	 strb r3,[r1]
+ 758 0052 8369     	 ldr r3,[r0,#24]
+ 759 0054 93F90020 	 ldrsb r2,[r3]
+ 760 0058 0121     	 movs r1,#1
+ 761 005a 043A     	 subs r2,r2,#4
+ 762 005c 09E0     	 b .L65
+ 763              	.L57:
+ 764 005e 0B78     	 ldrb r3,[r1]
+ 765 0060 002B     	 cmp r3,#0
+ 766 0062 3ED1     	 bne .L52
+ 767 0064 2A23     	 movs r3,#42
+ 768 0066 2248     	 ldr r0,.L66+12
+ 769 0068 0B70     	 strb r3,[r1]
+ 770 006a 8369     	 ldr r3,[r0,#24]
+ 771 006c 93F90020 	 ldrsb r2,[r3]
+ 772 0070 0121     	 movs r1,#1
+ 773              	.L65:
+ 774 0072 BDE80840 	 pop {r3,lr}
+ 775 0076 FFF7FEBF 	 b TFT_textbox_setStatus
+ 776              	.L58:
+ 777 007a 0B78     	 ldrb r3,[r1]
+ 778 007c 8BBB     	 cbnz r3,.L52
+ 779 007e 2A23     	 movs r3,#42
+ 780 0080 0B70     	 strb r3,[r1]
+ 781 0082 1C48     	 ldr r0,.L66+16
+ 782 0084 1C49     	 ldr r1,.L66+20
+ 783 0086 FFF7FEFF 	 bl curveset_prepare
+ 784 008a 1C4B     	 ldr r3,.L66+24
+ 785 008c 1878     	 ldrb r0,[r3]
+ 786 008e BDE80840 	 pop {r3,lr}
+ 787 0092 FFF7FEBF 	 b TFT_setMenu
+ 788              	.L60:
+ 789 0096 0B78     	 ldrb r3,[r1]
+ 790 0098 1BBB     	 cbnz r3,.L52
+ 791 009a 2A23     	 movs r3,#42
+ 792 009c 0B70     	 strb r3,[r1]
+ 793 009e 08BD     	 pop {r3,pc}
+ 794              	.L59:
+ 795 00a0 0B78     	 ldrb r3,[r1]
+ 796 00a2 F3B9     	 cbnz r3,.L52
+ 797 00a4 2A23     	 movs r3,#42
+ 798 00a6 0B70     	 strb r3,[r1]
+ 799 00a8 1548     	 ldr r0,.L66+28
+ 800 00aa 0121     	 movs r1,#1
+ 801 00ac 4FF0FF32 	 mov r2,#-1
+ 802 00b0 DFE7     	 b .L65
+ 803              	.L61:
+ 804 00b2 0B78     	 ldrb r3,[r1]
+ 805 00b4 3BB9     	 cbnz r3,.L53
+ 806 00b6 2A23     	 movs r3,#42
+ 807 00b8 0B70     	 strb r3,[r1]
+ 808 00ba 1248     	 ldr r0,.L66+32
+ 809 00bc 0121     	 movs r1,#1
+ 810 00be 4FF0FF32 	 mov r2,#-1
+ 811 00c2 FFF7FEFF 	 bl TFT_textbox_setStatus
+ 812              	.L53:
+ 813 00c6 0948     	 ldr r0,.L66+8
+ 814 00c8 FFF7FEFF 	 bl TFT_textbox_touch
+ 815 00cc 0848     	 ldr r0,.L66+12
+ 816 00ce FFF7FEFF 	 bl TFT_textbox_touch
+ 817 00d2 0B48     	 ldr r0,.L66+28
+ 818 00d4 FFF7FEFF 	 bl TFT_textbox_touch
+ 819 00d8 0A48     	 ldr r0,.L66+32
+ 820 00da BDE80840 	 pop {r3,lr}
+ 821 00de FFF7FEBF 	 b TFT_textbox_touch
+ 822              	.L52:
+ 823 00e2 08BD     	 pop {r3,pc}
+ 824              	.L67:
+ 825              	 .align 2
+ 826              	.L66:
+ 827 00e4 00000000 	 .word .LANCHOR22
+ 828 00e8 D4203000 	 .word 3154132
+ 829 00ec 00000000 	 .word .LANCHOR9
+ 830 00f0 00000000 	 .word .LANCHOR11
+ 831 00f4 00000000 	 .word InputBuffer1
+ 832 00f8 00000000 	 .word InputBuffer1_idx
+ 833 00fc 00000000 	 .word .LANCHOR37
+ 834 0100 00000000 	 .word .LANCHOR12
+ 835 0104 00000000 	 .word .LANCHOR14
+ 837              	 .section .text.curveset_setEditMode,"ax",%progbits
+ 838              	 .align 1
+ 839              	 .global curveset_setEditMode
+ 840              	 .thumb
+ 841              	 .thumb_func
+ 843              	curveset_setEditMode:
+ 844              	 
+ 845              	 
+ 846              	 
+ 847 0000 0128     	 cmp r0,#1
+ 848 0002 01D1     	 bne .L69
+ 849 0004 FFF7FEBF 	 b curveset_setEditMode.part.3
+ 850              	.L69:
+ 851 0008 144A     	 ldr r2,.L76
+ 852 000a 1549     	 ldr r1,.L76+4
+ 853 000c 1161     	 str r1,[r2,#16]
+ 854 000e 0023     	 movs r3,#0
+ 855 0010 9382     	 strh r3,[r2,#20]
+ 856 0012 144A     	 ldr r2,.L76+8
+ 857 0014 DFED147A 	 flds s15,.L76+12
+ 858 0018 1373     	 strb r3,[r2,#12]
+ 859 001a 144A     	 ldr r2,.L76+16
+ 860 001c 0B21     	 movs r1,#11
+ 861 001e 1173     	 strb r1,[r2,#12]
+ 862 0020 134A     	 ldr r2,.L76+20
+ 863 0022 0C21     	 movs r1,#12
+ 864 0024 1173     	 strb r1,[r2,#12]
+ 865 0026 134A     	 ldr r2,.L76+24
+ 866 0028 1188     	 ldrh r1,[r2]
+ 867 002a 134A     	 ldr r2,.L76+28
+ 868 002c 1068     	 ldr r0,[r2]
+ 869              	.L70:
+ 870 002e DAB2     	 uxtb r2,r3
+ 871 0030 8A42     	 cmp r2,r1
+ 872 0032 0CD8     	 bhi .L75
+ 873 0034 00EB8202 	 add r2,r0,r2,lsl#2
+ 874 0038 92ED007A 	 flds s14,[r2]
+ 875 003c B4EE677A 	 fcmps s14,s15
+ 876 0040 F1EE10FA 	 fmstat
+ 877 0044 C8BF     	 it gt
+ 878 0046 F0EE477A 	 fcpysgt s15,s14
+ 879 004a 0133     	 adds r3,r3,#1
+ 880 004c EFE7     	 b .L70
+ 881              	.L75:
+ 882 004e 0B4B     	 ldr r3,.L76+32
+ 883 0050 C3ED067A 	 fsts s15,[r3,#24]
+ 884 0054 C3ED057A 	 fsts s15,[r3,#20]
+ 885 0058 7047     	 bx lr
+ 886              	.L77:
+ 887 005a 00BF     	 .align 2
+ 888              	.L76:
+ 889 005c 00000000 	 .word .LANCHOR27
+ 890 0060 43000000 	 .word .LC14
+ 891 0064 00000000 	 .word .LANCHOR19
+ 892 0068 00000000 	 .word 0
+ 893 006c 00000000 	 .word .LANCHOR28
+ 894 0070 00000000 	 .word .LANCHOR29
+ 895 0074 00000000 	 .word .LANCHOR32
+ 896 0078 00000000 	 .word buf_acty_curveset
+ 897 007c 00000000 	 .word .LANCHOR16
+ 899              	 .section .text.TFT_touch_menu_curveset,"ax",%progbits
+ 900              	 .align 1
+ 901              	 .global TFT_touch_menu_curveset
+ 902              	 .thumb
+ 903              	 .thumb_func
+ 905              	TFT_touch_menu_curveset:
+ 906              	 
+ 907              	 
+ 908 0000 F7B5     	 push {r0,r1,r2,r4,r5,r6,r7,lr}
+ 909 0002 0A38     	 subs r0,r0,#10
+ 910 0004 1028     	 cmp r0,#16
+ 911 0006 00F2D380 	 bhi .L79
+ 912 000a DFE810F0 	 tbh [pc,r0,lsl#1]
+ 913              	.L81:
+ 914 000e 1100     	 .2byte (.L80-.L81)/2
+ 915 0010 6900     	 .2byte (.L82-.L81)/2
+ 916 0012 7500     	 .2byte (.L83-.L81)/2
+ 917 0014 C500     	 .2byte (.L84-.L81)/2
+ 918 0016 2B00     	 .2byte (.L85-.L81)/2
+ 919 0018 D100     	 .2byte (.L79-.L81)/2
+ 920 001a D100     	 .2byte (.L79-.L81)/2
+ 921 001c D100     	 .2byte (.L79-.L81)/2
+ 922 001e D100     	 .2byte (.L79-.L81)/2
+ 923 0020 D100     	 .2byte (.L79-.L81)/2
+ 924 0022 D100     	 .2byte (.L79-.L81)/2
+ 925 0024 D100     	 .2byte (.L79-.L81)/2
+ 926 0026 D100     	 .2byte (.L79-.L81)/2
+ 927 0028 D100     	 .2byte (.L79-.L81)/2
+ 928 002a 5400     	 .2byte (.L86-.L81)/2
+ 929 002c D100     	 .2byte (.L79-.L81)/2
+ 930 002e 5B00     	 .2byte (.L87-.L81)/2
+ 931              	 .p2align 1
+ 932              	.L80:
+ 933 0030 0B78     	 ldrb r3,[r1]
+ 934 0032 002B     	 cmp r3,#0
+ 935 0034 40F0C280 	 bne .L78
+ 936 0038 2A23     	 movs r3,#42
+ 937 003a 0B70     	 strb r3,[r1]
+ 938 003c 604B     	 ldr r3,.L112
+ 939 003e 6149     	 ldr r1,.L112+4
+ 940 0040 1C78     	 ldrb r4,[r3]
+ 941 0042 6148     	 ldr r0,.L112+8
+ 942 0044 A200     	 lsls r2,r4,#2
+ 943 0046 FFF7FEFF 	 bl memcpy
+ 944 004a 604B     	 ldr r3,.L112+12
+ 945 004c 1C70     	 strb r4,[r3]
+ 946 004e 604B     	 ldr r3,.L112+16
+ 947 0050 1868     	 ldr r0,[r3]
+ 948 0052 FFF7FEFF 	 bl free
+ 949 0056 5F4B     	 ldr r3,.L112+20
+ 950 0058 1868     	 ldr r0,[r3]
+ 951 005a FFF7FEFF 	 bl free
+ 952 005e 5E4B     	 ldr r3,.L112+24
+ 953 0060 1878     	 ldrb r0,[r3]
+ 954 0062 94E0     	 b .L109
+ 955              	.L85:
+ 956 0064 0B78     	 ldrb r3,[r1]
+ 957 0066 002B     	 cmp r3,#0
+ 958 0068 40F0A880 	 bne .L78
+ 959 006c 2A23     	 movs r3,#42
+ 960 006e 0B70     	 strb r3,[r1]
+ 961 0070 534B     	 ldr r3,.L112
+ 962 0072 1A78     	 ldrb r2,[r3]
+ 963 0074 0132     	 adds r2,r2,#1
+ 964 0076 D2B2     	 uxtb r2,r2
+ 965 0078 032A     	 cmp r2,#3
+ 966 007a 88BF     	 it hi
+ 967 007c 0122     	 movhi r2,#1
+ 968 007e 1A70     	 strb r2,[r3]
+ 969 0080 1B78     	 ldrb r3,[r3]
+ 970 0082 022B     	 cmp r3,#2
+ 971 0084 05D0     	 beq .L94
+ 972 0086 032B     	 cmp r3,#3
+ 973 0088 05D0     	 beq .L95
+ 974 008a 012B     	 cmp r3,#1
+ 975 008c 06D1     	 bne .L93
+ 976 008e 5349     	 ldr r1,.L112+28
+ 977 0090 02E0     	 b .L108
+ 978              	.L94:
+ 979 0092 5349     	 ldr r1,.L112+32
+ 980 0094 00E0     	 b .L108
+ 981              	.L95:
+ 982 0096 5349     	 ldr r1,.L112+36
+ 983              	.L108:
+ 984 0098 534A     	 ldr r2,.L112+40
+ 985 009a 1161     	 str r1,[r2,#16]
+ 986              	.L93:
+ 987 009c 534A     	 ldr r2,.L112+44
+ 988 009e 4949     	 ldr r1,.L112+4
+ 989 00a0 1288     	 ldrh r2,[r2]
+ 990 00a2 0091     	 str r1,[sp]
+ 991 00a4 4B49     	 ldr r1,.L112+20
+ 992 00a6 0868     	 ldr r0,[r1]
+ 993 00a8 4949     	 ldr r1,.L112+16
+ 994 00aa 0968     	 ldr r1,[r1]
+ 995 00ac FFF7FEFF 	 bl polyfit
+ 996 00b0 4F4B     	 ldr r3,.L112+48
+ 997 00b2 1870     	 strb r0,[r3]
+ 998 00b4 82E0     	 b .L78
+ 999              	.L86:
+ 1000 00b6 0B78     	 ldrb r3,[r1]
+ 1001 00b8 002B     	 cmp r3,#0
+ 1002 00ba 7FD1     	 bne .L78
+ 1003 00bc 2A23     	 movs r3,#42
+ 1004 00be 0B70     	 strb r3,[r1]
+ 1005 00c0 4C48     	 ldr r0,.L112+52
+ 1006 00c2 05E0     	 b .L110
+ 1007              	.L87:
+ 1008 00c4 0B78     	 ldrb r3,[r1]
+ 1009 00c6 002B     	 cmp r3,#0
+ 1010 00c8 78D1     	 bne .L78
+ 1011 00ca 2A23     	 movs r3,#42
+ 1012 00cc 4A48     	 ldr r0,.L112+56
+ 1013 00ce 0B70     	 strb r3,[r1]
+ 1014              	.L110:
+ 1015 00d0 0121     	 movs r1,#1
+ 1016 00d2 4FF0FF32 	 mov r2,#-1
+ 1017 00d6 03B0     	 add sp,sp,#12
+ 1018              	 
+ 1019 00d8 BDE8F040 	 pop {r4,r5,r6,r7,lr}
+ 1020 00dc FFF7FEBF 	 b TFT_textbox_setStatus
+ 1021              	.L82:
+ 1022 00e0 0B78     	 ldrb r3,[r1]
+ 1023 00e2 002B     	 cmp r3,#0
+ 1024 00e4 6AD1     	 bne .L78
+ 1025 00e6 2A23     	 movs r3,#42
+ 1026 00e8 444A     	 ldr r2,.L112+60
+ 1027 00ea 0B70     	 strb r3,[r1]
+ 1028 00ec 1388     	 ldrh r3,[r2]
+ 1029 00ee 002B     	 cmp r3,#0
+ 1030 00f0 64D0     	 beq .L78
+ 1031 00f2 013B     	 subs r3,r3,#1
+ 1032 00f4 1380     	 strh r3,[r2]
+ 1033 00f6 61E0     	 b .L78
+ 1034              	.L83:
+ 1035 00f8 0B78     	 ldrb r3,[r1]
+ 1036 00fa 002B     	 cmp r3,#0
+ 1037 00fc 5ED1     	 bne .L78
+ 1038 00fe 2A23     	 movs r3,#42
+ 1039 0100 3E4D     	 ldr r5,.L112+60
+ 1040 0102 0B70     	 strb r3,[r1]
+ 1041 0104 2B88     	 ldrh r3,[r5]
+ 1042 0106 FD2B     	 cmp r3,#253
+ 1043 0108 58D8     	 bhi .L78
+ 1044 010a 384E     	 ldr r6,.L112+44
+ 1045 010c 0133     	 adds r3,r3,#1
+ 1046 010e 3188     	 ldrh r1,[r6]
+ 1047 0110 9BB2     	 uxth r3,r3
+ 1048 0112 9942     	 cmp r1,r3
+ 1049 0114 2B80     	 strh r3,[r5]
+ 1050 0116 51DC     	 bgt .L78
+ 1051 0118 2D4C     	 ldr r4,.L112+16
+ 1052 011a 2E4F     	 ldr r7,.L112+20
+ 1053 011c 2068     	 ldr r0,[r4]
+ 1054 011e 0131     	 adds r1,r1,#1
+ 1055 0120 89B2     	 uxth r1,r1
+ 1056 0122 3180     	 strh r1,[r6]
+ 1057 0124 8900     	 lsls r1,r1,#2
+ 1058 0126 FFF7FEFF 	 bl realloc
+ 1059 012a 3188     	 ldrh r1,[r6]
+ 1060 012c 2060     	 str r0,[r4]
+ 1061 012e 8900     	 lsls r1,r1,#2
+ 1062 0130 3868     	 ldr r0,[r7]
+ 1063 0132 FFF7FEFF 	 bl realloc
+ 1064 0136 304B     	 ldr r3,.L112+56
+ 1065 0138 2468     	 ldr r4,[r4]
+ 1066 013a 3149     	 ldr r1,.L112+64
+ 1067 013c DC62     	 str r4,[r3,#44]
+ 1068 013e 314B     	 ldr r3,.L112+68
+ 1069 0140 0968     	 ldr r1,[r1]
+ 1070 0142 D862     	 str r0,[r3,#44]
+ 1071 0144 2A88     	 ldrh r2,[r5]
+ 1072 0146 0D88     	 ldrh r5,[r1]
+ 1073 0148 2F49     	 ldr r1,.L112+72
+ 1074 014a 3860     	 str r0,[r7]
+ 1075 014c 0968     	 ldr r1,[r1]
+ 1076 014e 31F81510 	 ldrh r1,[r1,r5,lsl#1]
+ 1077 0152 07EE901A 	 fmsr s15,r1
+ 1078 0156 9300     	 lsls r3,r2,#2
+ 1079 0158 F8EE677A 	 fuitos s15,s15
+ 1080 015c 1844     	 add r0,r0,r3
+ 1081 015e 2449     	 ldr r1,.L112+48
+ 1082 0160 C0ED007A 	 fsts s15,[r0]
+ 1083 0164 0978     	 ldrb r1,[r1]
+ 1084 0166 49B9     	 cbnz r1,.L97
+ 1085 0168 1C44     	 add r4,r4,r3
+ 1086 016a 154B     	 ldr r3,.L112
+ 1087 016c 1549     	 ldr r1,.L112+4
+ 1088 016e 1A78     	 ldrb r2,[r3]
+ 1089 0170 17EE900A 	 fmrs r0,s15
+ 1090 0174 FFF7FEFF 	 bl poly_calc
+ 1091 0178 2060     	 str r0,[r4]
+ 1092 017a 04E0     	 b .L98
+ 1093              	.L97:
+ 1094 017c 1AB1     	 cbz r2,.L98
+ 1095 017e 2344     	 add r3,r3,r4
+ 1096 0180 53F8042C 	 ldr r2,[r3,#-4]
+ 1097 0184 1A60     	 str r2,[r3]
+ 1098              	.L98:
+ 1099 0186 FFF7FEFF 	 bl curveset_setEditMode.part.3
+ 1100              	.L111:
+ 1101 018a 4FF0FF30 	 mov r0,#-1
+ 1102              	.L109:
+ 1103 018e 03B0     	 add sp,sp,#12
+ 1104              	 
+ 1105 0190 BDE8F040 	 pop {r4,r5,r6,r7,lr}
+ 1106 0194 FFF7FEBF 	 b TFT_setMenu
+ 1107              	.L84:
+ 1108 0198 0878     	 ldrb r0,[r1]
+ 1109 019a 78B9     	 cbnz r0,.L78
+ 1110 019c 2A23     	 movs r3,#42
+ 1111 019e 0B70     	 strb r3,[r1]
+ 1112 01a0 1A4B     	 ldr r3,.L112+76
+ 1113 01a2 9B8A     	 ldrh r3,[r3,#20]
+ 1114 01a4 B3F5807F 	 cmp r3,#256
+ 1115 01a8 EDD1     	 bne .L98
+ 1116 01aa FFF7FEFF 	 bl curveset_setEditMode
+ 1117 01ae ECE7     	 b .L111
+ 1118              	.L79:
+ 1119 01b0 1148     	 ldr r0,.L112+56
+ 1120 01b2 03B0     	 add sp,sp,#12
+ 1121              	 
+ 1122 01b4 BDE8F040 	 pop {r4,r5,r6,r7,lr}
+ 1123 01b8 FFF7FEBF 	 b TFT_textbox_touch
+ 1124              	.L78:
+ 1125 01bc 03B0     	 add sp,sp,#12
+ 1126              	 
+ 1127 01be F0BD     	 pop {r4,r5,r6,r7,pc}
+ 1128              	.L113:
+ 1129              	 .align 2
+ 1130              	.L112:
+ 1131 01c0 00000000 	 .word .LANCHOR34
+ 1132 01c4 00000000 	 .word .LANCHOR35
+ 1133 01c8 00000000 	 .word s1_coefficients
+ 1134 01cc 00000000 	 .word s1_fit_order
+ 1135 01d0 00000000 	 .word buf_acty_curveset
+ 1136 01d4 00000000 	 .word buf_nomx_curveset
+ 1137 01d8 00000000 	 .word .LANCHOR7
+ 1138 01dc 4A000000 	 .word .LC15
+ 1139 01e0 51000000 	 .word .LC16
+ 1140 01e4 58000000 	 .word .LC17
+ 1141 01e8 00000000 	 .word .LANCHOR38
+ 1142 01ec 00000000 	 .word .LANCHOR32
+ 1143 01f0 00000000 	 .word .LANCHOR36
+ 1144 01f4 00000000 	 .word .LANCHOR17
+ 1145 01f8 00000000 	 .word .LANCHOR19
+ 1146 01fc 00000000 	 .word .LANCHOR33
+ 1147 0200 00000000 	 .word curveset_sensBuffer_curIdx
+ 1148 0204 00000000 	 .word .LANCHOR18
+ 1149 0208 00000000 	 .word curveset_sensBuffer
+ 1150 020c 00000000 	 .word .LANCHOR27
+ 1152              	 .section .text.menu_shelf_datapoint,"ax",%progbits
+ 1153              	 .align 1
+ 1154              	 .global menu_shelf_datapoint
+ 1155              	 .thumb
+ 1156              	 .thumb_func
+ 1158              	menu_shelf_datapoint:
+ 1159              	 
+ 1160              	 
+ 1161 0000 F0B5     	 push {r4,r5,r6,r7,lr}
+ 1162 0002 9E00     	 lsls r6,r3,#2
+ 1163 0004 00EB060E 	 add lr,r0,r6
+ 1164 0008 051F     	 subs r5,r0,#4
+ 1165 000a 0027     	 movs r7,#0
+ 1166              	.L115:
+ 1167 000c FCB2     	 uxtb r4,r7
+ 1168 000e 9442     	 cmp r4,r2
+ 1169 0010 1ED2     	 bcs .L134
+ 1170 0012 DEED007A 	 flds s15,[lr]
+ 1171 0016 34B1     	 cbz r4,.L116
+ 1172 0018 95ED007A 	 flds s14,[r5]
+ 1173 001c F4EEC77A 	 fcmpes s15,s14
+ 1174 0020 F1EE10FA 	 fmstat
+ 1175 0024 06DD     	 ble .L117
+ 1176              	.L116:
+ 1177 0026 95ED017A 	 flds s14,[r5,#4]
+ 1178 002a F4EEC77A 	 fcmpes s15,s14
+ 1179 002e F1EE10FA 	 fmstat
+ 1180 0032 0FD4     	 bmi .L119
+ 1181              	.L117:
+ 1182 0034 02F1FF3C 	 add ip,r2,#-1
+ 1183 0038 6745     	 cmp r7,ip
+ 1184 003a 06D1     	 bne .L120
+ 1185 003c 95ED017A 	 flds s14,[r5,#4]
+ 1186 0040 F4EEC77A 	 fcmpes s15,s14
+ 1187 0044 F1EE10FA 	 fmstat
+ 1188 0048 04DC     	 bgt .L119
+ 1189              	.L120:
+ 1190 004a 0137     	 adds r7,r7,#1
+ 1191 004c 0435     	 adds r5,r5,#4
+ 1192 004e DDE7     	 b .L115
+ 1193              	.L134:
+ 1194 0050 1C46     	 mov r4,r3
+ 1195 0052 2DE0     	 b .L123
+ 1196              	.L119:
+ 1197 0054 A342     	 cmp r3,r4
+ 1198 0056 2BD0     	 beq .L123
+ 1199 0058 0E44     	 add r6,r6,r1
+ 1200 005a 3668     	 ldr r6,[r6]
+ 1201 005c 17D2     	 bcs .L126
+ 1202              	.L125:
+ 1203 005e 9A00     	 lsls r2,r3,#2
+ 1204 0060 151D     	 adds r5,r2,#4
+ 1205 0062 4719     	 adds r7,r0,r5
+ 1206 0064 0133     	 adds r3,r3,#1
+ 1207 0066 D7F800E0 	 ldr lr,[r7]
+ 1208 006a 8718     	 adds r7,r0,r2
+ 1209 006c 0D44     	 add r5,r5,r1
+ 1210 006e C7F800E0 	 str lr,[r7]
+ 1211 0072 0A44     	 add r2,r2,r1
+ 1212 0074 DBB2     	 uxtb r3,r3
+ 1213 0076 2D68     	 ldr r5,[r5]
+ 1214 0078 1560     	 str r5,[r2]
+ 1215 007a A342     	 cmp r3,r4
+ 1216 007c EFD1     	 bne .L125
+ 1217              	.L127:
+ 1218 007e 23B2     	 sxth r3,r4
+ 1219 0080 9B00     	 lsls r3,r3,#2
+ 1220 0082 1944     	 add r1,r1,r3
+ 1221 0084 1844     	 add r0,r0,r3
+ 1222 0086 C0ED007A 	 fsts s15,[r0]
+ 1223 008a 0E60     	 str r6,[r1]
+ 1224 008c 10E0     	 b .L123
+ 1225              	.L126:
+ 1226 008e 9A00     	 lsls r2,r3,#2
+ 1227 0090 151F     	 subs r5,r2,#4
+ 1228 0092 4719     	 adds r7,r0,r5
+ 1229 0094 013B     	 subs r3,r3,#1
+ 1230 0096 D7F800E0 	 ldr lr,[r7]
+ 1231 009a 8718     	 adds r7,r0,r2
+ 1232 009c 0D44     	 add r5,r5,r1
+ 1233 009e C7F800E0 	 str lr,[r7]
+ 1234 00a2 0A44     	 add r2,r2,r1
+ 1235 00a4 DBB2     	 uxtb r3,r3
+ 1236 00a6 2D68     	 ldr r5,[r5]
+ 1237 00a8 1560     	 str r5,[r2]
+ 1238 00aa A342     	 cmp r3,r4
+ 1239 00ac EFD1     	 bne .L126
+ 1240 00ae E6E7     	 b .L127
+ 1241              	.L123:
+ 1242 00b0 2046     	 mov r0,r4
+ 1243 00b2 F0BD     	 pop {r4,r5,r6,r7,pc}
+ 1245              	 .section .text.TFT_display_menu_curveset,"ax",%progbits
+ 1246              	 .align 1
+ 1247              	 .global TFT_display_menu_curveset
+ 1248              	 .thumb
+ 1249              	 .thumb_func
+ 1251              	TFT_display_menu_curveset:
+ 1252              	 
+ 1253              	 
+ 1254 0000 2DE9FF47 	 push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,lr}
+ 1255 0004 494D     	 ldr r5,.L143
+ 1256 0006 4A4E     	 ldr r6,.L143+4
+ 1257 0008 95F90C30 	 ldrsb r3,[r5,#12]
+ 1258 000c 494F     	 ldr r7,.L143+8
+ 1259 000e 4A4C     	 ldr r4,.L143+12
+ 1260 0010 DFF87C81 	 ldr r8,.L143+100
+ 1261 0014 5BB3     	 cbz r3,.L136
+ 1262 0016 336B     	 ldr r3,[r6,#48]
+ 1263 0018 DFF878A1 	 ldr r10,.L143+104
+ 1264 001c 1A88     	 ldrh r2,[r3]
+ 1265 001e F36A     	 ldr r3,[r6,#44]
+ 1266 0020 DFF87491 	 ldr r9,.L143+108
+ 1267 0024 DAF80000 	 ldr r0,[r10]
+ 1268 0028 03EB8203 	 add r3,r3,r2,lsl#2
+ 1269 002c 434A     	 ldr r2,.L143+16
+ 1270 002e 1268     	 ldr r2,[r2]
+ 1271 0030 1188     	 ldrh r1,[r2]
+ 1272 0032 434A     	 ldr r2,.L143+20
+ 1273 0034 1268     	 ldr r2,[r2]
+ 1274 0036 32F81120 	 ldrh r2,[r2,r1,lsl#1]
+ 1275 003a D9F80010 	 ldr r1,[r9]
+ 1276 003e 07EE902A 	 fmsr s15,r2
+ 1277 0042 F8EE677A 	 fuitos s15,s15
+ 1278 0046 3A78     	 ldrb r2,[r7]
+ 1279 0048 C3ED007A 	 fsts s15,[r3]
+ 1280 004c 2378     	 ldrb r3,[r4]
+ 1281 004e FFF7FEFF 	 bl menu_shelf_datapoint
+ 1282 0052 3C49     	 ldr r1,.L143+24
+ 1283 0054 2080     	 strh r0,[r4]
+ 1284 0056 3A88     	 ldrh r2,[r7]
+ 1285 0058 0091     	 str r1,[sp]
+ 1286 005a 98F80030 	 ldrb r3,[r8]
+ 1287 005e DAF80000 	 ldr r0,[r10]
+ 1288 0062 D9F80010 	 ldr r1,[r9]
+ 1289 0066 FFF7FEFF 	 bl polyfit
+ 1290 006a 374B     	 ldr r3,.L143+28
+ 1291 006c 1870     	 strb r0,[r3]
+ 1292              	.L136:
+ 1293 006e 3B88     	 ldrh r3,[r7]
+ 1294 0070 2188     	 ldrh r1,[r4]
+ 1295 0072 3648     	 ldr r0,.L143+32
+ 1296 0074 5A1E     	 subs r2,r3,#1
+ 1297 0076 9142     	 cmp r1,r2
+ 1298 0078 354A     	 ldr r2,.L143+36
+ 1299 007a ACBF     	 ite ge
+ 1300 007c 3549     	 ldrge r1,.L143+40
+ 1301 007e 3649     	 ldrlt r1,.L143+44
+ 1302 0080 1161     	 str r1,[r2,#16]
+ 1303 0082 4FF00009 	 mov r9,#0
+ 1304 0086 354A     	 ldr r2,.L143+48
+ 1305 0088 0094     	 str r4,[sp]
+ 1306 008a 0292     	 str r2,[sp,#8]
+ 1307 008c E96A     	 ldr r1,[r5,#44]
+ 1308 008e F26A     	 ldr r2,[r6,#44]
+ 1309 0090 CDF80490 	 str r9,[sp,#4]
+ 1310 0094 FFF7FEFF 	 bl TFT_graph_XYdata
+ 1311 0098 3B88     	 ldrh r3,[r7]
+ 1312 009a 314A     	 ldr r2,.L143+52
+ 1313 009c 0094     	 str r4,[sp]
+ 1314 009e 0124     	 movs r4,#1
+ 1315 00a0 0292     	 str r2,[sp,#8]
+ 1316 00a2 E96A     	 ldr r1,[r5,#44]
+ 1317 00a4 F26A     	 ldr r2,[r6,#44]
+ 1318 00a6 0194     	 str r4,[sp,#4]
+ 1319 00a8 2848     	 ldr r0,.L143+32
+ 1320 00aa FFF7FEFF 	 bl TFT_graph_XYdata
+ 1321 00ae 43F69E73 	 movw r3,#16286
+ 1322 00b2 98F80020 	 ldrb r2,[r8]
+ 1323 00b6 0193     	 str r3,[sp,#4]
+ 1324 00b8 CDF80090 	 str r9,[sp]
+ 1325 00bc 0223     	 movs r3,#2
+ 1326 00be 2348     	 ldr r0,.L143+32
+ 1327 00c0 2049     	 ldr r1,.L143+24
+ 1328 00c2 FFF7FEFF 	 bl TFT_graph_function
+ 1329 00c6 2046     	 mov r0,r4
+ 1330 00c8 2649     	 ldr r1,.L143+56
+ 1331 00ca FFF7FEFF 	 bl TFT_header
+ 1332 00ce 264B     	 ldr r3,.L143+60
+ 1333 00d0 0093     	 str r3,[sp]
+ 1334 00d2 03F50513 	 add r3,r3,#2179072
+ 1335 00d6 254A     	 ldr r2,.L143+64
+ 1336 00d8 2549     	 ldr r1,.L143+68
+ 1337 00da 03F65433 	 addw r3,r3,#2900
+ 1338 00de 2046     	 mov r0,r4
+ 1339 00e0 FFF7FEFF 	 bl TFT_setColor
+ 1340 00e4 2348     	 ldr r0,.L143+72
+ 1341 00e6 FFF7FEFF 	 bl TFT_control
+ 1342 00ea 2348     	 ldr r0,.L143+76
+ 1343 00ec FFF7FEFF 	 bl TFT_control
+ 1344 00f0 2248     	 ldr r0,.L143+80
+ 1345 00f2 FFF7FEFF 	 bl TFT_control
+ 1346 00f6 2248     	 ldr r0,.L143+84
+ 1347 00f8 FFF7FEFF 	 bl TFT_control
+ 1348 00fc 1448     	 ldr r0,.L143+36
+ 1349 00fe FFF7FEFF 	 bl TFT_control
+ 1350 0102 2048     	 ldr r0,.L143+88
+ 1351 0104 FFF7FEFF 	 bl TFT_textbox_display
+ 1352 0108 0948     	 ldr r0,.L143+4
+ 1353 010a FFF7FEFF 	 bl TFT_textbox_display
+ 1354 010e 0748     	 ldr r0,.L143
+ 1355 0110 FFF7FEFF 	 bl TFT_textbox_display
+ 1356 0114 2046     	 mov r0,r4
+ 1357 0116 1C49     	 ldr r1,.L143+92
+ 1358 0118 FFF7FEFF 	 bl TFT_label
+ 1359 011c 1B49     	 ldr r1,.L143+96
+ 1360 011e 2046     	 mov r0,r4
+ 1361 0120 04B0     	 add sp,sp,#16
+ 1362              	 
+ 1363 0122 BDE8F047 	 pop {r4,r5,r6,r7,r8,r9,r10,lr}
+ 1364 0126 FFF7FEBF 	 b TFT_label
+ 1365              	.L144:
+ 1366 012a 00BF     	 .align 2
+ 1367              	.L143:
+ 1368 012c 00000000 	 .word .LANCHOR19
+ 1369 0130 00000000 	 .word .LANCHOR18
+ 1370 0134 00000000 	 .word .LANCHOR32
+ 1371 0138 00000000 	 .word .LANCHOR33
+ 1372 013c 00000000 	 .word curveset_sensBuffer_curIdx
+ 1373 0140 00000000 	 .word curveset_sensBuffer
+ 1374 0144 00000000 	 .word .LANCHOR35
+ 1375 0148 00000000 	 .word .LANCHOR36
+ 1376 014c 00000000 	 .word .LANCHOR16
+ 1377 0150 00000000 	 .word .LANCHOR29
+ 1378 0154 5E000000 	 .word .LC18
+ 1379 0158 60000000 	 .word .LC19
+ 1380 015c ADCBE700 	 .word 15190957
+ 1381 0160 4B586400 	 .word 6576203
+ 1382 0164 00000000 	 .word .LANCHOR37
+ 1383 0168 124B8C00 	 .word 9194258
+ 1384 016c 2BA9EA00 	 .word 15378731
+ 1385 0170 EEF8FF00 	 .word 16775406
+ 1386 0174 00000000 	 .word .LANCHOR39
+ 1387 0178 00000000 	 .word .LANCHOR38
+ 1388 017c 00000000 	 .word .LANCHOR27
+ 1389 0180 00000000 	 .word .LANCHOR28
+ 1390 0184 00000000 	 .word .LANCHOR17
+ 1391 0188 00000000 	 .word .LANCHOR40
+ 1392 018c 00000000 	 .word .LANCHOR41
+ 1393 0190 00000000 	 .word .LANCHOR34
+ 1394 0194 00000000 	 .word buf_nomx_curveset
+ 1395 0198 00000000 	 .word buf_acty_curveset
+ 1397              	 .global tbx_act
+ 1398              	 .global str_act_curLength
+ 1399              	 .global str_act
+ 1400              	 .global tbx_nom
+ 1401              	 .global str_nom_curLength
+ 1402              	 .global str_nom
+ 1403              	 .global tbx_dp
+ 1404              	 .global str_dp_curLength
+ 1405              	 .global str_dp
+ 1406              	 .global btn_setchange
+ 1407              	 .global btn_db_next
+ 1408              	 .global btn_db_last
+ 1409              	 .global gph_curveset
+ 1410              	 .global btn_order
+ 1411              	 .global lbl_fitorder
+ 1412              	 .global lbl_curveset
+ 1413              	 .global btn_back
+ 1414              	 .global fit_result
+ 1415              	 .global coefficients
+ 1416              	 .global fit_order
+ 1417              	 .comm curveset_sensBuffer_curIdx,4,4
+ 1418              	 .comm curveset_sensBuffer,4,4
+ 1419              	 .comm buf_nomx_curveset,4,4
+ 1420              	 .comm buf_acty_curveset,4,4
+ 1421              	 .global DP_cur
+ 1422              	 .global DP_size
+ 1423              	 .global tbx_hour
+ 1424              	 .global str_hour_curLength
+ 1425              	 .global str_hour
+ 1426              	 .global lbl_RTC
+ 1427              	 .global btn_dimmmer
+ 1428              	 .global lbl_backlight
+ 1429              	 .global btn_linSensor2
+ 1430              	 .global tbx_sensor2
+ 1431              	 .global str_s2_linspec_curLength
+ 1432              	 .global str_s2_linspec
+ 1433              	 .global btn_linSensor1
+ 1434              	 .global tbx_sensor1
+ 1435              	 .global str_s1_linspec_curLength
+ 1436              	 .global str_s1_linspec
+ 1437              	 .global lbl_linearisation
+ 1438              	 .global tbx_filename
+ 1439              	 .global str_filename_curLength
+ 1440              	 .global str_filename
+ 1441              	 .global lbl_recording
+ 1442              	 .global lbl_record
+ 1443              	 .global btn_startRec
+ 1444              	 .global gph_monitor
+ 1445              	 .global lbl_sensor_val
+ 1446              	 .global lbl_sensor
+ 1447              	 .global lbl_DLsize_val
+ 1448              	 .global lbl_DLsize
+ 1449              	 .global tgl_graphMode
+ 1450              	 .global btn_input
+ 1451              	 .global tracker
+ 1452              	 .global display_list_size
+ 1453              	 .global Menu_Objects
+ 1454              	 .global menu_curveset
+ 1455              	 .global menu_setup
+ 1456              	 .global menu_1
+ 1457              	 .global menu_0
+ 1458              	 .global TFT_cur_Menu
+ 1459              	 .global TFT_touch_cur_Menu__fptr_arr
+ 1460              	 .global TFT_display_cur_Menu__fptr_arr
+ 1461              	 .global TFT_display_static_cur_Menu__fptr_arr
+ 1462              	 .comm ReadData,1,1
+ 1463              	 .comm frameover,1,1
+ 1464              	 .comm InputType,1,1
+ 1465              	 .comm InputBuffer1_idx,2,2
+ 1466              	 .comm MeasurementCounter,4,4
+ 1467              	 .comm tft_tick,1,1
+ 1468              	 .comm _msCounter,4,4
+ 1469              	 .section .data.tbx_hour,"aw",%progbits
+ 1470              	 .align 2
+ 1471              	 .set .LANCHOR14,.+0
+ 1474              	tbx_hour:
+ 1475 0000 8C00     	 .short 140
+ 1476 0002 EA00     	 .short 234
+ 1477 0004 7800     	 .short 120
+ 1478 0006 8200     	 .short 130
+ 1479 0008 C9000000 	 .word .LC31
+ 1480 000c 19       	 .byte 25
+ 1481 000d 000000   	 .space 3
+ 1482 0010 00000000 	 .word str_hour
+ 1483 0014 12       	 .byte 18
+ 1484 0015 000000   	 .space 3
+ 1485 0018 00000000 	 .word str_hour_curLength
+ 1486 001c 00       	 .byte 0
+ 1487 001d 00000000 	 .space 11
+ 1487      00000000 
+ 1487      000000
+ 1488 0028 00       	 .byte 0
+ 1489 0029 00000000 	 .space 11
+ 1489      00000000 
+ 1489      000000
+ 1490 0034 01       	 .byte 1
+ 1491 0035 000000   	 .space 3
+ 1492              	 .section .data.str_filename_curLength,"aw",%progbits
+ 1495              	str_filename_curLength:
+ 1496 0000 08       	 .byte 8
+ 1497              	 .section .data.gph_curveset,"aw",%progbits
+ 1498              	 .align 2
+ 1499              	 .set .LANCHOR16,.+0
+ 1502              	gph_curveset:
+ 1503 0000 0A00     	 .short 10
+ 1504 0002 2C00     	 .short 44
+ 1505 0004 B801     	 .short 440
+ 1506 0006 9300     	 .short 147
+ 1507 0008 0A00     	 .short 10
+ 1508 000a 0000     	 .space 2
+ 1509 000c 91000000 	 .word .LC26
+ 1510 0010 99000000 	 .word .LC27
+ 1511 0014 00004843 	 .word 1128792064
+ 1512 0018 00004843 	 .word 1128792064
+ 1513 001c 00000000 	 .word 0
+ 1514 0020 00008045 	 .word 1166016512
+ 1515 0024 00008040 	 .word 1082130432
+ 1516 0028 00000040 	 .word 1073741824
+ 1517 002c 01       	 .byte 1
+ 1518 002d 000000   	 .space 3
+ 1519              	 .section .data.btn_order,"aw",%progbits
+ 1520              	 .align 2
+ 1521              	 .set .LANCHOR38,.+0
+ 1524              	btn_order:
+ 1525 0000 2C01     	 .short 300
+ 1526 0002 0500     	 .short 5
+ 1527 0004 3C00     	 .short 60
+ 1528 0006 1E00     	 .short 30
+ 1529 0008 1A00     	 .short 26
+ 1530 000a 0000     	 .short 0
+ 1531 000c 0E       	 .byte 14
+ 1532 000d 000000   	 .space 3
+ 1533 0010 4A000000 	 .word .LC15
+ 1534 0014 0000     	 .short 0
+ 1535 0016 00       	 .byte 0
+ 1536 0017 00       	 .byte 0
+ 1537              	 .section .data.str_s1_linspec_curLength,"aw",%progbits
+ 1540              	str_s1_linspec_curLength:
+ 1541 0000 06       	 .byte 6
+ 1542              	 .section .data.lbl_RTC,"aw",%progbits
+ 1543              	 .align 2
+ 1544              	 .set .LANCHOR13,.+0
+ 1547              	lbl_RTC:
+ 1548 0000 1900     	 .short 25
+ 1549 0002 EF00     	 .short 239
+ 1550 0004 1B00     	 .short 27
+ 1551 0006 0000     	 .short 0
+ 1552 0008 DB000000 	 .word .LC32
+ 1553 000c 00000000 	 .space 13
+ 1553      00000000 
+ 1553      00000000 
+ 1553      00
+ 1554 0019 00       	 .byte 0
+ 1555 001a 0000     	 .space 2
+ 1556              	 .section .data.str_nom_curLength,"aw",%progbits
+ 1559              	str_nom_curLength:
+ 1560 0000 04       	 .byte 4
+ 1561              	 .section .data.str_nom,"aw",%progbits
+ 1564              	str_nom:
+ 1565 0000 34303935 	 .ascii "4095\000"
+ 1565      00
+ 1566 0005 00000000 	 .space 5
+ 1566      00
+ 1567              	 .section .data.str_s2_linspec_curLength,"aw",%progbits
+ 1570              	str_s2_linspec_curLength:
+ 1571 0000 06       	 .byte 6
+ 1572              	 .section .data.tbx_act,"aw",%progbits
+ 1573              	 .align 2
+ 1574              	 .set .LANCHOR19,.+0
+ 1577              	tbx_act:
+ 1578 0000 3101     	 .short 305
+ 1579 0002 DA00     	 .short 218
+ 1580 0004 3C00     	 .short 60
+ 1581 0006 3200     	 .short 50
+ 1582 0008 62000000 	 .word .LC20
+ 1583 000c 00       	 .byte 0
+ 1584 000d 000000   	 .space 3
+ 1585 0010 00000000 	 .word str_act
+ 1586 0014 0A       	 .byte 10
+ 1587 0015 000000   	 .space 3
+ 1588 0018 00000000 	 .word str_act_curLength
+ 1589 001c 00       	 .byte 0
+ 1590 001d 000000   	 .space 3
+ 1591 0020 6A000000 	 .word .LC21
+ 1592 0024 02       	 .byte 2
+ 1593 0025 000000   	 .space 3
+ 1594 0028 02       	 .byte 2
+ 1595 0029 000000   	 .space 3
+ 1596 002c 00000000 	 .word 0
+ 1597 0030 00000000 	 .word 0
+ 1598 0034 01       	 .byte 1
+ 1599 0035 000000   	 .space 3
+ 1600              	 .section .data.TFT_display_static_cur_Menu__fptr_arr,"aw",%progbits
+ 1601              	 .align 2
+ 1604              	TFT_display_static_cur_Menu__fptr_arr:
+ 1605 0000 00000000 	 .word TFT_display_static_menu0
+ 1606 0004 00000000 	 .word TFT_display_static_menu1
+ 1607 0008 00000000 	 .word TFT_display_static_menu_setup
+ 1608 000c 00000000 	 .word TFT_display_static_menu_curveset
+ 1609              	 .section .data.lbl_sensor_val,"aw",%progbits
+ 1610              	 .align 2
+ 1611              	 .set .LANCHOR25,.+0
+ 1614              	lbl_sensor_val:
+ 1615 0000 D601     	 .short 470
+ 1616 0002 1900     	 .short 25
+ 1617 0004 1A00     	 .short 26
+ 1618 0006 0008     	 .short 2048
+ 1619 0008 16000000 	 .word .LC5
+ 1620 000c 01       	 .byte 1
+ 1621 000d 000000   	 .space 3
+ 1622 0010 00000000 	 .word InputBuffer1
+ 1623 0014 00000000 	 .word InputBuffer1_idx
+ 1624 0018 02       	 .byte 2
+ 1625 0019 01       	 .byte 1
+ 1626 001a 0000     	 .space 2
+ 1627              	 .section .data.fit_order,"aw",%progbits
+ 1628              	 .set .LANCHOR34,.+0
+ 1631              	fit_order:
+ 1632 0000 01       	 .byte 1
+ 1633              	 .section .data.tbx_nom,"aw",%progbits
+ 1634              	 .align 2
+ 1635              	 .set .LANCHOR18,.+0
+ 1638              	tbx_nom:
+ 1639 0000 BC00     	 .short 188
+ 1640 0002 DA00     	 .short 218
+ 1641 0004 3200     	 .short 50
+ 1642 0006 3A00     	 .short 58
+ 1643 0008 72000000 	 .word .LC22
+ 1644 000c 00       	 .byte 0
+ 1645 000d 000000   	 .space 3
+ 1646 0010 00000000 	 .word str_nom
+ 1647 0014 0A       	 .byte 10
+ 1648 0015 000000   	 .space 3
+ 1649 0018 00000000 	 .word str_nom_curLength
+ 1650 001c 00       	 .byte 0
+ 1651 001d 000000   	 .space 3
+ 1652 0020 7B000000 	 .word .LC23
+ 1653 0024 01       	 .byte 1
+ 1654 0025 000000   	 .space 3
+ 1655 0028 02       	 .byte 2
+ 1656 0029 000000   	 .space 3
+ 1657 002c 00000000 	 .word 0
+ 1658 0030 00000000 	 .word 0
+ 1659 0034 01       	 .byte 1
+ 1660 0035 000000   	 .space 3
+ 1661              	 .section .data.menu_curveset,"aw",%progbits
+ 1662              	 .align 2
+ 1663              	 .set .LANCHOR37,.+0
+ 1666              	menu_curveset:
+ 1667 0000 03       	 .byte 3
+ 1668 0001 000000   	 .space 3
+ 1669 0004 61010000 	 .word .LC47
+ 1670 0008 0000     	 .short 0
+ 1671 000a 0000     	 .short 0
+ 1672 000c 9F01     	 .short 415
+ 1673 000e 2800     	 .short 40
+ 1674 0010 AE01     	 .short 430
+ 1675 0012 00000000 	 .space 6
+ 1675      0000
+ 1676 0018 4B586400 	 .word 6576203
+ 1677 001c 29CDF300 	 .word 15977769
+ 1678 0020 29CDF300 	 .word 15977769
+ 1679              	 .section .data.str_hour,"aw",%progbits
+ 1682              	str_hour:
+ 1683 0000 31323A31 	 .ascii "12:13:26 24.03.21\000"
+ 1683      333A3236 
+ 1683      2032342E 
+ 1683      30332E32 
+ 1683      3100
+ 1684              	 .section .data.lbl_recording,"aw",%progbits
+ 1685              	 .align 2
+ 1686              	 .set .LANCHOR8,.+0
+ 1689              	lbl_recording:
+ 1690 0000 1900     	 .short 25
+ 1691 0002 4F00     	 .short 79
+ 1692 0004 1B00     	 .short 27
+ 1693 0006 0000     	 .short 0
+ 1694 0008 31010000 	 .word .LC40
+ 1695 000c 00000000 	 .space 13
+ 1695      00000000 
+ 1695      00000000 
+ 1695      00
+ 1696 0019 00       	 .byte 0
+ 1697 001a 0000     	 .space 2
+ 1698              	 .section .data.DP_size,"aw",%progbits
+ 1699              	 .align 1
+ 1700              	 .set .LANCHOR32,.+0
+ 1703              	DP_size:
+ 1704 0000 0300     	 .short 3
+ 1705              	 .section .data.str_dp_curLength,"aw",%progbits
+ 1708              	str_dp_curLength:
+ 1709 0000 01       	 .byte 1
+ 1710              	 .section .data.gph_monitor,"aw",%progbits
+ 1711              	 .align 2
+ 1712              	 .set .LANCHOR3,.+0
+ 1715              	gph_monitor:
+ 1716 0000 0A00     	 .short 10
+ 1717 0002 5100     	 .short 81
+ 1718 0004 B801     	 .short 440
+ 1719 0006 A100     	 .short 161
+ 1720 0008 0A00     	 .short 10
+ 1721 000a 0000     	 .space 2
+ 1722 000c 48010000 	 .word .LC43
+ 1723 0010 4C010000 	 .word .LC44
+ 1724 0014 00F07F45 	 .word 1166012416
+ 1725 0018 6666A640 	 .word 1084647014
+ 1726 001c 00000000 	 .space 4
+ 1727 0020 CDCC0C40 	 .word 1074580685
+ 1728 0024 00008040 	 .word 1082130432
+ 1729 0028 CDCC0C40 	 .word 1074580685
+ 1730 002c 00       	 .byte 0
+ 1731 002d 000000   	 .space 3
+ 1732              	 .section .data.str_s1_linspec,"aw",%progbits
+ 1735              	str_s1_linspec:
+ 1736 0000 73312E6C 	 .ascii "s1.lin\000"
+ 1736      696E00
+ 1737 0007 000000   	 .space 3
+ 1738              	 .section .bss.tracker,"aw",%nobits
+ 1739              	 .align 2
+ 1740              	 .set .LANCHOR31,.+0
+ 1743              	tracker:
+ 1744 0000 00000000 	 .space 4
+ 1745              	 .section .data.tbx_sensor1,"aw",%progbits
+ 1746              	 .align 2
+ 1747              	 .set .LANCHOR11,.+0
+ 1750              	tbx_sensor1:
+ 1751 0000 8C00     	 .short 140
+ 1752 0002 7200     	 .short 114
+ 1753 0004 7800     	 .short 120
+ 1754 0006 8200     	 .short 130
+ 1755 0008 09010000 	 .word .LC37
+ 1756 000c 15       	 .byte 21
+ 1757 000d 000000   	 .space 3
+ 1758 0010 00000000 	 .word str_s1_linspec
+ 1759 0014 0A       	 .byte 10
+ 1760 0015 000000   	 .space 3
+ 1761 0018 00000000 	 .word str_s1_linspec_curLength
+ 1762 001c 00       	 .byte 0
+ 1763 001d 00000000 	 .space 11
+ 1763      00000000 
+ 1763      000000
+ 1764 0028 00       	 .byte 0
+ 1765 0029 00000000 	 .space 11
+ 1765      00000000 
+ 1765      000000
+ 1766 0034 00       	 .byte 0
+ 1767 0035 000000   	 .space 3
+ 1768              	 .section .data.tbx_sensor2,"aw",%progbits
+ 1769              	 .align 2
+ 1770              	 .set .LANCHOR12,.+0
+ 1773              	tbx_sensor2:
+ 1774 0000 8C00     	 .short 140
+ 1775 0002 9A00     	 .short 154
+ 1776 0004 7800     	 .short 120
+ 1777 0006 8200     	 .short 130
+ 1778 0008 F4000000 	 .word .LC36
+ 1779 000c 17       	 .byte 23
+ 1780 000d 000000   	 .space 3
+ 1781 0010 00000000 	 .word str_s2_linspec
+ 1782 0014 0A       	 .byte 10
+ 1783 0015 000000   	 .space 3
+ 1784 0018 00000000 	 .word str_s2_linspec_curLength
+ 1785 001c 00       	 .byte 0
+ 1786 001d 00000000 	 .space 11
+ 1786      00000000 
+ 1786      000000
+ 1787 0028 00       	 .byte 0
+ 1788 0029 00000000 	 .space 11
+ 1788      00000000 
+ 1788      000000
+ 1789 0034 00       	 .byte 0
+ 1790 0035 000000   	 .space 3
+ 1791              	 .section .rodata.str1.1,"aMS",%progbits,1
+ 1792              	.LC0:
+ 1793 0000 583A00   	 .ascii "X:\000"
+ 1794              	.LC1:
+ 1795 0003 593A00   	 .ascii "Y:\000"
+ 1796              	.LC2:
+ 1797 0006 526F6C6C 	 .ascii "Roll\000"
+ 1797      00
+ 1798              	.LC3:
+ 1799 000b 4672616D 	 .ascii "Frame\000"
+ 1799      6500
+ 1800              	.LC4:
+ 1801 0011 52617731 	 .ascii "Raw1\000"
+ 1801      00
+ 1802              	.LC5:
+ 1803 0016 256400   	 .ascii "%d\000"
+ 1804              	.LC6:
+ 1805 0019 5600     	 .ascii "V\000"
+ 1806              	.LC7:
+ 1807 001b 496D7000 	 .ascii "Imp\000"
+ 1808              	.LC8:
+ 1809 001f 53617700 	 .ascii "Saw\000"
+ 1810              	.LC9:
+ 1811 0023 53696E65 	 .ascii "Sine\000"
+ 1811      00
+ 1812              	.LC10:
+ 1813 0028 53656E73 	 .ascii "Sensor1\000"
+ 1813      6F723100 
+ 1814              	.LC11:
+ 1815 0030 25642E25 	 .ascii "%d.%.2d mm\000"
+ 1815      2E326420 
+ 1815      6D6D00
+ 1816              	.LC12:
+ 1817 003b 6D6D00   	 .ascii "mm\000"
+ 1818              	.LC13:
+ 1819 003e 53617665 	 .ascii "Save\000"
+ 1819      00
+ 1820              	.LC14:
+ 1821 0043 4368616E 	 .ascii "Change\000"
+ 1821      676500
+ 1822              	.LC15:
+ 1823 004a 4C696E65 	 .ascii "Linear\000"
+ 1823      617200
+ 1824              	.LC16:
+ 1825 0051 53717561 	 .ascii "Square\000"
+ 1825      726500
+ 1826              	.LC17:
+ 1827 0058 43756269 	 .ascii "Cubic\000"
+ 1827      6300
+ 1828              	.LC18:
+ 1829 005e 2B00     	 .ascii "+\000"
+ 1830              	.LC19:
+ 1831 0060 3E00     	 .ascii ">\000"
+ 1832              	.LC20:
+ 1833 0062 41637475 	 .ascii "Actual:\000"
+ 1833      616C3A00 
+ 1834              	.LC21:
+ 1835 006a 25642E25 	 .ascii "%d.%.2d\000"
+ 1835      2E326400 
+ 1836              	.LC22:
+ 1837 0072 4E6F6D69 	 .ascii "Nominal:\000"
+ 1837      6E616C3A 
+ 1837      00
+ 1838              	.LC23:
+ 1839 007b 25642E25 	 .ascii "%d.%.0d\000"
+ 1839      2E306400 
+ 1840              	.LC24:
+ 1841 0083 44617461 	 .ascii "Data Point:\000"
+ 1841      20506F69 
+ 1841      6E743A00 
+ 1842              	.LC25:
+ 1843 008f 3C00     	 .ascii "<\000"
+ 1844              	.LC26:
+ 1845 0091 6E6F6D69 	 .ascii "nominal\000"
+ 1845      6E616C00 
+ 1846              	.LC27:
+ 1847 0099 61637475 	 .ascii "actual in mm\000"
+ 1847      616C2069 
+ 1847      6E206D6D 
+ 1847      00
+ 1848              	.LC28:
+ 1849 00a6 46756E63 	 .ascii "Function\000"
+ 1849      74696F6E 
+ 1849      00
+ 1850              	.LC29:
+ 1851 00af 43757276 	 .ascii "Curve fit - Sensor 0\000"
+ 1851      65206669 
+ 1851      74202D20 
+ 1851      53656E73 
+ 1851      6F722030 
+ 1852              	.LC30:
+ 1853 00c4 4261636B 	 .ascii "Back\000"
+ 1853      00
+ 1854              	.LC31:
+ 1855 00c9 48483A6D 	 .ascii "HH:mm:ss dd.MM.yy\000"
+ 1855      6D3A7373 
+ 1855      2064642E 
+ 1855      4D4D2E79 
+ 1855      7900
+ 1856              	.LC32:
+ 1857 00db 52544300 	 .ascii "RTC\000"
+ 1858              	.LC33:
+ 1859 00df 44696D6D 	 .ascii "Dimmer\000"
+ 1859      657200
+ 1860              	.LC34:
+ 1861 00e6 4261636B 	 .ascii "Backlight\000"
+ 1861      6C696768 
+ 1861      7400
+ 1862              	.LC35:
+ 1863 00f0 53657400 	 .ascii "Set\000"
+ 1864              	.LC36:
+ 1865 00f4 53656E73 	 .ascii "Sensor2:   Spec File\000"
+ 1865      6F72323A 
+ 1865      20202053 
+ 1865      70656320 
+ 1865      46696C65 
+ 1866              	.LC37:
+ 1867 0109 53656E73 	 .ascii "Sensor1:   Spec File\000"
+ 1867      6F72313A 
+ 1867      20202053 
+ 1867      70656320 
+ 1867      46696C65 
+ 1868              	.LC38:
+ 1869 011e 43757276 	 .ascii "Curve fit\000"
+ 1869      65206669 
+ 1869      7400
+ 1870              	.LC39:
+ 1871 0128 46696C65 	 .ascii "Filename\000"
+ 1871      6E616D65 
+ 1871      00
+ 1872              	.LC40:
+ 1873 0131 5265636F 	 .ascii "Recording\000"
+ 1873      7264696E 
+ 1873      6700
+ 1874              	.LC41:
+ 1875 013b 5265636F 	 .ascii "Record\000"
+ 1875      726400
+ 1876              	.LC42:
+ 1877 0142 53746172 	 .ascii "Start\000"
+ 1877      7400
+ 1878              	.LC43:
+ 1879 0148 74202000 	 .ascii "t  \000"
+ 1880              	.LC44:
+ 1881 014c 56202000 	 .ascii "V  \000"
+ 1882              	.LC45:
+ 1883 0150 53656E73 	 .ascii "Sensor:\000"
+ 1883      6F723A00 
+ 1884              	.LC46:
+ 1885 0158 444C2D73 	 .ascii "DL-size:\000"
+ 1885      697A653A 
+ 1885      00
+ 1886              	.LC47:
+ 1887 0161 00       	 .ascii "\000"
+ 1888              	.LC48:
+ 1889 0162 53657475 	 .ascii "Setup\000"
+ 1889      7000
+ 1890              	.LC49:
+ 1891 0168 44617368 	 .ascii "Dashboard\000"
+ 1891      626F6172 
+ 1891      6400
+ 1892              	.LC50:
+ 1893 0172 4D6F6E69 	 .ascii "Monitoring\000"
+ 1893      746F7269 
+ 1893      6E6700
+ 1894              	 .section .data.menu_setup,"aw",%progbits
+ 1895              	 .align 2
+ 1896              	 .set .LANCHOR7,.+0
+ 1899              	menu_setup:
+ 1900 0000 02       	 .byte 2
+ 1901 0001 000000   	 .space 3
+ 1902 0004 62010000 	 .word .LC48
+ 1903 0008 4100     	 .short 65
+ 1904 000a 4100     	 .short 65
+ 1905 000c F000     	 .short 240
+ 1906 000e 3200     	 .short 50
+ 1907 0010 1801     	 .short 280
+ 1908 0012 00000000 	 .space 6
+ 1908      0000
+ 1909 0018 4B586400 	 .word 6576203
+ 1910 001c 29CDF300 	 .word 15977769
+ 1911 0020 29CDF300 	 .word 15977769
+ 1912              	 .section .data.str_dp,"aw",%progbits
+ 1915              	str_dp:
+ 1916 0000 3000     	 .ascii "0\000"
+ 1917 0002 00       	 .space 1
+ 1918              	 .section .bss.fit_result,"aw",%nobits
+ 1919              	 .set .LANCHOR36,.+0
+ 1922              	fit_result:
+ 1923 0000 00       	 .space 1
+ 1924              	 .section .bss.display_list_size,"aw",%nobits
+ 1925              	 .align 1
+ 1926              	 .set .LANCHOR30,.+0
+ 1929              	display_list_size:
+ 1930 0000 0000     	 .space 2
+ 1931              	 .section .bss.DP_cur,"aw",%nobits
+ 1932              	 .align 1
+ 1933              	 .set .LANCHOR33,.+0
+ 1936              	DP_cur:
+ 1937 0000 0000     	 .space 2
+ 1938              	 .section .data.lbl_DLsize_val,"aw",%progbits
+ 1939              	 .align 2
+ 1940              	 .set .LANCHOR26,.+0
+ 1943              	lbl_DLsize_val:
+ 1944 0000 D601     	 .short 470
+ 1945 0002 0A00     	 .short 10
+ 1946 0004 1A00     	 .short 26
+ 1947 0006 0008     	 .short 2048
+ 1948 0008 16000000 	 .word .LC5
+ 1949 000c 01       	 .byte 1
+ 1950 000d 000000   	 .space 3
+ 1951 0010 00000000 	 .word display_list_size
+ 1952 0014 00000000 	 .word 0
+ 1953 0018 00       	 .space 1
+ 1954 0019 01       	 .byte 1
+ 1955 001a 0000     	 .space 2
+ 1956              	 .section .data.lbl_sensor,"aw",%progbits
+ 1957              	 .align 2
+ 1958              	 .set .LANCHOR2,.+0
+ 1961              	lbl_sensor:
+ 1962 0000 6801     	 .short 360
+ 1963 0002 1900     	 .short 25
+ 1964 0004 1A00     	 .short 26
+ 1965 0006 0000     	 .short 0
+ 1966 0008 50010000 	 .word .LC45
+ 1967 000c 00       	 .byte 0
+ 1968 000d 00000000 	 .space 11
+ 1968      00000000 
+ 1968      000000
+ 1969 0018 00       	 .space 1
+ 1970 0019 01       	 .byte 1
+ 1971 001a 0000     	 .space 2
+ 1972              	 .section .data.menu_0,"aw",%progbits
+ 1973              	 .align 2
+ 1974              	 .set .LANCHOR0,.+0
+ 1977              	menu_0:
+ 1978 0000 00       	 .byte 0
+ 1979 0001 000000   	 .space 3
+ 1980 0004 72010000 	 .word .LC50
+ 1981 0008 4200     	 .short 66
+ 1982 000a 4200     	 .short 66
+ 1983 000c 4001     	 .short 320
+ 1984 000e 3200     	 .short 50
+ 1985 0010 6801     	 .short 360
+ 1986 0012 00000000 	 .space 6
+ 1986      0000
+ 1987 0018 4B586400 	 .word 6576203
+ 1988 001c 29CDF300 	 .word 15977769
+ 1989 0020 29CDF300 	 .word 15977769
+ 1990              	 .section .data.menu_1,"aw",%progbits
+ 1991              	 .align 2
+ 1992              	 .set .LANCHOR4,.+0
+ 1995              	menu_1:
+ 1996 0000 01       	 .byte 1
+ 1997 0001 000000   	 .space 3
+ 1998 0004 68010000 	 .word .LC49
+ 1999 0008 4200     	 .short 66
+ 2000 000a 4200     	 .short 66
+ 2001 000c 1801     	 .short 280
+ 2002 000e 3200     	 .short 50
+ 2003 0010 4001     	 .short 320
+ 2004 0012 00000000 	 .space 6
+ 2004      0000
+ 2005 0018 4B586400 	 .word 6576203
+ 2006 001c 29CDF300 	 .word 15977769
+ 2007 0020 29CDF300 	 .word 15977769
+ 2008              	 .section .data.lbl_backlight,"aw",%progbits
+ 2009              	 .align 2
+ 2010              	 .set .LANCHOR15,.+0
+ 2013              	lbl_backlight:
+ 2014 0000 1900     	 .short 25
+ 2015 0002 C700     	 .short 199
+ 2016 0004 1B00     	 .short 27
+ 2017 0006 0000     	 .short 0
+ 2018 0008 E6000000 	 .word .LC34
+ 2019 000c 00000000 	 .space 13
+ 2019      00000000 
+ 2019      00000000 
+ 2019      00
+ 2020 0019 00       	 .byte 0
+ 2021 001a 0000     	 .space 2
+ 2022              	 .section .bss.coefficients,"aw",%nobits
+ 2023              	 .align 2
+ 2024              	 .set .LANCHOR35,.+0
+ 2027              	coefficients:
+ 2028 0000 00000000 	 .space 16
+ 2028      00000000 
+ 2028      00000000 
+ 2028      00000000 
+ 2029              	 .section .data.TFT_touch_cur_Menu__fptr_arr,"aw",%progbits
+ 2030              	 .align 2
+ 2033              	TFT_touch_cur_Menu__fptr_arr:
+ 2034 0000 00000000 	 .word TFT_touch_menu0
+ 2035 0004 00000000 	 .word TFT_touch_menu1
+ 2036 0008 00000000 	 .word TFT_touch_menu_setup
+ 2037 000c 00000000 	 .word TFT_touch_menu_curveset
+ 2038              	 .section .data.btn_db_last,"aw",%progbits
+ 2039              	 .align 2
+ 2040              	 .set .LANCHOR28,.+0
+ 2043              	btn_db_last:
+ 2044 0000 7C00     	 .short 124
+ 2045 0002 DA00     	 .short 218
+ 2046 0004 1900     	 .short 25
+ 2047 0006 1E00     	 .short 30
+ 2048 0008 1B00     	 .short 27
+ 2049 000a 0000     	 .short 0
+ 2050 000c 0B       	 .byte 11
+ 2051 000d 000000   	 .space 3
+ 2052 0010 8F000000 	 .word .LC25
+ 2053 0014 0000     	 .short 0
+ 2054 0016 00       	 .byte 0
+ 2055 0017 00       	 .byte 0
+ 2056              	 .section .data.Menu_Objects,"aw",%progbits
+ 2057              	 .align 2
+ 2060              	Menu_Objects:
+ 2061 0000 00000000 	 .word menu_0
+ 2062 0004 00000000 	 .word menu_1
+ 2063 0008 00000000 	 .word menu_setup
+ 2064 000c 00000000 	 .word menu_curveset
+ 2065              	 .section .data.lbl_DLsize,"aw",%progbits
+ 2066              	 .align 2
+ 2067              	 .set .LANCHOR1,.+0
+ 2070              	lbl_DLsize:
+ 2071 0000 6801     	 .short 360
+ 2072 0002 0A00     	 .short 10
+ 2073 0004 1A00     	 .short 26
+ 2074 0006 0000     	 .short 0
+ 2075 0008 58010000 	 .word .LC46
+ 2076 000c 00       	 .byte 0
+ 2077 000d 00000000 	 .space 11
+ 2077      00000000 
+ 2077      000000
+ 2078 0018 00       	 .space 1
+ 2079 0019 01       	 .byte 1
+ 2080 001a 0000     	 .space 2
+ 2081              	 .section .bss.TFT_cur_Menu,"aw",%nobits
+ 2084              	TFT_cur_Menu:
+ 2085 0000 00       	 .space 1
+ 2086              	 .section .data.str_hour_curLength,"aw",%progbits
+ 2089              	str_hour_curLength:
+ 2090 0000 11       	 .byte 17
+ 2091              	 .section .data.tbx_dp,"aw",%progbits
+ 2092              	 .align 2
+ 2093              	 .set .LANCHOR17,.+0
+ 2096              	tbx_dp:
+ 2097 0000 0C00     	 .short 12
+ 2098 0002 DA00     	 .short 218
+ 2099 0004 2400     	 .short 36
+ 2100 0006 4B00     	 .short 75
+ 2101 0008 83000000 	 .word .LC24
+ 2102 000c 00       	 .byte 0
+ 2103 000d 000000   	 .space 3
+ 2104 0010 00000000 	 .word str_dp
+ 2105 0014 03       	 .byte 3
+ 2106 0015 000000   	 .space 3
+ 2107 0018 00000000 	 .word str_dp_curLength
+ 2108 001c 00       	 .byte 0
+ 2109 001d 000000   	 .space 3
+ 2110 0020 16000000 	 .word .LC5
+ 2111 0024 00000000 	 .space 4
+ 2112 0028 01       	 .byte 1
+ 2113 0029 000000   	 .space 3
+ 2114 002c 00000000 	 .word DP_cur
+ 2115 0030 00000000 	 .word 0
+ 2116 0034 01       	 .byte 1
+ 2117 0035 000000   	 .space 3
+ 2118              	 .section .data.str_s2_linspec,"aw",%progbits
+ 2121              	str_s2_linspec:
+ 2122 0000 73322E6C 	 .ascii "s2.lin\000"
+ 2122      696E00
+ 2123 0007 000000   	 .space 3
+ 2124              	 .section .data.lbl_record,"aw",%progbits
+ 2125              	 .align 2
+ 2126              	 .set .LANCHOR5,.+0
+ 2129              	lbl_record:
+ 2130 0000 1900     	 .short 25
+ 2131 0002 5000     	 .short 80
+ 2132 0004 1B00     	 .short 27
+ 2133 0006 0000     	 .short 0
+ 2134 0008 3B010000 	 .word .LC41
+ 2135 000c 00000000 	 .space 13
+ 2135      00000000 
+ 2135      00000000 
+ 2135      00
+ 2136 0019 00       	 .byte 0
+ 2137 001a 0000     	 .space 2
+ 2138              	 .section .data.lbl_linearisation,"aw",%progbits
+ 2139              	 .align 2
+ 2140              	 .set .LANCHOR10,.+0
+ 2143              	lbl_linearisation:
+ 2144 0000 1900     	 .short 25
+ 2145 0002 7700     	 .short 119
+ 2146 0004 1B00     	 .short 27
+ 2147 0006 0000     	 .short 0
+ 2148 0008 1E010000 	 .word .LC38
+ 2149 000c 00000000 	 .space 13
+ 2149      00000000 
+ 2149      00000000 
+ 2149      00
+ 2150 0019 00       	 .byte 0
+ 2151 001a 0000     	 .space 2
+ 2152              	 .section .bss.str_act,"aw",%nobits
+ 2155              	str_act:
+ 2156 0000 00000000 	 .space 10
+ 2156      00000000 
+ 2156      0000
+ 2157              	 .section .data.btn_input,"aw",%progbits
+ 2158              	 .align 2
+ 2159              	 .set .LANCHOR24,.+0
+ 2162              	btn_input:
+ 2163 0000 B400     	 .short 180
+ 2164 0002 0F00     	 .short 15
+ 2165 0004 4600     	 .short 70
+ 2166 0006 1E00     	 .short 30
+ 2167 0008 1B00     	 .short 27
+ 2168 000a 0000     	 .short 0
+ 2169 000c 0D       	 .byte 13
+ 2170 000d 000000   	 .space 3
+ 2171 0010 11000000 	 .word .LC4
+ 2172 0014 0000     	 .short 0
+ 2173 0016 00       	 .byte 0
+ 2174 0017 01       	 .byte 1
+ 2175              	 .section .data.btn_db_next,"aw",%progbits
+ 2176              	 .align 2
+ 2177              	 .set .LANCHOR29,.+0
+ 2180              	btn_db_next:
+ 2181 0000 9600     	 .short 150
+ 2182 0002 DA00     	 .short 218
+ 2183 0004 1900     	 .short 25
+ 2184 0006 1E00     	 .short 30
+ 2185 0008 1B00     	 .short 27
+ 2186 000a 0000     	 .short 0
+ 2187 000c 0C       	 .byte 12
+ 2188 000d 000000   	 .space 3
+ 2189 0010 60000000 	 .word .LC19
+ 2190 0014 0000     	 .short 0
+ 2191 0016 00       	 .byte 0
+ 2192 0017 00       	 .byte 0
+ 2193              	 .section .data.tbx_filename,"aw",%progbits
+ 2194              	 .align 2
+ 2195              	 .set .LANCHOR9,.+0
+ 2198              	tbx_filename:
+ 2199 0000 8C00     	 .short 140
+ 2200 0002 4A00     	 .short 74
+ 2201 0004 BE00     	 .short 190
+ 2202 0006 3C00     	 .short 60
+ 2203 0008 28010000 	 .word .LC39
+ 2204 000c 14       	 .byte 20
+ 2205 000d 000000   	 .space 3
+ 2206 0010 00000000 	 .word str_filename
+ 2207 0014 10       	 .byte 16
+ 2208 0015 000000   	 .space 3
+ 2209 0018 00000000 	 .word str_filename_curLength
+ 2210 001c 00       	 .byte 0
+ 2211 001d 00000000 	 .space 11
+ 2211      00000000 
+ 2211      000000
+ 2212 0028 00       	 .byte 0
+ 2213 0029 00000000 	 .space 11
+ 2213      00000000 
+ 2213      000000
+ 2214 0034 02       	 .byte 2
+ 2215 0035 000000   	 .space 3
+ 2216              	 .section .data.lbl_fitorder,"aw",%progbits
+ 2217              	 .align 2
+ 2218              	 .set .LANCHOR41,.+0
+ 2221              	lbl_fitorder:
+ 2222 0000 F000     	 .short 240
+ 2223 0002 0C00     	 .short 12
+ 2224 0004 1A00     	 .short 26
+ 2225 0006 0000     	 .short 0
+ 2226 0008 A6000000 	 .word .LC28
+ 2227 000c 00000000 	 .space 13
+ 2227      00000000 
+ 2227      00000000 
+ 2227      00
+ 2228 0019 00       	 .byte 0
+ 2229 001a 0000     	 .space 2
+ 2230              	 .section .data.btn_linSensor1,"aw",%progbits
+ 2231              	 .align 2
+ 2232              	 .set .LANCHOR20,.+0
+ 2235              	btn_linSensor1:
+ 2236 0000 9001     	 .short 400
+ 2237 0002 7200     	 .short 114
+ 2238 0004 3700     	 .short 55
+ 2239 0006 1F00     	 .short 31
+ 2240 0008 1B00     	 .short 27
+ 2241 000a 0000     	 .short 0
+ 2242 000c 16       	 .byte 22
+ 2243 000d 000000   	 .space 3
+ 2244 0010 F0000000 	 .word .LC35
+ 2245 0014 0000     	 .short 0
+ 2246 0016 00       	 .byte 0
+ 2247 0017 00       	 .byte 0
+ 2248              	 .section .data.btn_linSensor2,"aw",%progbits
+ 2249              	 .align 2
+ 2250              	 .set .LANCHOR21,.+0
+ 2253              	btn_linSensor2:
+ 2254 0000 9001     	 .short 400
+ 2255 0002 9A00     	 .short 154
+ 2256 0004 3700     	 .short 55
+ 2257 0006 1F00     	 .short 31
+ 2258 0008 1B00     	 .short 27
+ 2259 000a 0000     	 .short 0
+ 2260 000c 18       	 .byte 24
+ 2261 000d 000000   	 .space 3
+ 2262 0010 F0000000 	 .word .LC35
+ 2263 0014 0000     	 .short 0
+ 2264 0016 00       	 .byte 0
+ 2265 0017 00       	 .byte 0
+ 2266              	 .section .data.str_filename,"aw",%progbits
+ 2269              	str_filename:
+ 2270 0000 74657374 	 .ascii "test.csv\000"
+ 2270      2E637376 
+ 2270      00
+ 2271 0009 00000000 	 .space 7
+ 2271      000000
+ 2272              	 .section .bss.str_act_curLength,"aw",%nobits
+ 2275              	str_act_curLength:
+ 2276 0000 00       	 .space 1
+ 2277              	 .section .data.btn_back,"aw",%progbits
+ 2278              	 .align 2
+ 2279              	 .set .LANCHOR39,.+0
+ 2282              	btn_back:
+ 2283 0000 B301     	 .short 435
+ 2284 0002 0500     	 .short 5
+ 2285 0004 2800     	 .short 40
+ 2286 0006 1E00     	 .short 30
+ 2287 0008 1B00     	 .short 27
+ 2288 000a 0000     	 .short 0
+ 2289 000c 0A       	 .byte 10
+ 2290 000d 000000   	 .space 3
+ 2291 0010 C4000000 	 .word .LC30
+ 2292 0014 0000     	 .short 0
+ 2293 0016 00       	 .byte 0
+ 2294 0017 01       	 .byte 1
+ 2295              	 .section .data.btn_startRec,"aw",%progbits
+ 2296              	 .align 2
+ 2297              	 .set .LANCHOR6,.+0
+ 2300              	btn_startRec:
+ 2301 0000 C800     	 .short 200
+ 2302 0002 5000     	 .short 80
+ 2303 0004 3700     	 .short 55
+ 2304 0006 1F00     	 .short 31
+ 2305 0008 1B00     	 .short 27
+ 2306 000a 0000     	 .short 0
+ 2307 000c 0A       	 .byte 10
+ 2308 000d 000000   	 .space 3
+ 2309 0010 42010000 	 .word .LC42
+ 2310 0014 0000     	 .short 0
+ 2311 0016 00       	 .byte 0
+ 2312 0017 01       	 .byte 1
+ 2313              	 .section .data.lbl_curveset,"aw",%progbits
+ 2314              	 .align 2
+ 2315              	 .set .LANCHOR40,.+0
+ 2318              	lbl_curveset:
+ 2319 0000 1400     	 .short 20
+ 2320 0002 0900     	 .short 9
+ 2321 0004 1B00     	 .short 27
+ 2322 0006 0000     	 .short 0
+ 2323 0008 AF000000 	 .word .LC29
+ 2324 000c 00000000 	 .space 13
+ 2324      00000000 
+ 2324      00000000 
+ 2324      00
+ 2325 0019 00       	 .byte 0
+ 2326 001a 0000     	 .space 2
+ 2327              	 .section .data.tgl_graphMode,"aw",%progbits
+ 2328              	 .align 2
+ 2329              	 .set .LANCHOR23,.+0
+ 2332              	tgl_graphMode:
+ 2333 0000 0E01     	 .short 270
+ 2334 0002 1800     	 .short 24
+ 2335 0004 3C00     	 .short 60
+ 2336 0006 1B00     	 .short 27
+ 2337 0008 1B00     	 .short 27
+ 2338 000a 0000     	 .short 0
+ 2339 000c 0C       	 .byte 12
+ 2340 000d 000000   	 .space 3
+ 2341 0010 0B000000 	 .word .LC3
+ 2342 0014 0000     	 .short 0
+ 2343 0016 01       	 .byte 1
+ 2344 0017 01       	 .byte 1
+ 2345              	 .section .data.btn_dimmmer,"aw",%progbits
+ 2346              	 .align 2
+ 2347              	 .set .LANCHOR22,.+0
+ 2350              	btn_dimmmer:
+ 2351 0000 8C00     	 .short 140
+ 2352 0002 C200     	 .short 194
+ 2353 0004 5000     	 .short 80
+ 2354 0006 1E00     	 .short 30
+ 2355 0008 1B00     	 .short 27
+ 2356 000a 0000     	 .short 0
+ 2357 000c 0A       	 .byte 10
+ 2358 000d 000000   	 .space 3
+ 2359 0010 DF000000 	 .word .LC33
+ 2360 0014 0000     	 .short 0
+ 2361 0016 00       	 .byte 0
+ 2362 0017 00       	 .byte 0
+ 2363              	 .section .data.TFT_display_cur_Menu__fptr_arr,"aw",%progbits
+ 2364              	 .align 2
+ 2367              	TFT_display_cur_Menu__fptr_arr:
+ 2368 0000 00000000 	 .word TFT_display_menu0
+ 2369 0004 00000000 	 .word TFT_display_menu1
+ 2370 0008 00000000 	 .word TFT_display_menu_setup
+ 2371 000c 00000000 	 .word TFT_display_menu_curveset
+ 2372              	 .section .data.btn_setchange,"aw",%progbits
+ 2373              	 .align 2
+ 2374              	 .set .LANCHOR27,.+0
+ 2377              	btn_setchange:
+ 2378 0000 A001     	 .short 416
+ 2379 0002 DA00     	 .short 218
+ 2380 0004 3200     	 .short 50
+ 2381 0006 1E00     	 .short 30
+ 2382 0008 1A00     	 .short 26
+ 2383 000a 0000     	 .short 0
+ 2384 000c 0D       	 .byte 13
+ 2385 000d 000000   	 .space 3
+ 2386 0010 43000000 	 .word .LC14
+ 2387 0014 0000     	 .short 0
+ 2388 0016 00       	 .byte 0
+ 2389 0017 00       	 .byte 0
+ 2390              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 menu.c
+    {standard input}:17     .text.TFT_display_static_menu0:00000000 $t
+    {standard input}:22     .text.TFT_display_static_menu0:00000000 TFT_display_static_menu0
+    {standard input}:54     .text.TFT_display_static_menu0:00000044 $d
+    {standard input}:63     .text.TFT_display_static_menu1:00000000 $t
+    {standard input}:68     .text.TFT_display_static_menu1:00000000 TFT_display_static_menu1
+    {standard input}:112    .text.TFT_display_static_menu1:00000068 $d
+    {standard input}:121    .text.TFT_display_menu1:00000000 $t
+    {standard input}:126    .text.TFT_display_menu1:00000000 TFT_display_menu1
+    {standard input}:169    .text.TFT_display_menu1:0000005c $d
+    {standard input}:179    .text.TFT_display_static_menu_setup:00000000 $t
+    {standard input}:184    .text.TFT_display_static_menu_setup:00000000 TFT_display_static_menu_setup
+    {standard input}:231    .text.TFT_display_static_menu_setup:0000006c $d
+    {standard input}:244    .text.TFT_display_static_menu_curveset:00000000 $t
+    {standard input}:249    .text.TFT_display_static_menu_curveset:00000000 TFT_display_static_menu_curveset
+    {standard input}:281    .text.TFT_display_static_menu_curveset:00000044 $d
+    {standard input}:289    .text.TFT_display_menu_setup:00000000 $t
+    {standard input}:294    .text.TFT_display_menu_setup:00000000 TFT_display_menu_setup
+    {standard input}:332    .text.TFT_display_menu_setup:00000058 $d
+    {standard input}:344    .text.TFT_touch_menu0:00000000 $t
+    {standard input}:349    .text.TFT_touch_menu0:00000000 TFT_touch_menu0
+    {standard input}:457    .text.TFT_touch_menu0:000000c0 $d
+                            *COM*:00000001 InputType
+    {standard input}:480    .text.TFT_display_menu0:00000000 $t
+    {standard input}:485    .text.TFT_display_menu0:00000000 TFT_display_menu0
+    {standard input}:531    .text.TFT_display_menu0:00000064 $d
+                            *COM*:00000002 InputBuffer1_idx
+    {standard input}:545    .text.TFT_touch_menu1:00000000 $t
+    {standard input}:550    .text.TFT_touch_menu1:00000000 TFT_touch_menu1
+    {standard input}:565    .text.curveset_setEditMode.part.3:00000000 $t
+    {standard input}:569    .text.curveset_setEditMode.part.3:00000000 curveset_setEditMode.part.3
+    {standard input}:590    .text.curveset_setEditMode.part.3:00000020 $d
+    {standard input}:597    .text.TFT_display_get_values:00000000 $t
+    {standard input}:602    .text.TFT_display_get_values:00000000 TFT_display_get_values
+    {standard input}:618    .text.TFT_display_get_values:00000018 $d
+    {standard input}:624    .text.curveset_prepare:00000000 $t
+    {standard input}:629    .text.curveset_prepare:00000000 curveset_prepare
+    {standard input}:683    .text.curveset_prepare:00000068 $d
+                            *COM*:00000004 curveset_sensBuffer
+                            *COM*:00000004 curveset_sensBuffer_curIdx
+                            *COM*:00000004 buf_acty_curveset
+                            *COM*:00000004 buf_nomx_curveset
+    {standard input}:699    .text.TFT_touch_menu_setup:00000000 $t
+    {standard input}:704    .text.TFT_touch_menu_setup:00000000 TFT_touch_menu_setup
+    {standard input}:713    .text.TFT_touch_menu_setup:0000000c $d
+    {standard input}:729    .text.TFT_touch_menu_setup:0000001c $t
+    {standard input}:827    .text.TFT_touch_menu_setup:000000e4 $d
+    {standard input}:838    .text.curveset_setEditMode:00000000 $t
+    {standard input}:843    .text.curveset_setEditMode:00000000 curveset_setEditMode
+    {standard input}:889    .text.curveset_setEditMode:0000005c $d
+    {standard input}:900    .text.TFT_touch_menu_curveset:00000000 $t
+    {standard input}:905    .text.TFT_touch_menu_curveset:00000000 TFT_touch_menu_curveset
+    {standard input}:914    .text.TFT_touch_menu_curveset:0000000e $d
+    {standard input}:931    .text.TFT_touch_menu_curveset:00000030 $t
+    {standard input}:1131   .text.TFT_touch_menu_curveset:000001c0 $d
+    {standard input}:1153   .text.menu_shelf_datapoint:00000000 $t
+    {standard input}:1158   .text.menu_shelf_datapoint:00000000 menu_shelf_datapoint
+    {standard input}:1246   .text.TFT_display_menu_curveset:00000000 $t
+    {standard input}:1251   .text.TFT_display_menu_curveset:00000000 TFT_display_menu_curveset
+    {standard input}:1368   .text.TFT_display_menu_curveset:0000012c $d
+    {standard input}:1577   .data.tbx_act:00000000 tbx_act
+    {standard input}:2275   .bss.str_act_curLength:00000000 str_act_curLength
+    {standard input}:2155   .bss.str_act:00000000 str_act
+    {standard input}:1638   .data.tbx_nom:00000000 tbx_nom
+    {standard input}:1559   .data.str_nom_curLength:00000000 str_nom_curLength
+    {standard input}:1564   .data.str_nom:00000000 str_nom
+    {standard input}:2096   .data.tbx_dp:00000000 tbx_dp
+    {standard input}:1708   .data.str_dp_curLength:00000000 str_dp_curLength
+    {standard input}:1915   .data.str_dp:00000000 str_dp
+    {standard input}:2377   .data.btn_setchange:00000000 btn_setchange
+    {standard input}:2180   .data.btn_db_next:00000000 btn_db_next
+    {standard input}:2043   .data.btn_db_last:00000000 btn_db_last
+    {standard input}:1502   .data.gph_curveset:00000000 gph_curveset
+    {standard input}:1524   .data.btn_order:00000000 btn_order
+    {standard input}:2221   .data.lbl_fitorder:00000000 lbl_fitorder
+    {standard input}:2318   .data.lbl_curveset:00000000 lbl_curveset
+    {standard input}:2282   .data.btn_back:00000000 btn_back
+    {standard input}:1922   .bss.fit_result:00000000 fit_result
+    {standard input}:2027   .bss.coefficients:00000000 coefficients
+    {standard input}:1631   .data.fit_order:00000000 fit_order
+    {standard input}:1936   .bss.DP_cur:00000000 DP_cur
+    {standard input}:1703   .data.DP_size:00000000 DP_size
+    {standard input}:1474   .data.tbx_hour:00000000 tbx_hour
+    {standard input}:2089   .data.str_hour_curLength:00000000 str_hour_curLength
+    {standard input}:1682   .data.str_hour:00000000 str_hour
+    {standard input}:1547   .data.lbl_RTC:00000000 lbl_RTC
+    {standard input}:2350   .data.btn_dimmmer:00000000 btn_dimmmer
+    {standard input}:2013   .data.lbl_backlight:00000000 lbl_backlight
+    {standard input}:2253   .data.btn_linSensor2:00000000 btn_linSensor2
+    {standard input}:1773   .data.tbx_sensor2:00000000 tbx_sensor2
+    {standard input}:1570   .data.str_s2_linspec_curLength:00000000 str_s2_linspec_curLength
+    {standard input}:2121   .data.str_s2_linspec:00000000 str_s2_linspec
+    {standard input}:2235   .data.btn_linSensor1:00000000 btn_linSensor1
+    {standard input}:1750   .data.tbx_sensor1:00000000 tbx_sensor1
+    {standard input}:1540   .data.str_s1_linspec_curLength:00000000 str_s1_linspec_curLength
+    {standard input}:1735   .data.str_s1_linspec:00000000 str_s1_linspec
+    {standard input}:2143   .data.lbl_linearisation:00000000 lbl_linearisation
+    {standard input}:2198   .data.tbx_filename:00000000 tbx_filename
+    {standard input}:1495   .data.str_filename_curLength:00000000 str_filename_curLength
+    {standard input}:2269   .data.str_filename:00000000 str_filename
+    {standard input}:1689   .data.lbl_recording:00000000 lbl_recording
+    {standard input}:2129   .data.lbl_record:00000000 lbl_record
+    {standard input}:2300   .data.btn_startRec:00000000 btn_startRec
+    {standard input}:1715   .data.gph_monitor:00000000 gph_monitor
+    {standard input}:1614   .data.lbl_sensor_val:00000000 lbl_sensor_val
+    {standard input}:1961   .data.lbl_sensor:00000000 lbl_sensor
+    {standard input}:1943   .data.lbl_DLsize_val:00000000 lbl_DLsize_val
+    {standard input}:2070   .data.lbl_DLsize:00000000 lbl_DLsize
+    {standard input}:2332   .data.tgl_graphMode:00000000 tgl_graphMode
+    {standard input}:2162   .data.btn_input:00000000 btn_input
+    {standard input}:1743   .bss.tracker:00000000 tracker
+    {standard input}:1929   .bss.display_list_size:00000000 display_list_size
+    {standard input}:2060   .data.Menu_Objects:00000000 Menu_Objects
+    {standard input}:1666   .data.menu_curveset:00000000 menu_curveset
+    {standard input}:1899   .data.menu_setup:00000000 menu_setup
+    {standard input}:1995   .data.menu_1:00000000 menu_1
+    {standard input}:1977   .data.menu_0:00000000 menu_0
+    {standard input}:2084   .bss.TFT_cur_Menu:00000000 TFT_cur_Menu
+    {standard input}:2033   .data.TFT_touch_cur_Menu__fptr_arr:00000000 TFT_touch_cur_Menu__fptr_arr
+    {standard input}:2367   .data.TFT_display_cur_Menu__fptr_arr:00000000 TFT_display_cur_Menu__fptr_arr
+    {standard input}:1604   .data.TFT_display_static_cur_Menu__fptr_arr:00000000 TFT_display_static_cur_Menu__fptr_arr
+                            *COM*:00000001 ReadData
+                            *COM*:00000001 frameover
+                            *COM*:00000004 MeasurementCounter
+                            *COM*:00000001 tft_tick
+                            *COM*:00000004 _msCounter
+    {standard input}:1470   .data.tbx_hour:00000000 $d
+    {standard input}:1498   .data.gph_curveset:00000000 $d
+    {standard input}:1520   .data.btn_order:00000000 $d
+    {standard input}:1543   .data.lbl_RTC:00000000 $d
+    {standard input}:1566   .data.str_nom:00000005 $d
+    {standard input}:1573   .data.tbx_act:00000000 $d
+    {standard input}:1601   .data.TFT_display_static_cur_Menu__fptr_arr:00000000 $d
+    {standard input}:1610   .data.lbl_sensor_val:00000000 $d
+    {standard input}:1634   .data.tbx_nom:00000000 $d
+    {standard input}:1662   .data.menu_curveset:00000000 $d
+    {standard input}:1685   .data.lbl_recording:00000000 $d
+    {standard input}:1699   .data.DP_size:00000000 $d
+    {standard input}:1711   .data.gph_monitor:00000000 $d
+    {standard input}:1737   .data.str_s1_linspec:00000007 $d
+    {standard input}:1739   .bss.tracker:00000000 $d
+    {standard input}:1746   .data.tbx_sensor1:00000000 $d
+    {standard input}:1769   .data.tbx_sensor2:00000000 $d
+    {standard input}:1895   .data.menu_setup:00000000 $d
+    {standard input}:1917   .data.str_dp:00000002 $d
+    {standard input}:1923   .bss.fit_result:00000000 $d
+    {standard input}:1925   .bss.display_list_size:00000000 $d
+    {standard input}:1932   .bss.DP_cur:00000000 $d
+    {standard input}:1939   .data.lbl_DLsize_val:00000000 $d
+    {standard input}:1957   .data.lbl_sensor:00000000 $d
+    {standard input}:1973   .data.menu_0:00000000 $d
+    {standard input}:1991   .data.menu_1:00000000 $d
+    {standard input}:2009   .data.lbl_backlight:00000000 $d
+    {standard input}:2023   .bss.coefficients:00000000 $d
+    {standard input}:2030   .data.TFT_touch_cur_Menu__fptr_arr:00000000 $d
+    {standard input}:2039   .data.btn_db_last:00000000 $d
+    {standard input}:2057   .data.Menu_Objects:00000000 $d
+    {standard input}:2066   .data.lbl_DLsize:00000000 $d
+    {standard input}:2085   .bss.TFT_cur_Menu:00000000 $d
+    {standard input}:2092   .data.tbx_dp:00000000 $d
+    {standard input}:2123   .data.str_s2_linspec:00000007 $d
+    {standard input}:2125   .data.lbl_record:00000000 $d
+    {standard input}:2139   .data.lbl_linearisation:00000000 $d
+    {standard input}:2156   .bss.str_act:00000000 $d
+    {standard input}:2158   .data.btn_input:00000000 $d
+    {standard input}:2176   .data.btn_db_next:00000000 $d
+    {standard input}:2194   .data.tbx_filename:00000000 $d
+    {standard input}:2217   .data.lbl_fitorder:00000000 $d
+    {standard input}:2231   .data.btn_linSensor1:00000000 $d
+    {standard input}:2249   .data.btn_linSensor2:00000000 $d
+    {standard input}:2271   .data.str_filename:00000009 $d
+    {standard input}:2276   .bss.str_act_curLength:00000000 $d
+    {standard input}:2278   .data.btn_back:00000000 $d
+    {standard input}:2296   .data.btn_startRec:00000000 $d
+    {standard input}:2314   .data.lbl_curveset:00000000 $d
+    {standard input}:2328   .data.tgl_graphMode:00000000 $d
+    {standard input}:2346   .data.btn_dimmmer:00000000 $d
+    {standard input}:2364   .data.TFT_display_cur_Menu__fptr_arr:00000000 $d
+    {standard input}:2373   .data.btn_setchange:00000000 $d
+
+UNDEFINED SYMBOLS
+TFT_setMenu
+TFT_header
+TFT_setColor
+TFT_label
+TFT_graph_static
+EVE_cmd_dl_burst
+EVE_cmd_text_burst
+TFT_control
+EVE_cmd_number_burst
+swipeDistance_X
+swipeDistance_Y
+TFT_textbox_static
+TFT_textbox_display
+InputBuffer1
+InputBuffer1_conv
+TFT_graph_pixeldata_f
+TFT_graph_pixeldata_i
+record_buffer
+EVE_memRead16
+EVE_memRead32
+malloc
+polyfit
+EVE_memWrite8
+TFT_textbox_setStatus
+TFT_textbox_touch
+memcpy
+free
+realloc
+poly_calc
+s1_coefficients
+s1_fit_order
+TFT_graph_XYdata
+TFT_graph_function

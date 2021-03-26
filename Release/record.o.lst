@@ -1,0 +1,152 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "record.c"
+  16              	 .section .text.record_buffer,"ax",%progbits
+  17              	 .align 1
+  18              	 .global record_buffer
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	record_buffer:
+  23              	 
+  24              	 
+  25 0000 00B5     	 push {lr}
+  26 0002 2348     	 ldr r0,.L8
+  27 0004 2349     	 ldr r1,.L8+4
+  28 0006 8BB0     	 sub sp,sp,#44
+  29 0008 0122     	 movs r2,#1
+  30 000a FFF7FEFF 	 bl f_mount
+  31 000e 0028     	 cmp r0,#0
+  32 0010 3BD1     	 bne .L1
+  33 0012 2148     	 ldr r0,.L8+8
+  34 0014 FFF7FEFF 	 bl f_mkdir
+  35 0018 10F0F70F 	 tst r0,#247
+  36 001c 30D1     	 bne .L3
+  37 001e 1F48     	 ldr r0,.L8+12
+  38 0020 1F49     	 ldr r1,.L8+16
+  39 0022 0B22     	 movs r2,#11
+  40 0024 FFF7FEFF 	 bl f_open
+  41 0028 10F0F70F 	 tst r0,#247
+  42 002c 25D1     	 bne .L5
+  43 002e 1D4B     	 ldr r3,.L8+20
+  44 0030 1D49     	 ldr r1,.L8+24
+  45 0032 1A88     	 ldrh r2,[r3]
+  46 0034 1D4B     	 ldr r3,.L8+28
+  47 0036 03A8     	 add r0,sp,#12
+  48 0038 33F81220 	 ldrh r2,[r3,r2,lsl#1]
+  49 003c FFF7FEFF 	 bl sprintf
+  50 0040 03A9     	 add r1,sp,#12
+  51 0042 1648     	 ldr r0,.L8+12
+  52 0044 0F22     	 movs r2,#15
+  53 0046 01AB     	 add r3,sp,#4
+  54 0048 FFF7FEFF 	 bl f_write
+  55 004c 0146     	 mov r1,r0
+  56 004e A0B9     	 cbnz r0,.L5
+  57 0050 1248     	 ldr r0,.L8+12
+  58 0052 FFF7FEFF 	 bl f_lseek
+  59 0056 1148     	 ldr r0,.L8+12
+  60 0058 03A9     	 add r1,sp,#12
+  61 005a 0F22     	 movs r2,#15
+  62 005c 02AB     	 add r3,sp,#8
+  63 005e FFF7FEFF 	 bl f_read
+  64 0062 50B9     	 cbnz r0,.L5
+  65 0064 0D48     	 ldr r0,.L8+12
+  66 0066 0F21     	 movs r1,#15
+  67 0068 FFF7FEFF 	 bl f_lseek
+  68 006c 28B9     	 cbnz r0,.L5
+  69 006e 0B48     	 ldr r0,.L8+12
+  70 0070 0F49     	 ldr r1,.L8+32
+  71 0072 1422     	 movs r2,#20
+  72 0074 01AB     	 add r3,sp,#4
+  73 0076 FFF7FEFF 	 bl f_write
+  74              	.L5:
+  75 007a 0848     	 ldr r0,.L8+12
+  76 007c FFF7FEFF 	 bl f_close
+  77              	.L3:
+  78 0080 0020     	 movs r0,#0
+  79 0082 0449     	 ldr r1,.L8+4
+  80 0084 0246     	 mov r2,r0
+  81 0086 FFF7FEFF 	 bl f_mount
+  82              	.L1:
+  83 008a 0BB0     	 add sp,sp,#44
+  84              	 
+  85 008c 5DF804FB 	 ldr pc,[sp],#4
+  86              	.L9:
+  87              	 .align 2
+  88              	.L8:
+  89 0090 00000000 	 .word fs
+  90 0094 00000000 	 .word .LC0
+  91 0098 03000000 	 .word .LC1
+  92 009c 00000000 	 .word fil
+  93 00a0 0A000000 	 .word .LC2
+  94 00a4 00000000 	 .word InputBuffer1_idx
+  95 00a8 19000000 	 .word .LC3
+  96 00ac 00000000 	 .word InputBuffer1
+  97 00b0 2B000000 	 .word .LC4
+  99              	 .comm fil,556,4
+ 100              	 .comm fs,564,4
+ 101              	 .comm frameover,1,1
+ 102              	 .comm InputType,1,1
+ 103              	 .comm InputBuffer1_idx,2,2
+ 104              	 .comm MeasurementCounter,4,4
+ 105              	 .comm tft_tick,1,1
+ 106              	 .comm _msCounter,4,4
+ 107              	 .section .rodata.str1.1,"aMS",%progbits,1
+ 108              	.LC0:
+ 109 0000 303A00   	 .ascii "0:\000"
+ 110              	.LC1:
+ 111 0003 5265636F 	 .ascii "Record\000"
+ 111      726400
+ 112              	.LC2:
+ 113 000a 5265636F 	 .ascii "Record/log.txt\000"
+ 113      72642F6C 
+ 113      6F672E74 
+ 113      787400
+ 114              	.LC3:
+ 115 0019 43757272 	 .ascii "Current value %d\012\000"
+ 115      656E7420 
+ 115      76616C75 
+ 115      65202564 
+ 115      0A00
+ 116              	.LC4:
+ 117 002b 0A57656C 	 .ascii "\012Welcome to Infineon\000"
+ 117      636F6D65 
+ 117      20746F20 
+ 117      496E6669 
+ 117      6E656F6E 
+ 118              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 record.c
+    {standard input}:17     .text.record_buffer:00000000 $t
+    {standard input}:22     .text.record_buffer:00000000 record_buffer
+    {standard input}:89     .text.record_buffer:00000090 $d
+                            *COM*:00000234 fs
+                            *COM*:0000022c fil
+                            *COM*:00000002 InputBuffer1_idx
+                            *COM*:00000001 frameover
+                            *COM*:00000001 InputType
+                            *COM*:00000004 MeasurementCounter
+                            *COM*:00000001 tft_tick
+                            *COM*:00000004 _msCounter
+
+UNDEFINED SYMBOLS
+f_mount
+f_mkdir
+f_open
+sprintf
+f_write
+f_lseek
+f_read
+f_close
+InputBuffer1

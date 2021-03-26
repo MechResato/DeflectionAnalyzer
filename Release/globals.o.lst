@@ -1,0 +1,161 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "globals.c"
+  16              	 .section .text.delay_ms,"ax",%progbits
+  17              	 .align 1
+  18              	 .global delay_ms
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	delay_ms:
+  23              	 
+  24              	 
+  25 0000 10B5     	 push {r4,lr}
+  26 0002 0446     	 mov r4,r0
+  27 0004 FFF7FEFF 	 bl SYSTIMER_GetTime
+  28 0008 4FF47A73 	 mov r3,#1000
+  29 000c 03FB0404 	 mla r4,r3,r4,r0
+  30              	.L2:
+  31 0010 FFF7FEFF 	 bl SYSTIMER_GetTime
+  32 0014 8442     	 cmp r4,r0
+  33 0016 01D9     	 bls .L5
+  34              	
+  35 0018 00BF     	 nop
+  36              	
+  37              	 .thumb
+  38 001a F9E7     	 b .L2
+  39              	.L5:
+  40 001c 10BD     	 pop {r4,pc}
+  42              	 .section .text.poly_calc,"ax",%progbits
+  43              	 .align 1
+  44              	 .global poly_calc
+  45              	 .thumb
+  46              	 .thumb_func
+  48              	poly_calc:
+  49              	 
+  50              	 
+  51 0000 F8B5     	 push {r3,r4,r5,r6,r7,lr}
+  52 0002 2DED028B 	 fstmfdd sp!,{d8}
+  53 0006 9FED118A 	 flds s16,.L10
+  54 000a 0646     	 mov r6,r0
+  55 000c 0F46     	 mov r7,r1
+  56 000e 1546     	 mov r5,r2
+  57 0010 0023     	 movs r3,#0
+  58              	.L7:
+  59 0012 D9B2     	 uxtb r1,r3
+  60 0014 8D42     	 cmp r5,r1
+  61 0016 03F10104 	 add r4,r3,#1
+  62 001a 12DB     	 blt .L9
+  63 001c 07EE901A 	 fmsr s15,r1
+  64 0020 F8EE677A 	 fuitos s15,s15
+  65 0024 07EB8103 	 add r3,r7,r1,lsl#2
+  66 0028 3046     	 mov r0,r6
+  67 002a 17EE901A 	 fmrs r1,s15
+  68 002e D3ED008A 	 flds s17,[r3]
+  69 0032 FFF7FEFF 	 bl powf
+  70 0036 07EE900A 	 fmsr s15,r0
+  71 003a 2346     	 mov r3,r4
+  72 003c A8EEA78A 	 vfma.f32 s16,s17,s15
+  73 0040 E7E7     	 b .L7
+  74              	.L9:
+  75 0042 18EE100A 	 fmrs r0,s16
+  76 0046 BDEC028B 	 fldmfdd sp!,{d8}
+  77 004a F8BD     	 pop {r3,r4,r5,r6,r7,pc}
+  78              	.L11:
+  79              	 .align 2
+  80              	.L10:
+  81 004c 00000000 	 .word 0
+  83              	 .global s1_coefficients
+  84              	 .global s1_fit_order
+  85              	 .global InputBuffer1_conv
+  86              	 .global InputBuffer1
+  87              	 .global frameover
+  88              	 .global InputType
+  89              	 .global InputBuffer1_idx
+  90              	 .global MeasurementCounter
+  91              	 .global tft_tick
+  92              	 .comm _msCounter,4,4
+  93              	 .section .bss.frameover,"aw",%nobits
+  96              	frameover:
+  97 0000 00       	 .space 1
+  98              	 .section .data.s1_fit_order,"aw",%progbits
+ 101              	s1_fit_order:
+ 102 0000 02       	 .byte 2
+ 103              	 .section .bss.MeasurementCounter,"aw",%nobits
+ 104              	 .align 2
+ 107              	MeasurementCounter:
+ 108 0000 00000000 	 .space 4
+ 109              	 .section .data.s1_coefficients,"aw",%progbits
+ 110              	 .align 2
+ 113              	s1_coefficients:
+ 114 0000 1C3FACC0 	 .word -1062453476
+ 115 0004 E38B363D 	 .word 1026984931
+ 116 0008 BD3786B5 	 .word -1249495107
+ 117 000c 00000000 	 .word 0
+ 118              	 .section .bss.InputBuffer1_idx,"aw",%nobits
+ 119              	 .align 1
+ 122              	InputBuffer1_idx:
+ 123 0000 0000     	 .space 2
+ 124              	 .section .bss.InputBuffer1_conv,"aw",%nobits
+ 125              	 .align 2
+ 128              	InputBuffer1_conv:
+ 129 0000 00000000 	 .space 1760
+ 129      00000000 
+ 129      00000000 
+ 129      00000000 
+ 129      00000000 
+ 130              	 .section .bss.InputBuffer1,"aw",%nobits
+ 131              	 .align 1
+ 134              	InputBuffer1:
+ 135 0000 00000000 	 .space 880
+ 135      00000000 
+ 135      00000000 
+ 135      00000000 
+ 135      00000000 
+ 136              	 .section .bss.InputType,"aw",%nobits
+ 139              	InputType:
+ 140 0000 00       	 .space 1
+ 141              	 .section .bss.tft_tick,"aw",%nobits
+ 144              	tft_tick:
+ 145 0000 00       	 .space 1
+ 146              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 globals.c
+    {standard input}:17     .text.delay_ms:00000000 $t
+    {standard input}:22     .text.delay_ms:00000000 delay_ms
+    {standard input}:43     .text.poly_calc:00000000 $t
+    {standard input}:48     .text.poly_calc:00000000 poly_calc
+    {standard input}:81     .text.poly_calc:0000004c $d
+    {standard input}:113    .data.s1_coefficients:00000000 s1_coefficients
+    {standard input}:101    .data.s1_fit_order:00000000 s1_fit_order
+    {standard input}:128    .bss.InputBuffer1_conv:00000000 InputBuffer1_conv
+    {standard input}:134    .bss.InputBuffer1:00000000 InputBuffer1
+    {standard input}:96     .bss.frameover:00000000 frameover
+    {standard input}:139    .bss.InputType:00000000 InputType
+    {standard input}:122    .bss.InputBuffer1_idx:00000000 InputBuffer1_idx
+    {standard input}:107    .bss.MeasurementCounter:00000000 MeasurementCounter
+    {standard input}:144    .bss.tft_tick:00000000 tft_tick
+                            *COM*:00000004 _msCounter
+    {standard input}:97     .bss.frameover:00000000 $d
+    {standard input}:104    .bss.MeasurementCounter:00000000 $d
+    {standard input}:110    .data.s1_coefficients:00000000 $d
+    {standard input}:119    .bss.InputBuffer1_idx:00000000 $d
+    {standard input}:125    .bss.InputBuffer1_conv:00000000 $d
+    {standard input}:131    .bss.InputBuffer1:00000000 $d
+    {standard input}:140    .bss.InputType:00000000 $d
+    {standard input}:145    .bss.tft_tick:00000000 $d
+
+UNDEFINED SYMBOLS
+SYSTIMER_GetTime
+powf

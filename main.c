@@ -4,7 +4,7 @@
  *  Author: Rene Santeler @ MCI 2020/21
  *  Version: V0.2
  *  Comment:
- *  Parts are taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done with Stefan Reinmüller
+ *  Parts are taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done by Stefan Reinmüller and Rene Santeler
  */
 
 #include <DAVE.h>                 // Declarations from DAVE Code Generation (includes SFR declaration)

@@ -10,7 +10,7 @@
 #include <globals.h>
 
 /*  MACROS - DEFINEs */
-#define DEBUG_ENABLE // self implemented Debug flag
+//#define DEBUG_ENABLE // self implemented Debug flag
 #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
 /* DEBUG */
@@ -36,12 +36,13 @@ volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
 uint16_t InputBuffer1_idx = 0; // Current index in Buffer
 int_buffer_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
 float_buffer_t InputBuffer1_conv[INPUTBUFFER1_SIZE] = { 0.0 }; // all elements 0
-
+uint8_t s1_fit_order = 2;
+float s1_coefficients[4] = {-5.382704, 0.044567, -0.000001, 0};
 
 
 ///*  MENU AND USER INTERFACE */
 // Input signal type used for measurement and GUI display
-volatile uint8_t InputType = 2; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
+volatile uint8_t InputType = 0; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
 
 
 
@@ -52,13 +53,7 @@ volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
 
 
 ///*  FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------- */
-//void SysTick_Handler(){ // Interrupt Routine - used for delay_ms
-//	_msCounter++;
-//}
 void delay_ms(uint32_t ms){
-	// Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
-	//uint32_t now = SYSTIMER_GetTickCount();
-	//while(now+ms > SYSTIMER_GetTickCount())
 	uint32_t targetMicroSec = SYSTIMER_GetTime() + (ms*1000);
 	while(targetMicroSec > SYSTIMER_GetTime())
 		__NOP(); // do nothing

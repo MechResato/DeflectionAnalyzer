@@ -46,10 +46,14 @@ void Adc_Measurement_Handler(void){
 		case 3:
 			InputBuffer1[InputBuffer1_idx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)MeasurementCounter/3000))))*4095.0);
 			break;
+		default:
+			InputBuffer1[InputBuffer1_idx] = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A); //result = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A);
+			// Convert raw value to adapted value and save it
+			InputBuffer1_conv[InputBuffer1_idx] = poly_calc(InputBuffer1[InputBuffer1_idx], &s1_coefficients[0], s1_fit_order); //5.2/4096.0*InputBuffer1[InputBuffer1_idx];
+
+			break;
 	 }
 
-	// Convert raw value to adapted value and save it
-	InputBuffer1_conv[InputBuffer1_idx] = 10.0/4096.0*InputBuffer1[InputBuffer1_idx];
 
 	// Trigger next main loop (with his it is running in synch with the measurement -> change if needed!)
 	tft_tick = 42;

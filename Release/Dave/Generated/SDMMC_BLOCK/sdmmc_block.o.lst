@@ -1,0 +1,444 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "sdmmc_block.c"
+  16              	 .section .text.SDMMC_BLOCK_GetAppVersion,"ax",%progbits
+  17              	 .align 1
+  18              	 .global SDMMC_BLOCK_GetAppVersion
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	SDMMC_BLOCK_GetAppVersion:
+  23              	 
+  24              	 
+  25              	 
+  26 0000 0023     	 movs r3,#0
+  27 0002 1846     	 mov r0,r3
+  28 0004 0422     	 movs r2,#4
+  29 0006 62F30700 	 bfi r0,r2,#0,#8
+  30 000a 63F30F20 	 bfi r0,r3,#8,#8
+  31 000e 1C23     	 movs r3,#28
+  32 0010 63F31740 	 bfi r0,r3,#16,#8
+  33 0014 82B0     	 sub sp,sp,#8
+  34 0016 02B0     	 add sp,sp,#8
+  35              	 
+  36 0018 7047     	 bx lr
+  38              	 .section .text.SDMMC_BLOCK_Init,"ax",%progbits
+  39              	 .align 1
+  40              	 .global SDMMC_BLOCK_Init
+  41              	 .thumb
+  42              	 .thumb_func
+  44              	SDMMC_BLOCK_Init:
+  45              	 
+  46              	 
+  47 0000 38B5     	 push {r3,r4,r5,lr}
+  48 0002 437B     	 ldrb r3,[r0,#13]
+  49 0004 0446     	 mov r4,r0
+  50 0006 6BB9     	 cbnz r3,.L6
+  51 0008 4368     	 ldr r3,[r0,#4]
+  52 000a 03B1     	 cbz r3,.L4
+  53 000c 9847     	 blx r3
+  54              	.L4:
+  55 000e 257B     	 ldrb r5,[r4,#12]
+  56 0010 35B9     	 cbnz r5,.L5
+  57 0012 2046     	 mov r0,r4
+  58 0014 FFF7FEFF 	 bl SDMMC_BLOCK_SD_Init
+  59 0018 10B1     	 cbz r0,.L5
+  60 001a 6573     	 strb r5,[r4,#13]
+  61 001c 0120     	 movs r0,#1
+  62 001e 38BD     	 pop {r3,r4,r5,pc}
+  63              	.L5:
+  64 0020 0123     	 movs r3,#1
+  65 0022 6373     	 strb r3,[r4,#13]
+  66              	.L6:
+  67 0024 0020     	 movs r0,#0
+  68 0026 38BD     	 pop {r3,r4,r5,pc}
+  70              	 .section .text.SDMMC_BLOCK_Initialize,"ax",%progbits
+  71              	 .align 1
+  72              	 .global SDMMC_BLOCK_Initialize
+  73              	 .thumb
+  74              	 .thumb_func
+  76              	SDMMC_BLOCK_Initialize:
+  77              	 
+  78              	 
+  79 0000 08B5     	 push {r3,lr}
+  80 0002 037B     	 ldrb r3,[r0,#12]
+  81 0004 2BB9     	 cbnz r3,.L16
+  82 0006 FFF7FEFF 	 bl SDMMC_BLOCK_SD_CardIdentificationProcess
+  83 000a 0030     	 adds r0,r0,#0
+  84 000c 18BF     	 it ne
+  85 000e 0120     	 movne r0,#1
+  86 0010 08BD     	 pop {r3,pc}
+  87              	.L16:
+  88 0012 0020     	 movs r0,#0
+  89 0014 08BD     	 pop {r3,pc}
+  91              	 .section .text.SDMMC_BLOCK_ReadBlock,"ax",%progbits
+  92              	 .align 1
+  93              	 .global SDMMC_BLOCK_ReadBlock
+  94              	 .thumb
+  95              	 .thumb_func
+  97              	SDMMC_BLOCK_ReadBlock:
+  98              	 
+  99              	 
+ 100 0000 10B5     	 push {r4,lr}
+ 101 0002 047B     	 ldrb r4,[r0,#12]
+ 102 0004 1CB9     	 cbnz r4,.L18
+ 103 0006 BDE81040 	 pop {r4,lr}
+ 104 000a FFF7FEBF 	 b SDMMC_BLOCK_SD_ReadBlock
+ 105              	.L18:
+ 106 000e 0020     	 movs r0,#0
+ 107 0010 10BD     	 pop {r4,pc}
+ 109              	 .section .text.SDMMC_BLOCK_WriteBlock,"ax",%progbits
+ 110              	 .align 1
+ 111              	 .global SDMMC_BLOCK_WriteBlock
+ 112              	 .thumb
+ 113              	 .thumb_func
+ 115              	SDMMC_BLOCK_WriteBlock:
+ 116              	 
+ 117              	 
+ 118 0000 10B5     	 push {r4,lr}
+ 119 0002 047B     	 ldrb r4,[r0,#12]
+ 120 0004 1CB9     	 cbnz r4,.L20
+ 121 0006 BDE81040 	 pop {r4,lr}
+ 122 000a FFF7FEBF 	 b SDMMC_BLOCK_SD_WriteBlock
+ 123              	.L20:
+ 124 000e 0020     	 movs r0,#0
+ 125 0010 10BD     	 pop {r4,pc}
+ 127              	 .section .text.SDMMC_BLOCK_GetStatus,"ax",%progbits
+ 128              	 .align 1
+ 129              	 .global SDMMC_BLOCK_GetStatus
+ 130              	 .thumb
+ 131              	 .thumb_func
+ 133              	SDMMC_BLOCK_GetStatus:
+ 134              	 
+ 135              	 
+ 136              	 
+ 137 0000 037B     	 ldrb r3,[r0,#12]
+ 138 0002 0BB9     	 cbnz r3,.L22
+ 139 0004 FFF7FEBF 	 b SDMMC_BLOCK_SD_GetState
+ 140              	.L22:
+ 141 0008 0020     	 movs r0,#0
+ 142 000a 7047     	 bx lr
+ 144              	 .section .text.SDMMC_BLOCK_Ioctl,"ax",%progbits
+ 145              	 .align 1
+ 146              	 .global SDMMC_BLOCK_Ioctl
+ 147              	 .thumb
+ 148              	 .thumb_func
+ 150              	SDMMC_BLOCK_Ioctl:
+ 151              	 
+ 152              	 
+ 153 0000 F0B5     	 push {r4,r5,r6,r7,lr}
+ 154 0002 0446     	 mov r4,r0
+ 155 0004 8BB0     	 sub sp,sp,#44
+ 156 0006 0E46     	 mov r6,r1
+ 157 0008 1546     	 mov r5,r2
+ 158 000a 01A8     	 add r0,sp,#4
+ 159 000c 2222     	 movs r2,#34
+ 160 000e 0021     	 movs r1,#0
+ 161 0010 FFF7FEFF 	 bl memset
+ 162 0014 237A     	 ldrb r3,[r4,#8]
+ 163 0016 DA07     	 lsls r2,r3,#31
+ 164 0018 0CD4     	 bmi .L51
+ 165 001a 2046     	 mov r0,r4
+ 166 001c FFF7FEFF 	 bl SDMMC_BLOCK_GetStatus
+ 167 0020 0307     	 lsls r3,r0,#28
+ 168 0022 0BD5     	 bpl .L25
+ 169 0024 16F0FB0F 	 tst r6,#251
+ 170 0028 06D0     	 beq .L53
+ 171 002a A6F10D03 	 sub r3,r6,#13
+ 172 002e 012B     	 cmp r3,#1
+ 173 0030 04D8     	 bhi .L25
+ 174 0032 01E0     	 b .L53
+ 175              	.L51:
+ 176 0034 0320     	 movs r0,#3
+ 177 0036 FEE0     	 b .L61
+ 178              	.L53:
+ 179 0038 0520     	 movs r0,#5
+ 180 003a FCE0     	 b .L61
+ 181              	.L25:
+ 182 003c 252E     	 cmp r6,#37
+ 183 003e 00F2F980 	 bhi .L49
+ 184 0042 DFE816F0 	 tbh [pc,r6,lsl#1]
+ 185              	.L50:
+ 186 0046 F500     	 .2byte (.L28-.L50)/2
+ 187 0048 2F00     	 .2byte (.L30-.L50)/2
+ 188 004a 2600     	 .2byte (.L26-.L50)/2
+ 189 004c 4200     	 .2byte (.L33-.L50)/2
+ 190 004e 3800     	 .2byte (.L32-.L50)/2
+ 191 0050 F700     	 .2byte (.L49-.L50)/2
+ 192 0052 F700     	 .2byte (.L49-.L50)/2
+ 193 0054 E400     	 .2byte (.L47-.L50)/2
+ 194 0056 F700     	 .2byte (.L49-.L50)/2
+ 195 0058 F700     	 .2byte (.L49-.L50)/2
+ 196 005a 4B00     	 .2byte (.L34-.L50)/2
+ 197 005c 5400     	 .2byte (.L35-.L50)/2
+ 198 005e 5D00     	 .2byte (.L36-.L50)/2
+ 199 0060 6600     	 .2byte (.L37-.L50)/2
+ 200 0062 6F00     	 .2byte (.L38-.L50)/2
+ 201 0064 F700     	 .2byte (.L49-.L50)/2
+ 202 0066 F700     	 .2byte (.L49-.L50)/2
+ 203 0068 F700     	 .2byte (.L49-.L50)/2
+ 204 006a F700     	 .2byte (.L49-.L50)/2
+ 205 006c F700     	 .2byte (.L49-.L50)/2
+ 206 006e F700     	 .2byte (.L49-.L50)/2
+ 207 0070 F700     	 .2byte (.L49-.L50)/2
+ 208 0072 F700     	 .2byte (.L49-.L50)/2
+ 209 0074 F700     	 .2byte (.L49-.L50)/2
+ 210 0076 F700     	 .2byte (.L49-.L50)/2
+ 211 0078 F700     	 .2byte (.L49-.L50)/2
+ 212 007a F700     	 .2byte (.L49-.L50)/2
+ 213 007c F700     	 .2byte (.L49-.L50)/2
+ 214 007e F700     	 .2byte (.L49-.L50)/2
+ 215 0080 F700     	 .2byte (.L49-.L50)/2
+ 216 0082 F700     	 .2byte (.L49-.L50)/2
+ 217 0084 7800     	 .2byte (.L39-.L50)/2
+ 218 0086 8500     	 .2byte (.L41-.L50)/2
+ 219 0088 8700     	 .2byte (.L42-.L50)/2
+ 220 008a A200     	 .2byte (.L43-.L50)/2
+ 221 008c B100     	 .2byte (.L44-.L50)/2
+ 222 008e D300     	 .2byte (.L45-.L50)/2
+ 223 0090 DA00     	 .2byte (.L46-.L50)/2
+ 224              	 .p2align 1
+ 225              	.L26:
+ 226 0092 237B     	 ldrb r3,[r4,#12]
+ 227 0094 002B     	 cmp r3,#0
+ 228 0096 40F0CB80 	 bne .L28
+ 229 009a 2046     	 mov r0,r4
+ 230 009c 2946     	 mov r1,r5
+ 231 009e FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetSectorSize
+ 232 00a2 B9E0     	 b .L29
+ 233              	.L30:
+ 234 00a4 237B     	 ldrb r3,[r4,#12]
+ 235 00a6 002B     	 cmp r3,#0
+ 236 00a8 40F0C280 	 bne .L28
+ 237 00ac 2046     	 mov r0,r4
+ 238 00ae 2946     	 mov r1,r5
+ 239 00b0 FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetSectorCount
+ 240 00b4 B0E0     	 b .L29
+ 241              	.L32:
+ 242 00b6 237B     	 ldrb r3,[r4,#12]
+ 243 00b8 002B     	 cmp r3,#0
+ 244 00ba 40F0B980 	 bne .L28
+ 245 00be 2046     	 mov r0,r4
+ 246 00c0 95E80600 	 ldmia r5,{r1,r2}
+ 247 00c4 FFF7FEFF 	 bl SDMMC_BLOCK_SD_EraseBlock
+ 248 00c8 A6E0     	 b .L29
+ 249              	.L33:
+ 250 00ca 237B     	 ldrb r3,[r4,#12]
+ 251 00cc 002B     	 cmp r3,#0
+ 252 00ce 40F0AF80 	 bne .L28
+ 253 00d2 2046     	 mov r0,r4
+ 254 00d4 2946     	 mov r1,r5
+ 255 00d6 FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetBlockSize
+ 256 00da 9DE0     	 b .L29
+ 257              	.L34:
+ 258 00dc 237B     	 ldrb r3,[r4,#12]
+ 259 00de 002B     	 cmp r3,#0
+ 260 00e0 40F0A680 	 bne .L28
+ 261 00e4 2046     	 mov r0,r4
+ 262 00e6 2946     	 mov r1,r5
+ 263 00e8 FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetCardType
+ 264 00ec 94E0     	 b .L29
+ 265              	.L35:
+ 266 00ee 237B     	 ldrb r3,[r4,#12]
+ 267 00f0 002B     	 cmp r3,#0
+ 268 00f2 40F09D80 	 bne .L28
+ 269 00f6 2046     	 mov r0,r4
+ 270 00f8 2946     	 mov r1,r5
+ 271 00fa FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetCsd
+ 272 00fe 8BE0     	 b .L29
+ 273              	.L36:
+ 274 0100 237B     	 ldrb r3,[r4,#12]
+ 275 0102 002B     	 cmp r3,#0
+ 276 0104 40F09480 	 bne .L28
+ 277 0108 2046     	 mov r0,r4
+ 278 010a 2946     	 mov r1,r5
+ 279 010c FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetCid
+ 280 0110 82E0     	 b .L29
+ 281              	.L37:
+ 282 0112 237B     	 ldrb r3,[r4,#12]
+ 283 0114 002B     	 cmp r3,#0
+ 284 0116 40F08B80 	 bne .L28
+ 285 011a 2046     	 mov r0,r4
+ 286 011c 2946     	 mov r1,r5
+ 287 011e FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetOcr
+ 288 0122 79E0     	 b .L29
+ 289              	.L38:
+ 290 0124 237B     	 ldrb r3,[r4,#12]
+ 291 0126 002B     	 cmp r3,#0
+ 292 0128 40F08280 	 bne .L28
+ 293 012c 2046     	 mov r0,r4
+ 294 012e 2946     	 mov r1,r5
+ 295 0130 FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetSdStatus
+ 296 0134 70E0     	 b .L29
+ 297              	.L39:
+ 298 0136 95F82020 	 ldrb r2,[r5,#32]
+ 299 013a 0423     	 movs r3,#4
+ 300 013c 102A     	 cmp r2,#16
+ 301 013e 8DF80430 	 strb r3,[sp,#4]
+ 302 0142 77D8     	 bhi .L49
+ 303 0144 8DF80520 	 strb r2,[sp,#5]
+ 304 0148 0DF10600 	 add r0,sp,#6
+ 305 014c 2946     	 mov r1,r5
+ 306 014e 45E0     	 b .L71
+ 307              	.L41:
+ 308 0150 0023     	 movs r3,#0
+ 309 0152 1BE0     	 b .L75
+ 310              	.L42:
+ 311 0154 95F82060 	 ldrb r6,[r5,#32]
+ 312 0158 0123     	 movs r3,#1
+ 313 015a 102E     	 cmp r6,#16
+ 314 015c 8DF80430 	 strb r3,[sp,#4]
+ 315 0160 68D8     	 bhi .L49
+ 316 0162 95F82170 	 ldrb r7,[r5,#33]
+ 317 0166 102F     	 cmp r7,#16
+ 318 0168 64D8     	 bhi .L49
+ 319 016a BB19     	 adds r3,r7,r6
+ 320 016c 2946     	 mov r1,r5
+ 321 016e 3246     	 mov r2,r6
+ 322 0170 0DF10600 	 add r0,sp,#6
+ 323 0174 8DF80530 	 strb r3,[sp,#5]
+ 324 0178 FFF7FEFF 	 bl memcpy
+ 325 017c 01AB     	 add r3,sp,#4
+ 326 017e 9819     	 adds r0,r3,r6
+ 327 0180 0230     	 adds r0,r0,#2
+ 328 0182 05F11001 	 add r1,r5,#16
+ 329 0186 3A46     	 mov r2,r7
+ 330 0188 0BE0     	 b .L72
+ 331              	.L43:
+ 332 018a 0223     	 movs r3,#2
+ 333              	.L75:
+ 334 018c 95F82020 	 ldrb r2,[r5,#32]
+ 335 0190 8DF80430 	 strb r3,[sp,#4]
+ 336 0194 102A     	 cmp r2,#16
+ 337 0196 4DD8     	 bhi .L49
+ 338 0198 8DF80520 	 strb r2,[sp,#5]
+ 339 019c 0DF10600 	 add r0,sp,#6
+ 340 01a0 2946     	 mov r1,r5
+ 341              	.L72:
+ 342 01a2 FFF7FEFF 	 bl memcpy
+ 343 01a6 2BE0     	 b .L66
+ 344              	.L44:
+ 345 01a8 95F82060 	 ldrb r6,[r5,#32]
+ 346 01ac 0523     	 movs r3,#5
+ 347 01ae 102E     	 cmp r6,#16
+ 348 01b0 8DF80430 	 strb r3,[sp,#4]
+ 349 01b4 3ED8     	 bhi .L49
+ 350 01b6 95F82170 	 ldrb r7,[r5,#33]
+ 351 01ba 102F     	 cmp r7,#16
+ 352 01bc 3AD8     	 bhi .L49
+ 353 01be BB19     	 adds r3,r7,r6
+ 354 01c0 2946     	 mov r1,r5
+ 355 01c2 3246     	 mov r2,r6
+ 356 01c4 0DF10600 	 add r0,sp,#6
+ 357 01c8 8DF80530 	 strb r3,[sp,#5]
+ 358 01cc FFF7FEFF 	 bl memcpy
+ 359 01d0 01AB     	 add r3,sp,#4
+ 360 01d2 9819     	 adds r0,r3,r6
+ 361 01d4 0230     	 adds r0,r0,#2
+ 362 01d6 05F11001 	 add r1,r5,#16
+ 363 01da 3A46     	 mov r2,r7
+ 364              	.L71:
+ 365 01dc FFF7FEFF 	 bl memcpy
+ 366 01e0 237B     	 ldrb r3,[r4,#12]
+ 367 01e2 2BBB     	 cbnz r3,.L28
+ 368 01e4 2046     	 mov r0,r4
+ 369 01e6 01A9     	 add r1,sp,#4
+ 370 01e8 0122     	 movs r2,#1
+ 371 01ea 0DE0     	 b .L64
+ 372              	.L45:
+ 373 01ec 237B     	 ldrb r3,[r4,#12]
+ 374 01ee FBB9     	 cbnz r3,.L28
+ 375 01f0 2046     	 mov r0,r4
+ 376 01f2 2946     	 mov r1,r5
+ 377 01f4 FFF7FEFF 	 bl SDMMC_BLOCK_SD_GetLockStatus
+ 378 01f8 0EE0     	 b .L29
+ 379              	.L46:
+ 380 01fa 0823     	 movs r3,#8
+ 381 01fc 8DF80430 	 strb r3,[sp,#4]
+ 382              	.L66:
+ 383 0200 227B     	 ldrb r2,[r4,#12]
+ 384 0202 AAB9     	 cbnz r2,.L28
+ 385 0204 2046     	 mov r0,r4
+ 386 0206 01A9     	 add r1,sp,#4
+ 387              	.L64:
+ 388 0208 FFF7FEFF 	 bl SDMMC_BLOCK_SD_LockUnlockCard
+ 389 020c 04E0     	 b .L29
+ 390              	.L47:
+ 391 020e 237B     	 ldrb r3,[r4,#12]
+ 392 0210 73B9     	 cbnz r3,.L28
+ 393 0212 2046     	 mov r0,r4
+ 394 0214 FFF7FEFF 	 bl SDMMC_BLOCK_SD_EjectCard
+ 395              	.L29:
+ 396 0218 68B1     	 cbz r0,.L61
+ 397 021a 0F28     	 cmp r0,#15
+ 398 021c 06D0     	 beq .L55
+ 399 021e 0A28     	 cmp r0,#10
+ 400 0220 08D0     	 beq .L49
+ 401 0222 3328     	 cmp r0,#51
+ 402 0224 0CBF     	 ite eq
+ 403 0226 0420     	 moveq r0,#4
+ 404 0228 0120     	 movne r0,#1
+ 405 022a 04E0     	 b .L61
+ 406              	.L55:
+ 407 022c 0220     	 movs r0,#2
+ 408 022e 02E0     	 b .L61
+ 409              	.L28:
+ 410 0230 0020     	 movs r0,#0
+ 411 0232 00E0     	 b .L61
+ 412              	.L49:
+ 413 0234 0420     	 movs r0,#4
+ 414              	.L61:
+ 415 0236 0BB0     	 add sp,sp,#44
+ 416              	 
+ 417 0238 F0BD     	 pop {r4,r5,r6,r7,pc}
+ 419              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 sdmmc_block.c
+    {standard input}:17     .text.SDMMC_BLOCK_GetAppVersion:00000000 $t
+    {standard input}:22     .text.SDMMC_BLOCK_GetAppVersion:00000000 SDMMC_BLOCK_GetAppVersion
+    {standard input}:39     .text.SDMMC_BLOCK_Init:00000000 $t
+    {standard input}:44     .text.SDMMC_BLOCK_Init:00000000 SDMMC_BLOCK_Init
+    {standard input}:71     .text.SDMMC_BLOCK_Initialize:00000000 $t
+    {standard input}:76     .text.SDMMC_BLOCK_Initialize:00000000 SDMMC_BLOCK_Initialize
+    {standard input}:92     .text.SDMMC_BLOCK_ReadBlock:00000000 $t
+    {standard input}:97     .text.SDMMC_BLOCK_ReadBlock:00000000 SDMMC_BLOCK_ReadBlock
+    {standard input}:110    .text.SDMMC_BLOCK_WriteBlock:00000000 $t
+    {standard input}:115    .text.SDMMC_BLOCK_WriteBlock:00000000 SDMMC_BLOCK_WriteBlock
+    {standard input}:128    .text.SDMMC_BLOCK_GetStatus:00000000 $t
+    {standard input}:133    .text.SDMMC_BLOCK_GetStatus:00000000 SDMMC_BLOCK_GetStatus
+    {standard input}:145    .text.SDMMC_BLOCK_Ioctl:00000000 $t
+    {standard input}:150    .text.SDMMC_BLOCK_Ioctl:00000000 SDMMC_BLOCK_Ioctl
+    {standard input}:186    .text.SDMMC_BLOCK_Ioctl:00000046 $d
+    {standard input}:224    .text.SDMMC_BLOCK_Ioctl:00000092 $t
+
+UNDEFINED SYMBOLS
+SDMMC_BLOCK_SD_Init
+SDMMC_BLOCK_SD_CardIdentificationProcess
+SDMMC_BLOCK_SD_ReadBlock
+SDMMC_BLOCK_SD_WriteBlock
+SDMMC_BLOCK_SD_GetState
+memset
+SDMMC_BLOCK_SD_GetSectorSize
+SDMMC_BLOCK_SD_GetSectorCount
+SDMMC_BLOCK_SD_EraseBlock
+SDMMC_BLOCK_SD_GetBlockSize
+SDMMC_BLOCK_SD_GetCardType
+SDMMC_BLOCK_SD_GetCsd
+SDMMC_BLOCK_SD_GetCid
+SDMMC_BLOCK_SD_GetOcr
+SDMMC_BLOCK_SD_GetSdStatus
+memcpy
+SDMMC_BLOCK_SD_GetLockStatus
+SDMMC_BLOCK_SD_LockUnlockCard
+SDMMC_BLOCK_SD_EjectCard

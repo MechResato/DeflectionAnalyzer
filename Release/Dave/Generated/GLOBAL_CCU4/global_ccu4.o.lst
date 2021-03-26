@@ -1,0 +1,68 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "global_ccu4.c"
+  16              	 .section .text.GLOBAL_CCU4_GetAppVersion,"ax",%progbits
+  17              	 .align 1
+  18              	 .global GLOBAL_CCU4_GetAppVersion
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	GLOBAL_CCU4_GetAppVersion:
+  23              	 
+  24              	 
+  25              	 
+  26 0000 0423     	 movs r3,#4
+  27 0002 0020     	 movs r0,#0
+  28 0004 63F30700 	 bfi r0,r3,#0,#8
+  29 0008 0123     	 movs r3,#1
+  30 000a 63F30F20 	 bfi r0,r3,#8,#8
+  31 000e 0C23     	 movs r3,#12
+  32 0010 63F31740 	 bfi r0,r3,#16,#8
+  33 0014 82B0     	 sub sp,sp,#8
+  34 0016 02B0     	 add sp,sp,#8
+  35              	 
+  36 0018 7047     	 bx lr
+  38              	 .section .text.GLOBAL_CCU4_Init,"ax",%progbits
+  39              	 .align 1
+  40              	 .global GLOBAL_CCU4_Init
+  41              	 .thumb
+  42              	 .thumb_func
+  44              	GLOBAL_CCU4_Init:
+  45              	 
+  46              	 
+  47 0000 437B     	 ldrb r3,[r0,#13]
+  48 0002 10B5     	 push {r4,lr}
+  49 0004 0446     	 mov r4,r0
+  50 0006 4BB9     	 cbnz r3,.L3
+  51 0008 8068     	 ldr r0,[r0,#8]
+  52 000a 217B     	 ldrb r1,[r4,#12]
+  53 000c FFF7FEFF 	 bl XMC_CCU4_Init
+  54 0010 A368     	 ldr r3,[r4,#8]
+  55 0012 4FF48072 	 mov r2,#256
+  56 0016 DA60     	 str r2,[r3,#12]
+  57 0018 0123     	 movs r3,#1
+  58 001a 6373     	 strb r3,[r4,#13]
+  59              	.L3:
+  60 001c 0020     	 movs r0,#0
+  61 001e 10BD     	 pop {r4,pc}
+  63              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 global_ccu4.c
+    {standard input}:17     .text.GLOBAL_CCU4_GetAppVersion:00000000 $t
+    {standard input}:22     .text.GLOBAL_CCU4_GetAppVersion:00000000 GLOBAL_CCU4_GetAppVersion
+    {standard input}:39     .text.GLOBAL_CCU4_Init:00000000 $t
+    {standard input}:44     .text.GLOBAL_CCU4_Init:00000000 GLOBAL_CCU4_Init
+
+UNDEFINED SYMBOLS
+XMC_CCU4_Init

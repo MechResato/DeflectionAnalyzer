@@ -51,7 +51,7 @@ extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t*
 extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 // TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
 // TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
-static int8_t TFT_cur_MenuIdx = 2; // Index of currently used menu (TFT_display,TFT_touch).
+static int8_t TFT_cur_MenuIdx = 0; // Index of currently used menu (TFT_display,TFT_touch).
 static int8_t TFT_last_MenuIdx = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_MenuIdx the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 static uint32_t keypadControlKeyBgColor = MAIN_BTNCOLOR;
 static uint32_t keypadControlKeyFgColor = MAIN_BTNCTSCOLOR;
@@ -846,7 +846,7 @@ void TFT_graph_static(uint8_t burst, graph* gph){
 
 }
 
-void TFT_graph_pixeldata(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
+void TFT_graph_pixeldata_i(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	/// Every data-point is assumed to be at one pixel of the screen. Make this as wide as there are elements in the data-array.
 	///
@@ -882,7 +882,7 @@ void TFT_graph_pixeldata(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint
 	/// Display graph roll-mode
 	else {
 		// Print newest value always at the rightmost corner with all older values to the right
-		// => Start Display    x position at rightmost corner and decrement till 0 (last run will make it -1 at the end but it isnt used after that)
+		// => Start Display    x position at rightmost corner and decrement till 0 (last run will make it -1 at the end but it isn't used after that)
 		// => Start Arrayindex i at current index and decrement every loop. If i goes below 0, reset to max index and decrement further till
 		//    value before current is hit.
 
@@ -913,6 +913,62 @@ void TFT_graph_pixeldata(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint
 	/////////////// GRAPH END
 
 }
+
+
+void TFT_graph_pixeldata_f(graph* gph, float_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
+	/// This is a copy of the above function! It taken a float buffer and will later be merged to its origin.
+	/// TODO: Make this a "generic" function (C equivalent)
+
+
+	// Determine current position (with scroll value)
+	uint16_t curY = gph->y - TFT_cur_ScrollV;
+
+
+	/// Display current DATA as line strip in frame or roll mode
+	EVE_cmd_dl_burst(DL_COLOR_RGB | datacolor);
+	EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+	/// Display graph frame-mode
+	if(gph->graphmode == 0){
+		// Print values in the order they are stored
+		for (int x_cur = 0; x_cur < buf_size; ++x_cur) {
+			EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + x_cur, curY + gph->padding + gph->height - (uint16_t)(( ((float)buf[x_cur]) / ((float)gph->y_max) )*(float)(gph->height)) )); //if(frameover==1) printf("%lf %lf\n", ((((float)(buf[x_cur]))/((float)gph->y_max))*(float)(gph->height)), (float)buf[gph->x]);
+		}
+	}
+	/// Display graph roll-mode
+	else {
+		// Print newest value always at the rightmost corner with all older values to the right
+		// => Start Display    x position at rightmost corner and decrement till 0 (last run will make it -1 at the end but it isn't used after that)
+		// => Start Arrayindex i at current index and decrement every loop. If i goes below 0, reset to max index and decrement further till
+		//    value before current is hit.
+
+		int16_t i = *buf_curidx;
+		for (int16_t x_cur = buf_size-1; x_cur >= 0; x_cur--) {
+			// if index goes below 0 set to highest buffer index
+			if(i < 0){i = buf_size-1;}
+
+			// Send next point for EVE_LINE_STRIP at current x+padding and normalized buffer value
+			EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + x_cur, curY + gph->padding + gph->height - (uint16_t)(( ((float)buf[i]) / ((float)gph->y_max) )*(float)(gph->height)) )); 				// EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + x_cur, EVE_VSIZE - ((uint16_t)(buf[i]/y_div) + margin + gph->padding)));
+
+			// decrement index
+			i--;
+		}
+	}
+	// End EVE_LINE_STRIP and therefore DATA
+	EVE_cmd_dl_burst(DL_END);
+
+
+	/// Draw current POSITION MARKER in frame mode
+	if(gph->graphmode == 0){
+		EVE_cmd_dl_burst(DL_COLOR_RGB | 0xff0000);
+		EVE_cmd_dl_burst(DL_BEGIN | EVE_LINE_STRIP);
+		EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + *buf_curidx, curY + gph->padding - 5 ));
+		EVE_cmd_dl_burst(VERTEX2F(gph->x + gph->padding + *buf_curidx, curY + gph->padding + gph->height + 5 ));
+		EVE_cmd_dl_burst(DL_END);
+	}
+	/////////////// GRAPH END
+
+}
+
 
 void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
