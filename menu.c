@@ -382,8 +382,8 @@ void curveset_setEditMode(uint8_t editMode);
 uint16_t DP_size = 3;
 uint16_t DP_cur = 0;
 // The pointers the the x and y value arrays to be allocated by malloc and resized by realloc and used by the textboxes and graph
-float* buf_acty_curveset;
-float* buf_nomx_curveset;
+//float* tbx_act.numSrc.floatSrc;
+//float* tbx_nom.numSrc.floatSrc;
 // Pointers to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function
 int_buffer_t* curveset_sensBuffer;
 uint16_t* curveset_sensBuffer_curIdx;
@@ -924,31 +924,31 @@ void curveset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx){
 
 	// Allocate and set the y-value array
 	DP_size = 3;
-	buf_acty_curveset = (float*)malloc(DP_size*sizeof(float));
-	buf_acty_curveset[0] = 0.0;
-	buf_acty_curveset[1] = 100.0;
-	buf_acty_curveset[2] = 200.0;
+	tbx_act.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
+	tbx_act.numSrc.floatSrc[0] = 0.0;
+	tbx_act.numSrc.floatSrc[1] = 100.0;
+	tbx_act.numSrc.floatSrc[2] = 200.0;
 
 	// Allocate and set the x-value array
-	buf_nomx_curveset = (float*)malloc(DP_size*sizeof(float));
-	buf_nomx_curveset[0] = 10.0;
-	buf_nomx_curveset[1] = 2048.0;
-	buf_nomx_curveset[2] = 4096.0;
+	tbx_nom.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
+	tbx_nom.numSrc.floatSrc[0] = 0.0;
+	tbx_nom.numSrc.floatSrc[1] = 2048.0;
+	tbx_nom.numSrc.floatSrc[2] = 4096.0;
 
 	// Check for allocation errors
-	if(buf_acty_curveset == NULL || buf_nomx_curveset == NULL)
-	printf("Memory realloc failed!\n");
+	if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
+	printf("Memory malloc failed!\n");
 
 	// Link actual value array to corresponding textbox
-	tbx_act.numSrc.floatSrc = &buf_acty_curveset[0];
+	//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
 	tbx_act.numSrc.srcOffset = &DP_cur;
 
 	// Link actual value array to corresponding textbox
-	tbx_nom.numSrc.floatSrc = &buf_nomx_curveset[0];
+	//tbx_nom.numSrc.floatSrc = &tbx_nom.numSrc.floatSrc[0];
 	tbx_nom.numSrc.srcOffset = &DP_cur;
 
 	// Determine fitted polynomial for the first time
-	fit_result = polyfit(buf_nomx_curveset, buf_acty_curveset, DP_size, fit_order, coefficients);
+	fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
 }
 void curveset_setEditMode(uint8_t editMode){
 	/// Changes the GUI to data point editing mode and back (disable/enable of textboxes and buttons)
@@ -979,9 +979,9 @@ void curveset_setEditMode(uint8_t editMode){
 		/// Set graph boundaries
 		// Get biggest y-value
 		float cur_y_max = 0;
-		for(uint8_t i = 0; i <= DP_size; i++)
-			if(buf_acty_curveset[i] > cur_y_max)
-				cur_y_max = buf_acty_curveset[i];
+		for(uint8_t i = 0; i < DP_size; i++)
+			if(tbx_act.numSrc.floatSrc[i] > cur_y_max)
+				cur_y_max = tbx_act.numSrc.floatSrc[i];
 
 		// Set biggest y-value as graph
 		gph_curveset.y_max = gph_curveset.amp_max = cur_y_max;
@@ -1075,16 +1075,16 @@ void TFT_display_menu_curveset(void){
 	///
 
 
-	// If current data point is is edit mode
+	// If current data point is in edit mode
 	if(tbx_act.mytag != 0){
 		// Save current nominal value
 		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sensBuffer[*curveset_sensBuffer_curIdx];
 
-		// Sort buf_acty_curveset & buf_nomx_curveset based on nomx and change current datapoint if necessary
-		DP_cur = menu_shelf_datapoint(buf_nomx_curveset, buf_acty_curveset, DP_size, DP_cur);
+		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
+		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
 
 		// Determine fitted polynomial
-		fit_result = polyfit(buf_nomx_curveset, buf_acty_curveset, DP_size, fit_order, coefficients);
+		fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
 	}
 
 	// Change "right" button to "new" if on the edge of points
@@ -1148,8 +1148,8 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 				s1_fit_order = fit_order;
 
 				// Free allocated memory
-				free(buf_acty_curveset);
-				free(buf_nomx_curveset);
+				free(tbx_act.numSrc.floatSrc);
+				free(tbx_nom.numSrc.floatSrc);
 
 				// Change menu
 				TFT_setMenu(menu_setup.index);
@@ -1184,7 +1184,7 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 				// ...
 
 				// Determine fitted polynomial after order change
-				fit_result = polyfit(buf_nomx_curveset, buf_acty_curveset, DP_size, fit_order, coefficients);
+				fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
 			}
 			break;
 		case TBX_DP_TAG:
@@ -1210,7 +1210,7 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 				printf("Button last\n");
 				*toggle_lock = 42;
 
-				// if the data point isn't at the limits - change current index, set text of DP-textbox and set text of Actual-textbox
+				// If the data point isn't at the limits - change current index
 				if(DP_cur > 0){
 					// Decrease currently selected data point index
 					DP_cur--;
@@ -1231,27 +1231,27 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 					if(DP_cur > (DP_size-1)){
 						// Increase size of array
 						DP_size++;
-						buf_acty_curveset = (float*)realloc(buf_acty_curveset, DP_size*sizeof(float));
-						buf_nomx_curveset = (float*)realloc(buf_nomx_curveset, DP_size*sizeof(float));
-						tbx_act.numSrc.floatSrc = &buf_acty_curveset[0];
-						tbx_nom.numSrc.floatSrc = &buf_nomx_curveset[0];
+						tbx_act.numSrc.floatSrc = (float*)realloc(tbx_act.numSrc.floatSrc, DP_size*sizeof(float));
+						tbx_nom.numSrc.floatSrc = (float*)realloc(tbx_nom.numSrc.floatSrc, DP_size*sizeof(float));
+						//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
+						//tbx_nom.numSrc.floatSrc = &tbx_nom.numSrc.floatSrc[0];
 
 						// Check for allocation errors
-						if(buf_acty_curveset == NULL || buf_nomx_curveset == NULL)
+						if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
 							printf("Memory realloc failed!\n");
 
 						/// Set initial value's
 						// Set initial x value to current sensor value
-						buf_nomx_curveset[DP_cur] = (float)curveset_sensBuffer[*curveset_sensBuffer_curIdx];//buf_acty_curveset[DP_cur+1];
+						tbx_nom.numSrc.floatSrc[DP_cur] = (float)curveset_sensBuffer[*curveset_sensBuffer_curIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
 						// If an OK fit is available set initial y-value to the one corresponding to the curretn sensor value
 						if(fit_result == 0)
-							buf_acty_curveset[DP_cur] = poly_calc(buf_nomx_curveset[DP_cur], &coefficients[0], fit_order);
+							tbx_act.numSrc.floatSrc[DP_cur] = poly_calc(tbx_nom.numSrc.floatSrc[DP_cur], &coefficients[0], fit_order);
 						// If no OK fit is available but the new value is after an other one, use the previous y value as initial value
 						else if(DP_cur >= 1)
-							buf_acty_curveset[DP_cur] = buf_acty_curveset[DP_cur-1];
+							tbx_act.numSrc.floatSrc[DP_cur] = tbx_act.numSrc.floatSrc[DP_cur-1];
 						// If there is no previous y value use first one
 						else
-							buf_acty_curveset[DP_cur] = buf_acty_curveset[DP_cur];
+							tbx_act.numSrc.floatSrc[DP_cur] = tbx_act.numSrc.floatSrc[0];
 
 						// Set data point to edit mode
 						curveset_setEditMode(1);
