@@ -15,6 +15,7 @@ void record_openFile(const char* path);
 void record_closeFile();
 void record_printf(const char* path);
 
+void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size);
 
 void record_buffer(void);
 

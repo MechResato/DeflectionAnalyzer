@@ -177,7 +177,7 @@ label lbl_sensor_val = {
 		.ignoreScroll = 1,
 		.numSrc.srcType = srcTypeInt, //srcTypeFloat,
 		.numSrc.intSrc = (int_buffer_t*)&InputBuffer1, //(float_buffer_t*)&InputBuffer1_conv,
-		.numSrc.srcOffset = &InputBuffer1_idx,
+		.numSrc.srcOffset = &sensor1.bufferIdx,
 		.fracExp = 2
 };
 
@@ -265,9 +265,7 @@ label lbl_linearisation = {
 		.ignoreScroll = 0
 };
 
-#define STR_S1_LINSPEC_MAXLEN 10
-char str_s1_linspec[STR_S1_LINSPEC_MAXLEN] = "s1.lin";
-int8_t str_s1_linspec_curLength = 6;
+//char* const chptr = (char* const)&sensor1.filename_spec;
 #define TBX_SENSOR1_TAG 21
 textbox tbx_sensor1 = {
 	.x = M_COL_2,
@@ -276,9 +274,9 @@ textbox tbx_sensor1 = {
 	.labelOffsetX = 130,
 	.labelText = "Sensor1:   Spec File",
 	.mytag = TBX_SENSOR1_TAG,
-	.text = str_s1_linspec,
-	.text_maxlen = STR_S1_LINSPEC_MAXLEN,
-	.text_curlen = &str_s1_linspec_curLength,
+	.text = s1_filename_spec,
+	.text_maxlen = STR_SPEC_MAXLEN,
+	.text_curlen = &sensor1.filename_spec_curLength,
 	.keypadType = Standard,
 	.active = 0,
 	.numSrc.srcType = srcTypeNone
@@ -611,9 +609,9 @@ void TFT_display_menu0(void){
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
 	if(InputType == 4)
-		TFT_graph_pixeldata_f(&gph_monitor, &InputBuffer1_conv[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, GRAPH_DATA1COLOR);
+		TFT_graph_pixeldata_f(&gph_monitor, &InputBuffer1_conv[0], INPUTBUFFER1_SIZE, &sensor1.bufferIdx, GRAPH_DATA1COLOR);
 	else
-		TFT_graph_pixeldata_i(&gph_monitor, &InputBuffer1[0], INPUTBUFFER1_SIZE, &InputBuffer1_idx, GRAPH_DATA1COLOR);
+		TFT_graph_pixeldata_i(&gph_monitor, &InputBuffer1[0], INPUTBUFFER1_SIZE, &sensor1.bufferIdx, GRAPH_DATA1COLOR);
 
 }
 void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -872,7 +870,7 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// Prepare linSet menu for current sensor
-				//curveset_prepare(&InputBuffer1[0], &InputBuffer1_idx);
+				//curveset_prepare(&InputBuffer1[0], &sensor1.bufferIdx);
 
 				// Change menu
 				//TFT_setMenu(menu_curveset.index);
@@ -1056,7 +1054,6 @@ uint16_t menu_shelf_datapoint(float* x_buf, float* y_buf, uint8_t buf_size, uint
 }
 
 
-
 void TFT_display_static_menu_curveset(void){
 	// Set configuration for current menu
 	TFT_setMenu(3);
@@ -1139,13 +1136,16 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 				printf("Button Back\n");
 				*toggle_lock = 42;
 
-				// Store current poly fit to be used
+				// Store current polynomial fit to be used
 				for (uint8_t i = 0; i < 4; i++) {
-					//s1_coefficients[0] = coefficients[0];
+					curveset_sens->coefficients[i] = coefficients[i];
 					printf("c%i = %.10f\n",i, coefficients[i]);
 				}
-				memcpy(&sensor1.coefficients[0], &coefficients[0], fit_order*sizeof(coefficients[0]));
-				sensor1.fitOrder = fit_order;
+				//memcpy(&curveset_sens->coefficients[0], &coefficients[0], fit_order*sizeof(coefficients[0]));
+				curveset_sens->fitOrder = fit_order;
+
+				// Write Spec file
+				record_writeSpecFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
 				free(tbx_act.numSrc.floatSrc);

@@ -32,7 +32,8 @@ volatile uint8_t tft_tick;
 /*  MEASUREMENTs */
 volatile uint32_t MeasurementCounter;
 
-// Menu definition
+// Sensor data definition
+#define STR_SPEC_MAXLEN 20
 typedef struct {
 	uint8_t index;
 	char* sensorText;
@@ -40,16 +41,19 @@ typedef struct {
 	float_buffer_t* convBuffer;
 	uint16_t bufferIdx;
 	uint16_t bufferMaxIdx;
+	char* filename_spec;
+	int8_t filename_spec_curLength;
 	uint8_t fitOrder;
 	float coefficients[4];
 } sensor;
 
+char s1_filename_spec[STR_SPEC_MAXLEN];
 sensor sensor1;
-uint16_t InputBuffer1_idx;
+//uint16_t InputBuffer1_idx;
 extern int_buffer_t InputBuffer1[];
 extern float_buffer_t InputBuffer1_conv[];
-extern uint8_t s1_fit_order;
-extern float s1_coefficients[4];
+//extern uint8_t s1_fit_order;
+//extern float s1_coefficients[4];
 
 /*  MENU AND USER INTERFACE */
 volatile uint8_t InputType;

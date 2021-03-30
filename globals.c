@@ -34,6 +34,7 @@ volatile uint32_t MeasurementCounter = 0; // Count of executed measurements
 #define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 int_buffer_t InputBuffer1[INPUTBUFFER1_SIZE] = { 0 }; // all elements 0
 float_buffer_t InputBuffer1_conv[INPUTBUFFER1_SIZE] = { 0.0 }; // all elements 0
+char s1_filename_spec[STR_SPEC_MAXLEN] = "Record/log.txt";
 sensor sensor1 = {
 		.index = 1,
 		.sensorText = "Front",
@@ -41,6 +42,8 @@ sensor sensor1 = {
 		.convBuffer = (float_buffer_t*)&InputBuffer1_conv,
 		.bufferIdx = 0,
 		.bufferMaxIdx = INPUTBUFFER1_SIZE,
+		.filename_spec = s1_filename_spec,
+		.filename_spec_curLength = 7,
 		.fitOrder = 2,
 		.coefficients[0] = 0,
 		.coefficients[1] = 0,
@@ -49,7 +52,7 @@ sensor sensor1 = {
 };
 
 
-uint16_t InputBuffer1_idx = 0; // Current index in Buffer
+//uint16_t InputBuffer1_idx = 0; // Current index in Buffer
 
 
 

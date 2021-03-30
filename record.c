@@ -16,12 +16,13 @@
 
 static FATFS fs; // File system object (volume work area)
 static FIL fil; // File object
+static FILINFO fno; // File information object
 
 DSTATUS diskStatus;
 
 extern sdStates sdState;
 
-
+/// Note: This implementation allows only one open file at a time!
 void record_mountDisk(uint8_t mount){
 	/// Used to mount and unmount a disk.
 
@@ -96,8 +97,13 @@ void record_openFile(const char* path){
 	// If SD is mounted now, try to open the file/path
 	if(sdState == sdMounted) {
 		res = f_open(&fil, path, FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+
 		if ((res == FR_OK) || (res == FR_EXIST)){
 			printf("File opened\n");
+			sdState = sdFileOpen;
+		}
+		else if (res == FR_INVALID_NAME){
+			printf("File open error: FR_INVALID_NAME '%s'\n", path);
 			sdState = sdFileOpen;
 		}
 		else{
@@ -138,57 +144,89 @@ void record_closeFile(){
 
 void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size){
 	///
-
+	/// TODO: Check write results and written bytes for consistency
 
 	FRESULT res = 0; /* API result code */
 	UINT bw,br; /* Bytes written */
-	char buff[75];
+	char buff[100];
 
+	// Try to mount disk
+	record_mountDisk(1);
+
+	// If the SD card is ready backup existing file, try to open the new one and write specifications
 	if(sdState == sdMounted || sdState == sdFileOpen){
 
-		// Check if file already exists - if so rename it
+		/// Check if file already exists - if so rename it
+		// Get file-info to check if it exists
+		res = f_stat((char*)&sens->filename_spec[0], NULL); // Use &fno if actual file-info is needed
+		if(res == FR_OK){
+			sprintf(buff,"s%d_backup.spec", sens->index);
+			f_rename((char*)&sens->filename_spec[0], buff);
+		}
+		else{
+			printf("File not found: %d\n", res);
+		}
 
 		// Open/Create File
+		record_openFile((char*)&sens->filename_spec[0]);
 
 		// If file is ready to be written to ...
 		if(sdState == sdFileOpen){
 
 			// Write header
-			f_printf(&fil, "Specification file for Sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex values (memory content).", sens->index, sens->sensorText);
+			f_printf(&fil, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->sensorText);
 
 			// Write fit order header and value in separate lines
-			f_printf(&fil, "Curve fit function order: %d", sens->fitOrder);
+			f_printf(&fil, "Curve fit function order:\n");
 			sprintf(buff,"%d\n", sens->fitOrder);
 			res = f_write(&fil, buff, strlen(buff), &bw);
 
-			// Write coefficients header and value in separate lines
-			f_printf(&fil, "Coefficients: %.*f, %.*f, %.*f, %.*f\n", FLT_DIG, sens->coefficients[0], FLT_DIG, sens->coefficients[1], FLT_DIG, sens->coefficients[2], FLT_DIG, sens->coefficients[3]);
+			// Write coefficients header and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
+			sprintf(buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->coefficients[0], sens->coefficients[1], sens->coefficients[2], sens->coefficients[3]);
+			res = f_write(&fil, buff, strlen(buff), &bw);
 			sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->coefficients[0], *(unsigned long*)&sens->coefficients[1], *(unsigned long*)&sens->coefficients[2], *(unsigned long*)&sens->coefficients[3]);
 			res = f_write(&fil, buff, strlen(buff), &bw);
 
 			// numDataPoints header and value in separate lines
-			f_printf(&fil, "Number of data points: %d\n", dp_size);
+			f_printf(&fil, "Number of data points:\n");
 			sprintf(buff,"%d\n", dp_size);
 			res = f_write(&fil, buff, strlen(buff), &bw);
 
 			// DataPoints x-value header and value in separate lines
-			f_printf(&fil, "Data points x: %.*f", FLT_DIG, dp_x[0]);
-			for (uint8_t i = 1; i < dp_size-1; i++)
-				f_printf(&fil, ",%.*f", FLT_DIG, dp_x[i]);
+			sprintf(buff,"Data points x (%.8f", dp_x[0]);
+			res = f_write(&fil, buff, strlen(buff), &bw);
+			for (uint8_t i = 1; i < dp_size; i++){
+				sprintf(buff,",%.8f", dp_x[i]);
+				res = f_write(&fil, buff, strlen(buff), &bw);
+			}
 
-			f_printf(&fil, "\n%08lX", *(unsigned long*)&dp_x[0]);
-			for (uint8_t i = 1; i < dp_size-1; i++)
-				f_printf(&fil, ",%08lX", *(unsigned long*)&dp_x[i]);
+			sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_x[0]);
+			res = f_write(&fil, buff, strlen(buff), &bw);
+			for (uint8_t i = 1; i < dp_size; i++){
+				sprintf(buff,",%08lX", *(unsigned long*)&dp_x[i]);
+				res = f_write(&fil, buff, strlen(buff), &bw);
+			}
 
 			// DataPoints y-value header and value in separate lines
-			f_printf(&fil, "\nData points y: %.*f", FLT_DIG, dp_y[0]);
-			for (uint8_t i = 1; i < dp_size-1; i++)
-				f_printf(&fil, ",%.*f", FLT_DIG, dp_y[i]);
+			sprintf(buff,"\nData points y (%.8f", dp_y[0]);
+			res = f_write(&fil, buff, strlen(buff), &bw);
+			for (uint8_t i = 1; i < dp_size; i++){
+				sprintf(buff,",%.8f", dp_y[i]);
+				res = f_write(&fil, buff, strlen(buff), &bw);
+			}
 
-			f_printf(&fil, "\n%08lX", *(unsigned long*)&dp_y[0]);
-			for (uint8_t i = 1; i < dp_size-1; i++)
-				f_printf(&fil, ",%08lX", *(unsigned long*)&dp_y[i]);
+			sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_y[0]);
+			res = f_write(&fil, buff, strlen(buff), &bw);
+			for (uint8_t i = 1; i < dp_size; i++){
+				sprintf(buff,",%08lX", *(unsigned long*)&dp_y[i]);
+				res = f_write(&fil, buff, strlen(buff), &bw);
+			}
 
+			// Close file
+			record_closeFile();
+		}
+		else{
+			printf("Write Spec File not open\n");
 		}
 	}
 
