@@ -31,6 +31,20 @@ volatile uint8_t tft_tick;
 
 /*  MEASUREMENTs */
 volatile uint32_t MeasurementCounter;
+
+// Menu definition
+typedef struct {
+	uint8_t index;
+	char* sensorText;
+	int_buffer_t* rawBuffer;
+	float_buffer_t* convBuffer;
+	uint16_t bufferIdx;
+	uint16_t bufferMaxIdx;
+	uint8_t fitOrder;
+	float coefficients[4];
+} sensor;
+
+sensor sensor1;
 uint16_t InputBuffer1_idx;
 extern int_buffer_t InputBuffer1[];
 extern float_buffer_t InputBuffer1_conv[];
@@ -40,6 +54,9 @@ extern float s1_coefficients[4];
 /*  MENU AND USER INTERFACE */
 volatile uint8_t InputType;
 
+enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError};
+typedef enum sdStates sdStates;
+sdStates sdState;
 
 /* DEBUG */
 #if defined (DEBUG_ENABLE)

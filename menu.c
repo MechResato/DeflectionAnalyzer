@@ -293,7 +293,7 @@ control btn_linSensor1 = {
 	.ignoreScroll = 0
 };
 
-#define STR_S2_LINSPEC_MAXLEN 10
+#define STR_S2_LINSPEC_MAXLEN 20
 char str_s2_linspec[STR_S2_LINSPEC_MAXLEN] = "s2.lin";
 int8_t str_s2_linspec_curLength = 6;
 #define TBX_SENSOR2_TAG 23
@@ -375,7 +375,7 @@ textbox tbx_hour = {
 //		CurveSet Elements         -----------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void curveset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx);
+void curveset_prepare(sensor* sens);
 void curveset_setEditMode(uint8_t editMode);
 
 // Size and current index of all data point related arrays
@@ -384,9 +384,8 @@ uint16_t DP_cur = 0;
 // The pointers the the x and y value arrays to be allocated by malloc and resized by realloc and used by the textboxes and graph
 //float* tbx_act.numSrc.floatSrc;
 //float* tbx_nom.numSrc.floatSrc;
-// Pointers to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function
-int_buffer_t* curveset_sensBuffer;
-uint16_t* curveset_sensBuffer_curIdx;
+// Pointer to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function or storing of the fit values
+sensor* curveset_sens;
 // Array to store the coefficients for the fitted polynomial and the state of the fit (0=OK everything else is error)
 uint8_t fit_order = 1;
 float coefficients[4] = {0,0,0,0}; //{25.0, -0.0235162665374, 0.00001617208884, 0, 0};
@@ -861,7 +860,7 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// Prepare linSet menu for current sensor
-				curveset_prepare(&InputBuffer1[0], &InputBuffer1_idx);
+				curveset_prepare(&sensor1);
 
 				// Change menu
 				TFT_setMenu(menu_curveset.index);
@@ -911,13 +910,12 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 //		CurveSet             --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void curveset_prepare(int_buffer_t* sensBuffer, uint16_t* sensBuffer_curIdx){
+void curveset_prepare(sensor* sens){
 	/// Prepares the linearisation settings menu to use the current sensor and reads current configuration if available
 
 
 	// Store pointer to referenced Sensor buffer
-	curveset_sensBuffer = sensBuffer;
-	curveset_sensBuffer_curIdx = sensBuffer_curIdx;
+	curveset_sens = sens;
 
 	// Check if spec file exists and load current settings if possible
 	// ... TODO
@@ -1057,6 +1055,8 @@ uint16_t menu_shelf_datapoint(float* x_buf, float* y_buf, uint8_t buf_size, uint
 	return target_pos;
 }
 
+
+
 void TFT_display_static_menu_curveset(void){
 	// Set configuration for current menu
 	TFT_setMenu(3);
@@ -1078,7 +1078,7 @@ void TFT_display_menu_curveset(void){
 	// If current data point is in edit mode
 	if(tbx_act.mytag != 0){
 		// Save current nominal value
-		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sensBuffer[*curveset_sensBuffer_curIdx];
+		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sens->rawBuffer[curveset_sens->bufferIdx];
 
 		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
 		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
@@ -1144,8 +1144,8 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 					//s1_coefficients[0] = coefficients[0];
 					printf("c%i = %.10f\n",i, coefficients[i]);
 				}
-				memcpy(&s1_coefficients[0], &coefficients[0], fit_order*sizeof(coefficients[0]));
-				s1_fit_order = fit_order;
+				memcpy(&sensor1.coefficients[0], &coefficients[0], fit_order*sizeof(coefficients[0]));
+				sensor1.fitOrder = fit_order;
 
 				// Free allocated memory
 				free(tbx_act.numSrc.floatSrc);
@@ -1242,7 +1242,7 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 
 						/// Set initial value's
 						// Set initial x value to current sensor value
-						tbx_nom.numSrc.floatSrc[DP_cur] = (float)curveset_sensBuffer[*curveset_sensBuffer_curIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
+						tbx_nom.numSrc.floatSrc[DP_cur] = (float)curveset_sens->rawBuffer[curveset_sens->bufferIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
 						// If an OK fit is available set initial y-value to the one corresponding to the curretn sensor value
 						if(fit_result == 0)
 							tbx_act.numSrc.floatSrc[DP_cur] = poly_calc(tbx_nom.numSrc.floatSrc[DP_cur], &coefficients[0], fit_order);

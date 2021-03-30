@@ -10,7 +10,10 @@
 
 
 
-
+void record_mountDisk(uint8_t mount);
+void record_openFile(const char* path);
+void record_closeFile();
+void record_printf(const char* path);
 
 
 void record_buffer(void);

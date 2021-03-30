@@ -49,7 +49,7 @@ void Adc_Measurement_Handler(void){
 		default:
 			InputBuffer1[InputBuffer1_idx] = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A); //result = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A);
 			// Convert raw value to adapted value and save it
-			InputBuffer1_conv[InputBuffer1_idx] = poly_calc(InputBuffer1[InputBuffer1_idx], &s1_coefficients[0], s1_fit_order); //5.2/4096.0*InputBuffer1[InputBuffer1_idx];
+			InputBuffer1_conv[InputBuffer1_idx] = poly_calc(InputBuffer1[InputBuffer1_idx], &sensor1.coefficients[0], sensor1.fitOrder); //5.2/4096.0*InputBuffer1[InputBuffer1_idx];
 
 			break;
 	 }
