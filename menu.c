@@ -731,7 +731,10 @@ void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 				printf("Button StartRec\n");
 				*toggle_lock = 42;
 
-				record_buffer();
+				//record_buffer();
+
+				// Load Values from SD-Card if possible
+				record_readSpecFile(&sensor1, NULL, NULL, NULL);
 			}
 			break;
 		default:
@@ -916,24 +919,43 @@ void curveset_prepare(sensor* sens){
 	curveset_sens = sens;
 
 	// Check if spec file exists and load current settings if possible
-	// ... TODO
+	// Load Values from SD-Card if possible, or use standard values
+	DP_size = 0;
+	record_readSpecFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	// If there are still no data points - use default ones
+	if(DP_size == 0){
+		// Allocate and set the y-value array
+		DP_size = 3;
+		tbx_act.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
+		tbx_act.numSrc.floatSrc[0] = 0.0;
+		tbx_act.numSrc.floatSrc[1] = 100.0;
+		tbx_act.numSrc.floatSrc[2] = 200.0;
 
-	// Allocate and set the y-value array
-	DP_size = 3;
-	tbx_act.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
-	tbx_act.numSrc.floatSrc[0] = 0.0;
-	tbx_act.numSrc.floatSrc[1] = 100.0;
-	tbx_act.numSrc.floatSrc[2] = 200.0;
+		// Allocate and set the x-value array
+		tbx_nom.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
+		tbx_nom.numSrc.floatSrc[0] = 0.0;
+		tbx_nom.numSrc.floatSrc[1] = 2048.0;
+		tbx_nom.numSrc.floatSrc[2] = 4096.0;
 
-	// Allocate and set the x-value array
-	tbx_nom.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
-	tbx_nom.numSrc.floatSrc[0] = 0.0;
-	tbx_nom.numSrc.floatSrc[1] = 2048.0;
-	tbx_nom.numSrc.floatSrc[2] = 4096.0;
+	}
+	else{
+		// Set Function button text accordingly
+		switch (sens->fitOrder) {
+			case 1:
+				btn_order.text = "Linear";
+				break;
+			case 2:
+				btn_order.text = "Square";
+				break;
+			case 3:
+				btn_order.text = "Cubic";
+				break;
+		}
+	}
 
 	// Check for allocation errors
 	if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
-	printf("Memory malloc failed!\n");
+		printf("Memory malloc failed!\n");
 
 	// Link actual value array to corresponding textbox
 	//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];

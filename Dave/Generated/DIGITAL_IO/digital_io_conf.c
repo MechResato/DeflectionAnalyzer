@@ -78,3 +78,51 @@ const DIGITAL_IO_t IO_DIO_DIGOUT_CS_TFT =
   .hwctrl = XMC_GPIO_HWCTRL_DISABLED
 };
 		
+const DIGITAL_IO_t IO_6_2 =
+{
+  .gpio_port = XMC_GPIO_PORT6,
+  .gpio_pin = 2U,
+  .gpio_config = {
+    .mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL,
+    .output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,
+
+  },
+  .hwctrl = XMC_GPIO_HWCTRL_DISABLED
+};
+		
+const DIGITAL_IO_t IO_6_4 =
+{
+  .gpio_port = XMC_GPIO_PORT6,
+  .gpio_pin = 4U,
+  .gpio_config = {
+    .mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL,
+    .output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,
+
+  },
+  .hwctrl = XMC_GPIO_HWCTRL_DISABLED
+};
+		
+const DIGITAL_IO_t IO_6_6 =
+{
+  .gpio_port = XMC_GPIO_PORT6,
+  .gpio_pin = 6U,
+  .gpio_config = {
+    .mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL,
+    .output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,
+
+  },
+  .hwctrl = XMC_GPIO_HWCTRL_DISABLED
+};
+		
+const DIGITAL_IO_t IO_3_3 =
+{
+  .gpio_port = XMC_GPIO_PORT3,
+  .gpio_pin = 3U,
+  .gpio_config = {
+    .mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL,
+    .output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,
+
+  },
+  .hwctrl = XMC_GPIO_HWCTRL_DISABLED
+};
+		

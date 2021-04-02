@@ -13,6 +13,7 @@
 #include <math.h>
 #include <globals.h>
 #include <measure.h>
+#include <record.h>
 #include <tft.h> // Implementation of display communication using the EVE Library of Rudolph Riedel
 
 // This file is kept as clean as possible. All variables and functions used by more than one component are stated in the 'globals' files.
@@ -57,6 +58,12 @@ int main(void)
 	TFT_display_init_screen();
 	uint32_t now = SYSTIMER_GetTime();
 	while (SYSTIMER_GetTime() < now + (100*1000)) __NOP();
+
+	// Load Values from SD-Card if possible
+	record_readSpecFile(&sensor1, NULL, NULL, NULL);
+
+	ADC_MEASUREMENT_StartConversion(&ADC_MEASUREMENT_0);
+
 
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");

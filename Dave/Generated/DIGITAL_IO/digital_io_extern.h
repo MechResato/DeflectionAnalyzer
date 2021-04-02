@@ -69,6 +69,14 @@ extern const DIGITAL_IO_t IO_DIO_DIGOUT_PD_TFT;
 	
 extern const DIGITAL_IO_t IO_DIO_DIGOUT_CS_TFT; 
 	
+extern const DIGITAL_IO_t IO_6_2; 
+	
+extern const DIGITAL_IO_t IO_6_4; 
+	
+extern const DIGITAL_IO_t IO_6_6; 
+	
+extern const DIGITAL_IO_t IO_3_3; 
+	
  
 #endif  /* DIGITAL_IO_EXTERN_H */
 

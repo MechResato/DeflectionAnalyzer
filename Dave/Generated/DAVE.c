@@ -101,6 +101,26 @@ __WEAK DAVE_STATUS_t DAVE_Init(void)
   {
 	 /**  Initialization of FATFS APP instance FATFS_0 */
 	 init_status = (DAVE_STATUS_t)FATFS_Init(&FATFS_0); 
+   } 
+  if (init_status == DAVE_STATUS_SUCCESS)
+  {
+	 /**  Initialization of DIGITAL_IO APP instance IO_6_2 */
+	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_6_2); 
+   } 
+  if (init_status == DAVE_STATUS_SUCCESS)
+  {
+	 /**  Initialization of DIGITAL_IO APP instance IO_6_4 */
+	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_6_4); 
+   } 
+  if (init_status == DAVE_STATUS_SUCCESS)
+  {
+	 /**  Initialization of DIGITAL_IO APP instance IO_6_6 */
+	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_6_6); 
+   } 
+  if (init_status == DAVE_STATUS_SUCCESS)
+  {
+	 /**  Initialization of DIGITAL_IO APP instance IO_3_3 */
+	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_3_3); 
    }  
   return init_status;
 } /**  End of function DAVE_Init */

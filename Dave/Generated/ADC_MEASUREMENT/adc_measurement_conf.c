@@ -190,7 +190,7 @@ ADC_MEASUREMENT_t ADC_MEASUREMENT_0=
   .iclass_config_handle  = ( XMC_VADC_GLOBAL_CLASS_t *) &global_iclass_config,
   .srv_req_node          = XMC_VADC_SR_SHARED_SR2,
   .global_handle    	 = (GLOBAL_ADC_t *) &GLOBAL_ADC_0,
-  .start_conversion		 = (bool) true,
+  .start_conversion		 = (bool) false,
   .mux_config			 = NULL,
   .init_state 			 = ADC_MEASUREMENT_STATUS_UNINITIALIZED
 };
