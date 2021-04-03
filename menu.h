@@ -26,23 +26,6 @@
 #define GRAPH_DATA2COLOR   		0x64584B // graph data 2 (alternative/additional color)
 #define GRAPH_DATA2COLORLIGHT   0xe7cbad // graph data 2 light (alternative/additional color)
 
-void TFT_display_get_values(void);
-
-void TFT_display_static_menu0(void);
-void TFT_display_static_menu1(void);
-void TFT_display_static_menu_setup(void);
-void TFT_display_static_menu_curveset(void);
-
-void TFT_display_menu0(void);
-void TFT_display_menu1(void);
-void TFT_display_menu_setup(void);
-void TFT_display_menu_curveset(void);
-
-void TFT_touch_menu0(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
-void TFT_touch_menu1(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
-void TFT_touch_menu_setup(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
-void TFT_touch_menu_curveset(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
-
 
 // TFT_MENU_SIZE 	   Amount of overall menus. Must be changed if menus are added or removed
 #define TFT_MENU_SIZE 4
@@ -52,7 +35,27 @@ void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
 
-extern menu* Menu_Objects[TFT_MENU_SIZE];
+
+void TFT_display_get_values(void);
+
+void menu_display_static_0monitor(void);
+void menu_display_static_1dash(void);
+void menu_display_static_2setup(void);
+void menu_display_static_3curveset(void);
+
+void menu_display_0monitor(void);
+void menu_display_1dash(void);
+void menu_display_2setup(void);
+void menu_display_3curveset(void);
+
+void menu_touch_0monitor(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_1dash(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_2setup(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_3curveset(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+
+
+
+extern menu* menu_objects[TFT_MENU_SIZE];
 
 
 #endif /* MENU_H_ */

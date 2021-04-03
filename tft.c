@@ -45,7 +45,7 @@ static uint32_t num_dl_static; // Amount of bytes in the static part of our disp
 
 
 /////////// Menu function pointers - At the end of the TFT_display_static, TFT_display and TFT_touch the function referenced to this pointer is executed
-extern menu* Menu_Objects[TFT_MENU_SIZE]; // An array of menu structs that hold information general about the menus (see menu struct in tft.h for definition and menu.c for initialization)
+extern menu* menu_objects[TFT_MENU_SIZE]; // An array of menu structs that hold information general about the menus (see menu struct in tft.h for definition and menu.c for initialization)
 extern void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
 extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
@@ -172,7 +172,7 @@ void TFT_setMenu(int16_t idx){
 	// If the menu changed - reset features
 	if(TFT_cur_MenuIdx != TFT_last_MenuIdx){ //keypadActive &&
 		// Set upper bond
-		TFT_UpperBond = Menu_Objects[idx]->upperBond;
+		TFT_UpperBond = menu_objects[idx]->upperBond;
 
 		// Close keypad if necessary
 		keypad_close();

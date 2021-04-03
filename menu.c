@@ -25,25 +25,27 @@
 // TFT_MAIN_MENU_SIZE  is declared in menu.h. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
 int8_t TFT_cur_Menu = 0; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
-		&TFT_display_menu0,
-		&TFT_display_menu1,
-		&TFT_display_menu_setup,
-		&TFT_display_menu_curveset
+		&menu_display_0monitor,
+		&menu_display_1dash,
+		&menu_display_2setup,
+		&menu_display_3curveset
 };
 
 void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y) = {
-		&TFT_touch_menu0,
-		&TFT_touch_menu1,
-		&TFT_touch_menu_setup,
-		&TFT_touch_menu_curveset
+		&menu_touch_0monitor,
+		&menu_touch_1dash,
+		&menu_touch_2setup,
+		&menu_touch_3curveset
 };
 
 void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
-		&TFT_display_static_menu0,
-		&TFT_display_static_menu1,
-		&TFT_display_static_menu_setup,
-		&TFT_display_static_menu_curveset
+		&menu_display_static_0monitor,
+		&menu_display_static_1dash,
+		&menu_display_static_2setup,
+		&menu_display_static_3curveset
 };
+
+
 
 #define M_0_UPPERBOND 66 // deepest coordinate (greatest number) of the header
 menu menu_0 = {
@@ -90,7 +92,7 @@ menu menu_curveset = {
 };
 
 
-menu* Menu_Objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup, &menu_curveset};
+menu* menu_objects[TFT_MENU_SIZE] = {&menu_0, &menu_1, &menu_setup, &menu_curveset};
 
 
 
@@ -572,7 +574,7 @@ void TFT_display_get_values(void){
 //		Monitoring          --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void TFT_display_static_menu0(void){
+void menu_display_static_0monitor(void){
 	// Set configuration for current menu
 	TFT_setMenu(0);
 
@@ -590,8 +592,9 @@ void TFT_display_static_menu0(void){
 	TFT_graph_static(1, &gph_monitor);
 
 }
-void TFT_display_menu0(void){
-	/// The inputs are used to draw the Graph data. Note that also some predefined graph settings are used direct (#define G_... )
+void menu_display_0monitor(void){
+	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
+	/// This menu ...
 
 	/////////////// Display BUTTONS and Toggles
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
@@ -615,9 +618,11 @@ void TFT_display_menu0(void){
 		TFT_graph_pixeldata_i(&gph_monitor, &s1_buf_0raw[0], S1_BUF_SIZE, (uint16_t*)&sensor1.bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 
 }
-void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
-	/// ...
-	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
+void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
+	/// Do not use predefined TAG values! See tft.c "TAG ASSIGNMENT"!
+
+
 	// Determine which tag was touched
 	switch(tag)
 	{
@@ -687,7 +692,7 @@ void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 //		Dashboard          --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void TFT_display_static_menu1(void){
+void menu_display_static_1dash(void){
 	// Set configuration for current menu
 	TFT_setMenu(1);
 
@@ -704,8 +709,10 @@ void TFT_display_static_menu1(void){
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 	TFT_label(1, &lbl_record);
 }
-void TFT_display_menu1(void){
-	/// Test menu
+void menu_display_1dash(void){
+	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
+	/// This menu ...
+
 
 	/////////////// Display BUTTONS and Toggles
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
@@ -718,9 +725,9 @@ void TFT_display_menu1(void){
 	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
 	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
 }
-void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
-	/// ...
-	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
+void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
+	/// Do not use predefined TAG values! See tft.c "TAG ASSIGNMENT"!
 
 
 	// Determine which tag was touched
@@ -768,7 +775,7 @@ void TFT_touch_menu1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 //		Setup              --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void TFT_display_static_menu_setup(void){
+void menu_display_static_2setup(void){
 	// Set configuration for current menu
 	TFT_setMenu(2);
 
@@ -795,8 +802,9 @@ void TFT_display_static_menu_setup(void){
 	/// Backlight
 	TFT_label(1, &lbl_backlight);
 }
-void TFT_display_menu_setup(void){
-	///
+void menu_display_2setup(void){
+	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
+	/// This menu ...
 
 
 	// Set button color for header
@@ -815,9 +823,10 @@ void TFT_display_menu_setup(void){
 	TFT_textbox_display(&tbx_sensor2);
 	TFT_textbox_display(&tbx_hour);
 }
-void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
-	/// ...
-	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
+void menu_touch_2setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
+	/// Do not use predefined TAG values! See tft.c "TAG ASSIGNMENT"!
+
 
 	// Determine which tag was touched
 	switch(tag)
@@ -1089,7 +1098,7 @@ uint16_t menu_shelf_datapoint(float* x_buf, float* y_buf, uint8_t buf_size, uint
 }
 
 
-void TFT_display_static_menu_curveset(void){
+void menu_display_static_3curveset(void){
 	// Set configuration for current menu
 	TFT_setMenu(3);
 
@@ -1103,8 +1112,9 @@ void TFT_display_static_menu_curveset(void){
 	TFT_textbox_static(1, &tbx_nom);
 	TFT_textbox_static(1, &tbx_act);
 }
-void TFT_display_menu_curveset(void){
-	///
+void menu_display_3curveset(void){
+	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
+	/// This menu ...
 
 
 	// If current data point is in edit mode
@@ -1156,10 +1166,9 @@ void TFT_display_menu_curveset(void){
 	TFT_label(1, &lbl_fitorder);
 
 }
-void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
-	/// ...
-	/// Do not use tags higher than 32 (they will be interpreted as keyboard input) or predefined TAGs -> see tft.c "TAG ASSIGNMENT"!
-	/// ToDo: This menu is not finished!
+void menu_touch_3curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
+	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
+	/// Do not use predefined TAG values! See tft.c "TAG ASSIGNMENT"!
 
 
 	// Determine which tag was touched
@@ -1273,8 +1282,6 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 						DP_size++;
 						tbx_act.numSrc.floatSrc = (float*)realloc(tbx_act.numSrc.floatSrc, DP_size*sizeof(float));
 						tbx_nom.numSrc.floatSrc = (float*)realloc(tbx_nom.numSrc.floatSrc, DP_size*sizeof(float));
-						//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
-						//tbx_nom.numSrc.floatSrc = &tbx_nom.numSrc.floatSrc[0];
 
 						// Check for allocation errors
 						if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
@@ -1319,7 +1326,7 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 			break;
 		default:
 			TFT_textbox_touch(&tbx_act);
-			//TFT_textbox_touch(&tbx_dp); // TODO: Commented out because there needs to be an border check before this is useful
+			//TFT_textbox_touch(&tbx_dp); // TODO: Commented out because there needs to be an border check before this is useful. Meanwhile it's read only this way
 			break;
 	}
 }
