@@ -10,6 +10,6 @@
 
 void Adc_Measurement_Handler(void);
 
-
+extern void measure_movAvgFilter_clean(sensor* sens);
 
 #endif /* MEASURE_H_ */

@@ -136,7 +136,7 @@ void keypad_close(){
 
 
 
-void str_insert(char* target, int8_t* len, char ch, int8_t pos){
+void str_insert(char* target, uint8_t* len, char ch, int8_t pos){
 	/// Insert a character 'ch' at given position 'pos' of a string 'target'.
 	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
 

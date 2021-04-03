@@ -158,17 +158,17 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 
 		/// Check if file already exists - if so rename it
 		// Get file-info to check if it exists
-		res = f_stat((char*)&sens->filename_spec[0], NULL); // Use &fno if actual file-info is needed
+		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
 		if(res == FR_OK){
 			sprintf(buff,"s%d_backup.spec", sens->index);
-			f_rename((char*)&sens->filename_spec[0], buff);
+			f_rename((char*)&sens->fitFilename[0], buff);
 		}
 		else{
 			printf("File not found: %d\n", res);
 		}
 
 		// Open/Create File
-		record_openFile((char*)&sens->filename_spec[0]);
+		record_openFile((char*)&sens->fitFilename[0]);
 
 		// If file is ready to be written to ...
 		if(sdState == sdFileOpen){
@@ -178,7 +178,7 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				printf("Writing spec file\n");
 
 				// Write header
-				f_printf(&fil, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->sensorText);
+				f_printf(&fil, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->name);
 				printf("Write header\n");
 
 				// Write fit order header and value in separate lines
@@ -190,10 +190,10 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				printf("Write fit order\n");
 
 				// Write coefficients header and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
-				sprintf(buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->coefficients[0], sens->coefficients[1], sens->coefficients[2], sens->coefficients[3]);
+				sprintf(buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->fitCoefficients[0], sens->fitCoefficients[1], sens->fitCoefficients[2], sens->fitCoefficients[3]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
 				printf("Write coefficients comment\n");
-				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->coefficients[0], *(unsigned long*)&sens->coefficients[1], *(unsigned long*)&sens->coefficients[2], *(unsigned long*)&sens->coefficients[3]);
+				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->fitCoefficients[0], *(unsigned long*)&sens->fitCoefficients[1], *(unsigned long*)&sens->fitCoefficients[2], *(unsigned long*)&sens->fitCoefficients[3]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
 				if (res != FR_OK) break;
 				printf("Write coefficients\n");
@@ -265,9 +265,10 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 }
 
 
-void record_readSpecFile(sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
+void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
 	///
 	/// This function is not optimized for high speed. It should only be used when performance is not top priority (setup before actual start of record, not during).
+	/// On 03.04.2021 this function measured to take about 266ms to complete...
 
 	FRESULT res = 0; /* API result code */
 
@@ -283,11 +284,11 @@ void record_readSpecFile(sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_
 
 		/// Check if file exists - if so open it
 		printf("Check if file exists\n");
-		res = f_stat((char*)&sens->filename_spec[0], NULL); // Use &fno if actual file-info is needed
+		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
 		if(res == FR_OK){
 			// Open/Create File
 			printf("Open file\n");
-			record_openFile((char*)&sens->filename_spec[0]);
+			record_openFile((char*)&sens->fitFilename[0]);
 
 			// If file is ready ...
 			if(sdState == sdFileOpen){
@@ -320,8 +321,8 @@ void record_readSpecFile(sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_
 						// Read as hex long
 						unsigned long tmp = strtoul(ptr, &ptr, 16);
 						// Convert to float and write to sensor struct
-						sens->coefficients[i] = *(float*)&tmp;
-						printf("= %.8f\n", sens->coefficients[i]);
+						sens->fitCoefficients[i] = *(float*)&tmp;
+						printf("= %.8f\n", sens->fitCoefficients[i]);
 						// Ignore separator between values
 						if( (ptr - &buff[0]) < strlen(&buff[0]) )
 							ptr++;

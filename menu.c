@@ -176,8 +176,8 @@ label lbl_sensor_val = {
 		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d",//.text = "%d.%.2d V",
 		.ignoreScroll = 1,
 		.numSrc.srcType = srcTypeInt, //srcTypeFloat,
-		.numSrc.intSrc = (int_buffer_t*)&InputBuffer1, //(float_buffer_t*)&InputBuffer1_conv,
-		.numSrc.srcOffset = &sensor1.bufferIdx,
+		.numSrc.intSrc = (int_buffer_t*)&s1_buf_0raw, //(float_buffer_t*)&InputBuffer1_conv,
+		.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx, // (ignore volatile here)
 		.fracExp = 2
 };
 
@@ -242,7 +242,7 @@ label lbl_recording = {
 
 #define STR_FILENAME_MAXLEN 16
 char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
-int8_t str_filename_curLength = 8;
+uint8_t str_filename_curLength = 8;
 #define TBX_FILENAME_TAG 20
 textbox tbx_filename = {
 	.x = M_COL_2,
@@ -276,7 +276,7 @@ textbox tbx_sensor1 = {
 	.mytag = TBX_SENSOR1_TAG,
 	.text = s1_filename_spec,
 	.text_maxlen = STR_SPEC_MAXLEN,
-	.text_curlen = &sensor1.filename_spec_curLength,
+	.text_curlen = (uint8_t*)&sensor1.fitFilename_curLen,  //(ignore volatile here)
 	.keypadType = Standard,
 	.active = 0,
 	.numSrc.srcType = srcTypeNone
@@ -293,7 +293,7 @@ control btn_linSensor1 = {
 
 #define STR_S2_LINSPEC_MAXLEN 20
 char str_s2_linspec[STR_S2_LINSPEC_MAXLEN] = "s2.lin";
-int8_t str_s2_linspec_curLength = 6;
+uint8_t str_s2_linspec_curLength = 6;
 #define TBX_SENSOR2_TAG 23
 textbox tbx_sensor2 = {
 	.x = M_COL_2,
@@ -346,7 +346,7 @@ label lbl_RTC = {
 //uint8_t hour_val_idx = 0;
 #define STR_HOUR_MAXLEN 18
 char str_hour[STR_HOUR_MAXLEN] = "12:13:26 24.03.21";
-int8_t str_hour_curLength = 17;
+uint8_t str_hour_curLength = 17;
 #define TBX_HOUR_TAG 25
 textbox tbx_hour = {
 	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) - TEXTBOX_PAD_V + FONT_COMP*1,
@@ -373,17 +373,16 @@ textbox tbx_hour = {
 //		CurveSet Elements         -----------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void curveset_prepare(sensor* sens);
+void curveset_prepare(volatile sensor* sens);
 void curveset_setEditMode(uint8_t editMode);
 
 // Size and current index of all data point related arrays
 uint16_t DP_size = 3;
 uint16_t DP_cur = 0;
-// The pointers the the x and y value arrays to be allocated by malloc and resized by realloc and used by the textboxes and graph
-//float* tbx_act.numSrc.floatSrc;
-//float* tbx_nom.numSrc.floatSrc;
 // Pointer to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function or storing of the fit values
-sensor* curveset_sens;
+sensor*  curveset_sens;
+// The avgFilterOrder of the sensor is temporarily changed while curveset menu is active. This variable stores the original value it will be reset to when coming back from the submenu.
+uint16_t curveset_previousAvgFilterOrder;
 // Array to store the coefficients for the fitted polynomial and the state of the fit (0=OK everything else is error)
 uint8_t fit_order = 1;
 float coefficients[4] = {0,0,0,0}; //{25.0, -0.0235162665374, 0.00001617208884, 0, 0};
@@ -472,7 +471,7 @@ control btn_setchange = {
 
 #define STR_DP_MAXLEN 3
 char str_dp[STR_DP_MAXLEN] = "0";
-int8_t str_dp_curLength = 1;
+uint8_t str_dp_curLength = 1;
 #define TBX_DP_TAG 24
 textbox tbx_dp = {
 	.x = (M_COL_1/2),
@@ -491,9 +490,11 @@ textbox tbx_dp = {
 	.numSrc.srcOffset = NULL,
 	.numSrcFormat = "%d"
 };
+
+// The pointers the the x and y value arrays to be allocated by malloc and resized by realloc and used by the textboxes and graph are inside tbx_nom and tbx_act.
 #define STR_NOM_MAXLEN 10
 char str_nom[STR_NOM_MAXLEN] = "4095";
-int8_t str_nom_curLength = 4;
+uint8_t str_nom_curLength = 4;
 //#define TBX_NOM_TAG 0
 textbox tbx_nom = {
 	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8,
@@ -515,7 +516,7 @@ textbox tbx_nom = {
 };
 #define STR_ACT_MAXLEN 10
 char str_act[STR_ACT_MAXLEN] = "";
-int8_t str_act_curLength = 0;
+uint8_t str_act_curLength = 0;
 #define TBX_ACT_TAG 26
 textbox tbx_act = {
 	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8,
@@ -608,10 +609,10 @@ void TFT_display_menu0(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	if(InputType == 4)
-		TFT_graph_pixeldata_f(&gph_monitor, &InputBuffer1_conv[0], INPUTBUFFER1_SIZE, &sensor1.bufferIdx, GRAPH_DATA1COLOR);
+	if(inputType == 4)
+		TFT_graph_pixeldata_f(&gph_monitor, &s1_buf_2conv[0], S1_BUF_SIZE, (uint16_t*)&sensor1.bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 	else
-		TFT_graph_pixeldata_i(&gph_monitor, &InputBuffer1[0], INPUTBUFFER1_SIZE, &sensor1.bufferIdx, GRAPH_DATA1COLOR);
+		TFT_graph_pixeldata_i(&gph_monitor, &s1_buf_0raw[0], S1_BUF_SIZE, (uint16_t*)&sensor1.bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 
 }
 void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -644,29 +645,29 @@ void TFT_touch_menu0(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress,
 
 				// Switch signal type
 				//InputType++;
-				if(InputType == 0){ InputType = 4; }
-				else{ InputType = 0; }
+				if(inputType == 0){ inputType = 4; }
+				else{ inputType = 0; }
 
 				// Switch label of button to new input type
-				if(InputType == 0){
+				if(inputType == 0){
 					btn_input.text = "Raw1";
 					lbl_sensor_val.text = "%d";
 					lbl_sensor_val.numSrc.srcType = srcTypeInt;
-					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)&InputBuffer1;
+					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)&s1_buf_0raw;
 					lbl_sensor_val.fracExp = 1;
 
 					gph_monitor.amp_max = 5.2;
 					gph_monitor.y_max = 4095.0;
 					gph_monitor.y_label = "V";
 				}
-				else if(InputType == 1){	btn_input.text = "Imp";	}
-				else if(InputType == 2){	btn_input.text = "Saw";	}
-				else if(InputType == 3){	btn_input.text = "Sine"; }
+				else if(inputType == 1){	btn_input.text = "Imp";	}
+				else if(inputType == 2){	btn_input.text = "Saw";	}
+				else if(inputType == 3){	btn_input.text = "Sine"; }
 				else{
 					btn_input.text = "Sensor1";
 					lbl_sensor_val.text = "%d.%.2d mm";
 					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
-					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)&InputBuffer1_conv;
+					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)&s1_buf_2conv;
 					lbl_sensor_val.fracExp = 2;
 
 					gph_monitor.amp_max = 70;
@@ -911,12 +912,24 @@ void TFT_touch_menu_setup(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 //		CurveSet             --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void curveset_prepare(sensor* sens){
+void curveset_prepare(volatile sensor* sens){
 	/// Prepares the linearisation settings menu to use the current sensor and reads current configuration if available
 
 
-	// Store pointer to referenced Sensor buffer
-	curveset_sens = sens;
+	// Store pointer to referenced Sensor buffer (ignore volatile here)
+	curveset_sens = (sensor*)sens;
+	// Store current value of average filter order
+	curveset_previousAvgFilterOrder = sens->avgFilterOrder;
+
+	// Set avg filter order higher. This way its easier to get precise measurements. The user should be able to keep the distance for minimum 1 second, therefore filter over 1 second
+	uint16_t newFilOrder = (uint16_t)ceil(1000.0 / MEASUREMENT_INTERVAL);
+	if(newFilOrder < sens->bufMaxIdx)
+		curveset_sens->avgFilterOrder = newFilOrder;
+	else
+		curveset_sens->avgFilterOrder = sens->bufMaxIdx-1;
+	printf("Using Avg filter order %d during curveset!\n", sens->avgFilterOrder);
+	// Do a clean filter value calculation to sync it to the new filter order
+	measure_movAvgFilter_clean(curveset_sens);
 
 	// Check if spec file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
@@ -1097,7 +1110,7 @@ void TFT_display_menu_curveset(void){
 	// If current data point is in edit mode
 	if(tbx_act.mytag != 0){
 		// Save current nominal value
-		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sens->rawBuffer[curveset_sens->bufferIdx];
+		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sens->bufFilter[curveset_sens->bufIdx]; //(float)curveset_sens->bufRaw[curveset_sens->bufIdx];//
 
 		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
 		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
@@ -1158,12 +1171,17 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 				printf("Button Back\n");
 				*toggle_lock = 42;
 
+				// Reset filter order
+				curveset_sens->avgFilterOrder = curveset_previousAvgFilterOrder;
+				printf("Reseting avg filter order back to %d!\n", curveset_sens->avgFilterOrder);
+				// Do a clean filter value calculation to sync it to the new filter order
+				measure_movAvgFilter_clean(curveset_sens);
+
 				// Store current polynomial fit to be used
 				for (uint8_t i = 0; i < 4; i++) {
-					curveset_sens->coefficients[i] = coefficients[i];
+					curveset_sens->fitCoefficients[i] = coefficients[i];
 					printf("c%i = %.10f\n",i, coefficients[i]);
 				}
-				//memcpy(&curveset_sens->coefficients[0], &coefficients[0], fit_order*sizeof(coefficients[0]));
 				curveset_sens->fitOrder = fit_order;
 
 				// Write Spec file
@@ -1264,7 +1282,7 @@ void TFT_touch_menu_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInP
 
 						/// Set initial value's
 						// Set initial x value to current sensor value
-						tbx_nom.numSrc.floatSrc[DP_cur] = (float)curveset_sens->rawBuffer[curveset_sens->bufferIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
+						tbx_nom.numSrc.floatSrc[DP_cur] = (float)curveset_sens->bufFilter[curveset_sens->bufIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
 						// If an OK fit is available set initial y-value to the one corresponding to the curretn sensor value
 						if(fit_result == 0)
 							tbx_act.numSrc.floatSrc[DP_cur] = poly_calc(tbx_nom.numSrc.floatSrc[DP_cur], &coefficients[0], fit_order);

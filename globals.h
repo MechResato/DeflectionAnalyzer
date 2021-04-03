@@ -11,7 +11,8 @@
 
 /*  MACROS - DEFINEs */
 #define DEBUG_ENABLE // self implemented Debug flag
-#define INPUTBUFFER1_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
+#define MEASUREMENT_INTERVAL (5.0) // Time between measurements in ms. Must be same as is set in TIMER_0 DAVE App!
+#define S1_BUF_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
 // Function to convert a float to int16 with rounding // https://stackoverflow.com/questions/24723180/c-convert-floating-point-to-int
 #ifndef FLOAT_TO_INT16
@@ -28,36 +29,44 @@ typedef float float_buffer_t;
 /*  SYSTEM VARIABLEs */
 volatile uint32_t _msCounter;
 volatile uint8_t tft_tick;
+volatile uint32_t measurementCounter;
 
 /*  MEASUREMENTs */
-volatile uint32_t MeasurementCounter;
 
 // Sensor data definition
 #define STR_SPEC_MAXLEN 20
 typedef struct {
 	uint8_t index;
-	char* sensorText;
-	int_buffer_t* rawBuffer;
-	float_buffer_t* convBuffer;
-	uint16_t bufferIdx;
-	uint16_t bufferMaxIdx;
-	char* filename_spec;
-	int8_t filename_spec_curLength;
+	char*   name;
+	uint16_t        bufIdx;
+	uint16_t        bufMaxIdx;
+	int_buffer_t*   bufRaw;
+	float_buffer_t* bufFilter;
+	float_buffer_t* bufConv;
+	uint8_t	 	  errorOccured;	  		// Number of error-measurements that occurred since last valid value. If this is 0 the curent value is valid.
+	int_buffer_t  errorThreshold; 		// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
+	int32_t		  errorLastValidSlope;
+	float     avgFilterSum;
+	uint16_t  avgFilterOrder;
+	char*   fitFilename;
+	uint8_t  fitFilename_curLen;
 	uint8_t fitOrder;
-	float coefficients[4];
+	float   fitCoefficients[4];
+
 } sensor;
 
+// Sensor 1 Front
 char s1_filename_spec[STR_SPEC_MAXLEN];
-sensor sensor1;
-//uint16_t InputBuffer1_idx;
-extern int_buffer_t InputBuffer1[];
-extern float_buffer_t InputBuffer1_conv[];
-//extern uint8_t s1_fit_order;
-//extern float s1_coefficients[4];
+volatile sensor sensor1;
+extern int_buffer_t s1_buf_0raw[];
+extern float_buffer_t s1_buf_1filter[];
+extern float_buffer_t s1_buf_2conv[];
+
 
 /*  MENU AND USER INTERFACE */
-volatile uint8_t InputType;
+volatile uint8_t inputType;
 
+// SD-Card handling
 enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError};
 typedef enum sdStates sdStates;
 sdStates sdState;
@@ -68,7 +77,6 @@ sdStates sdState;
 #else
 	#define printf(...) { ; }
 #endif
-
 volatile uint8_t frameover;
 
 
@@ -78,5 +86,6 @@ void SysTick_Handler(); // Interrupt Routine - used for delay_ms
 void delay_ms(uint32_t ms); // Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
 
 float poly_calc (float c_x, float* f_coefficients, uint8_t order);
+void measure_movAvgFilter_clean(sensor* sens);
 
 #endif /* GLOBALS_H_ */

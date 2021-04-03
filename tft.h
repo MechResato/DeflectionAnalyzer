@@ -128,8 +128,8 @@ typedef struct {
 	char* labelText;		// Text of the preceding label.
 	int8_t mytag;			// The touch tag used for the textbox.
 	char* text;				// Pointer to the text buffer or value the textbox is linked to. Must be set!
-	int8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
-	int8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
+	uint8_t text_maxlen;		// The size of the buffer or value the textbox is linked to. Must be set!
+	uint8_t* text_curlen;	// Pointer to a variable showing the current size of the string buffer or value the textbox is linked to. IMPORTANT: This must be set to the current size at beginning!
 	int8_t active;			// Marker showing if textbox is being modified by user.
 	char* numSrcFormat;		// Format used when converting the referenced numeric source to text (at display and at setStatus). Must be set if an numeric source is used and must contain one %d for integer and two for float source (e.g."%d.%.2d")!
 	uint8_t fracExp;		// Determines how many fractional digits are shown when using a float source e.g. 2->2digits, 3->3digits.  NOTE: You also need to write the format specifier to the text field (e.g. for 2 digits "%d.%.2d")

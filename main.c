@@ -7,14 +7,14 @@
  *  Parts are taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done by Stefan Reinmüller and Rene Santeler
  */
 
-#include <DAVE.h>                 // Declarations from DAVE Code Generation (includes SFR declaration)
+#include <DAVE.h> // Declarations from DAVE Code Generation (includes SFR declaration)
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
 #include <globals.h>
-#include <measure.h>
-#include <record.h>
-#include <tft.h> // Implementation of display communication using the EVE Library of Rudolph Riedel
+#include <measure.h>	// Everything related to the measurement, filtering and conversion of data by Rene Santeler
+#include <record.h>		// Everything related to SD-Card handling and read/write by Rene Santeler
+#include <tft.h> 		// Implementation of a display menu framework by Rene Santeler using the EVE Library of Rudolph Riedel
 
 // This file is kept as clean as possible. All variables and functions used by more than one component are stated in the 'globals' files.
 // See "globals" for details on how everything works together
@@ -62,8 +62,8 @@ int main(void)
 	// Load Values from SD-Card if possible
 	record_readSpecFile(&sensor1, NULL, NULL, NULL);
 
+	// Start ADC measurement interrupt routine
 	ADC_MEASUREMENT_StartConversion(&ADC_MEASUREMENT_0);
-
 
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");
@@ -73,13 +73,13 @@ int main(void)
 			tft_tick = 0;
 
 			// Evaluate touches
-			TFT_touch();
+			TFT_touch(); // ~100us with no touch
 
 			// Evaluate and rewrite display list
 			display_delay++;
-			if(MeasurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
+			if(measurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
 				display_delay = 0;
-				TFT_display();
+				TFT_display(); // ~9000us at Monitor, 800us at Dashboard(empty), 1440us at Setup
 			}
 
 		}
