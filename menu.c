@@ -1168,18 +1168,6 @@ void curveset_prepare(volatile sensor* sens){
 
 	// Store pointer to referenced Sensor buffer (ignore volatile here)
 	curveset_sens = (sensor*)sens;
-	// Store current value of average filter order
-	curveset_previousAvgFilterOrder = sens->avgFilterOrder;
-
-	// Set avg filter order higher. This way its easier to get precise measurements. The user should be able to keep the distance for minimum 1 second, therefore filter over 1 second
-	uint16_t newFilOrder = (uint16_t)ceil(1000.0 / MEASUREMENT_INTERVAL);
-	if(newFilOrder < sens->bufMaxIdx)
-		curveset_sens->avgFilterOrder = newFilOrder;
-	else
-		curveset_sens->avgFilterOrder = sens->bufMaxIdx-1;
-	printf("Using Avg filter order %d during curveset!\n", sens->avgFilterOrder);
-	// Do a clean filter value calculation to sync it to the new filter order
-	measure_movAvgFilter_clean(curveset_sens);
 
 	// Check if spec file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
@@ -1219,6 +1207,21 @@ void curveset_prepare(volatile sensor* sens){
 	// Check for allocation errors
 	if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
 		printf("Memory malloc failed!\n");
+
+
+	// Store current value of average filter order
+	curveset_previousAvgFilterOrder = sens->avgFilterOrder;
+
+	// Set avg filter order higher. This way its easier to get precise measurements. The user should be able to keep the distance for minimum 1 second, therefore filter over 1 second
+	uint16_t newFilOrder = (uint16_t)ceil(1000.0 / MEASUREMENT_INTERVAL);
+	if(newFilOrder < sens->bufMaxIdx)
+		curveset_sens->avgFilterOrder = newFilOrder;
+	else
+		curveset_sens->avgFilterOrder = sens->bufMaxIdx-1;
+	printf("Using Avg filter order %d during curveset!\n", sens->avgFilterOrder);
+	// Do a clean filter value calculation to sync it to the new filter order
+	measure_movAvgFilter_clean(curveset_sens);
+
 
 	// Link actual value array to corresponding textbox
 	//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
@@ -1361,6 +1364,7 @@ void menu_display_curveset(void){
 	if(tbx_act.mytag != 0){
 		// Save current nominal value
 		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sens->bufFilter[curveset_sens->bufIdx]; //(float)curveset_sens->bufRaw[curveset_sens->bufIdx];//
+		printf("write %f\n", curveset_sens->bufFilter[curveset_sens->bufIdx]);
 
 		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
 		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
@@ -1673,7 +1677,7 @@ void menu_display_filterset(void){
 
 	// If error threshold is in edit mode show current sensor value
 	if(tbx_error_threshold_order.mytag != 0 && tbx_error_threshold_order.active == 0 ){
-		// Save current senosr value
+		// Save current sensor value
 		*tbx_error_threshold_order.numSrc.intSrc = (int_buffer_t)filterset_sens->bufFilter[filterset_sens->bufIdx];
 	}
 
@@ -1695,7 +1699,7 @@ void menu_display_filterset(void){
 	}
 	// In every other case only check if the current value is higher than last highest (sets cur_y_max only higher and only when needed)
 	else{
-		cur_y_max = filterset_sens->bufRaw[filterset_sens->bufIdx];
+		cur_y_max = (float)filterset_sens->bufRaw[filterset_sens->bufIdx];
 
 		/// Change graph if necessary
 		if(cur_y_max >= gph_filterset.y_max){

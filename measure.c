@@ -91,6 +91,9 @@ void Adc_Measurement_Handler(void){
 	// Calculate current filtered value
 	measure_movAvgFilter(&sensor1);
 
+	//if(sensor1.bufIdx % 20 == 0) printf("raw %d, fil %f, eo %d, \n", s1_buf_0raw[sensor1.bufIdx], s1_buf_1filter[sensor1.bufIdx], sensor1.errorOccured);
+
+
 	/// Convert raw value to adapted value and save it
 	//s1_buf_2conv[sensor1.bufIdx] =  poly_calc_m(s1_buf_0raw[sensor1.bufIdx], &sensor1.fitCoefficients[0], sensor1.fitOrder); //5.2/4096.0*InputBuffer1[sensor1.bufIdx]; //sens->bufFilter[sens->bufIdx] // poly_calc_sensor_i(&sensor1, sensor1.bufRaw);
 	// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.

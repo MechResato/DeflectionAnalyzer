@@ -150,6 +150,8 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 	UINT bw; /* Bytes written */
 	char buff[400];
 
+	printf("\nrecord_writeSpecFile:\n");
+
 	// Try to mount disk
 	record_mountDisk(1);
 
@@ -175,8 +177,6 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 			/// ... write comment and content lines alternating to file
 			// Single loop do-while slope to handle errors clean with break; (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 			do{
-				printf("Writing spec file\n");
-
 				// Write header
 				f_printf(&fil, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->name);
 				printf("Write header\n");
@@ -187,7 +187,7 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				sprintf(buff,"%d\n", sens->fitOrder);
 				res = f_write(&fil, buff, strlen(buff), &bw);
 				if (res != FR_OK || bw <= 0) break;
-				printf("Write fit order\n");
+				printf("Write fit order: %s", buff);
 
 				// Write coefficients header and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
 				sprintf(buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->fitCoefficients[0], sens->fitCoefficients[1], sens->fitCoefficients[2], sens->fitCoefficients[3]);
@@ -196,68 +196,99 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->fitCoefficients[0], *(unsigned long*)&sens->fitCoefficients[1], *(unsigned long*)&sens->fitCoefficients[2], *(unsigned long*)&sens->fitCoefficients[3]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
 				if (res != FR_OK || bw <= 0) break;
-				printf("Write coefficients\n");
+				printf("Write coefficients: %s", buff);
+
+				// Write avg filter order header and value in separate lines
+				f_printf(&fil, "Average filter order:\n");
+				printf("Write average filter order comment\n");
+				sprintf(buff,"%d\n", sens->avgFilterOrder);
+				res = f_write(&fil, buff, strlen(buff), &bw);
+				if (res != FR_OK || bw <= 0) break;
+				printf("Write avg filter order: %s", buff);
+
+				// Write avg filter order header and value in separate lines
+				f_printf(&fil, "Error threshold:\n");
+				printf("Write error threshold comment\n");
+				sprintf(buff,"%d\n", sens->errorThreshold);
+				res = f_write(&fil, buff, strlen(buff), &bw);
+				if (res != FR_OK || bw <= 0) break;
+				printf("Write error threshold: %s", buff);
 
 				// numDataPoints header and value in separate lines
 				f_printf(&fil, "Number of data points:\n");
 				sprintf(buff,"%d\n", dp_size);
 				res = f_write(&fil, buff, strlen(buff),&bw);
+				printf("Write numDataPoints comment\n");
 				if (res != FR_OK || bw <= 0) break;
-				printf("Write numDataPoints\n");
+				printf("Write numDataPoints: %s", buff);
 
-				// DataPoints x-value header and value in separate lines
-				sprintf(buff,"Data points x (%.8f", dp_x[0]);
+				// DataPoints x-value header
+				sprintf(buff,"Data Points x (%.8f", dp_x[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
+				printf("Write Comment %s", buff);
 				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%.8f", dp_x[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
+					printf("%s", buff);
 					if (res != FR_OK || bw <= 0) break;
 				}
-				printf("DataPoints x Comment\n");
 
+				// DataPoints x-values
 				sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_x[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
+				printf("%s", buff);
 				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%08lX", *(unsigned long*)&dp_x[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
+					printf("%s", buff);
 					if (res != FR_OK || bw <= 0) break;
 				}
-				printf("DataPoints x\n");
+				// Add a line break
+				res = f_write(&fil, "\n", 1, &bw);
+				if (res != FR_OK || bw <= 0) break;
 
-				// DataPoints y-value header and value in separate lines
-				sprintf(buff,"\nData points y (%.8f", dp_y[0]);
+				// DataPoints y-value header
+				sprintf(buff,"Data points y (%.8f", dp_y[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
+				printf("\nWrite Comment %s", buff);
 				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%.8f", dp_y[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
+					printf("%s", buff);
 					if (res != FR_OK || bw <= 0) break;
 				}
-				printf("DataPoints y Comment\n");
 
+				// DataPoints y-values
 				sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_y[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
+				printf("%s", buff);
 				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%08lX", *(unsigned long*)&dp_y[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
+					printf("%s", buff);
 					if (res != FR_OK || bw <= 0) break;
 				}
-				printf("DataPoints y\n");
+				// Add a line break
+				res = f_write(&fil, "\n", 1, &bw);
+				if (res != FR_OK || bw <= 0) break;
+
+				printf("\nWrite of spec file successful!\n");
 			} while(false);
 
 			// Close file
 			record_closeFile();
 		}
 		else{
-			printf("Write Spec File not open\n");
+			printf("Write Spec File not open");
 		}
 	}
 
-
-
+	// Add a line break
+	printf("\n");
 }
 
 
@@ -271,6 +302,8 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 	//UINT bw,br; /* Bytes written */
 	char buff[400];
 	TCHAR* res_buf;
+
+	printf("\nrecord_readSpecFile:\n");
 
 	// Try to mount disk
 	record_mountDisk(1);
@@ -291,19 +324,19 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 				/// ... read every second line and write it to its corresponding value
 				// Single loop do-while slope to handle errors clean with break (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 				do{
-					printf("do while\n");
+					//printf("do while\n");
 					res = f_lseek(&fil, 0);
 					if (res != FR_OK) break;
 
 					/// Read fit order
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
 					res_buf = f_gets(buff, 400, &fil);
-					printf("Spec header: '%s'\n", buff);
+					printf("Spec header: %s", buff);
 					res_buf = f_gets(buff, 400, &fil);
 					if (res_buf == 0) break;
 					// Convert read string to unsigned long and write back to sensor struct
 					sens->fitOrder = strtoul(buff, NULL, 10);
-					printf("fitOrder %d: '%s'\n", sens->fitOrder, buff);
+					printf("fitOrder %d: %s", sens->fitOrder, buff);
 
 					/// Read coefficients
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
@@ -313,7 +346,7 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 					// Convert read string to long and write back to sensor struct
 					char *ptr = &buff[0];
 					for (uint8_t i = 0; i < 4; i++) {
-						printf("coefficients %d: '%s' ",i , ptr);
+						printf("coefficients %d: %s ",i , ptr);
 						// Read as hex long
 						unsigned long tmp = strtoul(ptr, &ptr, 16);
 						// Convert to float and write to sensor struct
@@ -324,14 +357,30 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 							ptr++;
 					}
 
-					printf("After coefficients\n");
+					/// Read filter order
+					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
+					res_buf = f_gets(buff, 400, &fil);
+					res_buf = f_gets(buff, 400, &fil);
+					if (res_buf == 0) break;
+					// Convert read string to unsigned long and write back to sensor struct
+					sens->avgFilterOrder = strtoul(buff, NULL, 10);
+					printf("filterOrder %d: %s", sens->avgFilterOrder, buff);
+
+					/// Read error threshold
+					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
+					res_buf = f_gets(buff, 400, &fil);
+					res_buf = f_gets(buff, 400, &fil);
+					if (res_buf == 0) break;
+					// Convert read string to unsigned long and write back to sensor struct
+					sens->errorThreshold = strtoul(buff, NULL, 10);
+					printf("errorThreshold %d: %s", sens->errorThreshold, buff);
 
 					// Read numDataPoints
 					res_buf = f_gets(buff, 400, &fil);
 					res_buf = f_gets(buff, 400, &fil);
-					printf("buff: '%s' res %d\n", buff, (int)res_buf);
+					printf("numDataPoints: %s", buff);
 					if (res_buf != 0 && dp_size != NULL){
-						printf("Reading DPs\n");
+						printf("Reading DPs:\n");
 						*dp_size = (uint8_t)strtoul(buff, NULL, 10);
 						printf("dp_size %d\n", *dp_size);
 
@@ -390,24 +439,27 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 						}
 					}
 					else{
-						printf("No num data points or no pointers given\n");
+						printf("No num data points in file or no parameters called\n");
 					}
 					// Close file
 					record_closeFile();
 				} while(false);
 			}
 			else{
-				printf("Read Spec File not open\n");
+				printf("Read Spec File not open");
 			}
 		}
 
 	}
 	else{
-		printf("File not found: %d\n", res);
+		printf("File not found: %d", res);
 	}
 
+	// Update filter (the order might be changed)
+	measure_movAvgFilter_clean((sensor*)sens);
 
-
+	// Add a line break
+	printf("\n");
 }
 
 
