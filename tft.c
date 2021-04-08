@@ -97,7 +97,7 @@ static const char backspace_char = 46; 				// The code that needs to be used for
 //		128		Keyboard Enter
 
 /////////// Textbox feature
-uint8_t textbox_cursor_pos = 0;
+static uint8_t textbox_cursor_pos = 0;
 
 // Array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode.
 static void (*EVE_cmd_dl__fptr_arr[])(uint32_t) = {EVE_cmd_dl, EVE_cmd_dl_burst};
@@ -107,7 +107,7 @@ static void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, i
 
 
 
-void keypad_open(uint8_t evokedBy, enum keypadTypes type){
+void TFT_keypad_open(uint8_t evokedBy, enum keypadTypes type){
 	/// Open a keypad for the according evoker (control element - e.g. tag of an textbox)
 
 
@@ -123,7 +123,7 @@ void keypad_open(uint8_t evokedBy, enum keypadTypes type){
 	}
 }
 
-void keypad_close(){
+void TFT_keypad_close(){
 	/// Close and reset the keypad
 
 
@@ -175,7 +175,7 @@ void TFT_setMenu(int16_t idx){
 		TFT_UpperBond = menu_objects[idx]->upperBond;
 
 		// Close keypad if necessary
-		keypad_close();
+		TFT_keypad_close();
 
 		// Reset scroll
 		TFT_cur_ScrollV = 0;
@@ -451,8 +451,8 @@ void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	}
 }
 
-void TFT_textbox_touch(textbox* tbx){
-	/// Manage input from keyboard and manipulate text. Used at recurring touch evaluation in TFT_touch().
+uint8_t TFT_textbox_touch(textbox* tbx){
+	/// Manage input from keyboard and manipulate text. Used at recurring touch evaluation in TFT_touch(). Return 1 if OK/Enter is presses, else 0
 	/// Note: Set textbox_cursor_pos initial before entering this the first time. Check TAG ASSIGNMENT above - this refers to the conventions given there!
 	///
 	///  mytag			The tag of the current control element (code only responds for this textbox if keypadEvokedBy is mytag)
@@ -474,6 +474,13 @@ void TFT_textbox_touch(textbox* tbx){
 			if(keypadCurrentKey == 128){
 				// Close/reset keypad
 				TFT_textbox_setStatus(tbx, 0, 0);
+
+				// Mark keypress as handled (keypress is now processed -> wait till the next one comes)
+				keypadKeypressFinished = 0;
+				keypadCurrentKey = 0;
+
+				// Return 1 to mark that enter was presses (user code may do something now)
+				return 1;
 			}
 			else {
 				// Backspace - Delete last character
@@ -502,16 +509,19 @@ void TFT_textbox_touch(textbox* tbx){
 						str_insert(tbx->text, (tbx->text_curlen), (char)keypadCurrentKey, textbox_cursor_pos);
 						textbox_cursor_pos++;
 				}
+
+				// Mark keypress as handled (keypress is now processed -> wait till the next one comes)
+				keypadKeypressFinished = 0;
+				keypadCurrentKey = 0;
 			}
 
-			// Mark keypress as handled (keypress is now processed -> wait till the next one comes)
-			keypadKeypressFinished = 0;
-			keypadCurrentKey = 0;
+
 
 		} // end if - keypadKeypressFinished && keypadCurrentKey in range
 
 	} // end if - keyboard active && evoked by me
 
+	return 0;
 }
 
 
@@ -676,7 +686,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos){
 		tbx->active = 1;
 
 		// Activate Keypad and set cursor to given position
-		keypad_open(tbx->mytag, tbx->keypadType);
+		TFT_keypad_open(tbx->mytag, tbx->keypadType);
 		TFT_textbox_setCursor(tbx, cursorPos);
 	}
 	// If textbox shall be active and already is - update cursor position
@@ -707,7 +717,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos){
 		tbx->active = 0;
 
 		// Deactivate Keypad and set cursor to end
-		keypad_close();
+		TFT_keypad_close();
 	}
 
 
@@ -991,7 +1001,6 @@ void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size,
 	// Determine current position (with scroll value)
 	uint16_t curY = gph->y - TFT_cur_ScrollV;
 
-
 	// Convert coordinate x_step to actual pixels per step
 	uint16_t cx_step_px = gph->width / (gph->cx_max - gph->cx_initial) * cx_step;
 
@@ -1171,7 +1180,7 @@ void TFT_graph_function(graph* gph, float* f_coefficients, uint8_t order, uint16
 
 
 
-void touch_calibrate(uint8_t startCalibrate){
+void TFT_touch_calibrate(uint8_t startCalibrate){
 	/// Sends pre-recorded touch calibration values. Customized for EVE_RiTFT43. Created by Rudolph Riedel, adapted by RS @ MCI 2020/21
 	/// Note: All targets other than EVE_RiTFT43 where deleted -> see original lib
 
@@ -1257,7 +1266,7 @@ uint8_t TFT_init(void) {
 		EVE_memWrite8(REG_PWM_DUTY, 0x30);	/* setup backlight, range is from 0 = off to 0x80 = max */
 
 		// Write prerecorded touchscreen calibration back to display
-		touch_calibrate(0);
+		TFT_touch_calibrate(0);
 
 		// Clear screen, set precision for VERTEX2F to 1 pixel and show DL for the first time
 		EVE_start_cmd_burst(); /* start writing to the cmd-fifo as one stream of bytes, only sending the address once */

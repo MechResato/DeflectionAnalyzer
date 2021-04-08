@@ -26,7 +26,6 @@
 volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
 
 
-
 ///*  MEASUREMENTs */
 volatile uint32_t measurementCounter = 0; // Count of executed measurements
 

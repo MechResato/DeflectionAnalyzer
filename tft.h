@@ -80,8 +80,8 @@ extern int32_t swipeDistance_Y;
 // Keypad feature
 enum keypadTypes{Standard=0, Numeric, Filename};
 typedef enum keypadTypes keypadTypes;
-void keypad_open(uint8_t evokedBy, enum keypadTypes type);
-void keypad_close();
+void TFT_keypad_open(uint8_t evokedBy, enum keypadTypes type);
+void TFT_keypad_close();
 
 
 // Label
@@ -147,7 +147,7 @@ typedef struct {
 #define TEXTBOX_PAD_V 8		// Offset of the text from upper border in pixel.
 #define TEXTBOX_PAD_H 7		// Offset of the text from left border in pixel.
 void TFT_textbox_static(uint8_t burst, textbox* tbx);
-void TFT_textbox_touch(textbox* tbx);
+uint8_t TFT_textbox_touch(textbox* tbx);
 void TFT_textbox_display(textbox* tbx);
 void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos);
 

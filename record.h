@@ -21,5 +21,7 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 void record_buffer(void);
 
 
+int8_t record_start();
+void record_line();
 
 #endif /* RECORD_H_ */

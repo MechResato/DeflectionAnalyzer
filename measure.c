@@ -21,7 +21,7 @@ void Adc_Measurement_Handler(void){
 	/// Uses global/extern variables: InputType, tft_tick, sensor1, s1_buf_...
 
 	// Timing measurement pin high
-	DIGITAL_IO_SetOutputHigh(&IO_6_2);
+	//DIGITAL_IO_SetOutputHigh(&IO_6_2);
 
 	// Increment current Buffer index and set back to 0 if greater than size of array
 	sensor1.bufIdx++;
@@ -112,7 +112,7 @@ void Adc_Measurement_Handler(void){
 	measurementCounter++;
 
 	// Timing measurement pin low
-	DIGITAL_IO_SetOutputLow(&IO_6_2);
+	//DIGITAL_IO_SetOutputLow(&IO_6_2);
 }
 
 // Measurements at non leap-over cycle!

@@ -147,7 +147,7 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 	/// TODO: Check write results and written bytes for consistency
 
 	FRESULT res = 0; /* API result code */
-	UINT bw,br; /* Bytes written */
+	UINT bw; /* Bytes written */
 	char buff[400];
 
 	// Try to mount disk
@@ -186,7 +186,7 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				printf("Write fit order comment\n");
 				sprintf(buff,"%d\n", sens->fitOrder);
 				res = f_write(&fil, buff, strlen(buff), &bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				printf("Write fit order\n");
 
 				// Write coefficients header and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
@@ -195,55 +195,55 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				printf("Write coefficients comment\n");
 				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->fitCoefficients[0], *(unsigned long*)&sens->fitCoefficients[1], *(unsigned long*)&sens->fitCoefficients[2], *(unsigned long*)&sens->fitCoefficients[3]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				printf("Write coefficients\n");
 
 				// numDataPoints header and value in separate lines
 				f_printf(&fil, "Number of data points:\n");
 				sprintf(buff,"%d\n", dp_size);
 				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				printf("Write numDataPoints\n");
 
 				// DataPoints x-value header and value in separate lines
 				sprintf(buff,"Data points x (%.8f", dp_x[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%.8f", dp_x[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
-					if (res != FR_OK) break;
+					if (res != FR_OK || bw <= 0) break;
 				}
 				printf("DataPoints x Comment\n");
 
 				sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_x[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%08lX", *(unsigned long*)&dp_x[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
-					if (res != FR_OK) break;
+					if (res != FR_OK || bw <= 0) break;
 				}
 				printf("DataPoints x\n");
 
 				// DataPoints y-value header and value in separate lines
 				sprintf(buff,"\nData points y (%.8f", dp_y[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%.8f", dp_y[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
-					if (res != FR_OK) break;
+					if (res != FR_OK || bw <= 0) break;
 				}
 				printf("DataPoints y Comment\n");
 
 				sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_y[0]);
 				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK) break;
+				if (res != FR_OK || bw <= 0) break;
 				for (uint8_t i = 1; i < dp_size; i++){
 					sprintf(buff,",%08lX", *(unsigned long*)&dp_y[i]);
 					res = f_write(&fil, buff, strlen(buff),&bw);
-					if (res != FR_OK) break;
+					if (res != FR_OK || bw <= 0) break;
 				}
 				printf("DataPoints y\n");
 			} while(false);
@@ -257,10 +257,6 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 	}
 
 
-	br = 0;
-	bw = 0;
-	br = bw;
-	bw = br;
 
 }
 
@@ -342,8 +338,8 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 
 						// Allocate Memory for data points
 						if(*dp_size >= 1){
-							*dp_y = (float*)malloc(*dp_size*sizeof(float));
-							*dp_x = (float*)malloc(*dp_size*sizeof(float));
+							*dp_y = (float*)malloc((*dp_size+1)*sizeof(float));
+							*dp_x = (float*)malloc((*dp_size+1)*sizeof(float));
 							char *ptr = &buff[0];
 
 							// Check for allocation errors
@@ -359,7 +355,7 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 								buff[2] = '\0';
 							}
 							ptr = &buff[0];
-							for (uint8_t i = 0; i < *dp_size; i++) {
+							for (uint8_t i = 0; i < (*dp_size); i++) {
 								printf("y %d: ",i );
 								// Read as hex long
 								unsigned long tmp = strtoul(ptr, &ptr, 16);
@@ -380,7 +376,7 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 								buff[2] = '\0';
 							}
 							ptr = &buff[0];
-							for (uint8_t i = 0; i < *dp_size; i++) {
+							for (uint8_t i = 0; i < (*dp_size); i++) {
 								printf("x %d: ",i );
 								// Read as hex long
 								unsigned long tmp = strtoul(ptr, &ptr, 16);
@@ -417,6 +413,67 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 
 
 
+int8_t record_start(){
+	///
+	///
+
+
+	//FRESULT res = 0; /* API result code */
+	//UINT bw; /* Bytes written */
+	//char buff[400];
+
+	// Try to mount disk
+	record_mountDisk(1);
+
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	if(sdState == sdMounted){
+		/// Check if file already exists - if so rename it
+		// Get file-info to check if it exists
+		//res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
+		//if(res == FR_OK){
+		//	sprintf(buff,"s%d_backup.spec", sens->index);
+		//	f_rename((char*)&sens->fitFilename[0], buff);
+		//}
+		//else{
+		//	printf("File not found: %d\n", res);
+		//}
+
+		// Open/Create File
+		record_openFile("output.txt");
+
+		if(sdState == sdFileOpen){
+			printf("record started\n");
+			sdState = sdLogOpen;
+			return 1;
+		}
+
+	}
+
+	printf("record start failed\n");
+	return 0;
+}
+
+
+void record_line(){
+	///
+	///
+
+
+	FRESULT res = 0; /* API result code */
+	UINT bw; /* Bytes written */
+	char buff[512] = "1.14";
+
+	//float testF = 1.14;
+	//char* testC = "1.14";
+
+	//sprintf(buff,"%.2f", testF);
+	res = f_write(&fil, buff, 4, &bw);
+	if (res != FR_OK){
+		sdState = sdMounted;
+		printf("record line failed\n");
+	}
+
+}
 
 
 void record_buffer(void)

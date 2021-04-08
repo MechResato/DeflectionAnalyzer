@@ -31,6 +31,7 @@ volatile uint32_t _msCounter;
 volatile uint8_t tft_tick;
 volatile uint32_t measurementCounter;
 
+
 /*  MEASUREMENTs */
 
 // Sensor data definition
@@ -67,7 +68,7 @@ extern float_buffer_t s1_buf_2conv[];
 volatile uint8_t inputType;
 
 // SD-Card handling
-enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError};
+enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError, sdLogOpen};
 typedef enum sdStates sdStates;
 sdStates sdState;
 

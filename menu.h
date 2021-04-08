@@ -28,9 +28,9 @@
 
 
 // TFT_MENU_SIZE 	   Amount of overall menus. Must be changed if menus are added or removed
-#define TFT_MENU_SIZE 4
+#define TFT_MENU_SIZE 6
 // TFT_MAIN_MENU_SIZE  States to where the main menus (accessible via swipe an background) are listed. All higher menus are considered sub-menus (control on how to get there is on menu.c)
-#define TFT_MAIN_MENU_SIZE 3
+#define TFT_MAIN_MENU_SIZE 4
 void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
@@ -40,18 +40,24 @@ void TFT_display_get_values(void);
 
 void menu_display_static_0monitor(void);
 void menu_display_static_1dash(void);
-void menu_display_static_2setup(void);
-void menu_display_static_3curveset(void);
+void menu_display_static_2setup1(void);
+void menu_display_static_3setup2(void);
+void menu_display_static_curveset(void);
+void menu_display_static_filterset(void);
 
 void menu_display_0monitor(void);
 void menu_display_1dash(void);
-void menu_display_2setup(void);
-void menu_display_3curveset(void);
+void menu_display_2setup1(void);
+void menu_display_3setup2(void);
+void menu_display_curveset(void);
+void menu_display_filterset(void);
 
 void menu_touch_0monitor(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
 void menu_touch_1dash(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
-void menu_touch_2setup(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
-void menu_touch_3curveset(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_2setup1(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_3setup2(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_curveset(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
+void menu_touch_filterset(uint8_t, uint8_t*, uint8_t, uint8_t*, int32_t*, int32_t*);
 
 
 

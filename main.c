@@ -82,6 +82,16 @@ int main(void)
 				TFT_display(); // ~9000us at Monitor, 800us at Dashboard(empty), 1440us at Setup
 			}
 
+
+			if(sdState == sdLogOpen){
+				// Timing measurement pin high
+				DIGITAL_IO_SetOutputHigh(&IO_6_2);
+
+				record_line();
+
+				// Timing measurement pin high
+				DIGITAL_IO_SetOutputLow(&IO_6_2);
+			}
 		}
 	}
 
