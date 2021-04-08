@@ -70,13 +70,13 @@ void Adc_Measurement_Handler(void){
 
 		// Calculate last index and check for over leap
 		int32_t pre1Idx = sensor1.bufIdx - 1;
-		if(pre1Idx < 0) pre1Idx += sensor1.bufMaxIdx;
+		if(pre1Idx < 0) pre1Idx += sensor1.bufMaxIdx + 1;
 
 		// If this is the the first error after an valid value, calculate/store last OK value and slope for linear interpolation
 		if(sensor1.errorOccured == 1){
 			// Calculate second to last index and check for over leap
 			int32_t pre2Idx = sensor1.bufIdx - 2;
-			if(pre2Idx < 0) pre2Idx += sensor1.bufMaxIdx;
+			if(pre2Idx < 0) pre2Idx += sensor1.bufMaxIdx + 1;
 
 			// Store last valid value and slope, to be used till the next valid value comes
 			sensor1.errorLastValidSlope = s1_buf_1filter[pre1Idx] - s1_buf_1filter[pre2Idx];
@@ -139,7 +139,7 @@ static inline void measure_movAvgFilter(volatile sensor* sens){
 
 	// Get index of oldest element, which shall be removed (current index minus filter order with roll-over check)
 	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
-	if(oldIdx < 0) oldIdx += sens->bufMaxIdx;
+	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;
 
 	// Subtract oldest element and add newest to sum
 	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];

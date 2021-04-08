@@ -51,7 +51,7 @@ extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t*
 extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 // TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
 // TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
-static int8_t TFT_cur_MenuIdx = 0; // Index of currently used menu (TFT_display,TFT_touch).
+static int8_t TFT_cur_MenuIdx = 2; // Index of currently used menu (TFT_display, TFT_touch, ...).
 static int8_t TFT_last_MenuIdx = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_MenuIdx the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 static uint32_t keypadControlKeyBgColor = MAIN_BTNCOLOR;
 static uint32_t keypadControlKeyFgColor = MAIN_BTNCTSCOLOR;

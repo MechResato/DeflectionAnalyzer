@@ -19,11 +19,11 @@
 #include "menu.h"
 
 
+
 /////////// Menu function pointers - At the end of the menu control functions (TFT_display_static, TFT_display and TFT_touch inside tft.h) the function referenced to this pointer is executed
 // Every new menu needs to be defined in menu.h, declared at the end of this file and registered here in this function pointer array!
 // TFT_MENU_SIZE 	   is declared in menu.h and must be changed if menus are added or removed
 // TFT_MAIN_MENU_SIZE  is declared in menu.h. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
-int8_t TFT_cur_Menu = 0; // Index of currently used menu (TFT_display,TFT_touch). Externally declared in menu.c because this is the index used for above function pointers and submenus can to be used by menu.c too.
 void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 		&menu_display_0monitor,
 		&menu_display_1dash,
@@ -278,9 +278,9 @@ uint8_t str_filename_curLength = 8;
 textbox tbx_filename = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND - TEXTBOX_PAD_V + FONT_COMP*1,
-	.width = 190,
-	.labelOffsetX = 60,
-	.labelText = "Filename",
+	.width = EVE_HSIZE - M_COL_2 - 65 - 25,
+	.labelOffsetX = 65,
+	.labelText = "Filename:",
 	.mytag = TBX_FILENAME_TAG,
 	.text = str_filename,
 	.text_maxlen = STR_FILENAME_MAXLEN,
@@ -290,9 +290,9 @@ textbox tbx_filename = {
 	.numSrc.srcType = srcTypeNone
 };
 
-label lbl_linearisation = {
+label lbl_calibrate = {
 		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
-		.font = 27,		.options = 0,		.text = "Curve fit",
+		.font = 27,		.options = 0,		.text = "Calibrate",
 		.ignoreScroll = 0
 };
 
@@ -301,7 +301,7 @@ label lbl_linearisation = {
 textbox tbx_sensor1 = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
-	.width = 120,
+	.width = EVE_HSIZE - (M_COL_2) - 130 - 25,
 	.labelOffsetX = 130,
 	.labelText = "Sensor1:   Spec File",
 	.mytag = TBX_SENSOR1_TAG,
@@ -312,11 +312,32 @@ textbox tbx_sensor1 = {
 	.active = 0,
 	.numSrc.srcType = srcTypeNone
 };
-#define BTN_LINSENSOR1_TAG 22
-control btn_linSensor1 = {
-	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
+
+label lbl_curveset_S1 = {
+		.x = 205,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) + FONT_COMP*1,
+		.font = 26,		.options = 0,		.text = "Curve fit:",
+		.ignoreScroll = 0
+};
+#define BTN_CURVESET_S1_TAG 22
+control btn_curveset_S1 = {
+	.x = 270,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 55,		.h0 = 31,
-	.mytag = BTN_LINSENSOR1_TAG,	.font = 27,	.options = 0, .state = 0,
+	.mytag = BTN_CURVESET_S1_TAG,	.font = 27,	.options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+
+label lbl_filterset_S1 = {
+		.x = 355,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) + FONT_COMP*1,
+		.font = 26,		.options = 0,		.text = "Filter:",
+		.ignoreScroll = 0
+};
+#define BTN_FILTERSET_S1_TAG 23
+control btn_filterset_S1 = {
+	.x = EVE_HSIZE - 25 - 55,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 31,
+	.mytag = BTN_FILTERSET_S1_TAG,	.font = 27,	.options = 0, .state = 0,
 	.text = "Set",
 	.controlType = Button,
 	.ignoreScroll = 0
@@ -325,10 +346,10 @@ control btn_linSensor1 = {
 #define STR_S2_LINSPEC_MAXLEN 20
 char str_s2_linspec[STR_S2_LINSPEC_MAXLEN] = "s2.lin";
 uint8_t str_s2_linspec_curLength = 6;
-#define TBX_SENSOR2_TAG 23
+#define TBX_SENSOR2_TAG 24
 textbox tbx_sensor2 = {
 	.x = M_COL_2,
-	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = 120,
 	.labelOffsetX = 130,
 	.labelText = "Sensor2:   Spec File",
@@ -340,9 +361,9 @@ textbox tbx_sensor2 = {
 	.active = 0,
 	.numSrc.srcType = srcTypeNone
 };
-#define BTN_LINSENSOR2_TAG 24
+#define BTN_LINSENSOR2_TAG 25
 control btn_linSensor2 = {
-	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 55,		.h0 = 31,
 	.mytag = BTN_LINSENSOR2_TAG,	.font = 27,	.options = 0, .state = 0,
 	.text = "Set",
@@ -359,14 +380,14 @@ control btn_linSensor2 = {
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 label lbl_backlight = {
-		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3),
+		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0),
 		.font = 27,		.options = 0,		.text = "Backlight",
 		.ignoreScroll = 0
 };
 
 #define BTN_DIMMER_TAG 10
 control btn_dimmmer = {
-	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 80,		.h0 = 30,
 	.mytag = BTN_DIMMER_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Dimmer",
@@ -376,7 +397,7 @@ control btn_dimmmer = {
 
 
 label lbl_RTC = {
-		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4),
+		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
 		.font = 27,		.options = 0,		.text = "RTC",
 		.ignoreScroll = 0
 };
@@ -388,7 +409,7 @@ char str_hour[STR_HOUR_MAXLEN] = "12:13:26 24.03.21";
 uint8_t str_hour_curLength = 17;
 #define TBX_HOUR_TAG 25
 textbox tbx_hour = {
-	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = 120,
 	.labelOffsetX = 130,
 	.labelText = "HH:mm:ss dd.MM.yy",
@@ -577,7 +598,8 @@ void filterset_prepare(volatile sensor* sens);
 void filterset_setEditMode(uint8_t editMode);
 
 // Pointer to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function or storing of the fit values
-sensor*  filterset_sens;
+sensor*  filterset_sens = NULL;
+uint16_t filter_errorThreshold = 4095;
 
 label lbl_filterset = {
 		.x = 20,		.y = 9,
@@ -604,28 +626,28 @@ graph gph_filterset = {
 };
 
 #define BTN_FILTER_DOWN_TAG 11
-control btn_filter_up = {
-	.x = (M_COL_1/2) + 75 + 36 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.w0 = 25				  ,	.h0 = 30,
+control btn_filter_down = {
+	.x = M_COL_1 + 80 + 40 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 30				  ,	.h0 = 30,
 	.mytag = BTN_DP_LAST_TAG,	.font = 27, .options = 0, .state = 0,
-	.text = "<",
+	.text = "-",
 	.controlType = Button,
 	.ignoreScroll = 0
 };
 #define BTN_FILTER_UP_TAG 12
-control btn_filter_down = {
-	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.w0 = 25						   , 	.h0 = 30,
+control btn_filter_up = {
+	.x = M_COL_1 + 80 + 40 + 1 + 30 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 30						   , 	.h0 = 30,
 	.mytag = BTN_DP_NEXT_TAG,	.font = 27, .options = 0, .state = 0,
-	.text = ">",
+	.text = "+",
 	.controlType = Button,
 	.ignoreScroll = 0
 };
-#define BTN_DP_SETCHANGE_TAG 13
+#define BTN_FILTER_SETCHANGE_TAG 13
 control btn_filter_setchange = {
-	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8 + 50 + 60 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.w0 = 50, 	.h0 = 30,
-	.mytag = BTN_DP_SETCHANGE_TAG,	.font = 26, .options = 0, .state = 0,
+	.x = EVE_HSIZE - 55 - 25,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 55, 	.h0 = 30,
+	.mytag = BTN_FILTER_SETCHANGE_TAG,	.font = 26, .options = 0, .state = 0,
 	.text = "Change",
 	.controlType = Button,
 	.ignoreScroll = 0
@@ -633,19 +655,19 @@ control btn_filter_setchange = {
 
 
 /// Textboxes
-#define STR_FILTERORDER_MAXLEN 3
-char str_filter_order[STR_FILTERORDER_MAXLEN] = "0";
+#define STR_FILTER_ORDER_MAXLEN 3
+char str_filter_order[STR_FILTER_ORDER_MAXLEN] = "0";
 uint8_t str_filter_order_curLength = 1;
-#define TBX_DP_TAG 24
+#define TBX_FILTER_ORDER_TAG 24
 textbox tbx_filter_order = {
-	.x = (M_COL_1/2),
+	.x = M_COL_1,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.width = 36,
-	.labelOffsetX = 75,
+	.width = 40,
+	.labelOffsetX = 80,
 	.labelText = "Filter Order:",
-	.mytag = 0, //TBX_DP_TAG, // Todo: Made read-only because there needs to be an border check before this is useful
-	.text = str_dp,
-	.text_maxlen = STR_FILTERORDER_MAXLEN,
+	.mytag = 0,
+	.text = str_filter_order,
+	.text_maxlen = STR_FILTER_ORDER_MAXLEN,
 	.text_curlen = &str_filter_order_curLength,
 	.keypadType = Numeric,
 	.active = 0,
@@ -654,24 +676,24 @@ textbox tbx_filter_order = {
 	.numSrc.srcOffset = NULL,
 	.numSrcFormat = "%d"
 };
-#define STR_ERRORTHRESHOLD_MAXLEN 3
-char str_error_threshold[STR_ERRORTHRESHOLD_MAXLEN] = "0";
-uint8_t str_error_threshold_curLength = 1;
-#define TBX_DP_TAG 24
+#define STR_ERROR_THRESHOLD_MAXLEN 5
+char str_error_threshold[STR_ERROR_THRESHOLD_MAXLEN] = "4095";
+uint8_t str_error_threshold_curLength = 4;
+#define TBX_FILTER_ERROR_THRESHOLD_TAG 25
 textbox tbx_error_threshold_order = {
-	.x = (M_COL_1/2),
+	.x = EVE_HSIZE - 55 - 25 - 55 - 105 - 5,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.width = 36,
-	.labelOffsetX = 75,
+	.width = 55,
+	.labelOffsetX = 105,
 	.labelText = "Error Threshold:",
-	.mytag = 0, //TBX_DP_TAG, // Todo: Made read-only because there needs to be an border check before this is useful
-	.text = str_dp,
-	.text_maxlen = STR_ERRORTHRESHOLD_MAXLEN,
+	.mytag = 0,
+	.text = str_error_threshold,
+	.text_maxlen = STR_ERROR_THRESHOLD_MAXLEN,
 	.text_curlen = &str_error_threshold_curLength,
 	.keypadType = Numeric,
 	.active = 0,
 	.numSrc.srcType = srcTypeInt,
-	.numSrc.intSrc = NULL,
+	.numSrc.intSrc = &filter_errorThreshold,
 	.numSrc.srcOffset = NULL,
 	.numSrcFormat = "%d"
 };
@@ -948,8 +970,11 @@ void menu_display_static_2setup1(void){
 	TFT_textbox_static(1, &tbx_filename);
 
 	/// Sensor curve fit section
-	TFT_label(1, &lbl_linearisation);
+	TFT_label(1, &lbl_calibrate);
 	TFT_textbox_static(1, &tbx_sensor1);
+	TFT_label(1, &lbl_curveset);
+	TFT_label(1, &lbl_curveset_S1);
+	TFT_label(1, &lbl_filterset_S1);
 	TFT_textbox_static(1, &tbx_sensor2);
 }
 void menu_display_2setup1(void){
@@ -959,7 +984,8 @@ void menu_display_2setup1(void){
 
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	TFT_control(&btn_linSensor1);
+	TFT_control(&btn_curveset_S1);
+	TFT_control(&btn_filterset_S1);
 	TFT_control(&btn_linSensor2);
 
 	// Set Color
@@ -998,9 +1024,9 @@ void menu_touch_2setup1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				TFT_textbox_setStatus(&tbx_sensor1, 1, *(tbx_sensor1.text_curlen));
 			}
 			break;
-		case BTN_LINSENSOR1_TAG:
+		case BTN_CURVESET_S1_TAG:
 			if(*toggle_lock == 0) {
-				printf("Button LinS1\n");
+				printf("Button CurveFit S1\n");
 				*toggle_lock = 42;
 
 				// Prepare linSet menu for current sensor
@@ -1008,6 +1034,18 @@ void menu_touch_2setup1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 
 				// Change menu
 				TFT_setMenu(menu_curveset.index);
+			}
+			break;
+		case BTN_FILTERSET_S1_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button FilterSet S1\n");
+				*toggle_lock = 42;
+
+				// Prepare linSet menu for current sensor
+				filterset_prepare(&sensor1);
+
+				// Change menu
+				TFT_setMenu(menu_filterset.index);
 			}
 			break;
 		case BTN_LINSENSOR2_TAG:
@@ -1545,18 +1583,9 @@ void filterset_prepare(volatile sensor* sens){
 
 	// Store pointer to referenced Sensor buffer (ignore volatile here)
 	filterset_sens = (sensor*)sens;
-	// Store current value of average filter order
-	//filterset_previousAvgFilterOrder = sens->avgFilterOrder;
 
-	// Set avg filter order higher. This way its easier to get precise measurements. The user should be able to keep the distance for minimum 1 second, therefore filter over 1 second
-	uint16_t newFilOrder = (uint16_t)ceil(1000.0 / MEASUREMENT_INTERVAL);
-	if(newFilOrder < sens->bufMaxIdx)
-		filterset_sens->avgFilterOrder = newFilOrder;
-	else
-		filterset_sens->avgFilterOrder = sens->bufMaxIdx-1;
-	printf("Using Avg filter order %d during filterset!\n", sens->avgFilterOrder);
-	// Do a clean filter value calculation to sync it to the new filter order
-	measure_movAvgFilter_clean(filterset_sens);
+	// Do a clean filter value calculation to sync it
+	//measure_movAvgFilter_clean(filterset_sens);
 
 	// Check if spec file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
@@ -1579,73 +1608,46 @@ void filterset_prepare(volatile sensor* sens){
 
 	}
 	else{
-		// Set Function button text accordingly
-		switch (sens->fitOrder) {
-			case 1:
-				btn_order.text = "Linear";
-				break;
-			case 2:
-				btn_order.text = "Square";
-				break;
-			case 3:
-				btn_order.text = "Cubic";
-				break;
-		}
+
 	}
 
 	// Check for allocation errors
 	if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
 		printf("Memory malloc failed!\n");
 
+	// Link filter order textbox source to current sensor filter order
+	tbx_filter_order.numSrc.intSrc = &filterset_sens->avgFilterOrder;
+
 	// Link actual value array to corresponding textbox
 	//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
-	tbx_act.numSrc.srcOffset = &DP_cur;
+	//tbx_act.numSrc.srcOffset = &DP_cur;
 
 	// Link actual value array to corresponding textbox
 	//tbx_nom.numSrc.floatSrc = &tbx_nom.numSrc.floatSrc[0];
-	tbx_nom.numSrc.srcOffset = &DP_cur;
+	//tbx_nom.numSrc.srcOffset = &DP_cur;
 
 	// Determine fitted polynomial for the first time
-	fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+	//fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
 }
 void filterset_setEditMode(uint8_t editMode){
-	/// Changes the GUI to data point editing mode and back (disable/enable of textboxes and buttons)
+	/// Changes the GUI to error threshold editing mode and back (disable/enable of textboxes and buttons)
 
 
-	// Set to edit mode - activate textbox for actual value and deactivate data point selection
+	// Set to edit mode - activate textbox for error threshold
 	if(editMode == 1){
 		// Change button appearance and activate textbox
-		btn_setchange.state = EVE_OPT_FLAT;
-		btn_setchange.text = "Save";
-		tbx_act.mytag = TBX_ACT_TAG;
+		btn_filter_setchange.state = EVE_OPT_FLAT;
+		btn_filter_setchange.text = "Save";
+		tbx_error_threshold_order.mytag = TBX_FILTER_ERROR_THRESHOLD_TAG;
 
-		// Deactivate data point selector buttons and textbox (read-only)
-		btn_db_last.mytag = 0;
-		btn_db_next.mytag = 0;
 	}
-	// Set to view mode - deactivate textbox for actual value and activate data point selection again
+	// Set to view mode - deactivate textbox for error threshold
 	else{
 		// Change button appearance and deactivate textbox
-		btn_setchange.state = 0;
-		btn_setchange.text = "Change";
-		tbx_act.mytag = 0;
+		btn_filter_setchange.state = 0;
+		btn_filter_setchange.text = "Change";
+		tbx_error_threshold_order.mytag = 0;
 
-		// Activate data point selector buttons and textbox (read/write)
-		btn_db_last.mytag = BTN_DP_LAST_TAG;
-		btn_db_next.mytag = BTN_DP_NEXT_TAG;
-
-		/// Set graph boundaries
-		// Get biggest y-value
-		float cur_y_max = 0;
-		for(uint8_t i = 0; i < DP_size; i++)
-			if(tbx_act.numSrc.floatSrc[i] > cur_y_max)
-				cur_y_max = tbx_act.numSrc.floatSrc[i];
-
-		// Set biggest y-value as graph
-		gph_filterset.y_max = gph_filterset.amp_max = cur_y_max;
-
-		// Refresh static part of display (e.g. to show new textbox background when one changes from read-only to read-write)
-		//TFT_setMenu(-1);
 	}
 
 }
@@ -1661,41 +1663,58 @@ void menu_display_static_filterset(void){
 	/// Write the static part of the Graph to the display list
 	TFT_graph_static(1, &gph_filterset);
 
-	TFT_textbox_static(1, &tbx_dp);
-	TFT_textbox_static(1, &tbx_nom);
-	TFT_textbox_static(1, &tbx_act);
+	TFT_textbox_static(1, &tbx_filter_order);
+	TFT_textbox_static(1, &tbx_error_threshold_order);
 }
 void menu_display_filterset(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
 	/// This menu ...
 
 
-	// If current data point is in edit mode
-	if(tbx_act.mytag != 0){
-		// Save current nominal value
-		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)filterset_sens->bufFilter[filterset_sens->bufIdx]; //(float)filterset_sens->bufRaw[filterset_sens->bufIdx];//
-
-		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
-		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
-
-		// Determine fitted polynomial
-		fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+	// If error threshold is in edit mode show current sensor value
+	if(tbx_error_threshold_order.mytag != 0 && tbx_error_threshold_order.active == 0 ){
+		// Save current senosr value
+		*tbx_error_threshold_order.numSrc.intSrc = (int_buffer_t)filterset_sens->bufFilter[filterset_sens->bufIdx];
 	}
 
-	// Change "right" button to "new" if on the edge of points
-	if(DP_cur >= DP_size-1)
-		btn_db_next.text = "+";
-	else
-		btn_db_next.text = ">";
+	//// Get highest y value and set graph axis boundaries
+	/// Get biggest y-value
+	float cur_y_max = 0;
+	// On every leap-over of the buffer reevaluate all values (sets the cur_y_max bigger or lower!)
+	if(filterset_sens->bufIdx == 0){
+		for(int16_t i = filterset_sens->bufMaxIdx; i >= 0; i--)
+			if(filterset_sens->bufRaw[i] > cur_y_max)
+				cur_y_max = (float)filterset_sens->bufRaw[i];
+
+
+		// Set axis bounds
+		gph_filterset.y_max = gph_filterset.amp_max = cur_y_max;
+		// Refresh static part of display (graph static part changed)
+		TFT_setMenu(-1);
+
+	}
+	// In every other case only check if the current value is higher than last highest (sets cur_y_max only higher and only when needed)
+	else{
+		cur_y_max = filterset_sens->bufRaw[filterset_sens->bufIdx];
+
+		/// Change graph if necessary
+		if(cur_y_max >= gph_filterset.y_max){
+			// Set axis bounds
+			gph_filterset.y_max = gph_filterset.amp_max = cur_y_max;
+			// Refresh static part of display (graph static part changed)
+			TFT_setMenu(-1);
+		}
+	}
+
+
+
 
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
 	// Current data points and trace
-	TFT_graph_XYdata(&gph_filterset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size, (int16_t*)&DP_cur, graphLine, GRAPH_DATA2COLORLIGHT);
-	TFT_graph_XYdata(&gph_filterset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size, (int16_t*)&DP_cur, graphPoint, GRAPH_DATA2COLOR);
-	// Fitted curve
-	TFT_graph_function(&gph_filterset, &coefficients[0], fit_order, 2, graphLine, GRAPH_DATA1COLOR);
+	TFT_graph_pixeldata_i(&gph_filterset, filterset_sens->bufRaw, filterset_sens->bufMaxIdx, &filterset_sens->bufIdx, GRAPH_DATA2COLORLIGHT);
+	TFT_graph_pixeldata_f(&gph_filterset, filterset_sens->bufFilter, filterset_sens->bufMaxIdx, &filterset_sens->bufIdx, GRAPH_DATA2COLOR);
 
 	/// Draw Banner and divider line on top
 	TFT_header(1, &menu_filterset);
@@ -1704,19 +1723,16 @@ void menu_display_filterset(void){
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 	// Buttons
 	TFT_control(&btn_back); //	 - return from submenu
-	TFT_control(&btn_order); //	 - change curve fit function
-	TFT_control(&btn_setchange);
-	TFT_control(&btn_db_last);
-	TFT_control(&btn_db_next);
+	TFT_control(&btn_filter_down); //	 - change curve fit function
+	TFT_control(&btn_filter_up);
+	TFT_control(&btn_filter_setchange);
 
 	// Data point controls
-	TFT_textbox_display(&tbx_dp);
-	TFT_textbox_display(&tbx_nom);
-	TFT_textbox_display(&tbx_act);
+	TFT_textbox_display(&tbx_error_threshold_order);
+	TFT_textbox_display(&tbx_filter_order);
 
 	// Header labels
 	TFT_label(1, &lbl_filterset);
-	TFT_label(1, &lbl_fitorder);
 
 }
 void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -1739,12 +1755,8 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				// Do a clean filter value calculation to sync it to the new filter order
 				measure_movAvgFilter_clean(filterset_sens);
 
-				// Store current polynomial fit to be used
-				for (uint8_t i = 0; i < 4; i++) {
-					filterset_sens->fitCoefficients[i] = coefficients[i];
-					printf("c%i = %.10f\n",i, coefficients[i]);
-				}
-				filterset_sens->fitOrder = fit_order;
+				// Store current error threshold to be used (filter order is changed direct)
+				filterset_sens->errorThreshold = *tbx_error_threshold_order.numSrc.intSrc;
 
 				// Write Spec file
 				record_writeSpecFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
@@ -1757,129 +1769,65 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				TFT_setMenu(menu_2setup1.index);
 			}
 			break;
-		case BTN_ORDER_TAG:
+		case BTN_FILTER_DOWN_TAG:
 			if(*toggle_lock == 0) {
-				printf("Button order\n");
+				printf("Button down\n");
 				*toggle_lock = 42;
 
-				// Change polynomial order
-				fit_order++;
-				if (fit_order > 3)
-					fit_order = 1;
+				// If the filter isn't at the limits...
+				if(filterset_sens->avgFilterOrder > 0){
+					// Decrease current order
+					filterset_sens->avgFilterOrder--;
 
-				// Change button name accordingly
-				switch (fit_order) {
-					case 1:
-						btn_order.text = "Linear";
-						break;
-					case 2:
-						btn_order.text = "Square";
-						break;
-					case 3:
-						btn_order.text = "Cubic";
-						break;
-					default:
-						break;
-				}
-
-				// TODO: Warn user if there are to less points for selected function
-				// ...
-
-				// Determine fitted polynomial after order change
-				fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
-			}
-			break;
-		case TBX_DP_TAG:
-			if(*toggle_lock == 0) {
-				printf("Textbox actual\n");
-				*toggle_lock = 42;
-
-				// Activate Keypad and set cursor to end
-				TFT_textbox_setStatus(&tbx_dp, 1, -1);
-			}
-			break;
-		case TBX_ACT_TAG:
-			if(*toggle_lock == 0) {
-				printf("Textbox actual\n");
-				*toggle_lock = 42;
-
-				// Activate Keypad and set cursor to end
-				TFT_textbox_setStatus(&tbx_act, 1,-1);
-			}
-			break;
-		case BTN_DP_LAST_TAG:
-			if(*toggle_lock == 0) {
-				printf("Button last\n");
-				*toggle_lock = 42;
-
-				// If the data point isn't at the limits - change current index
-				if(DP_cur > 0){
-					// Decrease currently selected data point index
-					DP_cur--;
+					// Do a clean filter value calculation to sync it
+					measure_movAvgFilter_clean(filterset_sens);
 				}
 			}
 			break;
-		case BTN_DP_NEXT_TAG:
+		case BTN_FILTER_UP_TAG:
 			if(*toggle_lock == 0) {
-				printf("Button last\n");
+				printf("Button up\n");
 				*toggle_lock = 42;
 
-				// if the data point isn't at the limits - change current index, set text of DP-textbox and set text of Actual-textbox
-				if(DP_cur < 254){
-					// Decrease currently selected data point index
-					DP_cur++;
+				// If the filter isn't at the limits...
+				if(filterset_sens->avgFilterOrder < 254){
+					// Increase current order
+					filterset_sens->avgFilterOrder++;
 
-					// Add a new data-point if the border of the array is reached
-					if(DP_cur > (DP_size-1)){
-						// Increase size of array
-						DP_size++;
-						tbx_act.numSrc.floatSrc = (float*)realloc(tbx_act.numSrc.floatSrc, DP_size*sizeof(float));
-						tbx_nom.numSrc.floatSrc = (float*)realloc(tbx_nom.numSrc.floatSrc, DP_size*sizeof(float));
-
-						// Check for allocation errors
-						if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
-							printf("Memory realloc failed!\n");
-
-						/// Set initial value's
-						// Set initial x value to current sensor value
-						tbx_nom.numSrc.floatSrc[DP_cur] = (float)filterset_sens->bufFilter[filterset_sens->bufIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
-						// If an OK fit is available set initial y-value to the one corresponding to the curretn sensor value
-						if(fit_result == 0)
-							tbx_act.numSrc.floatSrc[DP_cur] = poly_calc(tbx_nom.numSrc.floatSrc[DP_cur], &coefficients[0], fit_order);
-						// If no OK fit is available but the new value is after an other one, use the previous y value as initial value
-						else if(DP_cur >= 1)
-							tbx_act.numSrc.floatSrc[DP_cur] = tbx_act.numSrc.floatSrc[DP_cur-1];
-						// If there is no previous y value use first one
-						else
-							tbx_act.numSrc.floatSrc[DP_cur] = tbx_act.numSrc.floatSrc[0];
-
-						// Set data point to edit mode
-						filterset_setEditMode(1);
-
-						// Refresh static part of display (e.g. to show new textboxbackground when one changes from read-only to read-write)
-						TFT_setMenu(-1);
-					}
+					// Do a clean filter value calculation to sync it
+					measure_movAvgFilter_clean(filterset_sens);
 				}
 			}
 			break;
-		case BTN_DP_SETCHANGE_TAG:
+		case BTN_FILTER_SETCHANGE_TAG:
 			if(*toggle_lock == 0) {
 				printf("Button set/change\n");
 				*toggle_lock = 42;
 
 				// Change from view to edit mode of current data point
-				if(btn_setchange.state == EVE_OPT_FLAT)
+				if(btn_filter_setchange.state == EVE_OPT_FLAT)
 					filterset_setEditMode(0);
 				else
 					filterset_setEditMode(1);
 
-				// Refresh static part of display (e.g. to show new textboxbackground when one changes from read-only to read-write)
+				// Refresh static part of display (e.g. to show new textbox background when one changes from read-only to read-write)
 				TFT_setMenu(-1);
 			}
 			break;
+		case TBX_FILTER_ERROR_THRESHOLD_TAG:
+				if(*toggle_lock == 0) {
+					printf("Textbox error_threshold\n");
+					*toggle_lock = 42;
+
+					// Activate Keypad and set cursor to end
+					TFT_textbox_setStatus(&tbx_error_threshold_order, 1, -1);
+				}
+				break;
 		default:
-			TFT_textbox_touch(&tbx_act);
-			//TFT_textbox_touch(&tbx_dp); // TODO: Commented out because there needs to be an border check before this is useful. Meanwhile it's read only this way
+			// Handle textbox and if an OK was pressed an the active keypad stop cell from being updated
+			if(TFT_textbox_touch(&tbx_error_threshold_order))
+				filterset_setEditMode(0);
+
 			break;
 	}
 }
