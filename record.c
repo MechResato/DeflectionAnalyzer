@@ -120,7 +120,7 @@ void record_closeFile(){
 	FRESULT res;
 
 	// If SD is mounted, try to open the file/path
-	if(sdState == sdFileOpen) {
+	if(sdState == sdFileOpen || sdState == sdLogOpen) {
 		res = f_close(&fil);
 		if (res == FR_OK){
 			printf("File closed\n");
@@ -505,21 +505,55 @@ int8_t record_start(){
 	return 0;
 }
 
+int8_t record_stop(){
+	///
+	///
+
+
+	//FRESULT res = 0; /* API result code */
+	//UINT bw; /* Bytes written */
+	//char buff[400];
+
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	if(sdState == sdLogOpen){
+		// Closee File
+		record_closeFile();
+
+		if(sdState == sdMounted){
+			printf("record stopped\n");
+			return 1;
+		}
+
+	}
+
+	printf("record stop failed\n");
+	return 0;
+}
 
 void record_line(){
 	///
 	///
 
+	// All writes that are not equal to 512byte need 2ms every 512byte that are written! Exactly 512 needs this every time
+
+	//   1 chars direct		 4.72us		res = f_write(&fil, "1" , 1, &bw);
+	//   2 chars direct		 4.92us		res = f_write(&fil, "1.", 2, &bw);
+	//  10 chars direct		 6.31us		res = f_write(&fil, "0123456789", 10, &bw);
+	// 100 chars direct		21.96us		res = f_write(&fil, "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", 100, &bw);
+	// 512 chars direct		1984.96us	res = f_write(&fil, "...", 512, &bw);
+	// 256 chars direct		abwechselnd 2.45ms und 49us
+
+
 
 	FRESULT res = 0; /* API result code */
 	UINT bw; /* Bytes written */
-	char buff[512] = "1.14";
+	//char buff[512] = "1.14";
 
 	//float testF = 1.14;
 	//char* testC = "1.14";
 
 	//sprintf(buff,"%.2f", testF);
-	res = f_write(&fil, buff, 4, &bw);
+	res = f_write(&fil, "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234", 255, &bw);
 	if (res != FR_OK){
 		sdState = sdMounted;
 		printf("record line failed\n");

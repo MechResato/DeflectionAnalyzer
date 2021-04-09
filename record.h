@@ -22,6 +22,7 @@ void record_buffer(void);
 
 
 int8_t record_start();
+int8_t record_stop();
 void record_line();
 
 #endif /* RECORD_H_ */

@@ -921,7 +921,17 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 				//record_buffer();
 
 				// Load Values from SD-Card if possible
-				record_readSpecFile(&sensor1, NULL, NULL, NULL);
+				//record_readSpecFile(&sensor1, NULL, NULL, NULL);
+				if(sdState == sdMounted){
+					int8_t res = record_start();
+					if(res == 1)
+						btn_startRec.text = "Stop";
+				}
+				else if(sdState == sdLogOpen){
+					int8_t res = record_stop();
+					if(res == 1)
+						btn_startRec.text = "Start";
+				}
 			}
 			break;
 		default:
