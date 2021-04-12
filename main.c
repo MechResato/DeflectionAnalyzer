@@ -10,6 +10,7 @@
 #include <DAVE.h> // Declarations from DAVE Code Generation (includes SFR declaration)
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <math.h>
 #include <globals.h>
 #include <measure.h>	// Everything related to the measurement, filtering and conversion of data by Rene Santeler
@@ -28,7 +29,7 @@ int main(void)
 {
 	// Make semihosting and printf back to DAVE possible if debug is enabled
 	#if defined (DEBUG_ENABLE)
-	initialise_monitor_handles();
+		initialise_monitor_handles();
 	#endif
 
 	// Initialize environment
@@ -62,6 +63,15 @@ int main(void)
 	// Load Values from SD-Card if possible
 	record_readSpecFile(&sensor1, NULL, NULL, NULL);
 
+	// Allocate memory for the log FIFO
+	//fifo_buf = (volatile uint8_t* volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+	//allocBuf();
+	// Check for allocation errors
+	//if(fifo_buf == NULL)
+	//	printf("Memory malloc failed!\n");
+	//else
+	//	printf("Memory allocated: %d!\n", fifo_buf);
+
 	// Start ADC measurement interrupt routine
 	ADC_MEASUREMENT_StartConversion(&ADC_MEASUREMENT_0);
 
@@ -80,6 +90,8 @@ int main(void)
 			if(measurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
 				display_delay = 0;
 				TFT_display(); // ~9000us at Monitor, 800us at Dashboard(empty), 1440us at Setup
+
+
 			}
 
 

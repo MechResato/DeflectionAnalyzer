@@ -18,8 +18,6 @@
 	#define printf(...) { ; }
 #endif
 
-
-
 ///*  SYSTEM VARIABLEs */
 // Counter used for function delay_ms
 //volatile uint32_t _msCounter = 0;
@@ -39,6 +37,7 @@ char    s1_filename_spec[STR_SPEC_MAXLEN] = "S1.CAL"; // Note: File extension mu
 volatile sensor sensor1 = {
 	.index = 1,
 	.name = "Front",
+	.adcChannel = &ADC_MEASUREMENT_Channel_A,
 	.bufIdx = 0,
 	.bufMaxIdx = S1_BUF_SIZE-1,
 	.bufRaw    = (int_buffer_t*)&s1_buf_0raw,
@@ -57,8 +56,47 @@ volatile sensor sensor1 = {
 	.fitCoefficients[3] = 0
 };
 
+#define S2_BUF_SIZE (480-20-20) // =440 values stored, new every 5ms -> 2.2sec storage
+int_buffer_t   s2_buf_0raw   [S2_BUF_SIZE] = { 0 }; // all elements 0
+float_buffer_t s2_buf_1filter[S2_BUF_SIZE] = { 0.0 };
+float_buffer_t s2_buf_2conv  [S2_BUF_SIZE] = { 0.0 };
+#define S2_FILENAME_CURLEN 6
+char    s2_filename_spec[STR_SPEC_MAXLEN] = "S2.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
+volatile sensor sensor2 = {
+	.index = 2,
+	.name = "Front",
+	.adcChannel = &ADC_MEASUREMENT_Channel_A,
+	.bufIdx = 0,
+	.bufMaxIdx = S2_BUF_SIZE-1,
+	.bufRaw    = (int_buffer_t*)&s2_buf_0raw,
+	.bufFilter = (float_buffer_t*)&s2_buf_1filter,
+	.bufConv   = (float_buffer_t*)&s2_buf_2conv,
+	.errorOccured = 0,
+	.errorThreshold = 3900, // Raw value above this threshold will be considered invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
+	.avgFilterOrder = 5,
+	.avgFilterSum = 0.0,
+	.fitFilename = s2_filename_spec,
+	.fitFilename_curLen = S2_FILENAME_CURLEN,
+	.fitOrder = 2,
+	.fitCoefficients[0] = 0,
+	.fitCoefficients[1] = 0,
+	.fitCoefficients[2] = 0,
+	.fitCoefficients[3] = 0
+};
 
-//uint16_t InputBuffer1_idx = 0; // Current index in Buffer
+// Array of all sensor objects to be used in measurement handler
+//volatile sensor* sensors[SENSORS_SIZE] = {&sensor1, &sensor2};
+volatile sensor* sensors[1] = {&sensor1}; // Temporarily deactivate sensor 2
+
+
+/* LOG FIFO */
+// Also see FIFO_BLOCK_SIZE, FIFO_BLOCKS and FIFO_WRITEBUFIDX_BITS -> defined in header file
+//volatile uint8_t* volatile fifo_buf;			// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
+volatile uint16_t fifo_writeBufIdx = 0;	// The index inside the fifo_buf where the next value will be written to by the measurement handler
+volatile uint8_t fifo_writeBlock = 0;	// The current block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler is writing to
+volatile uint8_t fifo_finBlock = 1;		// The last block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler was writing to, and is now ready to be written. Initialized to 1 because block 0 is not finished on startup
+volatile uint8_t fifo_logBlock = 0;		// The current block (multiple of BLOCK_SIZE) inside the fifo_buf that shall be written to SD-Card (as soon as finBlock==logBlock)
+
 
 
 

@@ -10,7 +10,8 @@
 #define GLOBALS_H_
 
 /*  MACROS - DEFINEs */
-#define DEBUG_ENABLE // self implemented Debug flag
+#define DEBUG_ENABLE   // self implemented Debug flag
+#define INPUT_STANDARD // Defines what signal shall be retrieved in ADC_measurement_handler. INPUT_STANDARD = current adc value, INPUT_TESTIMPULSE = generated impulse signal, INPUT_TESTSAWTOOTH = generated saw signal, INPUT_TESTSINE = generated sine signal
 #define MEASUREMENT_INTERVAL (5.0) // Time between measurements in ms. Must be same as is set in TIMER_0 DAVE App!
 #define S1_BUF_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
@@ -35,10 +36,12 @@ volatile uint32_t measurementCounter;
 /*  MEASUREMENTs */
 
 // Sensor data definition
+#define SENSOR_RAW_SIZE 2 // Bytes. Size of the a variable that represents the raw value. FIFO_BLOCK_SIZE MUST BE DIVISIBLE BY THIS!
 #define STR_SPEC_MAXLEN 20
 typedef struct {
 	uint8_t index;
 	char*   name;
+	ADC_MEASUREMENT_CHANNEL_t* adcChannel;
 	uint16_t        bufIdx;
 	uint16_t        bufMaxIdx;
 	int_buffer_t*   bufRaw;
@@ -63,6 +66,28 @@ extern int_buffer_t s1_buf_0raw[];
 extern float_buffer_t s1_buf_1filter[];
 extern float_buffer_t s1_buf_2conv[];
 
+// Sensor 2 Rear
+char s2_filename_spec[STR_SPEC_MAXLEN];
+volatile sensor sensor2;
+extern int_buffer_t s2_buf_0raw[];
+extern float_buffer_t s2_buf_1filter[];
+extern float_buffer_t s2_buf_2conv[];
+
+// Array of all sensor objects to be used in measurement handler
+#define SENSORS_SIZE 1
+extern volatile sensor* sensors[];
+
+// LOG FIFO
+#define FIFO_BLOCK_SIZE 1024			// Number of bytes in one block
+#define FIFO_BLOCKS 	4				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
+#define FIFO_BLOCK_BITS	0b001111111111	// =1023. Represents the used bits of the uint16_t which represents the index in buffer. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
+#define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE, and must be adapted if more or less sensors are recorded.
+#define FIFO_LINE_SIZE_PAD 	2				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
+volatile uint8_t* volatile fifo_buf;
+volatile uint16_t fifo_writeBufIdx;
+volatile uint8_t fifo_writeBlock;
+volatile uint8_t fifo_finBlock;
+volatile uint8_t fifo_logBlock;
 
 /*  MENU AND USER INTERFACE */
 volatile uint8_t inputType;

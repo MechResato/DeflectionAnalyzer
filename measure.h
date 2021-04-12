@@ -8,6 +8,9 @@
 #ifndef MEASURE_H_
 #define MEASURE_H_
 
+extern volatile uint8_t* volatile fifo_buf;
+void allocBuf();
+
 void Adc_Measurement_Handler(void);
 
 extern void measure_movAvgFilter_clean(sensor* sens);

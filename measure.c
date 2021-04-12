@@ -8,105 +8,158 @@
 #include <DAVE.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <math.h>
 #include <globals.h>
 
 uint32_t lastval = 0; // just for TestTriangle signal
 
+extern volatile uint8_t* volatile fifo_buf;
+
 static inline void measure_movAvgFilter(volatile sensor* sens);
+
+void allocBuf(){
+//	test = (volatile uint8_t* volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+//	if(test == NULL)
+//		printf("Memory malloc failed!\n");
+//	else
+//		printf("Memory allocated: %d!\n", test);
+}
 
 
 void Adc_Measurement_Handler(void){
 	/// Interrupt handler - Do measurements, filter/convert them and store result in buffers. Allows to 'measure' self produced test signal based on value in global variable InputType
-	/// Uses global/extern variables: InputType, tft_tick, sensor1, s1_buf_...
+	/// Uses global/extern variables: InputType, tft_tick, sensor[...], ...
 
 	// Timing measurement pin high
-	//DIGITAL_IO_SetOutputHigh(&IO_6_2);
-
-	// Increment current Buffer index and set back to 0 if greater than size of array
-	sensor1.bufIdx++;
-	if(sensor1.bufIdx >= S1_BUF_SIZE){
-		frameover = 1;
-		sensor1.bufIdx = 0;
-	}
-
-	/// Read next value from sensor
-	switch (inputType){
-		// 0 ADC Sensor 5
-		case 0:
-			s1_buf_0raw[sensor1.bufIdx] = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A); //result = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A);
-			break;
-		// 1 TestImpulse
-		case 1:
-			if(sensor1.bufIdx % (S1_BUF_SIZE/5)) s1_buf_0raw[sensor1.bufIdx] = 0;
-			else s1_buf_0raw[sensor1.bufIdx] = 4095;
-			break;
-		// 2 TestSawtooth
-		case 2:
-			if(lastval < 4095) s1_buf_0raw[sensor1.bufIdx] = lastval+7;
-			else s1_buf_0raw[sensor1.bufIdx] = 0;
-			lastval = s1_buf_0raw[sensor1.bufIdx];
-			break;
-		// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
-		case 3:
-			s1_buf_0raw[sensor1.bufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
-			break;
-		default:
-			// Get raw input from ADC
-			s1_buf_0raw[sensor1.bufIdx] = ADC_MEASUREMENT_GetResult(&ADC_MEASUREMENT_Channel_A);
-			break;
-	}
-
-	// TODO: (Consideration) Everything past here could be moved to the main slope. It would require a "last processed value" index and had to process every missed value between. The interrupt here would get much shorter though...
+	DIGITAL_IO_SetOutputHigh(&IO_6_2);
 
 
-	// Check for sensor errors and try to interpolate a raw value. Note: This is only necessary because the filter would be confused otherwise and to print "clean" lines on the graph.
-	// This should be OK as long as the frequency of the to be measured event is much lower than the sampling time, the average filter order adjusted to the application and only few error occur at a time.
-	// Square interpolation was ruled out due to performance issues (on first tests this made the slope only ~400ns slower when errors occur).
-	// Still, for precise results recalculate value in post-processing.
-	if(s1_buf_0raw[sensor1.bufIdx] > sensor1.errorThreshold){
-		// Mark current measurement as error
-		sensor1.errorOccured++;
 
-		// Calculate last index and check for over leap
-		int32_t pre1Idx = sensor1.bufIdx - 1;
-		if(pre1Idx < 0) pre1Idx += sensor1.bufMaxIdx + 1;
+	uint8_t sensIdx = 0;
+	volatile sensor* sens;
+	uint16_t sensBufIdx;
+	do{
+		// Store current sensor pointer (looks cleaner and may be faster without the additional indexing every time)
+		sens = sensors[sensIdx];
 
-		// If this is the the first error after an valid value, calculate/store last OK value and slope for linear interpolation
-		if(sensor1.errorOccured == 1){
-			// Calculate second to last index and check for over leap
-			int32_t pre2Idx = sensor1.bufIdx - 2;
-			if(pre2Idx < 0) pre2Idx += sensor1.bufMaxIdx + 1;
-
-			// Store last valid value and slope, to be used till the next valid value comes
-			sensor1.errorLastValidSlope = s1_buf_1filter[pre1Idx] - s1_buf_1filter[pre2Idx];
+		// Increment current Buffer index and set back to 0 if greater than size of array
+		sensBufIdx = sens->bufIdx = sens->bufIdx + 1;
+		if(sensBufIdx > sens->bufMaxIdx){
+			frameover = 1;
+			sensBufIdx = sens->bufIdx = 0;
 		}
-		// Linear interpolation of current value (needed to satisfy filter, otherwise the missing value would interfere for [avgFilterOrder] measurements)
-		s1_buf_0raw[sensor1.bufIdx] = s1_buf_0raw[pre1Idx] + sensor1.errorLastValidSlope;
+
+		// Read value from sensor (or generated test if defined)
+		#if defined(INPUT_STANDARD)
+			// Get raw input from ADC
+			sens->bufRaw[sensBufIdx] = ADC_MEASUREMENT_GetResult(sens->adcChannel);
+		#elif defined(INPUT_TESTIMPULSE)
+		// 1 TestImpulse
+			if(sensBufIdx % (S1_BUF_SIZE/5)) sens->bufRaw[sensBufIdx] = 0;
+			else sens->bufRaw[sensBufIdx] = 4095;
+		#elif defined(INPUT_TESTSAWTOOTH)
+			// 2 TestSawtooth
+			if(lastval < 4095) sens->bufRaw[sensBufIdx] = lastval+7;
+			else sens->bufRaw[sensBufIdx] = 0;
+			lastval = sens->bufRaw[sensBufIdx];
+		#elif defined(INPUT_TESTSINE)
+			// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
+			sens->bufRaw[sensBufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
+		#endif
+
+
+		// TODO: (Consideration) Everything past here could be moved to the main slope. It would require a "last processed value" index and had to process every missed value between. The interrupt here would get much shorter though...
+
+
+		// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
+		if (1){
+			// Check for sensor errors and try to interpolate a raw value. Note: This is only necessary because the filter would be confused otherwise and to print "clean" lines on the graph.
+			// This should be OK as long as the frequency of the to be measured event is much lower than the sampling time, the average filter order adjusted to the application and only few error occur at a time.
+			// Square interpolation was ruled out due to performance issues (on first tests this made the slope only ~400ns slower when errors occur).
+			// Still, for precise results recalculate value in post-processing.
+			if(sens->bufRaw[sensBufIdx] > sens->errorThreshold){
+				// Mark current measurement as error
+				sens->errorOccured++;
+
+				// Calculate last index and check for over leap
+				int32_t pre1Idx = sensBufIdx - 1;
+				if(pre1Idx < 0) pre1Idx += sens->bufMaxIdx + 1;
+
+				// If this is the the first error after an valid value, calculate/store last OK value and slope for linear interpolation
+				if(sens->errorOccured == 1){
+					// Calculate second to last index and check for over leap
+					int32_t pre2Idx = sensBufIdx - 2;
+					if(pre2Idx < 0) pre2Idx += sens->bufMaxIdx + 1;
+
+					// Store last valid value and slope, to be used till the next valid value comes
+					sens->errorLastValidSlope = sens->bufFilter[pre1Idx] - sens->bufFilter[pre2Idx];
+				}
+				// Linear interpolation of current value (needed to satisfy filter, otherwise the missing value would interfere for [avgFilterOrder] measurements)
+				sens->bufRaw[sensBufIdx] = sens->bufRaw[pre1Idx] + sens->errorLastValidSlope;
+			}
+			else {
+				sens->errorOccured = 0;
+			}
+
+			// Calculate current filtered value
+			measure_movAvgFilter(sens);
+
+			//if(sensBufIdx % 20 == 0) printf("raw %d, fil %f, eo %d, \n", sens->bufRaw[sensBufIdx], sens->bufFilter[sensBufIdx], sens->errorOccured);
+
+
+			/// Convert raw value to adapted value and save it
+			//sens->bufConv[sensBufIdx] =  poly_calc_m(sens->bufRaw[sensBufIdx], &sens->fitCoefficients[0], sens->fitOrder); //5.2/4096.0*InputBuffer1[sensBufIdx]; //sens->bufFilter[sens->bufIdx] // poly_calc_sensor_i(sens, sens->bufRaw);
+			// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
+			register float result = sens->fitCoefficients[0];
+			register float pow_x = 1;
+			// Calculate every term and add it to the result
+			for(uint8_t i = 1; i < sens->fitOrder+1; i++){
+				pow_x *= sens->bufFilter[sensBufIdx];
+				result += sens->fitCoefficients[i] * pow_x; //result += sens->fitCoefficients[i] * ipow(sens->bufFilter[sensBufIdx], i); //result += sens->fitCoefficients[i] * ipow(sens->bufRaw[sensBufIdx], i);
+			}
+			// Save result
+			sens->bufConv[sensBufIdx] = result;
+		}
+
+		// If system is in recording mode store current raw value in FIFO
+		if(1){
+			//memcpy
+			//memcpy(fifo_buf + fifo_writeBufIdx, &(sens->bufRaw[sensIdx]), SENSOR_RAW_SIZE);
+			//printf("%d %d %d %d\n",&(sens->bufRaw[sensIdx]), fifo_buf, &fifo_buf[0], SENSOR_RAW_SIZE);
+
+			// Increase index
+			fifo_writeBufIdx += SENSOR_RAW_SIZE;
+
+			// Overleap check and correction -> ignore all bits that are higher than the used ones
+			fifo_writeBufIdx &= FIFO_BLOCK_BITS;
+		}
+
+		// Check next sensor
+		sensIdx++;
+	} while(sensIdx != SENSORS_SIZE);
+
+	// If system is in recording mode, finish and fill up current line (lines need to)
+	if(0){
+		// Ignore rest of space on the current "line" defined by FIFO_LINE_SIZE. This is done to have the values of a measurement line inside a defined width, which must be a divider of the block size (a block must perfectly be fillable with n lines!)
+		fifo_writeBufIdx += FIFO_LINE_SIZE_PAD;
+
+		// Check for block end -> happens if the index is a multiple of the block size (e.g. 1024)
+		// -> for powers of 2 this is every time the bits representing e.g 1023 (001111111111) are all 1's
+		// Note: This only holds if the block size is a power of 2!!!
+		if((fifo_writeBufIdx & FIFO_BLOCK_BITS) == 0){ //fifo_writeBufIdx % 1024 == 0
+			// Mark current block as finished (ready to be written)
+			fifo_finBlock = fifo_writeBlock;
+			// Mark next block as current write block
+			fifo_writeBlock++;
+			// Overleap correction of the current block index
+			if(fifo_writeBlock == FIFO_BLOCKS)
+				fifo_writeBlock = 0;
+		}
 	}
-	else {
-		sensor1.errorOccured = 0;
-	}
 
-	// Calculate current filtered value
-	measure_movAvgFilter(&sensor1);
-
-	//if(sensor1.bufIdx % 20 == 0) printf("raw %d, fil %f, eo %d, \n", s1_buf_0raw[sensor1.bufIdx], s1_buf_1filter[sensor1.bufIdx], sensor1.errorOccured);
-
-
-	/// Convert raw value to adapted value and save it
-	//s1_buf_2conv[sensor1.bufIdx] =  poly_calc_m(s1_buf_0raw[sensor1.bufIdx], &sensor1.fitCoefficients[0], sensor1.fitOrder); //5.2/4096.0*InputBuffer1[sensor1.bufIdx]; //sens->bufFilter[sens->bufIdx] // poly_calc_sensor_i(&sensor1, sensor1.bufRaw);
-	// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
-	register float result = sensor1.fitCoefficients[0];
-	register float pow_x = 1;
-	// Calculate every term and add it to the result
-	for(uint8_t i = 1; i < sensor1.fitOrder+1; i++){
-		pow_x *= sensor1.bufFilter[sensor1.bufIdx];
-		result += sensor1.fitCoefficients[i] * pow_x; //result += sensor1.fitCoefficients[i] * ipow(sensor1.bufFilter[sensor1.bufIdx], i); //result += sensor1.fitCoefficients[i] * ipow(s1_buf_0raw[sensor1.bufIdx], i);
-	}
-	// Save result
-	s1_buf_2conv[sensor1.bufIdx] = result;
-
+	//if(fifo_writeBufIdx > 4094)
+		//printf("%d\n",fifo_writeBufIdx);
 
 	// Trigger next main loop (with this it is running in sync with the measurement -> change if needed!)
 	tft_tick = 42;
@@ -115,7 +168,7 @@ void Adc_Measurement_Handler(void){
 	measurementCounter++;
 
 	// Timing measurement pin low
-	//DIGITAL_IO_SetOutputLow(&IO_6_2);
+	DIGITAL_IO_SetOutputLow(&IO_6_2);
 }
 
 // Measurements at non leap-over cycle!
@@ -248,7 +301,7 @@ static inline void measure_movAvgFilter(volatile sensor* sens){
 
 
 //float s1_avgSum = 0;
-//float fil2 = measure_movAvgFilter(&s1_avgSum, &InputBuffer1[0], INPUTBUFFER1_SIZE, sensor1.bufIdx, sensor1.avgFilterOrder);
+//float fil2 = measure_movAvgFilter(&s1_avgSum, &InputBuffer1[0], INPUTBUFFER1_SIZE, sensBufIdx, sens->avgFilterOrder);
 //static inline float measure_movAvgFilter(float* sum, int_buffer_t* rbuf, uint16_t maxIdx, uint16_t newIdx, uint16_t order);
 //static inline float measure_movAvgFilter(float* sum, int_buffer_t* rbuf, uint16_t maxIdx, uint16_t newIdx, uint16_t order){
 //	/// Implementation of an moving average filter on an ring-buffer
@@ -270,11 +323,11 @@ static inline void measure_movAvgFilter(volatile sensor* sens){
 
 //float fil1 = 0;
 //float sum1 = 0;
-//int32_t oldIdx = sensor1.bufIdx - 5;
+//int32_t oldIdx = sensBufIdx - 5;
 //if(oldIdx < 0) oldIdx += INPUTBUFFER1_SIZE;
-//for(int i = sensor1.bufIdx; i != oldIdx; i--){
+//for(int i = sensBufIdx; i != oldIdx; i--){
 //	if(i<0) i += INPUTBUFFER1_SIZE+1;
 //	sum1 += InputBuffer1[i];
 //}
 //fil1 = sum1/5;
-//printf("-%d n%d %.2f %d\n", (int)oldIdx, (int)sensor1.bufIdx, fil1, InputBuffer1[sensor1.bufIdx]);
+//printf("-%d n%d %.2f %d\n", (int)oldIdx, (int)sensBufIdx, fil1, InputBuffer1[sensBufIdx]);
