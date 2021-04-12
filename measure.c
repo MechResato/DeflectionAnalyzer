@@ -8,27 +8,21 @@
 #include <DAVE.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <malloc.h>
 #include <math.h>
 #include <globals.h>
 
 uint32_t lastval = 0; // just for TestTriangle signal
 
-extern volatile uint8_t* volatile fifo_buf;
+extern volatile uint8_t volatile * volatile fifo_buf;
+
+
 
 static inline void measure_movAvgFilter(volatile sensor* sens);
 
-void allocBuf(){
-//	test = (volatile uint8_t* volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-//	if(test == NULL)
-//		printf("Memory malloc failed!\n");
-//	else
-//		printf("Memory allocated: %d!\n", test);
-}
-
-
 void Adc_Measurement_Handler(void){
 	/// Interrupt handler - Do measurements, filter/convert them and store result in buffers. Allows to 'measure' self produced test signal based on value in global variable InputType
+	/// Start Timer after init and make sure initial conversion in ADC_MEASUREMENT APP is deactivated
 	/// Uses global/extern variables: InputType, tft_tick, sensor[...], ...
 
 	// Timing measurement pin high
@@ -105,9 +99,6 @@ void Adc_Measurement_Handler(void){
 			// Calculate current filtered value
 			measure_movAvgFilter(sens);
 
-			//if(sensBufIdx % 20 == 0) printf("raw %d, fil %f, eo %d, \n", sens->bufRaw[sensBufIdx], sens->bufFilter[sensBufIdx], sens->errorOccured);
-
-
 			/// Convert raw value to adapted value and save it
 			//sens->bufConv[sensBufIdx] =  poly_calc_m(sens->bufRaw[sensBufIdx], &sens->fitCoefficients[0], sens->fitOrder); //5.2/4096.0*InputBuffer1[sensBufIdx]; //sens->bufFilter[sens->bufIdx] // poly_calc_sensor_i(sens, sens->bufRaw);
 			// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
@@ -124,9 +115,11 @@ void Adc_Measurement_Handler(void){
 
 		// If system is in recording mode store current raw value in FIFO
 		if(1){
-			//memcpy
-			//memcpy(fifo_buf + fifo_writeBufIdx, &(sens->bufRaw[sensIdx]), SENSOR_RAW_SIZE);
-			//printf("%d %d %d %d\n",&(sens->bufRaw[sensIdx]), fifo_buf, &fifo_buf[0], SENSOR_RAW_SIZE);
+			// Copy current value to FIFO
+			memcpy((void*)(fifo_buf + fifo_writeBufIdx), &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
+
+			//if(sensBufIdx % 150 == 0)
+				//printf("%d %d %d\n", fifo_buf + fifo_writeBufIdx, &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
 
 			// Increase index
 			fifo_writeBufIdx += SENSOR_RAW_SIZE;
@@ -140,7 +133,7 @@ void Adc_Measurement_Handler(void){
 	} while(sensIdx != SENSORS_SIZE);
 
 	// If system is in recording mode, finish and fill up current line (lines need to)
-	if(0){
+	if(1){
 		// Ignore rest of space on the current "line" defined by FIFO_LINE_SIZE. This is done to have the values of a measurement line inside a defined width, which must be a divider of the block size (a block must perfectly be fillable with n lines!)
 		fifo_writeBufIdx += FIFO_LINE_SIZE_PAD;
 

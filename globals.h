@@ -79,11 +79,11 @@ extern volatile sensor* sensors[];
 
 // LOG FIFO
 #define FIFO_BLOCK_SIZE 1024			// Number of bytes in one block
-#define FIFO_BLOCKS 	4				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
+#define FIFO_BLOCKS 	1				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
 #define FIFO_BLOCK_BITS	0b001111111111	// =1023. Represents the used bits of the uint16_t which represents the index in buffer. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
 #define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE, and must be adapted if more or less sensors are recorded.
 #define FIFO_LINE_SIZE_PAD 	2				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
-volatile uint8_t* volatile fifo_buf;
+volatile uint8_t volatile * volatile fifo_buf;
 volatile uint16_t fifo_writeBufIdx;
 volatile uint8_t fifo_writeBlock;
 volatile uint8_t fifo_finBlock;

@@ -91,7 +91,7 @@ volatile sensor* sensors[1] = {&sensor1}; // Temporarily deactivate sensor 2
 
 /* LOG FIFO */
 // Also see FIFO_BLOCK_SIZE, FIFO_BLOCKS and FIFO_WRITEBUFIDX_BITS -> defined in header file
-//volatile uint8_t* volatile fifo_buf;			// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
+volatile uint8_t volatile * volatile fifo_buf = NULL;			// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
 volatile uint16_t fifo_writeBufIdx = 0;	// The index inside the fifo_buf where the next value will be written to by the measurement handler
 volatile uint8_t fifo_writeBlock = 0;	// The current block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler is writing to
 volatile uint8_t fifo_finBlock = 1;		// The last block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler was writing to, and is now ready to be written. Initialized to 1 because block 0 is not finished on startup

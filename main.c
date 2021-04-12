@@ -10,7 +10,7 @@
 #include <DAVE.h> // Declarations from DAVE Code Generation (includes SFR declaration)
 #include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <malloc.h>
 #include <math.h>
 #include <globals.h>
 #include <measure.h>	// Everything related to the measurement, filtering and conversion of data by Rene Santeler
@@ -24,6 +24,7 @@
 // SysTick_Handler in "globals"
 // Adc_Measurement_Handler in "measure"
 
+extern volatile uint8_t volatile * volatile fifo_buf;
 
 int main(void)
 {
@@ -45,6 +46,15 @@ int main(void)
 	// Arm-M internal interrupt init
 	//SysTick_Config(SystemCoreClock / 144);
 
+	// Allocate memory for the log FIFO
+	fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+	//allocBuf();
+	// Check for allocation errors
+	if(fifo_buf == NULL)
+		printf("Memory malloc failed!\n");
+	else
+		printf("Memory allocated: %d!\n", fifo_buf);
+
 	// Counter for TFT_display init
 	uint8_t display_delay = 0;
 
@@ -63,17 +73,8 @@ int main(void)
 	// Load Values from SD-Card if possible
 	record_readSpecFile(&sensor1, NULL, NULL, NULL);
 
-	// Allocate memory for the log FIFO
-	//fifo_buf = (volatile uint8_t* volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-	//allocBuf();
-	// Check for allocation errors
-	//if(fifo_buf == NULL)
-	//	printf("Memory malloc failed!\n");
-	//else
-	//	printf("Memory allocated: %d!\n", fifo_buf);
-
 	// Start ADC measurement interrupt routine
-	ADC_MEASUREMENT_StartConversion(&ADC_MEASUREMENT_0);
+	TIMER_Start(&TIMER_0);
 
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");
