@@ -29,7 +29,7 @@ typedef float float_buffer_t;
 
 /*  SYSTEM VARIABLEs */
 volatile uint32_t _msCounter;
-volatile uint8_t tft_tick;
+volatile uint8_t main_tick;
 volatile uint32_t measurementCounter;
 
 
@@ -78,22 +78,29 @@ extern float_buffer_t s2_buf_2conv[];
 extern volatile sensor* sensors[];
 
 // LOG FIFO
+// Note: FIFO_BLOCK_SIZE times FIFO_BLOCKS must always be a power of 2! Otherwise the overleap check with &= doesn't work anymore
 #define FIFO_BLOCK_SIZE 1024			// Number of bytes in one block
-#define FIFO_BLOCKS 	1				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
-#define FIFO_BLOCK_BITS	0b001111111111	// =1023. Represents the used bits of the uint16_t which represents the index in buffer. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
+#define FIFO_BLOCKS 	4				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
+#define FIFO_BITS_ONE_BLOCK (FIFO_BLOCK_SIZE-1)		// = 0b000 0111 1111 111 for 1024BS. Represents the used bits of the uint16_t which represents the index in one block. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
+#define FIFO_BITS_ALL_BLOCK	((FIFO_BLOCK_SIZE*FIFO_BLOCKS)-1)// = 0b000 0011 1111 1111 for 1024BS and 4B. Represents the used bits of the uint16_t which represents the index in whole buffer. Use '&' to ignore higher bits
 #define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE, and must be adapted if more or less sensors are recorded.
 #define FIFO_LINE_SIZE_PAD 	2				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
 volatile uint8_t volatile * volatile fifo_buf;
 volatile uint16_t fifo_writeBufIdx;
 volatile uint8_t fifo_writeBlock;
-volatile uint8_t fifo_finBlock;
-volatile uint8_t fifo_logBlock;
+volatile uint8_t fifo_recordBlock;
+extern volatile uint8_t fifo_finBlock[];
 
 /*  MENU AND USER INTERFACE */
 volatile uint8_t inputType;
 
+// Data Acquisition Mode
+enum measureModes{measureModeNone=0, measureModeMonitoring, measureModeRecording};
+typedef enum measureModes measureModes;
+measureModes measureMode;
+
 // SD-Card handling
-enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError, sdLogOpen};
+enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError};
 typedef enum sdStates sdStates;
 sdStates sdState;
 

@@ -21,7 +21,7 @@
 ///*  SYSTEM VARIABLEs */
 // Counter used for function delay_ms
 //volatile uint32_t _msCounter = 0;
-volatile uint8_t tft_tick = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
+volatile uint8_t main_tick = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
 
 
 ///*  MEASUREMENTs */
@@ -91,11 +91,11 @@ volatile sensor* sensors[1] = {&sensor1}; // Temporarily deactivate sensor 2
 
 /* LOG FIFO */
 // Also see FIFO_BLOCK_SIZE, FIFO_BLOCKS and FIFO_WRITEBUFIDX_BITS -> defined in header file
-volatile uint8_t volatile * volatile fifo_buf = NULL;			// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
-volatile uint16_t fifo_writeBufIdx = 0;	// The index inside the fifo_buf where the next value will be written to by the measurement handler
-volatile uint8_t fifo_writeBlock = 0;	// The current block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler is writing to
-volatile uint8_t fifo_finBlock = 1;		// The last block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler was writing to, and is now ready to be written. Initialized to 1 because block 0 is not finished on startup
-volatile uint8_t fifo_logBlock = 0;		// The current block (multiple of BLOCK_SIZE) inside the fifo_buf that shall be written to SD-Card (as soon as finBlock==logBlock)
+volatile uint8_t volatile * volatile fifo_buf = NULL;	// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
+volatile uint16_t fifo_writeBufIdx = 0;					// The index inside the fifo_buf where the next value will be written to by the measurement handler
+volatile uint8_t fifo_writeBlock = 0;					// The current block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler is writing to
+volatile uint8_t fifo_recordBlock = 0;						// The current block (multiple of BLOCK_SIZE) inside the fifo_buf that shall be written to SD-Card (as soon as finBlock==logBlock)
+volatile uint8_t fifo_finBlock[FIFO_BLOCKS] = {0};		// An array with an element for every Block in fifo_buf. Each corresponding element represents if a block is ready to recorded
 
 
 
@@ -105,6 +105,7 @@ volatile uint8_t fifo_logBlock = 0;		// The current block (multiple of BLOCK_SIZ
 volatile uint8_t inputType = 0; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
 
 sdStates sdState = sdNone;
+measureModes measureMode = measureModeMonitoring;
 
 ///* DEBUG */
 // Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debugcode when actual data is there...)

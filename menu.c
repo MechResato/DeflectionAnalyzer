@@ -879,10 +879,10 @@ void menu_display_static_1dash(void){
 	TFT_header(1, &menu_1dashboard);
 
 	// Add the static text
-	EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
-	EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
-	EVE_cmd_text_burst(360, 10, 26, 0, "X:");
-	EVE_cmd_text_burst(360, 25, 26, 0, "Y:");
+	//EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
+	//EVE_cmd_dl_burst(DL_COLOR_RGB | MAIN_TEXTCOLOR);
+	//EVE_cmd_text_burst(360, 10, 26, 0, "X:");
+	//EVE_cmd_text_burst(360, 25, 26, 0, "Y:");
 
 	// Text
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
@@ -893,6 +893,16 @@ void menu_display_1dash(void){
 	/// This menu ...
 
 
+	// Change record button name if needed
+	static measureModes lastMeasMode;
+	if(measureMode != lastMeasMode){
+		lastMeasMode = measureMode;
+		if(measureMode == measureModeMonitoring)
+			btn_startRec.text = "Start";
+		else if(measureMode == measureModeRecording)
+			btn_startRec.text = "Stop";
+	}
+
 	/////////////// Display BUTTONS and Toggles
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
@@ -900,9 +910,9 @@ void menu_display_1dash(void){
 	TFT_control(&btn_startRec);
 
 	// Debug
-	TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
-	EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
+	//TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_X);
+	//EVE_cmd_number_burst(470, 25, 26, EVE_OPT_RIGHTX | EVE_OPT_SIGNED, swipeDistance_Y);
 }
 void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
@@ -918,19 +928,17 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 				printf("Button StartRec\n");
 				*toggle_lock = 42;
 
-				//record_buffer();
-
-				// Load Values from SD-Card if possible
-				//record_readSpecFile(&sensor1, NULL, NULL, NULL);
-				if(sdState == sdMounted){
+				// Start recording
+				if(measureMode == measureModeMonitoring){
+					measurementCounter = 0;
 					int8_t res = record_start();
-					if(res == 1)
-						btn_startRec.text = "Stop";
+					if(res != 1)
+						printf("Start failed\n");
 				}
-				else if(sdState == sdLogOpen){
+				else if(measureMode == measureModeRecording){
 					int8_t res = record_stop();
-					if(res == 1)
-						btn_startRec.text = "Start";
+					if(res != 1)
+						printf("Stop failed\n");
 				}
 			}
 			break;

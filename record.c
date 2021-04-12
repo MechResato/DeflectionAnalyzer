@@ -120,7 +120,7 @@ void record_closeFile(){
 	FRESULT res;
 
 	// If SD is mounted, try to open the file/path
-	if(sdState == sdFileOpen || sdState == sdLogOpen) {
+	if(sdState == sdFileOpen) {
 		res = f_close(&fil);
 		if (res == FR_OK){
 			printf("File closed\n");
@@ -495,7 +495,8 @@ int8_t record_start(){
 
 		if(sdState == sdFileOpen){
 			printf("record started\n");
-			sdState = sdLogOpen;
+			measureMode = measureModeRecording;
+			//sdState = sdLogOpen;
 			return 1;
 		}
 
@@ -515,12 +516,13 @@ int8_t record_stop(){
 	//char buff[400];
 
 	// If the SD card is ready, backup existing file, try to open the new one and write specifications
-	if(sdState == sdLogOpen){
+	if(sdState == sdFileOpen){
 		// Closee File
 		record_closeFile();
 
 		if(sdState == sdMounted){
 			printf("record stopped\n");
+			measureMode = measureModeMonitoring;
 			return 1;
 		}
 
@@ -528,6 +530,20 @@ int8_t record_stop(){
 
 	printf("record stop failed\n");
 	return 0;
+}
+
+void record_block(){
+
+	FRESULT res = 0; /* API result code */
+	UINT bw; /* Bytes written */
+
+	res = f_write(&fil, (void*)(fifo_buf + (fifo_recordBlock*FIFO_BLOCK_SIZE)), FIFO_BLOCK_SIZE, &bw);
+	if (res != FR_OK || bw != FIFO_BLOCK_SIZE){
+		sdState = sdMounted;
+		//record_stop();
+		printf("record block failed\n");
+	}
+
 }
 
 void record_line(){

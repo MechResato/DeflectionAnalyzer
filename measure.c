@@ -11,6 +11,7 @@
 #include <malloc.h>
 #include <math.h>
 #include <globals.h>
+#include <record.h>
 
 uint32_t lastval = 0; // just for TestTriangle signal
 
@@ -19,6 +20,8 @@ extern volatile uint8_t volatile * volatile fifo_buf;
 
 
 static inline void measure_movAvgFilter(volatile sensor* sens);
+
+volatile uint16_t testCount = 0;
 
 void Adc_Measurement_Handler(void){
 	/// Interrupt handler - Do measurements, filter/convert them and store result in buffers. Allows to 'measure' self produced test signal based on value in global variable InputType
@@ -62,12 +65,11 @@ void Adc_Measurement_Handler(void){
 			sens->bufRaw[sensBufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
 		#endif
 
-
 		// TODO: (Consideration) Everything past here could be moved to the main slope. It would require a "last processed value" index and had to process every missed value between. The interrupt here would get much shorter though...
 
 
 		// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
-		if (1){
+			if(measureMode == measureModeMonitoring){
 			// Check for sensor errors and try to interpolate a raw value. Note: This is only necessary because the filter would be confused otherwise and to print "clean" lines on the graph.
 			// This should be OK as long as the frequency of the to be measured event is much lower than the sampling time, the average filter order adjusted to the application and only few error occur at a time.
 			// Square interpolation was ruled out due to performance issues (on first tests this made the slope only ~400ns slower when errors occur).
@@ -114,7 +116,10 @@ void Adc_Measurement_Handler(void){
 		}
 
 		// If system is in recording mode store current raw value in FIFO
-		if(1){
+		if(measureMode == measureModeRecording){
+			sens->bufRaw[sensBufIdx] = testCount;
+			testCount++;
+
 			// Copy current value to FIFO
 			memcpy((void*)(fifo_buf + fifo_writeBufIdx), &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
 
@@ -123,31 +128,37 @@ void Adc_Measurement_Handler(void){
 
 			// Increase index
 			fifo_writeBufIdx += SENSOR_RAW_SIZE;
-
-			// Overleap check and correction -> ignore all bits that are higher than the used ones
-			fifo_writeBufIdx &= FIFO_BLOCK_BITS;
 		}
 
 		// Check next sensor
 		sensIdx++;
 	} while(sensIdx != SENSORS_SIZE);
 
+
 	// If system is in recording mode, finish and fill up current line (lines need to)
-	if(1){
+	if(measureMode == measureModeRecording){
 		// Ignore rest of space on the current "line" defined by FIFO_LINE_SIZE. This is done to have the values of a measurement line inside a defined width, which must be a divider of the block size (a block must perfectly be fillable with n lines!)
 		fifo_writeBufIdx += FIFO_LINE_SIZE_PAD;
+
+		// Overleap check and correction -> ignore all bits that are higher than the used ones
+		fifo_writeBufIdx &= FIFO_BITS_ALL_BLOCK;
 
 		// Check for block end -> happens if the index is a multiple of the block size (e.g. 1024)
 		// -> for powers of 2 this is every time the bits representing e.g 1023 (001111111111) are all 1's
 		// Note: This only holds if the block size is a power of 2!!!
-		if((fifo_writeBufIdx & FIFO_BLOCK_BITS) == 0){ //fifo_writeBufIdx % 1024 == 0
+		if((fifo_writeBufIdx & FIFO_BITS_ONE_BLOCK) == 0){ //fifo_writeBufIdx % 1024 == 0
 			// Mark current block as finished (ready to be written)
-			fifo_finBlock = fifo_writeBlock;
+			fifo_finBlock[fifo_writeBlock] = 1;
 			// Mark next block as current write block
 			fifo_writeBlock++;
 			// Overleap correction of the current block index
 			if(fifo_writeBlock == FIFO_BLOCKS)
 				fifo_writeBlock = 0;
+			// Check if the write block has been recorded, if not a "crash" occurs and the process must be stopped
+			if(fifo_finBlock[fifo_writeBlock] == 1){
+				// Stop recording
+				record_stop();
+			}
 		}
 	}
 
@@ -155,7 +166,7 @@ void Adc_Measurement_Handler(void){
 		//printf("%d\n",fifo_writeBufIdx);
 
 	// Trigger next main loop (with this it is running in sync with the measurement -> change if needed!)
-	tft_tick = 42;
+	main_tick = 42;
 
 	// Increase count of executed measurements
 	measurementCounter++;

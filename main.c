@@ -53,10 +53,12 @@ int main(void)
 	if(fifo_buf == NULL)
 		printf("Memory malloc failed!\n");
 	else
-		printf("Memory allocated: %d!\n", fifo_buf);
+		printf("Memory allocated: %d!\n", (int)fifo_buf);
+
+	memset(fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
 
 	// Counter for TFT_display init
-	uint8_t display_delay = 0;
+	uint8_t display_ticker = 0;
 
 	// Initial disable of CS pin
 	DIGITAL_IO_SetOutputHigh(&IO_DIO_DIGOUT_CS_TFT);
@@ -79,34 +81,48 @@ int main(void)
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");
 	while(1U) {
-		if(tft_tick) { // Is set by Adc_Measurement_Handler at every interrupt of it
-			// reset tick
-			tft_tick = 0;
+		if(main_tick) {
+			/// Main tick is set by Adc_Measurement_Handler at every interrupt of it and triggers this
+			// Reset tick
+			main_tick = 0;
 
+
+			/// RECORDING HANDLING
+			// If recording mode is active and there is something to record (current block is finished) write block to SD-Card
+			if(measureMode == measureModeRecording && fifo_finBlock[fifo_recordBlock] == 1){
+				// Timing measurement pin high
+				DIGITAL_IO_SetOutputHigh(&IO_6_2);
+
+				// Record current block
+				record_block();
+
+				// Mark Block as processed (if a block isn't processed before the measurement handler tries to write to it again the record fails)
+				fifo_finBlock[fifo_recordBlock] = 0;
+
+				// Mark next block as current record block
+				fifo_recordBlock++;
+				// Overleap correction of the current block index
+				if(fifo_recordBlock == FIFO_BLOCKS)
+					fifo_recordBlock = 0;
+
+				// Timing measurement pin low
+				DIGITAL_IO_SetOutputLow(&IO_6_2);
+			}
+
+
+			/// TFT HANDLING
 			// Evaluate touches
 			TFT_touch(); // ~100us with no touch
 
 			// Evaluate and rewrite display list
-			display_delay++;
+			display_ticker++;
 			if(measurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
-				display_delay = 0;
+				display_ticker = 0;
 				TFT_display(); // ~9000us at Monitor, 800us at Dashboard(empty), 1440us at Setup
-
-
 			}
 
-
-			if(sdState == sdLogOpen){
-				// Timing measurement pin high
-				DIGITAL_IO_SetOutputHigh(&IO_6_2);
-
-				record_line();
-
-				// Timing measurement pin high
-				DIGITAL_IO_SetOutputLow(&IO_6_2);
-			}
-		}
-	}
+		} // End of main_tick
+	} // End of mail loop
 
 
 }
