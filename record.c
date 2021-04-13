@@ -176,6 +176,7 @@ static uint8_t record_writeCalFile_pair (char* comment, char* val_buff){
 
 void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size){
 	/// Write the calibration/specification data of the given sensor to the file stated in the sensor struct.
+	// If the File already exists, the current version will be backed up (means: only 2 version are saved current and last file!)
 	/// Returns nothing.
 	///
 	///	sens	...	A struct of type sensor which holds all sensor data
@@ -195,15 +196,16 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 	// Try to mount disk
 	record_mountDisk(1);
 
-	// If the SD card is ready backup existing file, try to open the new one and write specifications
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
 	if(sdState == sdMounted || sdState == sdFileOpen){
 
 		/// Check if file already exists - if so rename it
 		// Get file-info to check if it exists
 		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
 		if(res == FR_OK){
-			sprintf(buff,"S%dCAL.BAL", sens->index);
-			f_rename((char*)&sens->fitFilename[0], buff);
+			sprintf(buff, "S%dBAK.CAL", sens->index);
+			res = f_rename((char*)&sens->fitFilename[0], buff);
+			printf("Backup CAL file to %s: %d\n", buff, res);
 		}
 		else{
 			printf("File not found: %d\n", res);
@@ -268,7 +270,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 				// Write comment and value
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
-				printf("\nWrite of CAL file successful!\n");
+				printf("Write of CAL file successful!\n");
 			} while(false);
 
 			// Close file
@@ -279,7 +281,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 		}
 	}
 
-	// Add a line break
+	// Add a line break to console
 	printf("\n");
 }
 
@@ -442,10 +444,12 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 						printf("No num data points in file or no parameters called\n");
 					}
 
-					// Close file
-					record_closeFile();
-
+					printf("Read of CAL file successful!\n");
 				} while(false);
+
+				// Close file
+				record_closeFile();
+
 			} // end of if "file ready"
 			else{
 				printf("CAL file not open!");
@@ -480,7 +484,9 @@ int8_t record_start(){
 
 	FRESULT res = 0; /* API result code */
 	//UINT bw; /* Bytes written */
-	char buff_filename[255];
+
+	// Initial log line
+	printf("\nrecord_start:\n");
 
 	// Try to mount disk
 	record_mountDisk(1);
@@ -488,87 +494,113 @@ int8_t record_start(){
 	//// -------------------------------------------------
 	//// If the SD card is ready, backup possible existing file, try to open the new one, allocate fifo_buf and mark everything accordingly
 	if(sdState == sdMounted){
+
 		// Only start if given name is longer than 4 characters (e.g. 'n.csv')
 		if(strlen(filename_rec) > 4){
+
 			// Marker used to detect problems while generating the filename/renaming
 			uint8_t fil_OK = 0;
+			char new_filename[255];
+			char base_rename[249];
 
-			// Add '.BIN' to the current filename and change '.CSV' to '_CSV'. NOTE: fatfs returns "fr_invalid_filename" if there are more than one dots of extension is longer than 3...
-			//sprintf(buff_filename,"%s.BIN", filename_rec);
-			//buff_filename[strlen(buff_filename)-1-3-4] = '_';
-			//printf("filename: %s\n", buff_filename);
-
-			sprintf(buff_filename, filename_rec);
-			buff_filename[strlen(buff_filename)-1] = 'N';
-			buff_filename[strlen(buff_filename)-2] = 'I';
-			buff_filename[strlen(buff_filename)-3] = 'B';
-
+			// Copy filename to new_filename and  Change file ending to '.BIN'
+			sprintf(new_filename, filename_rec);
+			new_filename[strlen(new_filename)-1] = 'N';
+			new_filename[strlen(new_filename)-2] = 'I';
+			new_filename[strlen(new_filename)-3] = 'B';
+			// Add '.BIN' to the current filename and change '.CSV' to '_CSV'.
+			//sprintf(new_filename,"%s.BIN", filename_rec);
+			//new_filename[strlen(new_filename)-1-3-4] = '_';
+			//printf("filename: %s\n", new_filename);
 
 			/// Check if file already exists - if so rename it
 			// Get file-info to check if it exists
-			res = f_stat(buff_filename, NULL); // Use &fno if actual file-info is needed
+			res = f_stat(new_filename, NULL);
 			if(res == FR_OK){
-				char buff_rename[249];
+				/// File already exists, we need to find a new name and rename the old file
 
-				// Write filename to buffer  without extension
-				snprintf(buff_rename, strlen(buff_filename)-3, buff_filename);
+				// Extract base of filename (without extension)
+				snprintf(base_rename, strlen(new_filename)-3, new_filename);
+
 				// Add two numbers '01' and file extension
-				sprintf(buff_filename, "%s01.BIN", buff_rename);
+				sprintf(new_filename, "%s01.BIN", base_rename);
 
-				printf("File already exists, try name: %s (%s)\n", buff_filename, buff_rename);
+				// Debug message
+				printf("File already exists, try name: %s (%s)\n", new_filename, base_rename);
 
-				// Check if file exists, else increase file number and dry again
+				// Check if a not yet used name is found - if not (still exists) increase file numbers and try again
 				uint8_t i = 1;
 				do{
 					// Check if file exists
-					res = f_stat(buff_filename, NULL);
-					if(res == FR_OK){ // it exists
+					res = f_stat(new_filename, NULL);
+					if(res == FR_OK){
+						// File already exists, generate filename with next number and try again
 						i++;
-						sprintf(buff_filename, "%s%02d.BIN", buff_rename, i);
-						printf("File already exists, try name: %s\n", buff_filename);
+						sprintf(new_filename, "%s%02d.BIN", base_rename, i);
+						printf("File already exists, try name: %s\n", new_filename);
 					}
 					else if (res == FR_NO_FILE){
-						printf("File not found\n");
+						/// A unique name was found - rename!
 
-						//
-						sprintf(&buff_rename[strlen(buff_rename)], ".BIN");
+						// Add .BIN to the base to use it for renaming
+						sprintf(&base_rename[strlen(base_rename)], ".BIN");
 
 						// Rename file
-						printf("Try to rename %s to %s\n", buff_rename, buff_filename);
-						res = f_rename(buff_rename, buff_filename);
+						printf("New filename found, rename %s to %s\n", base_rename, new_filename);
+						res = f_rename(base_rename, new_filename);
 						if(res == FR_OK){
+							// Rename successful
 							printf("Renamed file\n");
-							sprintf(buff_filename, buff_rename);
+
+							// The actual new record file shall be named without numbers,
+							// therefore just use the base name as new filename
+							sprintf(new_filename, base_rename);
+
+							// Mark renaming as successful
 							fil_OK = 1;
 						}
 						else{
+							// Rename failed - start not successful
 							printf("Rename failed %d\n", res);
+							fil_OK = 0;
 						}
+
+						// Tried renaming - now stop while loop
 						break;
 					}
 					else{
-						printf("Filename error: %d\n", res);
+						// Actual errors at file check only occur if all is lost - stop while loop
+						printf("Check file error: %d\n", res);
 						break;
 					}
 				}while(i < 100);
 			}
-			else{
-				printf("File not found: %d\n", res);
+			else if(res == FR_NO_FILE){
+				// File doesn't exist - no renaming necessary
+				printf("Filename is already unique - OK\n");
 				fil_OK = 1;
+			}
+			else{
+				// Actual errors at file check only occur if all is lost - stop while loop
+				printf("Check file error: %d\n", res);
+				fil_OK = 0;
 			}
 
 
+
+			// If the filename was already unique or the existing file was renamed - actually start/init the recording
 			if(fil_OK){
 				// Open/Create File
-				record_openFile(buff_filename);
+				record_openFile(new_filename);
 
 				// If file is successfully opened...
 				if(sdState == sdFileOpen){
 					// Allocate memory for the log FIFO
 					fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
 					// Check for allocation errors
-					if(fifo_buf == NULL)
+					if(fifo_buf == NULL){
 						printf("Memory allocation failed!\n");
+					}
 					else{
 						printf("Memory allocated!\n");
 
@@ -602,6 +634,9 @@ int8_t record_stop(uint8_t flushData){
 	///	Uses globals variables: sdState, measureMode, fifo_buf, ToDo
 	///
 
+
+	// Initial log line
+	printf("\nrecord_stop(flushData=%d):\n", flushData);
 
 	// If a file is open, close it
 	if(sdState == sdFileOpen){
