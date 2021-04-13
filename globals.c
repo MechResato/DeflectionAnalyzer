@@ -64,7 +64,7 @@ float_buffer_t s2_buf_2conv  [S2_BUF_SIZE] = { 0.0 };
 char    s2_filename_spec[STR_SPEC_MAXLEN] = "S2.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
 volatile sensor sensor2 = {
 	.index = 2,
-	.name = "Front",
+	.name = "Rear",
 	.adcChannel = &ADC_MEASUREMENT_Channel_A,
 	.bufIdx = 0,
 	.bufMaxIdx = S2_BUF_SIZE-1,
@@ -90,6 +90,8 @@ volatile sensor* sensors[1] = {&sensor1}; // Temporarily deactivate sensor 2
 
 
 /* LOG FIFO */
+char filename_rec[FILENAME_REC_MAXLEN] = "log.csv";
+uint8_t filename_rec_curLength = 8;
 // Also see FIFO_BLOCK_SIZE, FIFO_BLOCKS and FIFO_WRITEBUFIDX_BITS -> defined in header file
 volatile uint8_t volatile * volatile fifo_buf = NULL;	// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
 volatile uint16_t fifo_writeBufIdx = 0;					// The index inside the fifo_buf where the next value will be written to by the measurement handler

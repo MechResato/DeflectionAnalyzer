@@ -46,17 +46,6 @@ int main(void)
 	// Arm-M internal interrupt init
 	//SysTick_Config(SystemCoreClock / 144);
 
-	// Allocate memory for the log FIFO
-	fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-	//allocBuf();
-	// Check for allocation errors
-	if(fifo_buf == NULL)
-		printf("Memory malloc failed!\n");
-	else
-		printf("Memory allocated: %d!\n", (int)fifo_buf);
-
-	memset(fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-
 	// Counter for TFT_display init
 	uint8_t display_ticker = 0;
 
@@ -73,7 +62,8 @@ int main(void)
 	while (SYSTIMER_GetTime() < now + (100*1000)) __NOP();
 
 	// Load Values from SD-Card if possible
-	record_readSpecFile(&sensor1, NULL, NULL, NULL);
+	for (uint8_t i = 0; i < SENSORS_SIZE; i++)
+		record_readCalFile(sensors[i], NULL, NULL, NULL);
 
 	// Start ADC measurement interrupt routine
 	TIMER_Start(&TIMER_0);
@@ -91,7 +81,7 @@ int main(void)
 			// If recording mode is active and there is something to record (current block is finished) write block to SD-Card
 			if(measureMode == measureModeRecording && fifo_finBlock[fifo_recordBlock] == 1){
 				// Timing measurement pin high
-				DIGITAL_IO_SetOutputHigh(&IO_6_2);
+				//DIGITAL_IO_SetOutputHigh(&IO_6_2);
 
 				// Record current block
 				record_block();
@@ -106,7 +96,7 @@ int main(void)
 					fifo_recordBlock = 0;
 
 				// Timing measurement pin low
-				DIGITAL_IO_SetOutputLow(&IO_6_2);
+				//DIGITAL_IO_SetOutputLow(&IO_6_2);
 			}
 
 
@@ -118,7 +108,7 @@ int main(void)
 			display_ticker++;
 			if(measurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
 				display_ticker = 0;
-				TFT_display(); // ~9000us at Monitor, 800us at Dashboard(empty), 1440us at Setup
+				TFT_display(); // ~9000us at Monitoring, 800us at Dashboard(empty), 1440us at Setup
 			}
 
 		} // End of main_tick

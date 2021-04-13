@@ -5,6 +5,9 @@
  *      Author: Admin
  */
 
+
+// NOTE: Inside the fatfs DAVE App "LFN - Long File Names" are disabled per default and can only be enabled manually (must be redone after every "Generate code") at "ffconf.h" line 114 value "#define FF_USE_LFN		1"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -13,21 +16,26 @@
 #include <DAVE.h>
 #include "globals.h"
 
-
+DSTATUS diskStatus;
 static FATFS fs; // File system object (volume work area)
 static FIL fil; // File object
 //static FILINFO fno; // File information object
 
-DSTATUS diskStatus;
-
+/// External variables
 extern sdStates sdState;
+extern measureModes measureMode;
+
+/// Internal functions
+static uint8_t record_writeCalFile_pair (char* comment, char* val_buff);
+
+
 
 /// Note: This implementation allows only one open file at a time!
 void record_mountDisk(uint8_t mount){
 	/// Used to mount and unmount a disk.
 
 
-	// API result code
+	// FATFS result code
 	FRESULT res;
 
 	// Get current status of the SD
@@ -76,7 +84,8 @@ void record_mountDisk(uint8_t mount){
 void record_openFile(const char* path){
 	/// Used to open a file for read/write access. If another file is still open it will be closed automatically!
 
-	// API result code
+
+	// FATFS result code
 	FRESULT res;
 
 	// If SD is not mounted or a file is still open mount/close it
@@ -104,7 +113,7 @@ void record_openFile(const char* path){
 		}
 		else if (res == FR_INVALID_NAME){
 			printf("File open error: FR_INVALID_NAME '%s'\n", path);
-			sdState = sdFileOpen;
+			sdState = sdError;
 		}
 		else{
 			printf("File open error: %d\n", res);
@@ -116,7 +125,7 @@ void record_openFile(const char* path){
 void record_closeFile(){
 	/// Used to close a file.
 
-	// API result code
+	// FATFS result code
 	FRESULT res;
 
 	// If SD is mounted, try to open the file/path
@@ -141,15 +150,46 @@ void record_closeFile(){
 
 
 
+static uint8_t record_writeCalFile_pair (char* comment, char* val_buff){
+	/// Writes a comment and an actual value as two separate lines to the file
+	/// Returns 1 if there was an error, 0 means success.
 
-void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size){
+
+	// FATFS result code and bytes written
+	FRESULT res = 0;
+	UINT bw;
+
+	// Write comment
+	printf("Comment: %s", comment);
+	f_printf(&fil, comment);
+
+	// Write value
+	printf("Value: %s", val_buff);
+	res = f_write(&fil, val_buff, strlen(val_buff), &bw);
+
+	// Return 1 if there was an error, else 0
+	if (res != FR_OK || bw <= 0)
+		return 1;
+	else
+		return 0;
+}
+
+void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size){
+	/// Write the calibration/specification data of the given sensor to the file stated in the sensor struct.
+	/// Returns nothing.
 	///
-	/// TODO: Check write results and written bytes for consistency
+	///	sens	...	A struct of type sensor which holds all sensor data
+	/// dp_x	... A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
+	/// dp_y	... A float array holding all y-values (actual value in units e.g mm) used to do the curve fit (corresponding to x-values!)
+	/// dp_size	... Number of data points (elements in dp_x and dp_y)
 
-	FRESULT res = 0; /* API result code */
-	UINT bw; /* Bytes written */
+
+	// FATFS result code and two string buffers for comment and values
+	FRESULT res = 0;
+	char c_buff[400];
 	char buff[400];
 
+	// Initial log line
 	printf("\nrecord_writeSpecFile:\n");
 
 	// Try to mount disk
@@ -162,7 +202,7 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 		// Get file-info to check if it exists
 		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
 		if(res == FR_OK){
-			sprintf(buff,"s%d_backup.spec", sens->index);
+			sprintf(buff,"S%dCAL.BAL", sens->index);
 			f_rename((char*)&sens->fitFilename[0], buff);
 		}
 		else{
@@ -181,109 +221,61 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 				f_printf(&fil, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->name);
 				printf("Write header\n");
 
-				// Write fit order header and value in separate lines
-				f_printf(&fil, "Curve fit function order:\n");
-				printf("Write fit order comment\n");
+				// Write fit order comment and value in separate lines
 				sprintf(buff,"%d\n", sens->fitOrder);
-				res = f_write(&fil, buff, strlen(buff), &bw);
-				if (res != FR_OK || bw <= 0) break;
-				printf("Write fit order: %s", buff);
+				if( record_writeCalFile_pair("Curve fit function order:\n", &buff[0]) ) break;
 
-				// Write coefficients header and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
-				sprintf(buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->fitCoefficients[0], sens->fitCoefficients[1], sens->fitCoefficients[2], sens->fitCoefficients[3]);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				printf("Write coefficients comment\n");
+				// Write coefficients comment and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
+				sprintf(c_buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->fitCoefficients[0], sens->fitCoefficients[1], sens->fitCoefficients[2], sens->fitCoefficients[3]);
 				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->fitCoefficients[0], *(unsigned long*)&sens->fitCoefficients[1], *(unsigned long*)&sens->fitCoefficients[2], *(unsigned long*)&sens->fitCoefficients[3]);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				if (res != FR_OK || bw <= 0) break;
-				printf("Write coefficients: %s", buff);
+				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
-				// Write avg filter order header and value in separate lines
-				f_printf(&fil, "Average filter order:\n");
-				printf("Write average filter order comment\n");
+				// Write avg filter order comment and value in separate lines
 				sprintf(buff,"%d\n", sens->avgFilterOrder);
-				res = f_write(&fil, buff, strlen(buff), &bw);
-				if (res != FR_OK || bw <= 0) break;
-				printf("Write avg filter order: %s", buff);
+				if( record_writeCalFile_pair("Average filter order:\n", &buff[0]) ) break;
 
-				// Write avg filter order header and value in separate lines
-				f_printf(&fil, "Error threshold:\n");
-				printf("Write error threshold comment\n");
+				// Write avg filter order comment and value in separate lines
 				sprintf(buff,"%d\n", sens->errorThreshold);
-				res = f_write(&fil, buff, strlen(buff), &bw);
-				if (res != FR_OK || bw <= 0) break;
-				printf("Write error threshold: %s", buff);
+				if( record_writeCalFile_pair("Error threshold:\n", &buff[0]) ) break;
 
-				// numDataPoints header and value in separate lines
-				f_printf(&fil, "Number of data points:\n");
+				// Write numDataPoints comment and value in separate lines
 				sprintf(buff,"%d\n", dp_size);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				printf("Write numDataPoints comment\n");
-				if (res != FR_OK || bw <= 0) break;
-				printf("Write numDataPoints: %s", buff);
+				if( record_writeCalFile_pair("Number of data points:\n", &buff[0]) ) break;
 
-				// DataPoints x-value header
-				sprintf(buff,"Data Points x (%.8f", dp_x[0]);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				printf("Write Comment %s", buff);
-				if (res != FR_OK || bw <= 0) break;
-				for (uint8_t i = 1; i < dp_size; i++){
-					sprintf(buff,",%.8f", dp_x[i]);
-					res = f_write(&fil, buff, strlen(buff),&bw);
-					printf("%s", buff);
-					if (res != FR_OK || bw <= 0) break;
-				}
-
+				// DataPoints x-value comment
+				sprintf(c_buff,"Data Points x (%.8f", dp_x[0]);
+				for (uint8_t i = 1; i < dp_size; i++)
+					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", dp_x[i]);
+				sprintf(&c_buff[0] + (strlen(c_buff)),"):\n");
 				// DataPoints x-values
-				sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_x[0]);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				printf("%s", buff);
-				if (res != FR_OK || bw <= 0) break;
-				for (uint8_t i = 1; i < dp_size; i++){
-					sprintf(buff,",%08lX", *(unsigned long*)&dp_x[i]);
-					res = f_write(&fil, buff, strlen(buff),&bw);
-					printf("%s", buff);
-					if (res != FR_OK || bw <= 0) break;
-				}
-				// Add a line break
-				res = f_write(&fil, "\n", 1, &bw);
-				if (res != FR_OK || bw <= 0) break;
+				sprintf(buff,"%08lX", *(unsigned long*)&dp_x[0]);
+				for (uint8_t i = 1; i < dp_size; i++)
+					sprintf(&buff[0] + (strlen(buff)),",%08lX", *(unsigned long*)&dp_x[i]);
+				sprintf(&buff[0] + (strlen(buff)),"\n%c", '\0');
+				// Write comment and value
+				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
-				// DataPoints y-value header
-				sprintf(buff,"Data points y (%.8f", dp_y[0]);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				printf("\nWrite Comment %s", buff);
-				if (res != FR_OK || bw <= 0) break;
-				for (uint8_t i = 1; i < dp_size; i++){
-					sprintf(buff,",%.8f", dp_y[i]);
-					res = f_write(&fil, buff, strlen(buff),&bw);
-					printf("%s", buff);
-					if (res != FR_OK || bw <= 0) break;
-				}
-
+				// DataPoints y-value comment
+				sprintf(c_buff,"Data points y (%.8f", dp_y[0]);
+				for (uint8_t i = 1; i < dp_size; i++)
+					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", dp_y[i]);
+				sprintf(&c_buff[0] + (strlen(c_buff)),"):\n");
 				// DataPoints y-values
-				sprintf(buff,"):\n%08lX", *(unsigned long*)&dp_y[0]);
-				res = f_write(&fil, buff, strlen(buff),&bw);
-				printf("%s", buff);
-				if (res != FR_OK || bw <= 0) break;
-				for (uint8_t i = 1; i < dp_size; i++){
-					sprintf(buff,",%08lX", *(unsigned long*)&dp_y[i]);
-					res = f_write(&fil, buff, strlen(buff),&bw);
-					printf("%s", buff);
-					if (res != FR_OK || bw <= 0) break;
-				}
-				// Add a line break
-				res = f_write(&fil, "\n", 1, &bw);
-				if (res != FR_OK || bw <= 0) break;
+				sprintf(buff,"%08lX", *(unsigned long*)&dp_y[0]);
+				for (uint8_t i = 1; i < dp_size; i++)
+					sprintf(&buff[0] + (strlen(buff)),",%08lX", *(unsigned long*)&dp_y[i]);
+				sprintf(&buff[0] + (strlen(buff)),"\n%c", '\0');
+				// Write comment and value
+				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
-				printf("\nWrite of spec file successful!\n");
+				printf("\nWrite of CAL file successful!\n");
 			} while(false);
 
 			// Close file
 			record_closeFile();
 		}
 		else{
-			printf("Write Spec File not open");
+			printf("Write CAL File not open");
 		}
 	}
 
@@ -292,26 +284,33 @@ void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_s
 }
 
 
-void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
-	///
-	/// This function is not optimized for high speed. It should only be used when performance is not top priority (setup before actual start of record, not during).
+void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
+	/// Read the calibration/specification data of the given sensor from the file stated in the sensor struct.
+	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (setup before actual start of record, not during).
 	/// On 03.04.2021 this function measured to take about 266ms to complete...
+	/// Returns nothing.
+	///
+	///	sens	...	A struct of type sensor which will get all sensor data
+	/// dp_x	... Optional. A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
+	/// dp_y	... Optional. A float array holding all y-values (actual value in units e.g mm) used to do the curve fit (corresponding to x-values!)
+	/// dp_size	... Optional. Number of data points (elements in dp_x and dp_y)
 
+
+	// FATFS result code and two string buffers for comment and values
 	FRESULT res = 0; /* API result code */
-
-	//UINT bw,br; /* Bytes written */
 	char buff[400];
 	TCHAR* res_buf;
 
+	// Initial log line
 	printf("\nrecord_readSpecFile:\n");
 
 	// Try to mount disk
 	record_mountDisk(1);
 
-	// If the SD card is ready backup existing file, try to open the new one and write specifications
+	// If the SD card is ready, backup existing file, try to open the new one and read in data to sensor struct
 	if(sdState == sdMounted || sdState == sdFileOpen){
 
-		/// Check if file exists - if so open it
+		/// Check if file exists - if so, open it
 		printf("Check if file exists\n");
 		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
 		if(res == FR_OK){
@@ -331,6 +330,7 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 					/// Read fit order
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
 					res_buf = f_gets(buff, 400, &fil);
+					if (res_buf == 0) break;
 					printf("Spec header: %s", buff);
 					res_buf = f_gets(buff, 400, &fil);
 					if (res_buf == 0) break;
@@ -393,7 +393,7 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 
 							// Check for allocation errors
 							if(*dp_y == NULL || *dp_x == NULL)
-								printf("Read spec: Memory malloc failed!\n");
+								printf("Read CAL: Memory malloc failed!\n");
 
 							// Read DataPoints y-value
 							res_buf = f_gets(buff, 100, &fil);
@@ -441,12 +441,14 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 					else{
 						printf("No num data points in file or no parameters called\n");
 					}
+
 					// Close file
 					record_closeFile();
+
 				} while(false);
-			}
+			} // end of if "file ready"
 			else{
-				printf("Read Spec File not open");
+				printf("CAL file not open!");
 			}
 		}
 
@@ -455,10 +457,10 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 		printf("File not found: %d", res);
 	}
 
-	// Update filter (the order might be changed)
+	// Clean update of filter (the order might be changed)
 	measure_movAvgFilter_clean((sensor*)sens);
 
-	// Add a line break
+	// Add a line break to console
 	printf("\n");
 }
 
@@ -466,88 +468,204 @@ void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint
 
 
 int8_t record_start(){
+	/// Check if ready for recording, rename existing record file, open new file, allocate memory for the FIFO and change measuring mode.
+	/// This needs to be executed ONCE before record_block() is used!
+	/// Returns 1 if OK, 0 = error
 	///
+	/// No Inputs.
+	///
+	///	Uses globals variables: filename_rec, ToDo
 	///
 
 
-	//FRESULT res = 0; /* API result code */
+	FRESULT res = 0; /* API result code */
 	//UINT bw; /* Bytes written */
-	//char buff[400];
+	char buff_filename[255];
 
 	// Try to mount disk
 	record_mountDisk(1);
 
-	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	//// -------------------------------------------------
+	//// If the SD card is ready, backup possible existing file, try to open the new one, allocate fifo_buf and mark everything accordingly
 	if(sdState == sdMounted){
-		/// Check if file already exists - if so rename it
-		// Get file-info to check if it exists
-		//res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
-		//if(res == FR_OK){
-		//	sprintf(buff,"s%d_backup.spec", sens->index);
-		//	f_rename((char*)&sens->fitFilename[0], buff);
-		//}
-		//else{
-		//	printf("File not found: %d\n", res);
-		//}
+		// Only start if given name is longer than 4 characters (e.g. 'n.csv')
+		if(strlen(filename_rec) > 4){
+			// Marker used to detect problems while generating the filename/renaming
+			uint8_t fil_OK = 0;
 
-		// Open/Create File
-		record_openFile("output.txt");
+			// Add '.BIN' to the current filename and change '.CSV' to '_CSV'. NOTE: fatfs returns "fr_invalid_filename" if there are more than one dots of extension is longer than 3...
+			//sprintf(buff_filename,"%s.BIN", filename_rec);
+			//buff_filename[strlen(buff_filename)-1-3-4] = '_';
+			//printf("filename: %s\n", buff_filename);
 
-		if(sdState == sdFileOpen){
-			printf("record started\n");
-			measureMode = measureModeRecording;
-			//sdState = sdLogOpen;
-			return 1;
+			sprintf(buff_filename, filename_rec);
+			buff_filename[strlen(buff_filename)-1] = 'N';
+			buff_filename[strlen(buff_filename)-2] = 'I';
+			buff_filename[strlen(buff_filename)-3] = 'B';
+
+
+			/// Check if file already exists - if so rename it
+			// Get file-info to check if it exists
+			res = f_stat(buff_filename, NULL); // Use &fno if actual file-info is needed
+			if(res == FR_OK){
+				char buff_rename[249];
+
+				// Write filename to buffer  without extension
+				snprintf(buff_rename, strlen(buff_filename)-3, buff_filename);
+				// Add two numbers '01' and file extension
+				sprintf(buff_filename, "%s01.BIN", buff_rename);
+
+				printf("File already exists, try name: %s (%s)\n", buff_filename, buff_rename);
+
+				// Check if file exists, else increase file number and dry again
+				uint8_t i = 1;
+				do{
+					// Check if file exists
+					res = f_stat(buff_filename, NULL);
+					if(res == FR_OK){ // it exists
+						i++;
+						sprintf(buff_filename, "%s%02d.BIN", buff_rename, i);
+						printf("File already exists, try name: %s\n", buff_filename);
+					}
+					else if (res == FR_NO_FILE){
+						printf("File not found\n");
+
+						//
+						sprintf(&buff_rename[strlen(buff_rename)], ".BIN");
+
+						// Rename file
+						printf("Try to rename %s to %s\n", buff_rename, buff_filename);
+						res = f_rename(buff_rename, buff_filename);
+						if(res == FR_OK){
+							printf("Renamed file\n");
+							sprintf(buff_filename, buff_rename);
+							fil_OK = 1;
+						}
+						else{
+							printf("Rename failed %d\n", res);
+						}
+						break;
+					}
+					else{
+						printf("Filename error: %d\n", res);
+						break;
+					}
+				}while(i < 100);
+			}
+			else{
+				printf("File not found: %d\n", res);
+				fil_OK = 1;
+			}
+
+
+			if(fil_OK){
+				// Open/Create File
+				record_openFile(buff_filename);
+
+				// If file is successfully opened...
+				if(sdState == sdFileOpen){
+					// Allocate memory for the log FIFO
+					fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+					// Check for allocation errors
+					if(fifo_buf == NULL)
+						printf("Memory allocation failed!\n");
+					else{
+						printf("Memory allocated!\n");
+
+						// Set whole buffer null to avoid padding bytes being random
+						memset((uint8_t*)fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+
+						// Everything is OK - change mode (this enables actual storing and flushing of values)
+						measureMode = measureModeRecording;
+
+						// Return 1 - Success!
+						printf("recording started\n");
+						return 1;
+					}
+				}
+			}
 		}
-
 	}
 
-	printf("record start failed\n");
+	// Return 0 - Failed!
+	printf("recording start failed\n");
 	return 0;
 }
 
-int8_t record_stop(){
+int8_t record_stop(uint8_t flushData){
+	/// Check if file is open, flush remaining data to SD-card, free memory of the FIFO and change measuring mode.
+	/// This needs to be executed ONCE after the last record_block() execution!
+	/// Returns 1 if OK, 0 = error
 	///
+	/// flushData	...	If this is 1 the function will try to write the not yet written blocks to SD-card
+	///
+	///	Uses globals variables: sdState, measureMode, fifo_buf, ToDo
 	///
 
 
-	//FRESULT res = 0; /* API result code */
-	//UINT bw; /* Bytes written */
-	//char buff[400];
-
-	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	// If a file is open, close it
 	if(sdState == sdFileOpen){
-		// Closee File
+		// Everything is OK - change mode (this enables actual storing and flushing of values)
+		measureMode = measureModeMonitoring;
+
+		// Flush remaining Blocks and data to SD-card
+		if(flushData){
+			; // Todo Write last flush code
+		}
+
+		// Free Memory
+		free((uint8_t*)fifo_buf);
+
+		// Close File
 		record_closeFile();
 
+		// If everything is OK
 		if(sdState == sdMounted){
-			printf("record stopped\n");
-			measureMode = measureModeMonitoring;
+			// Return 1 - Stop successful!
+			printf("recording stopped\n");
 			return 1;
 		}
 
 	}
 
-	printf("record stop failed\n");
+	// Return 0 - Stop failed!
+	printf("recording stop failed\n");
 	return 0;
 }
 
 void record_block(){
+	/// Record the current block (fifo_recordBlock) of the FIFO to the SD-card
+	/// No inputs or output (performance)
+	///
+	///	Uses record-global variables: fil
+	///	Uses globals variables: fifo_buf, fifo_recordBlock, FIFO_BLOCK_SIZE
+
 
 	FRESULT res = 0; /* API result code */
 	UINT bw; /* Bytes written */
 
-	res = f_write(&fil, (void*)(fifo_buf + (fifo_recordBlock*FIFO_BLOCK_SIZE)), FIFO_BLOCK_SIZE, &bw);
+	// Write a FIFO_BLOCK_SIZE sized block to the beginning of the current block
+	res = f_write(
+			&fil,
+			(void*)(fifo_buf + (fifo_recordBlock*FIFO_BLOCK_SIZE)),
+			FIFO_BLOCK_SIZE,
+			&bw
+		  );
+
+	// If error occurred or there are less bytes written that should be - stop recording
 	if (res != FR_OK || bw != FIFO_BLOCK_SIZE){
-		sdState = sdMounted;
-		//record_stop();
-		printf("record block failed\n");
+		printf("Recording of block %d failed! Stopping record\n", fifo_recordBlock);
+		record_stop(0);
 	}
 
 }
 
+
+
+
+
 void record_line(){
-	///
+	///  Used to speed-test sd-cards with oscilloscope. TODO delete this
 	///
 
 	// All writes with transcent sd that are not equal to 512byte need 2ms every 512byte that are written! Exactly 512 needs this every time
@@ -582,10 +700,9 @@ void record_line(){
 
 }
 
-
 void record_buffer(void)
 {
-	// Example from Infineon for test purpose. TODO
+	// Example from Infineon for test purpose. TODO delete this
 
 	float testf_w = 1.0/7.0;
 	float testf_r = 0.0;

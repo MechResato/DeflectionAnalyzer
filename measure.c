@@ -157,7 +157,7 @@ void Adc_Measurement_Handler(void){
 			// Check if the write block has been recorded, if not a "crash" occurs and the process must be stopped
 			if(fifo_finBlock[fifo_writeBlock] == 1){
 				// Stop recording
-				record_stop();
+				record_stop(1);
 			}
 		}
 	}

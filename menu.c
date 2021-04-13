@@ -271,9 +271,6 @@ label lbl_recording = {
 		.ignoreScroll = 0
 };
 
-#define STR_FILENAME_MAXLEN 16
-char str_filename[STR_FILENAME_MAXLEN] = "test.csv";
-uint8_t str_filename_curLength = 8;
 #define TBX_FILENAME_TAG 20
 textbox tbx_filename = {
 	.x = M_COL_2,
@@ -282,9 +279,9 @@ textbox tbx_filename = {
 	.labelOffsetX = 65,
 	.labelText = "Filename:",
 	.mytag = TBX_FILENAME_TAG,
-	.text = str_filename,
-	.text_maxlen = STR_FILENAME_MAXLEN,
-	.text_curlen = &str_filename_curLength,
+	.text = filename_rec,
+	.text_maxlen = FILENAME_REC_MAXLEN,
+	.text_curlen = &filename_rec_curLength, // see globals.h/.c
 	.keypadType = Filename,
 	.active = 0,
 	.numSrc.srcType = srcTypeNone
@@ -680,7 +677,7 @@ textbox tbx_filter_order = {
 char str_error_threshold[STR_ERROR_THRESHOLD_MAXLEN] = "4095";
 uint8_t str_error_threshold_curLength = 4;
 #define TBX_FILTER_ERROR_THRESHOLD_TAG 25
-textbox tbx_error_threshold_order = {
+textbox tbx_error_threshold = {
 	.x = EVE_HSIZE - 55 - 25 - 55 - 105 - 5,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.width = 55,
@@ -936,7 +933,7 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 						printf("Start failed\n");
 				}
 				else if(measureMode == measureModeRecording){
-					int8_t res = record_stop();
+					int8_t res = record_stop(1);
 					if(res != 1)
 						printf("Stop failed\n");
 				}
@@ -1010,7 +1007,7 @@ void menu_display_2setup1(void){
 	TFT_setColor(1, BLACK, -1, -1, -1);
 
 	// Filename textbox
-	//TFT_textbox_display(20, 70, 20, str_filename);
+	//TFT_textbox_display(20, 70, 20, filename_rec);
 	TFT_textbox_display(&tbx_filename);
 	TFT_textbox_display(&tbx_sensor1);
 	TFT_textbox_display(&tbx_sensor2);
@@ -1088,7 +1085,7 @@ void menu_touch_2setup1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 			}
 			break;
 		default:
-			//TFT_textbox_touch(20, str_filename, STR_FILENAME_MAXLEN, &str_filename_curLength);
+			//TFT_textbox_touch(20, filename_rec, FILENAME_REC_MAXLEN, &filename_rec_curLength);
 			TFT_textbox_touch(&tbx_filename);
 			TFT_textbox_touch(&tbx_sensor1);
 			TFT_textbox_touch(&tbx_sensor2);
@@ -1132,7 +1129,7 @@ void menu_display_3setup2(void){
 	TFT_setColor(1, BLACK, -1, -1, -1);
 
 	// Filename textbox
-	//TFT_textbox_display(20, 70, 20, str_filename);
+	//TFT_textbox_display(20, 70, 20, filename_rec);
 	TFT_textbox_display(&tbx_hour);
 }
 void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -1190,7 +1187,7 @@ void curveset_prepare(volatile sensor* sens){
 	// Check if spec file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
 	DP_size = 0;
-	record_readSpecFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	record_readCalFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
 	// If there are still no data points - use default ones
 	if(DP_size == 0){
 		// Allocate and set the y-value array
@@ -1456,7 +1453,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				curveset_sens->fitOrder = fit_order;
 
 				// Write Spec file
-				record_writeSpecFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
 				free(tbx_act.numSrc.floatSrc);
@@ -1606,13 +1603,10 @@ void filterset_prepare(volatile sensor* sens){
 	// Store pointer to referenced Sensor buffer (ignore volatile here)
 	filterset_sens = (sensor*)sens;
 
-	// Do a clean filter value calculation to sync it
-	//measure_movAvgFilter_clean(filterset_sens);
-
 	// Check if spec file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
 	DP_size = 0;
-	record_readSpecFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	record_readCalFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
 	// If there are still no data points - use default ones
 	if(DP_size == 0){
 		// Allocate and set the y-value array
@@ -1627,10 +1621,6 @@ void filterset_prepare(volatile sensor* sens){
 		tbx_nom.numSrc.floatSrc[0] = 0.0;
 		tbx_nom.numSrc.floatSrc[1] = 2048.0;
 		tbx_nom.numSrc.floatSrc[2] = 4096.0;
-
-	}
-	else{
-
 	}
 
 	// Check for allocation errors
@@ -1640,16 +1630,8 @@ void filterset_prepare(volatile sensor* sens){
 	// Link filter order textbox source to current sensor filter order
 	tbx_filter_order.numSrc.intSrc = &filterset_sens->avgFilterOrder;
 
-	// Link actual value array to corresponding textbox
-	//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
-	//tbx_act.numSrc.srcOffset = &DP_cur;
-
-	// Link actual value array to corresponding textbox
-	//tbx_nom.numSrc.floatSrc = &tbx_nom.numSrc.floatSrc[0];
-	//tbx_nom.numSrc.srcOffset = &DP_cur;
-
-	// Determine fitted polynomial for the first time
-	//fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+	// Set current error threshold to retrieved value (we use a separate value in order to modify it dynamically)
+	filter_errorThreshold = filterset_sens->errorThreshold;
 }
 void filterset_setEditMode(uint8_t editMode){
 	/// Changes the GUI to error threshold editing mode and back (disable/enable of textboxes and buttons)
@@ -1660,7 +1642,7 @@ void filterset_setEditMode(uint8_t editMode){
 		// Change button appearance and activate textbox
 		btn_filter_setchange.state = EVE_OPT_FLAT;
 		btn_filter_setchange.text = "Save";
-		tbx_error_threshold_order.mytag = TBX_FILTER_ERROR_THRESHOLD_TAG;
+		tbx_error_threshold.mytag = TBX_FILTER_ERROR_THRESHOLD_TAG;
 
 	}
 	// Set to view mode - deactivate textbox for error threshold
@@ -1668,7 +1650,7 @@ void filterset_setEditMode(uint8_t editMode){
 		// Change button appearance and deactivate textbox
 		btn_filter_setchange.state = 0;
 		btn_filter_setchange.text = "Change";
-		tbx_error_threshold_order.mytag = 0;
+		tbx_error_threshold.mytag = 0;
 
 	}
 
@@ -1686,7 +1668,7 @@ void menu_display_static_filterset(void){
 	TFT_graph_static(1, &gph_filterset);
 
 	TFT_textbox_static(1, &tbx_filter_order);
-	TFT_textbox_static(1, &tbx_error_threshold_order);
+	TFT_textbox_static(1, &tbx_error_threshold);
 }
 void menu_display_filterset(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
@@ -1694,9 +1676,9 @@ void menu_display_filterset(void){
 
 
 	// If error threshold is in edit mode show current sensor value
-	if(tbx_error_threshold_order.mytag != 0 && tbx_error_threshold_order.active == 0 ){
+	if(tbx_error_threshold.mytag != 0 && tbx_error_threshold.active == 0 ){
 		// Save current sensor value
-		*tbx_error_threshold_order.numSrc.intSrc = (int_buffer_t)filterset_sens->bufFilter[filterset_sens->bufIdx];
+		*tbx_error_threshold.numSrc.intSrc = (int_buffer_t)filterset_sens->bufFilter[filterset_sens->bufIdx];
 	}
 
 	//// Get highest y value and set graph axis boundaries
@@ -1750,7 +1732,7 @@ void menu_display_filterset(void){
 	TFT_control(&btn_filter_setchange);
 
 	// Data point controls
-	TFT_textbox_display(&tbx_error_threshold_order);
+	TFT_textbox_display(&tbx_error_threshold);
 	TFT_textbox_display(&tbx_filter_order);
 
 	// Header labels
@@ -1778,10 +1760,10 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				measure_movAvgFilter_clean(filterset_sens);
 
 				// Store current error threshold to be used (filter order is changed direct)
-				filterset_sens->errorThreshold = *tbx_error_threshold_order.numSrc.intSrc;
+				filterset_sens->errorThreshold = *tbx_error_threshold.numSrc.intSrc;
 
 				// Write Spec file
-				record_writeSpecFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
 				free(tbx_act.numSrc.floatSrc);
@@ -1842,12 +1824,12 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 					*toggle_lock = 42;
 
 					// Activate Keypad and set cursor to end
-					TFT_textbox_setStatus(&tbx_error_threshold_order, 1, -1);
+					TFT_textbox_setStatus(&tbx_error_threshold, 1, -1);
 				}
 				break;
 		default:
 			// Handle textbox and if an OK was pressed an the active keypad stop cell from being updated
-			if(TFT_textbox_touch(&tbx_error_threshold_order))
+			if(TFT_textbox_touch(&tbx_error_threshold))
 				filterset_setEditMode(0);
 
 			break;

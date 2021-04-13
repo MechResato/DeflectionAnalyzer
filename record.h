@@ -15,14 +15,16 @@ void record_openFile(const char* path);
 void record_closeFile();
 void record_printf(const char* path);
 
-void record_writeSpecFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size);
-void record_readSpecFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size);
+void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size);
+void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size);
+
+
 
 void record_buffer(void);
 
 
 int8_t record_start();
-int8_t record_stop();
+int8_t record_stop(uint8_t flushData);
 void record_line();
 void record_block();
 

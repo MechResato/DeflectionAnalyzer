@@ -77,11 +77,15 @@ extern float_buffer_t s2_buf_2conv[];
 #define SENSORS_SIZE 1
 extern volatile sensor* sensors[];
 
-// LOG FIFO
+/*  RECORDING FIFO AND FILENAME */
+#define FILENAME_REC_MAXLEN 10
+extern char filename_rec[FILENAME_REC_MAXLEN];
+uint8_t filename_rec_curLength;
+
 // Note: FIFO_BLOCK_SIZE times FIFO_BLOCKS must always be a power of 2! Otherwise the overleap check with &= doesn't work anymore
 #define FIFO_BLOCK_SIZE 1024			// Number of bytes in one block
 #define FIFO_BLOCKS 	4				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
-#define FIFO_BITS_ONE_BLOCK (FIFO_BLOCK_SIZE-1)		// = 0b000 0111 1111 111 for 1024BS. Represents the used bits of the uint16_t which represents the index in one block. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
+#define FIFO_BITS_ONE_BLOCK (FIFO_BLOCK_SIZE-1)		         // = 0b000 0111 1111 111 for 1024BS. Represents the used bits of the uint16_t which represents the index in one block. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
 #define FIFO_BITS_ALL_BLOCK	((FIFO_BLOCK_SIZE*FIFO_BLOCKS)-1)// = 0b000 0011 1111 1111 for 1024BS and 4B. Represents the used bits of the uint16_t which represents the index in whole buffer. Use '&' to ignore higher bits
 #define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE, and must be adapted if more or less sensors are recorded.
 #define FIFO_LINE_SIZE_PAD 	2				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
