@@ -300,9 +300,9 @@ textbox tbx_sensor1 = {
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = EVE_HSIZE - (M_COL_2) - 130 - 25,
 	.labelOffsetX = 130,
-	.labelText = "Sensor1:   Spec File",
+	.labelText = "Sensor1:   CAL File",
 	.mytag = TBX_SENSOR1_TAG,
-	.text = s1_filename_spec,
+	.text = s1_filename_cal,
 	.text_maxlen = STR_SPEC_MAXLEN,
 	.text_curlen = (uint8_t*)&sensor1.fitFilename_curLen,  //(ignore volatile here)
 	.keypadType = Standard,
@@ -349,7 +349,7 @@ textbox tbx_sensor2 = {
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = 120,
 	.labelOffsetX = 130,
-	.labelText = "Sensor2:   Spec File",
+	.labelText = "Sensor2:   CAL File",
 	.mytag = TBX_SENSOR2_TAG,
 	.text = str_s2_linspec,
 	.text_maxlen = STR_S2_LINSPEC_MAXLEN,
@@ -1184,7 +1184,7 @@ void curveset_prepare(volatile sensor* sens){
 	// Store pointer to referenced Sensor buffer (ignore volatile here)
 	curveset_sens = (sensor*)sens;
 
-	// Check if spec file exists and load current settings if possible
+	// Check if CAL file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
 	DP_size = 0;
 	record_readCalFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);

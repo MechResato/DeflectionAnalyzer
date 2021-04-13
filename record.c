@@ -15,10 +15,12 @@
 #include <float.h>
 #include <DAVE.h>
 #include "globals.h"
+#include "record.h"
 
 DSTATUS diskStatus;
 static FATFS fs; // File system object (volume work area)
-static FIL fil; // File object
+static FIL fil_r; // File object used for read only
+static FIL fil_w; // File object used for write only
 //static FILINFO fno; // File information object
 
 /// External variables
@@ -30,7 +32,6 @@ static uint8_t record_writeCalFile_pair (char* comment, char* val_buff);
 
 
 
-/// Note: This implementation allows only one open file at a time!
 void record_mountDisk(uint8_t mount){
 	/// Used to mount and unmount a disk.
 
@@ -80,10 +81,10 @@ void record_mountDisk(uint8_t mount){
 
 }
 
-
-void record_openFile(const char* path){
-	/// Used to open a file for read/write access. If another file is still open it will be closed automatically!
-
+/// Note: This implementation allows only one read and one write file to be open at the same time!
+FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode){
+	/// Used to open a file on the read or write FIL struct for read/write access. If another file is still open it will be closed automatically!
+	/// Todo
 
 	// FATFS result code
 	FRESULT res;
@@ -91,22 +92,44 @@ void record_openFile(const char* path){
 	// If SD is not mounted or a file is still open mount/close it
 	if(sdState == sdNone)
 		record_mountDisk(1);
-	else if(sdState == sdFileOpen){
-		res = f_close(&fil);
-		if (res == FR_OK) {
-			printf("Close File OK\n");
-			sdState = sdMounted;
+	else{
+		// Initialize result variable to an undefined value to detect if a result was written
+		res = 127;
+
+		// Close already open file if needed
+		if(objFILrw == objFILread && fil_r.obj.fs != NULL){
+			res = f_close(&fil_r);
 		}
-		else{
-			printf("Close File error: %d\n", res);
-			sdState = sdError;
+		else if(objFILrw == objFILwrite && fil_w.obj.fs != NULL){
+			res = f_close(&fil_w);
+		}
+
+		// Check result if it has changed
+		if(res != 127){
+			if (res == FR_OK) {
+				printf("Close File OK\n");
+				sdState = sdMounted;
+			}
+			else{
+				printf("Close File error: %d\n", res);
+				sdState = sdError;
+			}
 		}
 	}
 
 	// If SD is mounted now, try to open the file/path
 	if(sdState == sdMounted) {
-		res = f_open(&fil, path, FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		// Check if a accessMode is given, else use FA_OPEN_ALWAYS
+		if(accessMode == 0)
+			accessMode = FA_OPEN_ALWAYS;
 
+		// Open file
+		if(objFILrw == objFILread)
+			res = f_open(&fil_r, path, accessMode | FA_READ);
+		else if (objFILrw == objFILwrite)
+			res = f_open(&fil_w, path, accessMode | FA_WRITE | FA_READ);
+
+		// Check if open was successful
 		if ((res == FR_OK) || (res == FR_EXIST)){
 			printf("File opened: %s\n", path);
 			sdState = sdFileOpen;
@@ -120,30 +143,44 @@ void record_openFile(const char* path){
 			sdState = sdError;
 		}
 	}
+
+	// Return last result
+	return res;
 }
 
-void record_closeFile(){
-	/// Used to close a file.
+FRESULT record_closeFile(objFIL objFILrw){
+	/// Used to close the file of the write or read FIL struct.
 
 	// FATFS result code
 	FRESULT res;
 
-	// If SD is mounted, try to open the file/path
-	if(sdState == sdFileOpen) {
-		res = f_close(&fil);
-		if (res == FR_OK){
-			printf("File closed\n");
+	// If SD is mounted and the corresponding file is still open close it
+	if(sdState == sdFileOpen){
+		// Close already open file if needed
+		if(objFILrw == objFILread && fil_r.obj.fs != NULL){
+			res = f_close(&fil_r);
+		}
+		else if(objFILrw == objFILwrite && fil_w.obj.fs != NULL){
+			res = f_close(&fil_w);
+		}
+
+		// Check result
+		if (res == FR_OK) {
+			printf("Close File OK\n");
 			sdState = sdMounted;
 		}
-		else if(res == FR_INVALID_OBJECT){
+		else if(res == FR_INVALID_OBJECT){ // Note: Unsure if needed - check this again
 			printf("File close warning: %d\n", res);
 			sdState = sdMounted;
 		}
 		else{
-			printf("File close error: %d\n", res);
+			printf("Close File error: %d\n", res);
 			sdState = sdError;
 		}
 	}
+
+	// Return last result
+	return res;
 }
 
 
@@ -161,11 +198,11 @@ static uint8_t record_writeCalFile_pair (char* comment, char* val_buff){
 
 	// Write comment
 	printf("Comment: %s", comment);
-	f_printf(&fil, comment);
+	f_printf(&fil_w, comment);
 
 	// Write value
 	printf("Value: %s", val_buff);
-	res = f_write(&fil, val_buff, strlen(val_buff), &bw);
+	res = f_write(&fil_w, val_buff, strlen(val_buff), &bw);
 
 	// Return 1 if there was an error, else 0
 	if (res != FR_OK || bw <= 0)
@@ -212,7 +249,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 		}
 
 		// Open/Create File
-		record_openFile((char*)&sens->fitFilename[0]);
+		record_openFile((char*)&sens->fitFilename[0], objFILwrite, 0);
 
 		// If file is ready to be written to ...
 		if(sdState == sdFileOpen){
@@ -220,7 +257,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 			// Single loop do-while slope to handle errors clean with break; (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 			do{
 				// Write header
-				f_printf(&fil, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->name);
+				f_printf(&fil_w, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->name);
 				printf("Write header\n");
 
 				// Write fit order comment and value in separate lines
@@ -274,7 +311,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 			} while(false);
 
 			// Close file
-			record_closeFile();
+			record_closeFile(objFILwrite);
 		}
 		else{
 			printf("Write CAL File not open");
@@ -284,7 +321,6 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 	// Add a line break to console
 	printf("\n");
 }
-
 
 void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
 	/// Read the calibration/specification data of the given sensor from the file stated in the sensor struct.
@@ -318,7 +354,7 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 		if(res == FR_OK){
 			// Open/Create File
 			printf("Open file\n");
-			record_openFile((char*)&sens->fitFilename[0]);
+			record_openFile((char*)&sens->fitFilename[0], objFILread, 0);
 
 			// If file is ready ...
 			if(sdState == sdFileOpen){
@@ -326,15 +362,15 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 				// Single loop do-while slope to handle errors clean with break (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 				do{
 					//printf("do while\n");
-					res = f_lseek(&fil, 0);
+					res = f_lseek(&fil_r, 0);
 					if (res != FR_OK) break;
 
 					/// Read fit order
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
-					res_buf = f_gets(buff, 400, &fil);
+					res_buf = f_gets(buff, 400, &fil_r);
 					if (res_buf == 0) break;
-					printf("Spec header: %s", buff);
-					res_buf = f_gets(buff, 400, &fil);
+					printf("CAL header: %s", buff);
+					res_buf = f_gets(buff, 400, &fil_r);
 					if (res_buf == 0) break;
 					// Convert read string to unsigned long and write back to sensor struct
 					sens->fitOrder = strtoul(buff, NULL, 10);
@@ -342,8 +378,8 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 					/// Read coefficients
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
-					res_buf = f_gets(buff, 100, &fil);
-					res_buf = f_gets(buff, 100, &fil);
+					res_buf = f_gets(buff, 100, &fil_r);
+					res_buf = f_gets(buff, 100, &fil_r);
 					if (res_buf == 0) break;
 					// Convert read string to long and write back to sensor struct
 					char *ptr = &buff[0];
@@ -361,8 +397,8 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 					/// Read filter order
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
-					res_buf = f_gets(buff, 400, &fil);
-					res_buf = f_gets(buff, 400, &fil);
+					res_buf = f_gets(buff, 400, &fil_r);
+					res_buf = f_gets(buff, 400, &fil_r);
 					if (res_buf == 0) break;
 					// Convert read string to unsigned long and write back to sensor struct
 					sens->avgFilterOrder = strtoul(buff, NULL, 10);
@@ -370,16 +406,16 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 					/// Read error threshold
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
-					res_buf = f_gets(buff, 400, &fil);
-					res_buf = f_gets(buff, 400, &fil);
+					res_buf = f_gets(buff, 400, &fil_r);
+					res_buf = f_gets(buff, 400, &fil_r);
 					if (res_buf == 0) break;
 					// Convert read string to unsigned long and write back to sensor struct
 					sens->errorThreshold = strtoul(buff, NULL, 10);
 					printf("errorThreshold %d: %s", sens->errorThreshold, buff);
 
 					// Read numDataPoints
-					res_buf = f_gets(buff, 400, &fil);
-					res_buf = f_gets(buff, 400, &fil);
+					res_buf = f_gets(buff, 400, &fil_r);
+					res_buf = f_gets(buff, 400, &fil_r);
 					printf("numDataPoints: %s", buff);
 					if (res_buf != 0 && dp_size != NULL){
 						printf("Reading DPs:\n");
@@ -398,8 +434,8 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 								printf("Read CAL: Memory malloc failed!\n");
 
 							// Read DataPoints y-value
-							res_buf = f_gets(buff, 100, &fil);
-							res_buf = f_gets(buff, 100, &fil);
+							res_buf = f_gets(buff, 100, &fil_r);
+							res_buf = f_gets(buff, 100, &fil_r);
 							if (res_buf == 0){
 								buff[0] = '-';
 								buff[1] = '1';
@@ -419,8 +455,8 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 							}
 
 							// Read DataPoints x-value
-							res_buf = f_gets(buff, 100, &fil);
-							res_buf = f_gets(buff, 100, &fil);
+							res_buf = f_gets(buff, 100, &fil_r);
+							res_buf = f_gets(buff, 100, &fil_r);
 							if (res_buf == 0){
 								buff[0] = '-';
 								buff[1] = '1';
@@ -448,7 +484,7 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 				} while(false);
 
 				// Close file
-				record_closeFile();
+				record_closeFile(objFILread);
 
 			} // end of if "file ready"
 			else{
@@ -468,6 +504,107 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 	printf("\n");
 }
 
+
+
+void record_convertBinFile(const char* path, sensor** sensArray){
+	/// Read the .BIN file (path) and write a corresponding .CSV file.
+	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (after end of record, not during).
+	/// Returns nothing.
+	///
+	///	path	...	Path to the .BIN file.
+	/// dp_x	... Optional. A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
+	///
+	/// globals TODO
+
+
+	// FATFS result code, Bytes written and a string buffer
+	FRESULT res = 0;
+	UINT bw,br;
+	char buff[400]; // Consideration: dynamic allocation based on line length?
+
+
+	// Initial log line
+	printf("\nrecord_convertBinFile:\n");
+
+	// Stop measuring - needed because same buffers are used to convert (also enhances performance a bit)
+	measureMode = measureModeNone;
+
+	// Reset buffers of all sensors
+	for (uint8_t i = 0; i < SENSORS_SIZE; i++){
+		// Reset index counter
+
+		// Memset all elements of all buffers to 0
+
+		// Clean update of filter (sum must be reset)
+		measure_movAvgFilter_clean((sensor*)sensArray[i]);
+	}
+
+	// Try to mount disk
+	record_mountDisk(1);
+
+	// If the SD card is ready, backup existing file, try to open the .BIN and .CSV file and convert data
+	if(sdState == sdMounted || sdState == sdFileOpen){
+
+		/// Todo: renaming of existing files like in record_start();
+
+		/// Check if file exists - if so, open it
+		printf("Check if file exists\n");
+		res = f_stat(path, NULL);
+		if(res == FR_OK){
+			// Get line size, line padding size, block size and size of every value to be used while reading binary
+
+			// Open/Create File
+			printf("Open BIN file\n");
+			res &= record_openFile(path, objFILread, 0);
+
+			printf("Open CSV file\n");
+			res &= record_openFile(path, objFILwrite, 0);
+
+			// If files are ready ...
+			if(res == FR_OK){
+				// Generate line format (noit needed?)
+				//char lineFormat[100] = "%d\n";
+
+				// As long as end of file isn't reached - read line by line and convert to csv
+				while(1){
+					// Reset buff
+					char seperator = ';';
+
+					// Read next line
+
+					// For each sensor - read corresponding bits to sensor buffer, apply filter, convert value and write to CSV file
+					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
+						// Set current raw value
+
+						// Check for Error
+
+						// Set current filter value
+
+						// Set current converted value
+
+						// On last value of line - change separator to newline
+						if(i == SENSORS_SIZE-1)
+							seperator = '\n';
+
+						// Write current value to the buffer
+						sprintf(buff+strlen(buff), "%d%c", sensArray[i]->bufRaw[sensArray[i]->bufIdx], seperator);
+					}
+
+					// Write Line
+					res = f_write(&fil_w, buff, 13, &bw);
+					printf("Writing line: %s\n", buff);
+
+				}
+
+			}
+		}
+	}
+
+	// Restart measuring
+	measureMode = measureModeMonitoring;
+
+
+}
 
 
 
@@ -591,7 +728,7 @@ int8_t record_start(){
 			// If the filename was already unique or the existing file was renamed - actually start/init the recording
 			if(fil_OK){
 				// Open/Create File
-				record_openFile(new_filename);
+				record_openFile(new_filename, objFILwrite, 0);
 
 				// If file is successfully opened...
 				if(sdState == sdFileOpen){
@@ -652,7 +789,7 @@ int8_t record_stop(uint8_t flushData){
 		free((uint8_t*)fifo_buf);
 
 		// Close File
-		record_closeFile();
+		record_closeFile(objFILwrite);
 
 		// If everything is OK
 		if(sdState == sdMounted){
@@ -681,7 +818,7 @@ void record_block(){
 
 	// Write a FIFO_BLOCK_SIZE sized block to the beginning of the current block
 	res = f_write(
-			&fil,
+			&fil_w,
 			(void*)(fifo_buf + (fifo_recordBlock*FIFO_BLOCK_SIZE)),
 			FIFO_BLOCK_SIZE,
 			&bw
@@ -727,7 +864,7 @@ void record_line(){
 
 	//sprintf(buff,"%.2f", testF);
 	//res = f_write(&fil, "1" , 1, &bw);
-	res = f_write(&fil, "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234501234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234501234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345", 2048, &bw);
+	res = f_write(&fil_w, "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234501234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234501234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345", 2048, &bw);
 	if (res != FR_OK){
 		sdState = sdMounted;
 		printf("record line failed\n");
@@ -755,22 +892,22 @@ void record_buffer(void)
 		if ((res == FR_OK) || (res == FR_EXIST))
 		{
 			/* Create a file as new */
-			res = f_open(&fil, "Record/log.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+			res = f_open(&fil_w, "Record/log.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
 			if ((res == FR_OK) || (res == FR_EXIST))
 			{
 				/* Write a message */
 				sprintf(buff,"%08lX\n", *(unsigned long*)&testf_w);
 				printf("write: %s\n", buff);
-				res = f_write(&fil, buff, 13, &bw);
+				res = f_write(&fil_w, buff, 13, &bw);
 				//sprintf(buff,"Current value 2 %5d\n", InputBuffer1[InputBuffer1_idx]);
-				//res = f_write(&fil, buff, 22, &bw);
+				//res = f_write(&fil_w, buff, 22, &bw);
 				if (res == FR_OK )
 				{
-					res = f_lseek(&fil, 0);
+					res = f_lseek(&fil_w, 0);
 
 					//sprintf(Buffer2,"%08lX",*(unsigned long*)&ADCValue2_float2);
 					printf("ori: %08lX, %f\n", *(unsigned long*)&testf_w, testf_w);
-					f_gets(buff, 25, &fil);
+					f_gets(buff, 25, &fil_w);
 					printf("gets: %s\n", buff);
 
 					uint32_t tmp = strtol(buff, NULL, 16);
@@ -789,7 +926,7 @@ void record_buffer(void)
 					//	if(res == FR_OK)
 					//	{
 					//		/* Add some more content to the file */
-					//		res = f_write(&fil, "\nWelcome to Infineon", 20, &bw);
+					//		res = f_write(&fil_w, "\nWelcome to Infineon", 20, &bw);
 					//		if(res == FR_OK)
 					//		{
 					//
@@ -805,9 +942,9 @@ void record_buffer(void)
 			printf("disk_status open = %d\n", diskStatus);
 
 
-			res = f_close(&fil);
+			res = f_close(&fil_w);
 			printf("f_close 1: %d\n", res);
-			res = f_close(&fil);
+			res = f_close(&fil_w);
 			printf("f_close 2: %d\n", res);
 		}
 		diskStatus = disk_status(fs.pdrv);

@@ -33,7 +33,7 @@ int_buffer_t   s1_buf_0raw   [S1_BUF_SIZE] = { 0 }; // all elements 0
 float_buffer_t s1_buf_1filter[S1_BUF_SIZE] = { 0.0 };
 float_buffer_t s1_buf_2conv  [S1_BUF_SIZE] = { 0.0 };
 #define S1_FILENAME_CURLEN 6
-char    s1_filename_spec[STR_SPEC_MAXLEN] = "S1.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
+char    s1_filename_cal[STR_SPEC_MAXLEN] = "S1.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
 volatile sensor sensor1 = {
 	.index = 1,
 	.name = "Front",
@@ -47,7 +47,7 @@ volatile sensor sensor1 = {
 	.errorThreshold = 3900, // Raw value above this threshold will be considered invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	.avgFilterOrder = 5,
 	.avgFilterSum = 0.0,
-	.fitFilename = s1_filename_spec,
+	.fitFilename = s1_filename_cal,
 	.fitFilename_curLen = S1_FILENAME_CURLEN,
 	.fitOrder = 2,
 	.fitCoefficients[0] = 0,

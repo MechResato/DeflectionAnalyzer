@@ -60,7 +60,7 @@ typedef struct {
 } sensor;
 
 // Sensor 1 Front
-char s1_filename_spec[STR_SPEC_MAXLEN];
+char s1_filename_cal[STR_SPEC_MAXLEN];
 volatile sensor sensor1;
 extern int_buffer_t s1_buf_0raw[];
 extern float_buffer_t s1_buf_1filter[];
