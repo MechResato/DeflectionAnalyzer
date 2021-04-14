@@ -36,7 +36,7 @@ volatile uint32_t measurementCounter;
 /*  MEASUREMENTs */
 
 // Sensor data definition
-#define SENSOR_RAW_SIZE 2 // Bytes. Size of the a variable that represents the raw value. FIFO_BLOCK_SIZE MUST BE DIVISIBLE BY THIS!
+#define SENSOR_RAW_SIZE sizeof(int_buffer_t) // Bytes. Size of the a variable that represents the raw value. FIFO_BLOCK_SIZE MUST BE DIVISIBLE BY THIS!
 #define STR_SPEC_MAXLEN 20
 typedef struct {
 	uint8_t index;
@@ -81,6 +81,10 @@ extern volatile sensor* sensors[];
 #define FILENAME_REC_MAXLEN 10
 extern char filename_rec[FILENAME_REC_MAXLEN];
 uint8_t filename_rec_curLength;
+// Size of buffers used for filename handling (change this if Long File Names - LFN is activated)
+#define FILENAME_BUFFER_LENGTH 20
+// Size of buffers used to generate a line for the CSV File. Adapt if line gets longer (more sensors, values, etc).
+#define CSVLINE_BUFFER_LENGTH 200
 
 // Note: FIFO_BLOCK_SIZE times FIFO_BLOCKS must always be a power of 2! Otherwise the overleap check with &= doesn't work anymore
 #define FIFO_BLOCK_SIZE 1024			// Number of bytes in one block
@@ -96,8 +100,6 @@ volatile uint8_t fifo_recordBlock;
 extern volatile uint8_t fifo_finBlock[];
 
 /*  MENU AND USER INTERFACE */
-volatile uint8_t inputType;
-
 // Data Acquisition Mode
 enum measureModes{measureModeNone=0, measureModeMonitoring, measureModeRecording};
 typedef enum measureModes measureModes;

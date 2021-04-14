@@ -3034,8 +3034,6 @@
       </link>
     </connectionDecorators>
     <bendpoints x="801" y="50"/>
-    <bendpoints x="671" y="50"/>
-    <bendpoints x="671" y="120"/>
     <bendpoints x="814" y="120"/>
   </connections>
   <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.4/@anchors.0" end="//@children.16/@anchors.0">

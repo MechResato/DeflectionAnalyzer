@@ -13,8 +13,8 @@ enum objFIL{objFILwrite=0, objFILread};
 typedef enum objFIL objFIL;
 
 void record_mountDisk(uint8_t mount);
-FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode);
-FRESULT record_closeFile(objFIL objFILrw);
+//FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode);
+//FRESULT record_closeFile(objFIL objFILrw);
 //void record_printf(const char* path);
 
 void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size);

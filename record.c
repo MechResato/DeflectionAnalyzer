@@ -28,7 +28,11 @@ extern sdStates sdState;
 extern measureModes measureMode;
 
 /// Internal functions
+static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode);
+static FRESULT record_closeFile(objFIL objFILrw);
+static int8_t record_checkEndOfFile(objFIL objFILrw);
 static uint8_t record_writeCalFile_pair (char* comment, char* val_buff);
+static int8_t record_backupFile(const char* path);
 
 
 
@@ -82,7 +86,7 @@ void record_mountDisk(uint8_t mount){
 }
 
 /// Note: This implementation allows only one read and one write file to be open at the same time!
-FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode){
+static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode){
 	/// Used to open a file on the read or write FIL struct for read/write access. If another file is still open it will be closed automatically!
 	/// Todo
 
@@ -148,7 +152,7 @@ FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode){
 	return res;
 }
 
-FRESULT record_closeFile(objFIL objFILrw){
+static FRESULT record_closeFile(objFIL objFILrw){
 	/// Used to close the file of the write or read FIL struct.
 
 	// FATFS result code
@@ -183,6 +187,22 @@ FRESULT record_closeFile(objFIL objFILrw){
 	return res;
 }
 
+static int8_t record_checkEndOfFile(objFIL objFILrw){
+	/// Check and return end of file status of given file
+	/// Return 1 if if EOF is reached, 0 if its not reached and -1 if the requested file is wrong or not open
+	///
+	/// objFILrw	...	Requested file (see objFIL, write or read file)
+
+
+	// Return end of file status of given file
+	if(objFILrw == objFILread && fil_r.obj.fs != NULL)
+		return f_eof(&fil_r);
+	else if(objFILrw == objFILwrite && fil_w.obj.fs != NULL)
+		return f_eof(&fil_w);
+
+	// Return error if the requested file is wrong or not open
+	return -1;
+}
 
 
 
@@ -506,7 +526,7 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 
 
-void record_convertBinFile(const char* path, sensor** sensArray){
+void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
 	/// Read the .BIN file (path) and write a corresponding .CSV file.
 	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (after end of record, not during).
 	/// Returns nothing.
@@ -520,8 +540,7 @@ void record_convertBinFile(const char* path, sensor** sensArray){
 	// FATFS result code, Bytes written and a string buffer
 	FRESULT res = 0;
 	UINT bw,br;
-	char buff[400]; // Consideration: dynamic allocation based on line length?
-
+	char buff[CSVLINE_BUFFER_LENGTH]; // Consideration: dynamic allocation based on line length?
 
 	// Initial log line
 	printf("\nrecord_convertBinFile:\n");
@@ -529,11 +548,20 @@ void record_convertBinFile(const char* path, sensor** sensArray){
 	// Stop measuring - needed because same buffers are used to convert (also enhances performance a bit)
 	measureMode = measureModeNone;
 
+	// Wait a whole interval to make sure the buffers are'nt being written to anymore
+	delay_ms(MEASUREMENT_INTERVAL);
+
 	// Reset buffers of all sensors
 	for (uint8_t i = 0; i < SENSORS_SIZE; i++){
 		// Reset index counter
+		sensArray[i]->bufIdx = 0;
+		sensArray[i]->errorOccured = 0;
+		sensArray[i]->avgFilterSum = 0;
 
 		// Memset all elements of all buffers to 0
+		memset((int_buffer_t*)sensArray[i]->bufRaw   , 0, sensArray[i]->bufMaxIdx+1);
+		memset((int_buffer_t*)sensArray[i]->bufFilter, 0, sensArray[i]->bufMaxIdx+1);
+		memset((int_buffer_t*)sensArray[i]->bufConv  , 0, sensArray[i]->bufMaxIdx+1);
 
 		// Clean update of filter (sum must be reset)
 		measure_movAvgFilter_clean((sensor*)sensArray[i]);
@@ -544,29 +572,41 @@ void record_convertBinFile(const char* path, sensor** sensArray){
 
 	// If the SD card is ready, backup existing file, try to open the .BIN and .CSV file and convert data
 	if(sdState == sdMounted || sdState == sdFileOpen){
+		/// Change file extension to .CSV
+		// Buffer to store and modify the filename
+		char filename_CSV[FILENAME_BUFFER_LENGTH];
 
-		/// Todo: renaming of existing files like in record_start();
+		// Copy filename and change file extension to .CSV
+		sprintf(filename_CSV, filename_BIN);
+		filename_CSV[strlen(filename_CSV)-1] = 'V';
+		filename_CSV[strlen(filename_CSV)-2] = 'S';
+		filename_CSV[strlen(filename_CSV)-3] = 'C';
+
+		/// Check filename for uniqueness and rename existing file if needed
+		int8_t fil_OK = record_backupFile(filename_CSV);
 
 		/// Check if file exists - if so, open it
 		printf("Check if file exists\n");
-		res = f_stat(path, NULL);
-		if(res == FR_OK){
+		res = f_stat(filename_CSV, NULL);
+		if(fil_OK == 1 && res == FR_OK){
 			// Get line size, line padding size, block size and size of every value to be used while reading binary
+			// Todo list variables
+			// Note: This will not be done because we assume that this will run straight after the recording, and therefore the global variables must be equal
 
-			// Open/Create File
+			// Open/Create Files
 			printf("Open BIN file\n");
-			res &= record_openFile(path, objFILread, 0);
+			res &= record_openFile(filename_BIN, objFILread, 0);
 
 			printf("Open CSV file\n");
-			res &= record_openFile(path, objFILwrite, 0);
+			res &= record_openFile(filename_CSV, objFILwrite, 0);
 
 			// If files are ready ...
 			if(res == FR_OK){
-				// Generate line format (noit needed?)
+				// Generate line format (not needed?)
 				//char lineFormat[100] = "%d\n";
 
 				// As long as end of file isn't reached - read line by line and convert to csv
-				while(1){
+				while(record_checkEndOfFile(objFILread)){
 					// Reset buff
 					char seperator = ';';
 
@@ -608,6 +648,125 @@ void record_convertBinFile(const char* path, sensor** sensArray){
 
 
 
+
+
+
+
+
+static int8_t record_backupFile(const char* path){
+	/// Check if the given file (in root directory) already exists. If yes, it renames the existing file to a pattern "[oldName]00.[fileExtesion]" where 00 is the next not used number between 1 and 99
+	/// Limitations: Only use 3 character file extensions! No sub-folders are supported because the length is checked (except LFN (Long File Names -> FF_USE_LFN) are activated)
+	/// Returns 1 if OK, 0 = error
+	///
+	/// path	...	The path/filename to be checked with extension
+	///
+	///	Uses globals variables: ToDo
+	///
+
+
+	FRESULT res = 0; /* API result code */
+
+	// Initial log line
+	printf("\trecord_backupFile:\n");
+
+	// Only start if given name is longer than 4 characters (e.g. 'n.csv')
+	if(strlen(path) > 4 && (strlen(path) <= 10 || FF_USE_LFN == 1)){
+
+		// Marker used to detect problems while generating the filename/renaming
+		char new_filename[FILENAME_BUFFER_LENGTH]; //
+		char base_rename[FILENAME_BUFFER_LENGTH];  //
+		char extension[4];
+
+		// Copy extension
+		extension[3] = '\0';
+		extension[2] = path[strlen(path)-1];
+		extension[1] = path[strlen(path)-2];
+		extension[0] = path[strlen(path)-3];
+
+		// Copy path to new_filename
+		sprintf(new_filename, path);
+
+		/// Check if file already exists - if so rename it
+		// Get file-info to check if it exists
+		res = f_stat(new_filename, NULL);
+		if(res == FR_OK){
+			/// File already exists, we need to find a new name and rename the old file
+
+			// Extract base of filename (without extension)
+			snprintf(base_rename, strlen(new_filename)-3, new_filename);
+
+			// Add two numbers '01' and file extension
+			sprintf(new_filename, "%s01.%s", base_rename, extension);
+
+			// Debug message
+			printf("\tFile already exists, try name: %s (%s)\n", new_filename, base_rename);
+
+			// Check if a not yet used name is found - if not (still exists) increase file numbers and try again
+			uint8_t i = 1;
+			do{
+				// Check if file exists
+				res = f_stat(new_filename, NULL);
+				if(res == FR_OK){
+					// File already exists, generate filename with next number and try again
+					i++;
+					sprintf(new_filename, "%s%02d.%s", base_rename, i, extension);
+					printf("\tFile already exists, try name: %s\n", new_filename);
+				}
+				else if (res == FR_NO_FILE){
+					/// A unique name was found - rename!
+
+					// Add extension to the base name in order to use it for renaming
+					sprintf(&base_rename[strlen(base_rename)], ".%s", extension);
+
+					// Rename file
+					printf("\tNew filename found, rename %s to %s\n", base_rename, new_filename);
+					res = f_rename(base_rename, new_filename);
+					if(res == FR_OK){
+						// Rename successful
+						printf("\t Renamed file\n");
+
+						// The actual new record file shall be named without numbers,
+						// therefore just use the base name as new filename
+						sprintf(new_filename, base_rename);
+
+						// Renaming was successful
+						return 1;
+					}
+					else{
+						// Rename failed - start not successful
+						printf("\t Rename failed %d\n", res);
+					}
+
+					// Tried renaming - now stop while loop
+					break;
+				}
+				else{
+					// Actual errors at file check only occur if all is lost - stop while loop
+					printf("\t Check file error: %d\n", res);
+					break;
+				}
+			}while(i < 100);
+		}
+		else if(res == FR_NO_FILE){
+			// File doesn't exist - no renaming necessary
+			printf("\t Filename is already unique - OK\n");
+			return 1;
+		}
+		else{
+			// Actual errors at file check only occur if all is lost - stop while loop
+			printf("\t Check file error: %d\n", res);
+		}
+
+
+
+	}
+
+
+	// Return 0 - Failed!
+	printf("record_backupFile failed\n");
+	return 0;
+}
+
 int8_t record_start(){
 	/// Check if ready for recording, rename existing record file, open new file, allocate memory for the FIFO and change measuring mode.
 	/// This needs to be executed ONCE before record_block() is used!
@@ -619,9 +778,6 @@ int8_t record_start(){
 	///
 
 
-	FRESULT res = 0; /* API result code */
-	//UINT bw; /* Bytes written */
-
 	// Initial log line
 	printf("\nrecord_start:\n");
 
@@ -632,128 +788,47 @@ int8_t record_start(){
 	//// If the SD card is ready, backup possible existing file, try to open the new one, allocate fifo_buf and mark everything accordingly
 	if(sdState == sdMounted){
 
-		// Only start if given name is longer than 4 characters (e.g. 'n.csv')
-		if(strlen(filename_rec) > 4){
+		// Buffer to store and modify the filename
+		char filename[FILENAME_BUFFER_LENGTH];
 
-			// Marker used to detect problems while generating the filename/renaming
-			uint8_t fil_OK = 0;
-			char new_filename[255];
-			char base_rename[249];
+		// Copy filename and change file extension to .BIN
+		sprintf(filename, filename_rec);
+		filename[strlen(filename)-1] = 'N';
+		filename[strlen(filename)-2] = 'I';
+		filename[strlen(filename)-3] = 'B';
 
-			// Copy filename to new_filename and  Change file ending to '.BIN'
-			sprintf(new_filename, filename_rec);
-			new_filename[strlen(new_filename)-1] = 'N';
-			new_filename[strlen(new_filename)-2] = 'I';
-			new_filename[strlen(new_filename)-3] = 'B';
-			// Add '.BIN' to the current filename and change '.CSV' to '_CSV'.
-			//sprintf(new_filename,"%s.BIN", filename_rec);
-			//new_filename[strlen(new_filename)-1-3-4] = '_';
-			//printf("filename: %s\n", new_filename);
+		// Check filename for uniqueness and rename existing file if needed
+		int8_t fil_OK = record_backupFile(filename);
 
-			/// Check if file already exists - if so rename it
-			// Get file-info to check if it exists
-			res = f_stat(new_filename, NULL);
-			if(res == FR_OK){
-				/// File already exists, we need to find a new name and rename the old file
+		// If the filename was already unique or the existing file was renamed - actually start/init the recording
+		if(fil_OK){
+			// Open/Create File
+			record_openFile(filename, objFILwrite, 0);
 
-				// Extract base of filename (without extension)
-				snprintf(base_rename, strlen(new_filename)-3, new_filename);
+			// If file is successfully opened...
+			if(sdState == sdFileOpen){
+				// Allocate memory for the log FIFO
+				fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+				// Check for allocation errors
+				if(fifo_buf == NULL){
+					printf("Memory allocation failed!\n");
+				}
+				else{
+					printf("Memory allocated!\n");
 
-				// Add two numbers '01' and file extension
-				sprintf(new_filename, "%s01.BIN", base_rename);
+					// Set whole buffer null to avoid padding bytes being random
+					memset((uint8_t*)fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
 
-				// Debug message
-				printf("File already exists, try name: %s (%s)\n", new_filename, base_rename);
+					// Everything is OK - change mode (this enables actual storing and flushing of values)
+					measureMode = measureModeRecording;
 
-				// Check if a not yet used name is found - if not (still exists) increase file numbers and try again
-				uint8_t i = 1;
-				do{
-					// Check if file exists
-					res = f_stat(new_filename, NULL);
-					if(res == FR_OK){
-						// File already exists, generate filename with next number and try again
-						i++;
-						sprintf(new_filename, "%s%02d.BIN", base_rename, i);
-						printf("File already exists, try name: %s\n", new_filename);
-					}
-					else if (res == FR_NO_FILE){
-						/// A unique name was found - rename!
-
-						// Add .BIN to the base to use it for renaming
-						sprintf(&base_rename[strlen(base_rename)], ".BIN");
-
-						// Rename file
-						printf("New filename found, rename %s to %s\n", base_rename, new_filename);
-						res = f_rename(base_rename, new_filename);
-						if(res == FR_OK){
-							// Rename successful
-							printf("Renamed file\n");
-
-							// The actual new record file shall be named without numbers,
-							// therefore just use the base name as new filename
-							sprintf(new_filename, base_rename);
-
-							// Mark renaming as successful
-							fil_OK = 1;
-						}
-						else{
-							// Rename failed - start not successful
-							printf("Rename failed %d\n", res);
-							fil_OK = 0;
-						}
-
-						// Tried renaming - now stop while loop
-						break;
-					}
-					else{
-						// Actual errors at file check only occur if all is lost - stop while loop
-						printf("Check file error: %d\n", res);
-						break;
-					}
-				}while(i < 100);
-			}
-			else if(res == FR_NO_FILE){
-				// File doesn't exist - no renaming necessary
-				printf("Filename is already unique - OK\n");
-				fil_OK = 1;
-			}
-			else{
-				// Actual errors at file check only occur if all is lost - stop while loop
-				printf("Check file error: %d\n", res);
-				fil_OK = 0;
-			}
-
-
-
-			// If the filename was already unique or the existing file was renamed - actually start/init the recording
-			if(fil_OK){
-				// Open/Create File
-				record_openFile(new_filename, objFILwrite, 0);
-
-				// If file is successfully opened...
-				if(sdState == sdFileOpen){
-					// Allocate memory for the log FIFO
-					fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-					// Check for allocation errors
-					if(fifo_buf == NULL){
-						printf("Memory allocation failed!\n");
-					}
-					else{
-						printf("Memory allocated!\n");
-
-						// Set whole buffer null to avoid padding bytes being random
-						memset((uint8_t*)fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-
-						// Everything is OK - change mode (this enables actual storing and flushing of values)
-						measureMode = measureModeRecording;
-
-						// Return 1 - Success!
-						printf("recording started\n");
-						return 1;
-					}
+					// Return 1 - Success!
+					printf("recording started\n");
+					return 1;
 				}
 			}
 		}
+
 	}
 
 	// Return 0 - Failed!

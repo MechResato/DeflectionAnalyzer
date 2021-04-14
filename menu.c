@@ -162,6 +162,10 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 //		Monitoring Elements         -----------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Input signal type used for measurement and GUI display
+uint8_t inputType = 0;
+
 #define BTN_INPUT_TAG 13
 control btn_input = {
 	.x = 180,		.y = 15,

@@ -96,16 +96,13 @@ uint8_t filename_rec_curLength = 8;
 volatile uint8_t volatile * volatile fifo_buf = NULL;	// The pointer to the FIFO buffer itself. Will be allocated by malloc at start of log
 volatile uint16_t fifo_writeBufIdx = 0;					// The index inside the fifo_buf where the next value will be written to by the measurement handler
 volatile uint8_t fifo_writeBlock = 0;					// The current block (multiple of BLOCK_SIZE) inside the fifo_buf the measurement handler is writing to
-volatile uint8_t fifo_recordBlock = 0;						// The current block (multiple of BLOCK_SIZE) inside the fifo_buf that shall be written to SD-Card (as soon as finBlock==logBlock)
+volatile uint8_t fifo_recordBlock = 0;					// The current block (multiple of BLOCK_SIZE) inside the fifo_buf that shall be written to SD-Card (as soon as finBlock==logBlock)
 volatile uint8_t fifo_finBlock[FIFO_BLOCKS] = {0};		// An array with an element for every Block in fifo_buf. Each corresponding element represents if a block is ready to recorded
 
 
 
 
 ///*  MENU AND USER INTERFACE */
-// Input signal type used for measurement and GUI display
-volatile uint8_t inputType = 0; // 0=Sensor5, 1=TestImpulse, 2=TestSawTooth, 3=TestSine
-
 sdStates sdState = sdNone;
 measureModes measureMode = measureModeMonitoring;
 
