@@ -538,6 +538,8 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 	///
 	/// globals TODO
 
+	/// Note: This would be much faster with the FIFO implemented. But for current situation there is no need.
+
 
 	// FATFS result code, Bytes written and a string buffer
 	FRESULT res = 0;
@@ -556,21 +558,20 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 
 	// Reset buffers of all sensors
 	for (uint8_t i = 0; i < SENSORS_SIZE; i++){
+		printf("Reset sensor struct %d\n", i);
+
 		// Reset index counter
 		sensArray[i]->bufIdx = sensArray[i]->bufMaxIdx;
 		sensArray[i]->errorLastValid = 0;
-		sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
 		sensArray[i]->avgFilterSum = 0;
+
+		// Set the current error count to the filter order. This lets the filter ignore that the entry's before the first one are still empty
+		sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
 
 		// Memset all elements of all buffers to 0
 		memset((int_buffer_t*)sensArray[i]->bufRaw     , 0, (sensArray[i]->bufMaxIdx+1)*sizeof(int_buffer_t));
 		memset((float_buffer_t*)sensArray[i]->bufFilter, 0, (sensArray[i]->bufMaxIdx+1)*sizeof(float_buffer_t));
 		memset((float_buffer_t*)sensArray[i]->bufConv  , 0, (sensArray[i]->bufMaxIdx+1)*sizeof(float_buffer_t));
-
-		// Clean update of filter (sum must be reset)
-		//measure_movAvgFilter_clean((sensor*)sensArray[i], sensArray[i]->avgFilterOrder);
-
-		printf("Reset sensor %d\n", i);
 	}
 
 	// Try to mount disk
@@ -625,22 +626,19 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 				res |= f_lseek(&fil_w, 0);
 				printf("\tReset file cursors (res%d)\n", res);
 
-				// As long as end of file isn't reached - read line by line and convert to csv
+				// Read line by line and convert to csv, as long as end of file isn't reached
 				uint16_t linCount = 0;
 				while(record_checkEndOfFile(objFILread) == 0  ){ //linCount < 10
 					// Reset buff
 					char seperator = ';';
 					int_buffer_t raw = 0;
-					//buff[0] = '\0';
-
-					// Read next line from bin file
-					//f_read(&fil_r, bin_line_buff, FIFO_LINE_SIZE, &br);
 
 					// For each sensor - read corresponding bits to sensor buffer, apply filter, convert value and write to CSV file
 					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
+						int16_t compFilterOrder;
+
 						// Read raw value from file
 						raw = 0;
-						int16_t compFilterOrder = sensArray[i]->avgFilterOrder;
 						res = f_read(&fil_r, &raw, SENSOR_RAW_SIZE, &br);
 						//printf("\tRead raw %d, read %d (res%d)", raw, br, res);
 
@@ -654,8 +652,8 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 
 
 						/// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
-						// Get oldest index
 						if(sensArray[i]->errorOccured != 0){
+							// Get oldest index
 							int32_t oldIdx = sensArray[i]->bufIdx - sensArray[i]->avgFilterOrder;
 							if(oldIdx < 0) oldIdx += sensArray[i]->bufMaxIdx+1;
 							// Decrease error counter
@@ -663,51 +661,24 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 								sensArray[i]->errorOccured--;
 						}
 
-						// Check for error and set raw to 0 if detected
+						/// Check if newest value in filter interval (to be added) is an error, if so increase error counter, null raw value
+						/// null raw value and limit max amount of errors possible
 						if(raw > sensArray[i]->errorThreshold){
-							/// The current value is an error
+							// Increment Count of errors in filter interval
+							sensArray[i]->errorOccured++;
 
-							// Increment error counter
-							sensArray[i]->errorOccured++; // Count of errors in filter interval increased
-
-							// Set all values to 0
+							// Set raw value to 0
 							sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
-							sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
-							sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
 
-							// If more errors occurred than can be compensated by the avg filter
-							if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder){
-								// The number of errors during the filter interval can never be bigger than the error interval it self
+							// If more errors occurred than can be compensated by the avg filter, limit it to stay in interval
+							if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder)
 								sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
-							}
-
-
 						}
-//						else{
-//							/// The current value is OK
-//
-//							// If there were errors during the current filter interval
-//							if(sensArray[i]->errorOccured != 0){
-//								// Get filter order compensated by error occurred (number of actual values used as divider during mean)
-//								compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
-//
-//								// Do a clean avg filter calculation (sum was not updated during errors and is invalid now)
-//								//measure_movAvgFilter_clean(sensArray[i], sensArray[i]->avgFilterOrder, compFilterOrder);
-//								//if(compFilterOrder)
-//									//measure_movAvgFilter(sensArray[i], compFilterOrder);
-//							}
-//							else{
-//								// Set current filter value
-//								//measure_movAvgFilter(sensArray[i], sensArray[i]->avgFilterOrder);
-//							}
-//
-//
-//						}
 
-						// Get filter order compensated by error occurred (number of actual values used as divider during mean)
+						// Get filter order compensated by errors occurred (number of actual values in interval, used as divider)
 						compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
 
-						// Post processing
+						// Post processing: If an
 						if(compFilterOrder){
 							// Set current filter value
 							measure_movAvgFilter(sensArray[i], compFilterOrder);
@@ -716,11 +687,14 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 							measure_polyConversion(sensArray[i], sensArray[i]->bufIdx);
 						}
 						else{
-							// Keep sum up to date but ignore result
-							measure_movAvgFilter(sensArray[i], 1);
+							// Set current filter value to 0 (current value is unusable)
+							measure_movAvgFilter(sensArray[i], 1); // Only to keep sum up to date - result must be ignored
 							sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
+
+							// Set current converted value to 0 (current value is unusable)
 							sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
 						}
+
 
 						// On last value of line - change separator to newline
 						if(i == SENSORS_SIZE-1)

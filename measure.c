@@ -103,9 +103,9 @@ void Adc_Measurement_Handler(void){
 		// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
 		if(measureMode == measureModeMonitoring){
 			// Check for sensor errors and try to interpolate a raw value. Note: This is only necessary because the filter would be confused otherwise and to print "clean" lines on the graph.
-			// This should be OK as long as the frequency of the to be measured event is much lower than the sampling time, the average filter order adjusted to the application and only few error occur at a time.
-			// Square interpolation was ruled out due to performance issues (on first tests this made the slope only ~400ns slower when errors occur).
-			// Still, for precise results recalculate value in post-processing.
+			// This should be OK as long as the frequency of the to be measured event is much lower than the frequency time, the average filter order adjusted to the application and only few errord occur at a time.
+			// Square interpolation was ruled out due to performance issues (on first tests the linear approach made the slope only ~400ns slower when errors occur).
+			// Still, for more precise results the value must be recalculate in post-processing.
 			if(sens->bufRaw[sensBufIdx] > sens->errorThreshold){
 				// Mark current measurement as error
 				sens->errorOccured++;
