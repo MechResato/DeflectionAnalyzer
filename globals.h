@@ -49,7 +49,7 @@ typedef struct {
 	float_buffer_t* bufConv;
 	uint8_t	 	  errorOccured;	  		// Number of error-measurements that occurred since last valid value. If this is 0 the curent value is valid.
 	int_buffer_t  errorThreshold; 		// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
-	int32_t		  errorLastValidSlope;
+	int32_t		  errorLastValid;
 	float     avgFilterSum;
 	uint16_t  avgFilterOrder;
 	char*   fitFilename;
@@ -125,6 +125,6 @@ void SysTick_Handler(); // Interrupt Routine - used for delay_ms
 void delay_ms(uint32_t ms); // Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
 
 float poly_calc (float c_x, float* f_coefficients, uint8_t order);
-void measure_movAvgFilter_clean(sensor* sens);
+void measure_movAvgFilter_clean(sensor* sens, uint16_t filterOrder, uint8_t compFilterOrder);
 
 #endif /* GLOBALS_H_ */

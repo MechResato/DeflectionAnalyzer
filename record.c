@@ -15,6 +15,7 @@
 #include <float.h>
 #include <DAVE.h>
 #include "globals.h"
+#include "measure.h"
 #include "record.h"
 
 DSTATUS diskStatus;
@@ -111,18 +112,18 @@ static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t access
 		// Check result if it has changed
 		if(res != 127){
 			if (res == FR_OK) {
-				printf("Close File OK\n");
+				printf("\tClose File OK\n");
 				sdState = sdMounted;
 			}
 			else{
-				printf("Close File error: %d\n", res);
+				printf("\tClose File error: %d\n", res);
 				sdState = sdError;
 			}
 		}
 	}
 
 	// If SD is mounted now, try to open the file/path
-	if(sdState == sdMounted) {
+	if(sdState != sdError && sdState != sdNone) {
 		// Check if a accessMode is given, else use FA_OPEN_ALWAYS
 		if(accessMode == 0)
 			accessMode = FA_OPEN_ALWAYS;
@@ -135,15 +136,15 @@ static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t access
 
 		// Check if open was successful
 		if ((res == FR_OK) || (res == FR_EXIST)){
-			printf("File opened: %s\n", path);
+			printf("\tFile opened: %s\n", path);
 			sdState = sdFileOpen;
 		}
 		else if (res == FR_INVALID_NAME){
-			printf("File open error: FR_INVALID_NAME '%s'\n", path);
+			printf("\tFile open error: FR_INVALID_NAME '%s'\n", path);
 			sdState = sdError;
 		}
 		else{
-			printf("File open error: %d\n", res);
+			printf("\tFile open error: %d\n", res);
 			sdState = sdError;
 		}
 	}
@@ -159,7 +160,7 @@ static FRESULT record_closeFile(objFIL objFILrw){
 	FRESULT res;
 
 	// If SD is mounted and the corresponding file is still open close it
-	if(sdState == sdFileOpen){
+	if(sdState != sdError && sdState != sdNone){
 		// Close already open file if needed
 		if(objFILrw == objFILread && fil_r.obj.fs != NULL){
 			res = f_close(&fil_r);
@@ -170,15 +171,15 @@ static FRESULT record_closeFile(objFIL objFILrw){
 
 		// Check result
 		if (res == FR_OK) {
-			printf("Close File OK\n");
+			printf("\tClose File OK\n");
 			sdState = sdMounted;
 		}
 		else if(res == FR_INVALID_OBJECT){ // Note: Unsure if needed - check this again
-			printf("File close warning: %d\n", res);
+			printf("\tFile close warning: %d\n", res);
 			sdState = sdMounted;
 		}
 		else{
-			printf("Close File error: %d\n", res);
+			printf("\tClose File error: %d\n", res);
 			sdState = sdError;
 		}
 	}
@@ -518,7 +519,7 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 	}
 
 	// Clean update of filter (the order might be changed)
-	measure_movAvgFilter_clean((sensor*)sens);
+	measure_movAvgFilter_clean((sensor*)sens, sens->avgFilterOrder, 0);
 
 	// Add a line break to console
 	printf("\n");
@@ -526,13 +527,14 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 
 
-void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
-	/// Read the .BIN file (path) and write a corresponding .CSV file.
+void record_convertBinFile(const char* filename, sensor** sensArray){
+	/// Read the .BIN file (path) and write a corresponding .CSV file. The base name of both file will be same (error if not possible).
+	/// Therefore only the base name of 'filename' is used, extensions are changed as needed (a parameter "test.csv" or "test.bin" will lead to the same result!).
 	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (after end of record, not during).
 	/// Returns nothing.
 	///
-	///	path	...	Path to the .BIN file.
-	/// dp_x	... Optional. A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
+	///	filename	...	Path to the .BIN file.
+	/// dp_x		... Optional. A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
 	///
 	/// globals TODO
 
@@ -540,7 +542,8 @@ void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
 	// FATFS result code, Bytes written and a string buffer
 	FRESULT res = 0;
 	UINT bw,br;
-	char buff[CSVLINE_BUFFER_LENGTH]; // Consideration: dynamic allocation based on line length?
+	//char bin_line_buff[FIFO_LINE_SIZE+1];
+	char csv_line_buff[CSVLINE_BUFFER_LENGTH]; // Consideration: dynamic allocation based on line length?
 
 	// Initial log line
 	printf("\nrecord_convertBinFile:\n");
@@ -554,17 +557,20 @@ void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
 	// Reset buffers of all sensors
 	for (uint8_t i = 0; i < SENSORS_SIZE; i++){
 		// Reset index counter
-		sensArray[i]->bufIdx = 0;
+		sensArray[i]->bufIdx = sensArray[i]->bufMaxIdx;
+		sensArray[i]->errorLastValid = 0;
 		sensArray[i]->errorOccured = 0;
 		sensArray[i]->avgFilterSum = 0;
 
 		// Memset all elements of all buffers to 0
-		memset((int_buffer_t*)sensArray[i]->bufRaw   , 0, sensArray[i]->bufMaxIdx+1);
-		memset((int_buffer_t*)sensArray[i]->bufFilter, 0, sensArray[i]->bufMaxIdx+1);
-		memset((int_buffer_t*)sensArray[i]->bufConv  , 0, sensArray[i]->bufMaxIdx+1);
+		memset((int_buffer_t*)sensArray[i]->bufRaw     , 0, (sensArray[i]->bufMaxIdx+1)*sizeof(int_buffer_t));
+		memset((float_buffer_t*)sensArray[i]->bufFilter, 0, (sensArray[i]->bufMaxIdx+1)*sizeof(float_buffer_t));
+		memset((float_buffer_t*)sensArray[i]->bufConv  , 0, (sensArray[i]->bufMaxIdx+1)*sizeof(float_buffer_t));
 
 		// Clean update of filter (sum must be reset)
-		measure_movAvgFilter_clean((sensor*)sensArray[i]);
+		//measure_movAvgFilter_clean((sensor*)sensArray[i], sensArray[i]->avgFilterOrder);
+
+		printf("Reset sensor %d\n", i);
 	}
 
 	// Try to mount disk
@@ -572,12 +578,19 @@ void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
 
 	// If the SD card is ready, backup existing file, try to open the .BIN and .CSV file and convert data
 	if(sdState == sdMounted || sdState == sdFileOpen){
-		/// Change file extension to .CSV
+		/// Determine right .BIN and .CSV filename
 		// Buffer to store and modify the filename
 		char filename_CSV[FILENAME_BUFFER_LENGTH];
+		char filename_BIN[FILENAME_BUFFER_LENGTH];
+
+		// Copy filename and make sure file extension is .BIN
+		sprintf(filename_BIN, filename);
+		filename_BIN[strlen(filename_BIN)-1] = 'N';
+		filename_BIN[strlen(filename_BIN)-2] = 'I';
+		filename_BIN[strlen(filename_BIN)-3] = 'B';
 
 		// Copy filename and change file extension to .CSV
-		sprintf(filename_CSV, filename_BIN);
+		sprintf(filename_CSV, filename);
 		filename_CSV[strlen(filename_CSV)-1] = 'V';
 		filename_CSV[strlen(filename_CSV)-2] = 'S';
 		filename_CSV[strlen(filename_CSV)-3] = 'C';
@@ -586,57 +599,149 @@ void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
 		int8_t fil_OK = record_backupFile(filename_CSV);
 
 		/// Check if file exists - if so, open it
-		printf("Check if file exists\n");
-		res = f_stat(filename_CSV, NULL);
+		res = f_stat(filename_BIN, NULL);
+		printf("Checked if file exists: %d\n", res);
 		if(fil_OK == 1 && res == FR_OK){
 			// Get line size, line padding size, block size and size of every value to be used while reading binary
 			// Todo list variables
 			// Note: This will not be done because we assume that this will run straight after the recording, and therefore the global variables must be equal
 
 			// Open/Create Files
-			printf("Open BIN file\n");
-			res &= record_openFile(filename_BIN, objFILread, 0);
+			res = record_openFile(filename_BIN, objFILread, 0);
+			printf("Tried open BIN file: Error=%d\n", res);
 
-			printf("Open CSV file\n");
-			res &= record_openFile(filename_CSV, objFILwrite, 0);
+			res |= record_openFile(filename_CSV, objFILwrite, 0);
+			printf("Tried open CSV file: Error=%d\n", res);
+
+			DIGITAL_IO_SetOutputHigh(&IO_6_2);
 
 			// If files are ready ...
 			if(res == FR_OK){
 				// Generate line format (not needed?)
 				//char lineFormat[100] = "%d\n";
 
+				// Set file cursor
+				res = f_lseek(&fil_r, 0);
+				res |= f_lseek(&fil_w, 0);
+				printf("\tReset file cursors (res%d)\n", res);
+
 				// As long as end of file isn't reached - read line by line and convert to csv
-				while(record_checkEndOfFile(objFILread)){
+				uint16_t linCount = 0;
+				while(record_checkEndOfFile(objFILread) == 0  ){ //linCount < 10
 					// Reset buff
 					char seperator = ';';
+					int_buffer_t raw = 0;
+					//buff[0] = '\0';
 
-					// Read next line
+					// Read next line from bin file
+					//f_read(&fil_r, bin_line_buff, FIFO_LINE_SIZE, &br);
 
 					// For each sensor - read corresponding bits to sensor buffer, apply filter, convert value and write to CSV file
 					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
+						// Read raw value from file
+						raw = 0;
+						int16_t compFilterOrder;
+						res = f_read(&fil_r, &raw, SENSOR_RAW_SIZE, &br);
+						//printf("\tRead raw %d, read %d (res%d)", raw, br, res);
+
+						// Increment current Buffer index and set back to 0 if greater than size of array
+						sensArray[i]->bufIdx++;
+						if(sensArray[i]->bufIdx > sensArray[i]->bufMaxIdx)
+							sensArray[i]->bufIdx = 0;
+
 						// Set current raw value
+						sensArray[i]->bufRaw[sensArray[i]->bufIdx] = raw;
 
-						// Check for Error
 
-						// Set current filter value
+						/// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
+						// Get oldest index
+						if(sensArray[i]->errorOccured != 0){
+							int32_t oldIdx = sensArray[i]->bufIdx - sensArray[i]->avgFilterOrder;
+							if(oldIdx < 0) oldIdx += sensArray[i]->bufMaxIdx+1;
+							// Decrease error counter
+							if(sensArray[i]->bufRaw[oldIdx] == 0)
+								sensArray[i]->errorOccured--;
+						}
 
-						// Set current converted value
+						// Check for error and set raw to 0 if detected
+						if(raw > sensArray[i]->errorThreshold){
+							/// The current value is an error
+
+							// Increment error counter
+							sensArray[i]->errorOccured++; // Count of errors in filter interval increased
+
+							// Set all values to 0
+							sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
+							sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
+							sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
+
+							// If more errors occurred than can be compensated by the avg filter
+							if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder){
+								// The number of errors during the filter interval can never be bigger than the error interval it self
+								sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
+							}
+
+						}
+						else{
+							/// The current value is OK
+
+							compFilterOrder = sensArray[i]->avgFilterOrder;
+
+							// If there were errors during the current filter interval
+							if(sensArray[i]->errorOccured != 0){
+								// Get filter order compensated by error occurred (number of actual values used as divider during mean)
+								compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
+
+								// Do a clean avg filter calculation (sum was not updated during errors and is invalid now)
+								measure_movAvgFilter_clean(sensArray[i], sensArray[i]->avgFilterOrder, compFilterOrder);
+							}
+							else{
+								// Set current filter value
+								measure_movAvgFilter(sensArray[i], sensArray[i]->avgFilterOrder);
+							}
+
+							// Set current converted value
+							measure_polyConversion(sensArray[i], sensArray[i]->bufIdx);
+						}
 
 						// On last value of line - change separator to newline
 						if(i == SENSORS_SIZE-1)
 							seperator = '\n';
 
 						// Write current value to the buffer
-						sprintf(buff+strlen(buff), "%d%c", sensArray[i]->bufRaw[sensArray[i]->bufIdx], seperator);
+						sprintf(csv_line_buff+strlen(csv_line_buff), "%d;%.1f;%.2f;%d;%d%c", sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], compFilterOrder, sensArray[i]->errorOccured, seperator);
+
+						//printf("\n\tWriting sensor %d: (raw%d) %s",i ,raw, csv_line_buff);
 					}
 
 					// Write Line
-					res = f_write(&fil_w, buff, 13, &bw);
-					printf("Writing line: %s\n", buff);
+					res = f_write(&fil_w, csv_line_buff, strlen(csv_line_buff), &bw);
+					//printf("Writing line: (res=%d) %s", res, csv_line_buff);
 
+					// Read padding bytes to move cursor
+					f_read(&fil_r, &raw, FIFO_LINE_SIZE_PAD, &br);
+					//printf("\tPad is '%d'\n", raw);
+
+					// Reset Buffer
+					csv_line_buff[0] = '\0';
+
+					linCount++;
 				}
 
+				printf("End of BIN file!\n");
 			}
+			else{
+				printf("Error: Files are not ready or not open!\n");
+			}
+
+			DIGITAL_IO_SetOutputLow(&IO_6_2);
+
+			// Close Files
+			record_closeFile(objFILread);
+			record_closeFile(objFILwrite);
+		}
+		else{
+			printf("Error: BIN file not existent or CSV filename not unique/backuped!\n");
 		}
 	}
 
@@ -647,6 +752,15 @@ void record_convertBinFile(const char* filename_BIN, sensor** sensArray){
 }
 
 
+// If this is the first error after an valid value, calculate/store last OK value
+//							if(sensArray[i]->errorOccured == 1){
+//								// Calculate second to last index and check for over leap
+//								int32_t pre1Idx = sensBufIdx - 1;
+//								if(pre1Idx < 0) pre1Idx += sens->bufMaxIdx + 1;
+//
+//								// Store last valid value and slope, to be used till the next valid value comes
+//								sensArray[i]->errorLastValid = sensArray[i]->bufFilter[pre1Idx];
+//							}
 
 
 
@@ -809,6 +923,14 @@ int8_t record_start(){
 			if(sdState == sdFileOpen){
 				// Allocate memory for the log FIFO
 				fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+
+				// Reset fifo control variables
+				fifo_writeBufIdx = 0;
+				fifo_writeBlock = 0;
+				fifo_recordBlock = 0;
+				for(uint8_t i = 0; i < FIFO_BLOCKS; i++)
+					fifo_finBlock[i] = 0;
+
 				// Check for allocation errors
 				if(fifo_buf == NULL){
 					printf("Memory allocation failed!\n");

@@ -929,6 +929,8 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 				printf("Button StartRec\n");
 				*toggle_lock = 42;
 
+				//record_convertBinFile("LOG.BIN", (sensor**)&sensors);
+
 				// Start recording
 				if(measureMode == measureModeMonitoring){
 					measurementCounter = 0;
@@ -940,6 +942,8 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 					int8_t res = record_stop(1);
 					if(res != 1)
 						printf("Stop failed\n");
+					else
+						record_convertBinFile(filename_rec, (sensor**)&sensors);
 				}
 			}
 			break;
@@ -1239,7 +1243,7 @@ void curveset_prepare(volatile sensor* sens){
 		curveset_sens->avgFilterOrder = sens->bufMaxIdx-1;
 	printf("Using Avg filter order %d during curveset!\n", sens->avgFilterOrder);
 	// Do a clean filter value calculation to sync it to the new filter order
-	measure_movAvgFilter_clean(curveset_sens);
+	measure_movAvgFilter_clean(curveset_sens, curveset_sens->avgFilterOrder, 0);
 
 
 	// Link actual value array to corresponding textbox
@@ -1447,7 +1451,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				curveset_sens->avgFilterOrder = curveset_previousAvgFilterOrder;
 				printf("Reseting avg filter order back to %d!\n", curveset_sens->avgFilterOrder);
 				// Do a clean filter value calculation to sync it to the new filter order
-				measure_movAvgFilter_clean(curveset_sens);
+				measure_movAvgFilter_clean(curveset_sens, curveset_sens->avgFilterOrder, 0);
 
 				// Store current polynomial fit to be used
 				for (uint8_t i = 0; i < 4; i++) {
@@ -1761,7 +1765,7 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				//filterset_sens->avgFilterOrder = filterset_previousAvgFilterOrder;
 				printf("Reseting avg filter order back to %d!\n", filterset_sens->avgFilterOrder);
 				// Do a clean filter value calculation to sync it to the new filter order
-				measure_movAvgFilter_clean(filterset_sens);
+				measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
 
 				// Store current error threshold to be used (filter order is changed direct)
 				filterset_sens->errorThreshold = *tbx_error_threshold.numSrc.intSrc;
@@ -1788,7 +1792,7 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 					filterset_sens->avgFilterOrder--;
 
 					// Do a clean filter value calculation to sync it
-					measure_movAvgFilter_clean(filterset_sens);
+					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
 				}
 			}
 			break;
@@ -1803,7 +1807,7 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 					filterset_sens->avgFilterOrder++;
 
 					// Do a clean filter value calculation to sync it
-					measure_movAvgFilter_clean(filterset_sens);
+					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
 				}
 			}
 			break;

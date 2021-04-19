@@ -20,7 +20,7 @@ void record_mountDisk(uint8_t mount);
 void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size);
 void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size);
 
-
+void record_convertBinFile(const char* filename_BIN, sensor** sensArray);
 
 
 void record_buffer(void);

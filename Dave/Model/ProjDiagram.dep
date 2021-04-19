@@ -2998,7 +2998,6 @@
       </link>
     </connectionDecorators>
     <bendpoints x="649" y="58"/>
-    <bendpoints x="652" y="120"/>
   </connections>
   <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.10/@anchors.0" end="//@children.6/@anchors.0">
     <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.4"/>
@@ -3051,7 +3050,7 @@
         <businessObjects href="ModelConfigData.data#//@connections.5"/>
       </link>
     </connectionDecorators>
-    <bendpoints x="629" y="60"/>
+    <bendpoints x="600" y="60"/>
     <bendpoints x="483" y="60"/>
     <bendpoints x="483" y="130"/>
     <bendpoints x="562" y="130"/>
@@ -3074,8 +3073,7 @@
       </link>
     </connectionDecorators>
     <bendpoints x="181" y="120"/>
-    <bendpoints x="120" y="120"/>
-    <bendpoints x="120" y="200"/>
+    <bendpoints x="157" y="120"/>
     <bendpoints x="157" y="200"/>
   </connections>
   <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.5/@anchors.0" end="//@children.0/@anchors.0">

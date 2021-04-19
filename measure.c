@@ -19,9 +19,38 @@ extern volatile uint8_t volatile * volatile fifo_buf;
 
 
 
-static inline void measure_movAvgFilter(volatile sensor* sens);
+//static inline void measure_movAvgFilter(volatile sensor* sens);
 
 volatile uint16_t testCount = 0;
+
+/// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
+/// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
+/// Note: This only subtracts the oldest and adds the newest entry to the stored sum before dividing.
+#define MEASURE_MOVAVGFILTER(sens, filterOrder)                       			\
+	/* Get index of oldest element, which shall be removed
+	 * (current index - filter order with roll-over check) */					\
+	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;						\
+	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;									\
+	/* Subtract oldest element and add newest to sum */							\
+	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];	\
+	/* Calculate average and return it */										\
+	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / filterOrder;
+
+/// Convert raw value to adapted value and save it
+// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
+#define MEASURE_POLYCONVERSION(sens, sensBufIdx)		\
+	register float result = sens->fitCoefficients[0];	\
+	register float pow_x = 1;							\
+	/* Calculate every term and add it to the result*/	\
+	for(uint8_t i = 1; i < sens->fitOrder+1; i++){		\
+		pow_x *= sens->bufFilter[sensBufIdx];			\
+		result += sens->fitCoefficients[i] * pow_x; 	\
+	}													\
+	/* Save result*/									\
+	sens->bufConv[sensBufIdx] = result;
+
+
+
 
 void Adc_Measurement_Handler(void){
 	/// Interrupt handler - Do measurements, filter/convert them and store result in buffers. Allows to 'measure' self produced test signal based on value in global variable InputType
@@ -29,7 +58,7 @@ void Adc_Measurement_Handler(void){
 	/// Uses global/extern variables: InputType, tft_tick, sensor[...], ...
 
 	// Timing measurement pin high
-	DIGITAL_IO_SetOutputHigh(&IO_6_2);
+	//DIGITAL_IO_SetOutputHigh(&IO_6_2);
 
 
 
@@ -40,36 +69,39 @@ void Adc_Measurement_Handler(void){
 		// Store current sensor pointer (looks cleaner and may be faster without the additional indexing every time)
 		sens = sensors[sensIdx];
 
-		// Increment current Buffer index and set back to 0 if greater than size of array
-		sensBufIdx = sens->bufIdx = sens->bufIdx + 1;
-		if(sensBufIdx > sens->bufMaxIdx){
-			frameover = 1;
-			sensBufIdx = sens->bufIdx = 0;
+		// Increment buffer index and store current ADC value if a measuring mode is active
+		if(measureMode != measureModeNone){
+			// Increment current Buffer index and set back to 0 if greater than size of array
+			sensBufIdx = sens->bufIdx = sens->bufIdx + 1;
+			if(sensBufIdx > sens->bufMaxIdx){
+				frameover = 1;
+				sensBufIdx = sens->bufIdx = 0;
+			}
+
+
+			// Read value from sensor (or generated test if defined)
+			#if defined(INPUT_STANDARD)
+				// Get raw input from ADC
+				sens->bufRaw[sensBufIdx] = ADC_MEASUREMENT_GetResult(sens->adcChannel);
+			#elif defined(INPUT_TESTIMPULSE)
+			// 1 TestImpulse
+				if(sensBufIdx % (S1_BUF_SIZE/5)) sens->bufRaw[sensBufIdx] = 0;
+				else sens->bufRaw[sensBufIdx] = 4095;
+			#elif defined(INPUT_TESTSAWTOOTH)
+				// 2 TestSawtooth
+				if(lastval < 4095) sens->bufRaw[sensBufIdx] = lastval+7;
+				else sens->bufRaw[sensBufIdx] = 0;
+				lastval = sens->bufRaw[sensBufIdx];
+			#elif defined(INPUT_TESTSINE)
+				// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
+				sens->bufRaw[sensBufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
+			#endif
 		}
-
-		// Read value from sensor (or generated test if defined)
-		#if defined(INPUT_STANDARD)
-			// Get raw input from ADC
-			sens->bufRaw[sensBufIdx] = ADC_MEASUREMENT_GetResult(sens->adcChannel);
-		#elif defined(INPUT_TESTIMPULSE)
-		// 1 TestImpulse
-			if(sensBufIdx % (S1_BUF_SIZE/5)) sens->bufRaw[sensBufIdx] = 0;
-			else sens->bufRaw[sensBufIdx] = 4095;
-		#elif defined(INPUT_TESTSAWTOOTH)
-			// 2 TestSawtooth
-			if(lastval < 4095) sens->bufRaw[sensBufIdx] = lastval+7;
-			else sens->bufRaw[sensBufIdx] = 0;
-			lastval = sens->bufRaw[sensBufIdx];
-		#elif defined(INPUT_TESTSINE)
-			// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
-			sens->bufRaw[sensBufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
-		#endif
-
 		// TODO: (Consideration) Everything past here could be moved to the main slope. It would require a "last processed value" index and had to process every missed value between. The interrupt here would get much shorter though...
 
 
 		// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
-			if(measureMode == measureModeMonitoring){
+		if(measureMode == measureModeMonitoring){
 			// Check for sensor errors and try to interpolate a raw value. Note: This is only necessary because the filter would be confused otherwise and to print "clean" lines on the graph.
 			// This should be OK as long as the frequency of the to be measured event is much lower than the sampling time, the average filter order adjusted to the application and only few error occur at a time.
 			// Square interpolation was ruled out due to performance issues (on first tests this made the slope only ~400ns slower when errors occur).
@@ -89,35 +121,25 @@ void Adc_Measurement_Handler(void){
 					if(pre2Idx < 0) pre2Idx += sens->bufMaxIdx + 1;
 
 					// Store last valid value and slope, to be used till the next valid value comes
-					sens->errorLastValidSlope = sens->bufFilter[pre1Idx] - sens->bufFilter[pre2Idx];
+					sens->errorLastValid = sens->bufFilter[pre1Idx] - sens->bufFilter[pre2Idx];
 				}
 				// Linear interpolation of current value (needed to satisfy filter, otherwise the missing value would interfere for [avgFilterOrder] measurements)
-				sens->bufRaw[sensBufIdx] = sens->bufRaw[pre1Idx] + sens->errorLastValidSlope;
+				sens->bufRaw[sensBufIdx] = sens->bufRaw[pre1Idx] + sens->errorLastValid;
 			}
 			else {
 				sens->errorOccured = 0;
 			}
 
-			// Calculate current filtered value
-			measure_movAvgFilter(sens);
+			// Calculate current filtered value and save it in sensor struct
+			MEASURE_MOVAVGFILTER(sens, sens->avgFilterOrder);
 
-			/// Convert raw value to adapted value and save it
-			//sens->bufConv[sensBufIdx] =  poly_calc_m(sens->bufRaw[sensBufIdx], &sens->fitCoefficients[0], sens->fitOrder); //5.2/4096.0*InputBuffer1[sensBufIdx]; //sens->bufFilter[sens->bufIdx] // poly_calc_sensor_i(sens, sens->bufRaw);
-			// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
-			register float result = sens->fitCoefficients[0];
-			register float pow_x = 1;
-			// Calculate every term and add it to the result
-			for(uint8_t i = 1; i < sens->fitOrder+1; i++){
-				pow_x *= sens->bufFilter[sensBufIdx];
-				result += sens->fitCoefficients[i] * pow_x; //result += sens->fitCoefficients[i] * ipow(sens->bufFilter[sensBufIdx], i); //result += sens->fitCoefficients[i] * ipow(sens->bufRaw[sensBufIdx], i);
-			}
-			// Save result
-			sens->bufConv[sensBufIdx] = result;
+			/// Convert raw value to adapted value and save it in sensor struct
+			MEASURE_POLYCONVERSION(sens, sensBufIdx);
 		}
 
 		// If system is in recording mode store current raw value in FIFO
 		if(measureMode == measureModeRecording){
-			sens->bufRaw[sensBufIdx] = testCount;
+			//sens->bufRaw[sensBufIdx] = testCount;
 			testCount++;
 
 			// Copy current value to FIFO
@@ -172,7 +194,31 @@ void Adc_Measurement_Handler(void){
 	measurementCounter++;
 
 	// Timing measurement pin low
-	DIGITAL_IO_SetOutputLow(&IO_6_2);
+	//DIGITAL_IO_SetOutputLow(&IO_6_2);
+}
+
+// Check for error and set raw to 0 if detected
+//if(sensArray[i]->bufRaw[sensArray[i]->bufIdx] > sensArray[i]->errorThreshold){
+//	sensArray[i]->errorOccured++;
+//	sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
+//
+//	if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder){
+//
+//	}
+//}
+//else if(sensArray[i]->errorOccured != 0){
+//	sensArray[i]->errorOccured--;
+//}
+
+
+void measure_movAvgFilter(volatile sensor* sens, uint16_t filterOrder){
+	// See MEASURE_MOVAVGFILTER() macro for details. This is only made to be used outside of this module.
+	MEASURE_MOVAVGFILTER(sens, filterOrder);
+}
+
+void measure_polyConversion(volatile sensor* sens, uint16_t sensBufIdx){
+	// See MEASURE_POLYCONVERSION() macro for details. This is only made to be used outside of this module.
+	MEASURE_POLYCONVERSION(sens, sensBufIdx);
 }
 
 // Measurements at non leap-over cycle!
@@ -191,22 +237,22 @@ void Adc_Measurement_Handler(void){
 // movin avg filter function  -> 2.96us (@leap over 3.12us)
 // movin avg filter inline function  -> 2.76us (@leap over 2.88us)
 
-static inline void measure_movAvgFilter(volatile sensor* sens){
-	/// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
-	/// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
-	/// Note: This only subtracts the oldest and adds the newest entry to the stored sum before dividing.
-
-
-	// Get index of oldest element, which shall be removed (current index minus filter order with roll-over check)
-	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
-	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;
-
-	// Subtract oldest element and add newest to sum
-	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];
-
-	// Calculate average and return it
-	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / sens->avgFilterOrder;
-}
+//static inline void measure_movAvgFilter(volatile sensor* sens){
+//	/// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
+//	/// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
+//	/// Note: This only subtracts the oldest and adds the newest entry to the stored sum before dividing.
+//
+//
+//	// Get index of oldest element, which shall be removed (current index minus filter order with roll-over check)
+//	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
+//	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;
+//
+//	// Subtract oldest element and add newest to sum
+//	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];
+//
+//	// Calculate average and return it
+//	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / sens->avgFilterOrder;
+//}
 
 
 

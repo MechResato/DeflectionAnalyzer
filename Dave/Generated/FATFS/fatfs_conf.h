@@ -58,7 +58,7 @@
  **********************************************************************************************************************/
 #define FATFS_STANDARDLIBRARY    (0U)
 #define FF_FS_READONLY           (0U)
-#define FF_FS_LOCK               (1U)
+#define FF_FS_LOCK               (2U)
 #define FF_USE_FIND               (0U)
 #define FF_USE_MKFS               (0U)
 #define FF_USE_FASTSEEK           (0U)

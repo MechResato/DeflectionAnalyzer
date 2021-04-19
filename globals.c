@@ -133,10 +133,13 @@ float poly_calc (float c_x, float* f_Coefficients, uint8_t order){
 	return result;
 }
 
-void measure_movAvgFilter_clean(sensor* sens){
+void measure_movAvgFilter_clean(sensor* sens, uint16_t filterOrder, uint8_t compFilterOrder){
 	/// Implementation of an moving average filter on an ring-buffer. This version is used to reevaluate the sum variable if the filter order is changed or the buffer is not 0'd out when starting the moving average filter.
+	/// It can also be used to calculate the sum over the filter while ignoring zeroed out values (decrease order/divider with every 0 found during sum).
 	/// Note: This resets the sum and adds all elements between the oldest and newest entry to it before dividing.
 
+	// Variable to count not 0 values in case order is specified to be self calculated
+	//uint8_t numNotNullEl = 0;
 
 	// Get index of oldest element, which shall be removed (current index minus filter order with roll-over check)
 	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
@@ -147,8 +150,14 @@ void measure_movAvgFilter_clean(sensor* sens){
 	for(int i = sens->bufIdx; i != oldIdx; i--){
 		if(i<0) i += sens->bufMaxIdx+1;
 		sens->avgFilterSum += sens->bufRaw[i];
+		//if(sens->bufRaw[i]) numNotNullEl++;
 	}
 
 	// Calculate average and return it
-	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / sens->avgFilterOrder;
+	if(compFilterOrder != 0)
+		sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / compFilterOrder;
+	else if(filterOrder != 0)
+		sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / filterOrder;
+	else
+		sens->bufFilter[sens->bufIdx] = 0;
 }
