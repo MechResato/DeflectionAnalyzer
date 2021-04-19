@@ -559,7 +559,7 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 		// Reset index counter
 		sensArray[i]->bufIdx = sensArray[i]->bufMaxIdx;
 		sensArray[i]->errorLastValid = 0;
-		sensArray[i]->errorOccured = 0;
+		sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
 		sensArray[i]->avgFilterSum = 0;
 
 		// Memset all elements of all buffers to 0
@@ -640,7 +640,7 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
 						// Read raw value from file
 						raw = 0;
-						int16_t compFilterOrder;
+						int16_t compFilterOrder = sensArray[i]->avgFilterOrder;
 						res = f_read(&fil_r, &raw, SENSOR_RAW_SIZE, &br);
 						//printf("\tRead raw %d, read %d (res%d)", raw, br, res);
 
@@ -681,27 +681,45 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 								sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
 							}
 
+
 						}
-						else{
-							/// The current value is OK
+//						else{
+//							/// The current value is OK
+//
+//							// If there were errors during the current filter interval
+//							if(sensArray[i]->errorOccured != 0){
+//								// Get filter order compensated by error occurred (number of actual values used as divider during mean)
+//								compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
+//
+//								// Do a clean avg filter calculation (sum was not updated during errors and is invalid now)
+//								//measure_movAvgFilter_clean(sensArray[i], sensArray[i]->avgFilterOrder, compFilterOrder);
+//								//if(compFilterOrder)
+//									//measure_movAvgFilter(sensArray[i], compFilterOrder);
+//							}
+//							else{
+//								// Set current filter value
+//								//measure_movAvgFilter(sensArray[i], sensArray[i]->avgFilterOrder);
+//							}
+//
+//
+//						}
 
-							compFilterOrder = sensArray[i]->avgFilterOrder;
+						// Get filter order compensated by error occurred (number of actual values used as divider during mean)
+						compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
 
-							// If there were errors during the current filter interval
-							if(sensArray[i]->errorOccured != 0){
-								// Get filter order compensated by error occurred (number of actual values used as divider during mean)
-								compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
-
-								// Do a clean avg filter calculation (sum was not updated during errors and is invalid now)
-								measure_movAvgFilter_clean(sensArray[i], sensArray[i]->avgFilterOrder, compFilterOrder);
-							}
-							else{
-								// Set current filter value
-								measure_movAvgFilter(sensArray[i], sensArray[i]->avgFilterOrder);
-							}
+						// Post processing
+						if(compFilterOrder){
+							// Set current filter value
+							measure_movAvgFilter(sensArray[i], compFilterOrder);
 
 							// Set current converted value
 							measure_polyConversion(sensArray[i], sensArray[i]->bufIdx);
+						}
+						else{
+							// Keep sum up to date but ignore result
+							measure_movAvgFilter(sensArray[i], 1);
+							sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
+							sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
 						}
 
 						// On last value of line - change separator to newline

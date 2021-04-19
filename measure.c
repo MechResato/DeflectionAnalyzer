@@ -26,7 +26,7 @@ volatile uint16_t testCount = 0;
 /// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
 /// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
 /// Note: This only subtracts the oldest and adds the newest entry to the stored sum before dividing.
-#define MEASURE_MOVAVGFILTER(sens, filterOrder)                       			\
+#define MEASURE_MOVAVGFILTER(sens, divider)                       				\
 	/* Get index of oldest element, which shall be removed
 	 * (current index - filter order with roll-over check) */					\
 	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;						\
@@ -34,7 +34,7 @@ volatile uint16_t testCount = 0;
 	/* Subtract oldest element and add newest to sum */							\
 	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];	\
 	/* Calculate average and return it */										\
-	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / filterOrder;
+	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / divider;
 
 /// Convert raw value to adapted value and save it
 // Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
@@ -211,9 +211,9 @@ void Adc_Measurement_Handler(void){
 //}
 
 
-void measure_movAvgFilter(volatile sensor* sens, uint16_t filterOrder){
+void measure_movAvgFilter(volatile sensor* sens, uint16_t divider){
 	// See MEASURE_MOVAVGFILTER() macro for details. This is only made to be used outside of this module.
-	MEASURE_MOVAVGFILTER(sens, filterOrder);
+	MEASURE_MOVAVGFILTER(sens, divider);
 }
 
 void measure_polyConversion(volatile sensor* sens, uint16_t sensBufIdx){
