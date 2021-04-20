@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <float.h>
 #include <math.h>
 #include <DAVE.h>
 #include "globals.h"
@@ -462,16 +463,6 @@ label lbl_fitorder = {
 		.ignoreScroll = 0
 };
 
-#define BTN_ORDER_TAG 14
-control btn_order = {
-	.x = M_COL_3 + 40 + 60 ,	.y = 5,
-	.w0 = 60, 	.h0 = 30,
-	.mytag = BTN_ORDER_TAG,	.font = 26, .options = 0, .state = 0,
-	.text = "Linear",
-	.controlType = Button,
-	.ignoreScroll = 0
-};
-
 #define G_PADDING 10 //
 graph gph_curveset = {
 	.x = 10,		// 10 px from left to leave some room
@@ -508,12 +499,33 @@ control btn_db_next = {
 	.controlType = Button,
 	.ignoreScroll = 0
 };
-#define BTN_DP_SETCHANGE_TAG 13
+
+#define BTN_DP_DELETE_TAG 13
+control btn_db_delete = {
+	.x = (M_COL_1/2) + 75 + 36 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.w0 = 50				  ,	.h0 = 30,
+	.mytag = BTN_DP_DELETE_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Delete",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+
+#define BTN_DP_SETCHANGE_TAG 14
 control btn_setchange = {
 	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8 + 1 + 50 + 58 + 8 + 50 + 60 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.w0 = 50, 	.h0 = 30,
 	.mytag = BTN_DP_SETCHANGE_TAG,	.font = 26, .options = 0, .state = 0,
 	.text = "Change",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+
+#define BTN_ORDER_TAG 15
+control btn_order = {
+	.x = M_COL_3 + 40 + 60 ,	.y = 5,
+	.w0 = 60, 	.h0 = 30,
+	.mytag = BTN_ORDER_TAG,	.font = 26, .options = 0, .state = 0,
+	.text = "Linear",
 	.controlType = Button,
 	.ignoreScroll = 0
 };
@@ -605,6 +617,23 @@ uint16_t filter_errorThreshold = 4095;
 label lbl_filterset = {
 		.x = 20,		.y = 9,
 		.font = 27,		.options = 0,		.text = "Filter set - Sensor 0",
+		.ignoreScroll = 0
+};
+
+// Current maximum error between filtered and unfiltered values
+float_buffer_t filterset_maxError = 0;
+label lbl_filterErrorText = {
+		.x = M_COL_3 + 40,		.y = 9 + FONT_COMP,
+		.font = 26,		.options = 0,		.text = "Max error: ",
+		.ignoreScroll = 0
+};
+label lbl_filterError = {
+		.x = M_COL_3 + 105,		.y = 9 + FONT_COMP,
+		.font = 26,		.options = 0,		.text = "%d.%.2d mm",
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&filterset_maxError, //(ignore volatile here)
+		.numSrc.srcOffset = NULL,
+		.fracExp = 2,
 		.ignoreScroll = 0
 };
 
@@ -1430,7 +1459,7 @@ void menu_display_curveset(void){
 	if(tbx_act.mytag != 0){
 		// Save current nominal value
 		tbx_nom.numSrc.floatSrc[*tbx_nom.numSrc.srcOffset] = (float)curveset_sens->bufFilter[curveset_sens->bufIdx]; //(float)curveset_sens->bufRaw[curveset_sens->bufIdx];//
-		printf("write %f\n", curveset_sens->bufFilter[curveset_sens->bufIdx]);
+		//printf("write %f\n", curveset_sens->bufFilter[curveset_sens->bufIdx]);
 
 		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
 		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
@@ -1465,6 +1494,10 @@ void menu_display_curveset(void){
 	TFT_control(&btn_setchange);
 	TFT_control(&btn_db_last);
 	TFT_control(&btn_db_next);
+	// Only show delete button if in edit mode
+	if(tbx_act.mytag != 0)
+		TFT_control(&btn_db_delete);
+
 
 	// Data point controls
 	TFT_textbox_display(&tbx_dp);
@@ -1504,7 +1537,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				curveset_sens->fitOrder = fit_order;
 
 				// Write Spec file
-				record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				//record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
 				free(tbx_act.numSrc.floatSrc);
@@ -1600,7 +1633,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 						/// Set initial value's
 						// Set initial x value to current sensor value
 						tbx_nom.numSrc.floatSrc[DP_cur] = (float)curveset_sens->bufFilter[curveset_sens->bufIdx];//tbx_act.numSrc.floatSrc[DP_cur+1];
-						// If an OK fit is available set initial y-value to the one corresponding to the curretn sensor value
+						// If an OK fit is available set initial y-value to the one corresponding to the current sensor value
 						if(fit_result == 0)
 							tbx_act.numSrc.floatSrc[DP_cur] = poly_calc(tbx_nom.numSrc.floatSrc[DP_cur], &coefficients[0], fit_order);
 						// If no OK fit is available but the new value is after an other one, use the previous y value as initial value
@@ -1616,6 +1649,41 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 						// Refresh static part of display (e.g. to show new textboxbackground when one changes from read-only to read-write)
 						TFT_setMenu(-1);
 					}
+				}
+			}
+			break;
+		case BTN_DP_DELETE_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button delete\n");
+				*toggle_lock = 42;
+
+				// if the data point isn't at the limits - change current index, set text of DP-textbox and set text of Actual-textbox
+				if(DP_size > 1){
+					// Set current point to highest value possible
+					tbx_nom.numSrc.floatSrc[DP_cur] = FLT_MAX;
+
+					// Leave edit mode
+					curveset_setEditMode(0);
+
+					// Shelf point to make it the last in the array (DP_cur will also change to DP_size-1)
+					DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
+
+					// Decrease currently selected data point (always selects the last point)
+					if(DP_cur != 0)
+						DP_cur--;
+
+					// Decrease size of array
+					DP_size--;
+					tbx_act.numSrc.floatSrc = (float*)realloc(tbx_act.numSrc.floatSrc, DP_size*sizeof(float));
+					tbx_nom.numSrc.floatSrc = (float*)realloc(tbx_nom.numSrc.floatSrc, DP_size*sizeof(float));
+
+					// Check for allocation errors
+					if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
+						printf("Memory realloc failed!\n");
+
+
+					// Refresh static part of display (e.g. to show new textbox background when one changes from read-only to read-write)
+					TFT_setMenu(-1);
 				}
 			}
 			break;
@@ -1732,7 +1800,7 @@ void menu_display_filterset(void){
 		*tbx_error_threshold.numSrc.intSrc = (int_buffer_t)filterset_sens->bufFilter[filterset_sens->bufIdx];
 	}
 
-	//// Get highest y value and set graph axis boundaries
+	//// Get highest y-value and set graph axis boundaries
 	/// Get biggest y-value
 	float cur_y_max = 0;
 	// On every leap-over of the buffer reevaluate all values (sets the cur_y_max bigger or lower!)
@@ -1761,7 +1829,25 @@ void menu_display_filterset(void){
 		}
 	}
 
+	/// Check all new values since the last time this was updated for higher tolerances
+	static uint16_t lastFilterErrorIndex = 0;
+	for (int16_t i = filterset_sens->bufIdx; i != lastFilterErrorIndex; i--) {
+		// if index goes below 0 set to highest buffer index
+		if(i < 0)
+			i = filterset_sens->bufMaxIdx;
 
+		// Convert current unfiltered raw value
+		float_buffer_t curRawConv = poly_calc(filterset_sens->bufRaw[filterset_sens->bufIdx], filterset_sens->fitCoefficients, filterset_sens->fitOrder);
+
+		// Calculate error
+		float_buffer_t err = fabsf(curRawConv - filterset_sens->bufConv[filterset_sens->bufIdx]);
+
+		// Check if error between converted unfiltered raw value and converted filtered raw value is bigger than the currently highest
+		if(err > filterset_maxError)
+			filterset_maxError = err;
+	}
+	// Remember the last value that was tested
+	lastFilterErrorIndex = filterset_sens->bufIdx;
 
 
 
@@ -1788,6 +1874,8 @@ void menu_display_filterset(void){
 
 	// Header labels
 	TFT_label(1, &lbl_filterset);
+	TFT_label(1, &lbl_filterErrorText);
+	TFT_label(1, &lbl_filterError);
 
 }
 void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
