@@ -105,6 +105,9 @@
   <nodes xsi:type="ApplicationModel:PeripheralNode">
     <resource xsi:type="ResourceModel:Peripheral" href="HW_RESOURCES/port6/port6_6.dd#/"/>
   </nodes>
+  <nodes xsi:type="ApplicationModel:PeripheralNode">
+    <resource xsi:type="ResourceModel:Peripheral" href="HW_RESOURCES/eru1/eru1_1.dd#/"/>
+  </nodes>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.1" target="//@nodes.0"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.16" target="//@nodes.0"/>
   <connections xsi:type="ApplicationModel:NodeConnection" source="//@nodes.17" target="//@nodes.16"/>

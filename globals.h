@@ -12,6 +12,7 @@
 /*  MACROS - DEFINEs */
 #define DEBUG_ENABLE   // self implemented Debug flag
 #define INPUT_STANDARD // Defines what signal shall be retrieved in ADC_measurement_handler. INPUT_STANDARD = current adc value, INPUT_TESTIMPULSE = generated impulse signal, INPUT_TESTSAWTOOTH = generated saw signal, INPUT_TESTSINE = generated sine signal
+
 #define MEASUREMENT_INTERVAL (5.0) // Time between measurements in ms. Must be same as is set in TIMER_0 DAVE App!
 #define S1_BUF_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
 
@@ -32,8 +33,19 @@ volatile uint32_t _msCounter;
 volatile uint8_t main_tick;
 volatile uint32_t measurementCounter;
 
+// Record screenshot marker, can only be used in debug mode
+#ifdef DEBUG_ENABLE
+	uint8_t menu_doScreenshot;
+#endif
 
 /*  MEASUREMENTs */
+
+// Setting to decide which error handling strategy is used. ONLY ONE OF THE FOLLOWING MUST BE ACTIVATED AT A TIME! the
+// See measure.c measure_postProcessing() for more details. When changing this you will also need to change the way the BIN->CSV conversion is done!
+#define POSTPROCESS_CHANGEORDER_AT_ERRORS 1
+#define POSTPROCESS_INTERPOLATE_ERRORS 0
+// If POSTPROCESS_CHANGEORDER_AT_ERRORS is activated this decides if a filtered/converted value for measurements considered errors shall be calculated (if filter order is greater than occurred errors)
+#define POSTPROCESS_BUGGED_VALUES 1
 
 // Sensor data definition
 #define SENSOR_RAW_SIZE sizeof(int_buffer_t) // Bytes. Size of the a variable that represents the raw value. FIFO_BLOCK_SIZE MUST BE DIVISIBLE BY THIS!
@@ -99,6 +111,14 @@ volatile uint8_t fifo_writeBlock;
 volatile uint8_t fifo_recordBlock;
 extern volatile uint8_t fifo_finBlock[];
 
+/// BIN to CSV conversion
+// The header text to be written once at first line of CSV file. Must include alle coumns of all sensors! Do not add the "Time" column or the line break at the end (will be automatically added).
+#define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;EO"
+// ... used for every sensor ... TODO
+#define RECORD_CSV_ARGUMENTS	sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured
+// ... used for every sensor ... TODO
+#define RECORD_CSV_FORMAT		"%d;%.1f;%.2f;%d"
+
 /*  MENU AND USER INTERFACE */
 // Data Acquisition Mode
 enum measureModes{measureModeNone=0, measureModeMonitoring, measureModeRecording};
@@ -117,6 +137,8 @@ sdStates sdState;
 	#define printf(...) { ; }
 #endif
 volatile uint8_t frameover;
+
+
 
 
 

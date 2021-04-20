@@ -737,15 +737,56 @@ control btn_back = {
 
 
 
+#ifdef DEBUG_ENABLE
+void TFT_recordScreenshot(void){
+	/// Create a screenshot and write it to sd-card
+	printf("Making screenshot\n");
+	// Open/create bmp file
+	uint8_t openOK = record_openBMP("SC.BMP");
+	if (openOK == 1){
+		// Number of pixels an bytes
+		#define SS_PIXELS (EVE_HSIZE * EVE_VSIZE)
+		#define SS_BYTES (SS_PIXELS * 4) // 32 bit
 
+		// Create Screenshot in display memory
+		EVE_cmd_snapshot2(0x20, 0, 0, 0, EVE_HSIZE*2, EVE_VSIZE);
 
+		// Get pixel per pixel (32bit) from display and write it to sd-card
+		printf("Writing screenshot\n");
+		uint32_t bmp = 0;
+		for (uint32_t i = 0; i < SS_PIXELS; i++) {
+			bmp = EVE_memRead32(0 + (i*4));
+			record_writeBMP(&bmp, 4);
+			if(i % 1000 == 0)
+				printf("%d\n", (int)i);
+		}
+		printf("Finished\n");
+
+		// Close bmp file
+		record_closeBMP();
+
+		// Refresh display
+		TFT_setMenu(-1);
+	}
+	else
+		printf("Unable to open screenshot\n");
+}
+#endif
 
 void TFT_display_get_values(void){
 	// Get size of last display list to be printed on screen (section "Debug Values")
 	display_list_size = EVE_memRead16(REG_CMD_DL);
 	tracker = EVE_memRead32(REG_TRACKER);
-}
 
+	// If in debug mode and variable is set to 1 record a screenshot
+	#ifdef DEBUG_ENABLE
+	if(menu_doScreenshot == 1){
+		TFT_recordScreenshot();
+		menu_doScreenshot = 0;
+	}
+
+	#endif
+}
 
 
 
@@ -1140,6 +1181,7 @@ void menu_display_3setup2(void){
 	//TFT_textbox_display(20, 70, 20, filename_rec);
 	TFT_textbox_display(&tbx_hour);
 }
+
 void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
 	/// Do not use predefined TAG values! See tft.c "TAG ASSIGNMENT"!
@@ -1161,6 +1203,7 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 					btn_dimmmer.state = 0;
 					EVE_memWrite8(REG_PWM_DUTY, 0x80);	/* setup backlight, range is from 0 = off to 0x80 = max */
 				}
+
 			}
 			break;
 		// textbox

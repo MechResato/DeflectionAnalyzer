@@ -154,4 +154,7 @@
     <upwardMapList xsi:type="ResourceModel:HWResource" href="../../APPS/DIGITAL_IO/v4_0_16/DIGITAL_IO_5.app#//@hwResources.1"/>
     <resourcesList name="pin" requiredResourceUri="http://resources/LQFP144.0.0/devicepackage/0/pin97"/>
   </provided>
+  <provided xsi:type="ResourceModel:ResourceGroup" name="75" URI="http://resources/lqfp144.0.0/devicepackage/0/75">
+    <resourcesList name="pin" requiredResourceUri="http://resources/LQFP144.0.0/devicepackage/0/pin75"/>
+  </provided>
 </ResourceModel:DevicePackage>

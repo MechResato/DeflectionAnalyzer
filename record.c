@@ -68,7 +68,7 @@ void record_mountDisk(uint8_t mount){
 
 	// If needed, mount the SD and mark state as mounted or error
 	if(mount){
-		/* Register work area */
+		// Register work area
 		res = f_mount(&fs, "0:", 1);
 		if (res == FR_OK) {
 			printf("Mount OK\n");
@@ -80,6 +80,18 @@ void record_mountDisk(uint8_t mount){
 		}
 		else {
 			printf("Mount error: %d\n", res);
+			sdState = sdError;
+		}
+	}
+	else{
+		// Unregister work area
+		res = f_unmount("0:");
+		if (res == FR_OK) {
+			printf("Unmount OK\n");
+			sdState = sdNone;
+		}
+		else {
+			printf("Unmount error: %d\n", res);
 			sdState = sdError;
 		}
 	}
@@ -614,20 +626,21 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 			res |= record_openFile(filename_CSV, objFILwrite, 0);
 			printf("Tried open CSV file: Error=%d\n", res);
 
-			DIGITAL_IO_SetOutputHigh(&IO_6_2);
-
 			// If files are ready ...
 			if(res == FR_OK){
-				// Generate line format (not needed?)
-				//char lineFormat[100] = "%d\n";
-
 				// Set file cursor
 				res = f_lseek(&fil_r, 0);
 				res |= f_lseek(&fil_w, 0);
 				printf("\tReset file cursors (res%d)\n", res);
 
+				// Generate header string, write it to file and reset buffer
+				sprintf(csv_line_buff, "Time;"   RECORD_CSV_HEADER     "\n");
+				res = f_write(&fil_w, csv_line_buff, strlen(csv_line_buff), &bw);
+				csv_line_buff[0] = '\0';
+
 				// Read line by line and convert to csv, as long as end of file isn't reached
 				uint16_t linCount = 0;
+				float curTimeO = 0;
 				while(record_checkEndOfFile(objFILread) == 0  ){ //linCount < 10
 					// Reset buff
 					char seperator = ';';
@@ -635,7 +648,6 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 
 					// For each sensor - read corresponding bits to sensor buffer, apply filter, convert value and write to CSV file
 					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
-						int16_t compFilterOrder;
 
 						// Read raw value from file
 						raw = 0;
@@ -650,58 +662,20 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 						// Set current raw value
 						sensArray[i]->bufRaw[sensArray[i]->bufIdx] = raw;
 
-
-						/// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
-						if(sensArray[i]->errorOccured != 0){
-							// Get oldest index
-							int32_t oldIdx = sensArray[i]->bufIdx - sensArray[i]->avgFilterOrder;
-							if(oldIdx < 0) oldIdx += sensArray[i]->bufMaxIdx+1;
-							// Decrease error counter
-							if(sensArray[i]->bufRaw[oldIdx] == 0)
-								sensArray[i]->errorOccured--;
-						}
-
-						/// Check if newest value in filter interval (to be added) is an error, if so increase error counter, null raw value
-						/// null raw value and limit max amount of errors possible
-						if(raw > sensArray[i]->errorThreshold){
-							// Increment Count of errors in filter interval
-							sensArray[i]->errorOccured++;
-
-							// Set raw value to 0
-							sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
-
-							// If more errors occurred than can be compensated by the avg filter, limit it to stay in interval
-							if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder)
-								sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
-						}
-
-						// Get filter order compensated by errors occurred (number of actual values in interval, used as divider)
-						compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
-
-						// Post processing: If an
-						if(compFilterOrder){
-							// Set current filter value
-							measure_movAvgFilter(sensArray[i], compFilterOrder);
-
-							// Set current converted value
-							measure_polyConversion(sensArray[i], sensArray[i]->bufIdx);
-						}
-						else{
-							// Set current filter value to 0 (current value is unusable)
-							measure_movAvgFilter(sensArray[i], 1); // Only to keep sum up to date - result must be ignored
-							sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
-
-							// Set current converted value to 0 (current value is unusable)
-							sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
-						}
-
+						// Error handling and calculation of raw/filtered/converted value
+						measure_postProcessing(sensArray[i]);
 
 						// On last value of line - change separator to newline
 						if(i == SENSORS_SIZE-1)
 							seperator = '\n';
 
 						// Write current value to the buffer
-						sprintf(csv_line_buff+strlen(csv_line_buff), "%d;%.1f;%.2f;%d;%d%c", sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], compFilterOrder, sensArray[i]->errorOccured, seperator);
+						//sprintf(csv_line_buff+strlen(csv_line_buff), "%.3f;%d;%.1f;%.2f;%d%c", curTimeO, sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured, seperator);
+						sprintf(
+							csv_line_buff+strlen(csv_line_buff),		// Add sensor data to end of buffer
+							"%.3f;"   RECORD_CSV_FORMAT     "%c",		// Concatenate format (time, [values from sensor] separator[; or \n])
+							curTimeO, RECORD_CSV_ARGUMENTS, seperator	// Arguments	->	  (time, [values from sensor] separator[; or \n])
+						);
 
 						//printf("\n\tWriting sensor %d: (raw%d) %s",i ,raw, csv_line_buff);
 					}
@@ -717,16 +691,16 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 					// Reset Buffer
 					csv_line_buff[0] = '\0';
 
+					// Increment line and time counter
+					curTimeO += (MEASUREMENT_INTERVAL/1000.0);
 					linCount++;
 				}
 
-				printf("End of BIN file!\n");
+				printf("End of BIN file! %d lines written = %.2fs\n", linCount, MEASUREMENT_INTERVAL*linCount/1000);
 			}
 			else{
 				printf("Error: Files are not ready or not open!\n");
 			}
-
-			DIGITAL_IO_SetOutputLow(&IO_6_2);
 
 			// Close Files
 			record_closeFile(objFILread);
@@ -741,6 +715,164 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 	measureMode = measureModeMonitoring;
 
 
+}
+
+
+///// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
+//if(sensArray[i]->errorOccured != 0){
+//	// Get oldest index
+//	int32_t oldIdx = sensArray[i]->bufIdx - sensArray[i]->avgFilterOrder;
+//	if(oldIdx < 0) oldIdx += sensArray[i]->bufMaxIdx+1;
+//	// Decrease error counter
+//	if(sensArray[i]->bufRaw[oldIdx] == 0)
+//		sensArray[i]->errorOccured--;
+//}
+//
+///// Check if newest value in filter interval (to be added) is an error, if so increase error counter, null raw value
+///// null raw value and limit max amount of errors possible
+//if(raw > sensArray[i]->errorThreshold){
+//	// Increment Count of errors in filter interval
+//	sensArray[i]->errorOccured++;
+//
+//	// Set raw value to 0
+//	sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
+//
+//	// If more errors occurred than can be compensated by the avg filter, limit it to stay in interval
+//	if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder)
+//		sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
+//}
+//
+//
+//// If no errors in filter interval - use avgFilterOrder as average divider
+//// Else if errors in filter interval - use filter order compensated by number of errors occurred (number of actual values in interval, used) as divider
+//if(sensArray[i]->errorOccured == 0)
+//	compFilterOrder = sensArray[i]->avgFilterOrder;
+//else
+//	compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
+//
+//
+///// Post processing: Calculate filtered/converted value and fill corresponding buffers
+//#if POSTPROCESS_BUGGED_VALUES == 1
+//// Always calculate filtered and converted value if possible (even if current value was an error)
+//if(compFilterOrder){
+//#else
+//// Only calculate filtered and converted value if no error are in filter interval
+//if(compFilterOrder && sensArray[i]->bufRaw[sensArray[i]->bufIdx] != 0){
+//#endif
+//	// Set current filter value
+//	measure_movAvgFilter(sensArray[i], compFilterOrder);
+//
+//	// Set current converted value
+//	measure_polyConversion(sensArray[i], sensArray[i]->bufIdx);
+//}
+//// compFilterOrder is 0 - no data available
+//else{
+//	// Set current filter value to 0 (current value is unusable)
+//	measure_movAvgFilter(sensArray[i], 1); // Only to keep sum up to date - result must be ignored
+//	sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
+//
+//	// Set current converted value to 0 (current value is unusable)
+//	sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
+//}
+
+
+
+
+uint8_t record_openBMP(const char* path){
+	///
+	///
+
+
+	// FATFS result code and two string buffers for comment and values
+	FRESULT res = 0;
+	UINT bw;
+	char buff[400];
+	// The Header of an 480x272 pixel sized 32bit bitmap
+	#define BMP_HEADER_ARGB8_32BIT_SIZE 54
+	const uint8_t bmp_header_argb8_32bit[BMP_HEADER_ARGB8_32BIT_SIZE] =
+	{
+		0x42, 0x4D, 0x38, 0xF8, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, // Header itself - 14Byte: 2B FileType, 4B FileSize, 2B Reserved, 2B Reserved, 4B PixelDataOffset
+		0x28, 0x00, 0x00, 0x00,	0xE0, 0x01,	0x00, 0x00, 0xF0, 0xFE, 0xFF, 0xFF, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00,  // Info Header - 40Byte (see)
+		0x02, 0xF8,	0x07, 0x00, 0x12, 0x0B,	0x00, 0x00,	0x12, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+
+
+	// Initial log line
+	printf("\nrecord_openBMP:\n");
+
+	// Try to mount disk
+	record_mountDisk(1);
+
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	if(sdState == sdMounted || sdState == sdFileOpen){
+
+		/// Check if file already exists - if so rename it
+		// Get file-info to check if it exists
+		res = f_stat(path, NULL); // Use &fno if actual file-info is needed
+		if(res == FR_OK){
+			sprintf(buff, "BACKUP.BMP");
+			res = f_rename(path, buff);
+			printf("Backup BMP file to %s: %d\n", buff, res);
+		}
+		else{
+			printf("File not found: %d\n", res);
+		}
+
+		// Open/Create File
+		record_openFile(path, objFILwrite, 0);
+
+		// If file is ready to be written to ...
+		if(sdState == sdFileOpen){
+			// Write Header
+			res = f_write(&fil_w, bmp_header_argb8_32bit, BMP_HEADER_ARGB8_32BIT_SIZE, &bw);
+			if (res != FR_OK || bw <= 0)
+				printf("\t BMP write failed %d (bw=%d)\n", res, bw);
+			printf("Write BMP File open\n");
+			return 1;
+		}
+		else{
+			printf("Write BMP File not open\n");
+			return 0;
+		}
+	}
+	else{
+		printf("No SD-Card mounted\n");
+		return 0;
+	}
+
+}
+
+void record_writeBMP(uint32_t* data, uint16_t size){
+	///
+	///
+
+	// FATFS result code and two string buffers for comment and values
+	FRESULT res = 0;
+	UINT bw;
+
+	// Write pixel
+	res = f_write(&fil_w, data, size, &bw);
+	if (res != FR_OK || bw <= 0)
+		printf("\t BMP write failed %d (bw=%d)\n", res, bw);
+}
+
+void record_closeBMP(){
+	///
+	///
+
+
+	// Initial log line
+	printf("\nrecord_closeBMP:\n");
+
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	if(sdState == sdMounted || sdState == sdFileOpen){
+
+		// Close file
+		record_closeFile(objFILwrite);
+
+		// Add a line break to console
+		printf("\n");
+	}
 }
 
 

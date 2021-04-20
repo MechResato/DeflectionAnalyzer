@@ -178,5 +178,9 @@
     <enumValues xsi:type="ResourceModel:RegEnumValue" value="#0" description="Disabled"/>
     <enumValues xsi:type="ResourceModel:RegEnumValue" value="#1" description="Enabled"/>
   </provided>
+  <provided xsi:type="ResourceModel:ResourceGroup" name="4" URI="http://resources/47.0.0/peripheral/scu/0/gcu/interrupt/erunmi/4">
+    <resourcesList name="in" requiredResourceUri="http://resources/47.0.0/peripheral/scu/0/interrupt_erunmi4_in"/>
+    <resourcesList name="out" requiredResourceUri="http://resources/47.0.0/peripheral/scu/0/interrupt_erunmi4_out"/>
+  </provided>
   <addressBlock offset="0x0" size="0x4000" usage="registers"/>
 </ResourceModel:Peripheral>

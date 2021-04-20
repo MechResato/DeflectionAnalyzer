@@ -11,17 +11,15 @@
 #include <malloc.h>
 #include <math.h>
 #include <globals.h>
+#include <measure.h>
 #include <record.h>
 
-uint32_t lastval = 0; // just for TestTriangle signal
+
 
 extern volatile uint8_t volatile * volatile fifo_buf;
 
 
 
-//static inline void measure_movAvgFilter(volatile sensor* sens);
-
-volatile uint16_t testCount = 0;
 
 /// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
 /// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
@@ -89,6 +87,7 @@ void Adc_Measurement_Handler(void){
 				else sens->bufRaw[sensBufIdx] = 4095;
 			#elif defined(INPUT_TESTSAWTOOTH)
 				// 2 TestSawtooth
+				static uint32_t lastval; // just for TestTriangle signal
 				if(lastval < 4095) sens->bufRaw[sensBufIdx] = lastval+7;
 				else sens->bufRaw[sensBufIdx] = 0;
 				lastval = sens->bufRaw[sensBufIdx];
@@ -102,51 +101,14 @@ void Adc_Measurement_Handler(void){
 
 		// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
 		if(measureMode == measureModeMonitoring){
-			// Check for sensor errors and try to interpolate a raw value. Note: This is only necessary because the filter would be confused otherwise and to print "clean" lines on the graph.
-			// This should be OK as long as the frequency of the to be measured event is much lower than the frequency time, the average filter order adjusted to the application and only few errord occur at a time.
-			// Square interpolation was ruled out due to performance issues (on first tests the linear approach made the slope only ~400ns slower when errors occur).
-			// Still, for more precise results the value must be recalculate in post-processing.
-			if(sens->bufRaw[sensBufIdx] > sens->errorThreshold){
-				// Mark current measurement as error
-				sens->errorOccured++;
-
-				// Calculate last index and check for over leap
-				int32_t pre1Idx = sensBufIdx - 1;
-				if(pre1Idx < 0) pre1Idx += sens->bufMaxIdx + 1;
-
-				// If this is the the first error after an valid value, calculate/store last OK value and slope for linear interpolation
-				if(sens->errorOccured == 1){
-					// Calculate second to last index and check for over leap
-					int32_t pre2Idx = sensBufIdx - 2;
-					if(pre2Idx < 0) pre2Idx += sens->bufMaxIdx + 1;
-
-					// Store last valid value and slope, to be used till the next valid value comes
-					sens->errorLastValid = sens->bufFilter[pre1Idx] - sens->bufFilter[pre2Idx];
-				}
-				// Linear interpolation of current value (needed to satisfy filter, otherwise the missing value would interfere for [avgFilterOrder] measurements)
-				sens->bufRaw[sensBufIdx] = sens->bufRaw[pre1Idx] + sens->errorLastValid;
-			}
-			else {
-				sens->errorOccured = 0;
-			}
-
-			// Calculate current filtered value and save it in sensor struct
-			MEASURE_MOVAVGFILTER(sens, sens->avgFilterOrder);
-
-			/// Convert raw value to adapted value and save it in sensor struct
-			MEASURE_POLYCONVERSION(sens, sensBufIdx);
+			// Error handling and calculation of raw/filtered/converted value
+			measure_postProcessing(sens);
 		}
 
 		// If system is in recording mode store current raw value in FIFO
 		if(measureMode == measureModeRecording){
-			//sens->bufRaw[sensBufIdx] = testCount;
-			testCount++;
-
 			// Copy current value to FIFO
 			memcpy((void*)(fifo_buf + fifo_writeBufIdx), &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
-
-			//if(sensBufIdx % 150 == 0)
-				//printf("%d %d %d\n", fifo_buf + fifo_writeBufIdx, &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
 
 			// Increase index
 			fifo_writeBufIdx += SENSOR_RAW_SIZE;
@@ -184,9 +146,6 @@ void Adc_Measurement_Handler(void){
 		}
 	}
 
-	//if(fifo_writeBufIdx > 4094)
-		//printf("%d\n",fifo_writeBufIdx);
-
 	// Trigger next main loop (with this it is running in sync with the measurement -> change if needed!)
 	main_tick = 42;
 
@@ -196,6 +155,153 @@ void Adc_Measurement_Handler(void){
 	// Timing measurement pin low
 	//DIGITAL_IO_SetOutputLow(&IO_6_2);
 }
+
+
+
+
+
+
+
+
+
+
+
+void measure_postProcessing(volatile sensor* sens){
+	/// Uses the raw buffer and current raw-value to detect errors, filter the data and convert. The processing of the
+	/// filtered and converted value is designed to be fast and accurate enough for monitoring. However for actual
+	/// precise results the raw value must be post-processed externally! The error handling is somewhat complicated
+	/// and can be controlled by global defined macros. In this context this is only necessary because the filter would
+	/// otherwise get confused by faulty values. This also allows "clear" lines to be printed to on the monitoring graph.
+	///
+	/// TODO
+
+
+#if POSTPROCESS_CHANGEORDER_AT_ERRORS == 1
+	/// Check for sensor errors and try to reduce filter order on every encounter. Detects errors that are entering or
+	/// leaving the filter interval and changes the filter order accordingly. Set sens.errorOccured to sens.avgFilterOrder
+	/// at the beginning of the measurement to ignore not yet written values and allow correct values to be written (no
+	/// ramp up). Errors are represented by a 0 value in the raw buffer. Make sure this can never be an actual value.
+
+	// The filter order compensated by the errors
+	int16_t compFilterOrder;
+
+	/// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
+	if(sens->errorOccured != 0){
+		// Get oldest index
+		int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
+		if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;
+		// Decrease error counter
+		if(sens->bufRaw[oldIdx] == 0)
+			sens->errorOccured--;
+	}
+
+	/// Check if newest value in filter interval (to be added) is an error, if so increase error counter, null raw value
+	/// null raw value and limit max amount of errors possible
+	if(sens->bufRaw[sens->bufIdx] > sens->errorThreshold){
+		// Increment Count of errors in filter interval
+		sens->errorOccured++;
+
+		// Set raw value to 0
+		sens->bufRaw[sens->bufIdx] = 0;
+
+		// If more errors occurred than can be compensated by the avg filter, limit it to stay in interval
+		if(sens->errorOccured > sens->avgFilterOrder)
+			sens->errorOccured = sens->avgFilterOrder;
+	}
+
+	// If no errors in filter interval - use avgFilterOrder as average divider
+	// Else if errors in filter interval - use filter order compensated by number of errors occurred (number of actual values in interval, used) as divider
+	if(sens->errorOccured == 0)
+		compFilterOrder = sens->avgFilterOrder;
+	else
+		compFilterOrder = sens->avgFilterOrder - sens->errorOccured;
+
+#elif POSTPROCESS_INTERPOLATE_ERRORS == 1
+	/// Check for sensor errors and try to interpolate a raw value. This should be OK as long as the frequency of the,
+	/// to be measured, event is much lower than the frequency time, the average filter order adjusted to the application
+	/// and only few errors occur at a time. Square interpolation was ruled out due to performance issues (on first tests
+	/// the linear approach made the slope only ~400ns slower when errors occur). However with this method the raw value
+	/// can't be used to detect errors (it might be interpolated!) therefore the errorOccured property of the sensor
+	/// struct must be recorded as well!
+
+	// Filter order is never changed with this approach
+	static int16_t compFilterOrder = sens->avgFilterOrder;
+
+	/// Check if newest value in filter interval (to be added) is an error
+	if(sens->bufRaw[sensBufIdx] > sens->errorThreshold){
+		// Mark current measurement as error
+		sens->errorOccured++;
+
+		// Calculate last index and check for over leap
+		int32_t pre1Idx = sensBufIdx - 1;
+		if(pre1Idx < 0) pre1Idx += sens->bufMaxIdx + 1;
+
+		// If this is the the first error after an valid value, calculate/store last OK value and slope for linear interpolation
+		if(sens->errorOccured == 1){
+			// Calculate second to last index and check for over leap
+			int32_t pre2Idx = sensBufIdx - 2;
+			if(pre2Idx < 0) pre2Idx += sens->bufMaxIdx + 1;
+
+			// Store last valid value and slope, to be used till the next valid value comes
+			sens->errorLastValid = sens->bufFilter[pre1Idx] - sens->bufFilter[pre2Idx];
+		}
+		// Linear interpolation of current value (needed to satisfy filter, otherwise the missing value would interfere for [avgFilterOrder] measurements)
+		sens->bufRaw[sensBufIdx] = sens->bufRaw[pre1Idx] + sens->errorLastValid;
+	}
+	else {
+		sens->errorOccured = 0;
+	}
+#else
+#error "Error: Global macro POSTPROCESS_INTERPOLATE_ERRORS or POSTPROCESS_CHANGEORDER_AT_ERRORS must be set to 1!"
+#endif
+
+	/// Post processing: Calculate filtered/converted value and fill corresponding buffers
+#if POSTPROCESS_BUGGED_VALUES == 1
+	// Always calculate filtered and converted value if possible (even if current value was an error)
+	if(compFilterOrder){
+#else
+	// Only calculate filtered and converted value if no error are in filter interval
+	if(compFilterOrder && sens->bufRaw[sens->bufIdx] != 0){
+#endif
+		// Set current filter value
+		MEASURE_MOVAVGFILTER(sens, compFilterOrder);
+
+		// Set current converted value
+		MEASURE_POLYCONVERSION(sens, sens->bufIdx);
+	}
+	// compFilterOrder is 0 - no data available
+	else{
+		// Set current filter value to 0 (current value is unusable)
+		MEASURE_MOVAVGFILTER(sens, 1); // Only to keep sum up to date - result must be ignored
+		sens->bufFilter[sens->bufIdx] = 0;
+
+		// Set current converted value to 0 (current value is unusable)
+		sens->bufConv[sens->bufIdx] = 0;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//if(sensBufIdx % 150 == 0)
+	//printf("%d %d %d\n", fifo_buf + fifo_writeBufIdx, &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
+
+
 
 // Check for error and set raw to 0 if detected
 //if(sensArray[i]->bufRaw[sensArray[i]->bufIdx] > sensArray[i]->errorThreshold){
@@ -211,15 +317,6 @@ void Adc_Measurement_Handler(void){
 //}
 
 
-void measure_movAvgFilter(volatile sensor* sens, uint16_t divider){
-	// See MEASURE_MOVAVGFILTER() macro for details. This is only made to be used outside of this module.
-	MEASURE_MOVAVGFILTER(sens, divider);
-}
-
-void measure_polyConversion(volatile sensor* sens, uint16_t sensBufIdx){
-	// See MEASURE_POLYCONVERSION() macro for details. This is only made to be used outside of this module.
-	MEASURE_POLYCONVERSION(sens, sensBufIdx);
-}
 
 // Measurements at non leap-over cycle!
 // poly_calc_sensor_i 5.80us max

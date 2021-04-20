@@ -104,8 +104,8 @@ __WEAK DAVE_STATUS_t DAVE_Init(void)
    } 
   if (init_status == DAVE_STATUS_SUCCESS)
   {
-	 /**  Initialization of DIGITAL_IO APP instance IO_6_2 */
-	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_6_2); 
+	 /**  Initialization of DIGITAL_IO APP instance IO_6_2_TIMING */
+	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_6_2_TIMING); 
    } 
   if (init_status == DAVE_STATUS_SUCCESS)
   {
@@ -119,8 +119,8 @@ __WEAK DAVE_STATUS_t DAVE_Init(void)
    } 
   if (init_status == DAVE_STATUS_SUCCESS)
   {
-	 /**  Initialization of DIGITAL_IO APP instance IO_3_3 */
-	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_3_3); 
+	 /**  Initialization of DIGITAL_IO APP instance IO_3_3_SC */
+	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&IO_3_3_SC); 
    }  
   return init_status;
 } /**  End of function DAVE_Init */

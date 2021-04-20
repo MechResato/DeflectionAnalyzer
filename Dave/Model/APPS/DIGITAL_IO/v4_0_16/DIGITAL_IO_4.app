@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ASCII"?>
-<ResourceModel:App xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ResourceModel="http://www.infineon.com/Davex/Resource.ecore" name="DIGITAL_IO" URI="http://resources/4.0.16/app/DIGITAL_IO/4" description="The DIGITAL_IO APP is used to configure &#xA; a port pin as digital Input/Output." mode="NOTSHARABLE" version="4.0.16" minDaveVersion="4.0.0" instanceLabel="IO_6_2" appLabel="">
+<ResourceModel:App xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ResourceModel="http://www.infineon.com/Davex/Resource.ecore" name="DIGITAL_IO" URI="http://resources/4.0.16/app/DIGITAL_IO/4" description="The DIGITAL_IO APP is used to configure &#xA; a port pin as digital Input/Output." mode="NOTSHARABLE" version="4.0.16" minDaveVersion="4.0.0" instanceLabel="IO_6_2_TIMING" appLabel="">
   <properties provideInit="true"/>
   <virtualSignals name="software controlled output signal" URI="http://resources/4.0.16/app/DIGITAL_IO/4/vs_digital_io_sw_pin" hwSignal="swreg_out" hwResource="//@hwResources.0"/>
   <virtualSignals name="pin" URI="http://resources/4.0.16/app/DIGITAL_IO/4/vs_digital_io_pad_pin" hwSignal="pad" hwResource="//@hwResources.0" visible="true"/>

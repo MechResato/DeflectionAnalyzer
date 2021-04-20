@@ -37,6 +37,7 @@ void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle
 
 
 void TFT_display_get_values(void);
+void TFT_recordScreenshot(void);
 
 void menu_display_static_0monitor(void);
 void menu_display_static_1dash(void);

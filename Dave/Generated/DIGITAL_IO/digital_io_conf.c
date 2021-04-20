@@ -78,7 +78,7 @@ const DIGITAL_IO_t IO_DIO_DIGOUT_CS_TFT =
   .hwctrl = XMC_GPIO_HWCTRL_DISABLED
 };
 		
-const DIGITAL_IO_t IO_6_2 =
+const DIGITAL_IO_t IO_6_2_TIMING =
 {
   .gpio_port = XMC_GPIO_PORT6,
   .gpio_pin = 2U,
@@ -114,13 +114,12 @@ const DIGITAL_IO_t IO_6_6 =
   .hwctrl = XMC_GPIO_HWCTRL_DISABLED
 };
 		
-const DIGITAL_IO_t IO_3_3 =
+const DIGITAL_IO_t IO_3_3_SC =
 {
   .gpio_port = XMC_GPIO_PORT3,
   .gpio_pin = 3U,
   .gpio_config = {
-    .mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL,
-    .output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,
+    .mode = XMC_GPIO_MODE_INPUT_TRISTATE,
 
   },
   .hwctrl = XMC_GPIO_HWCTRL_DISABLED

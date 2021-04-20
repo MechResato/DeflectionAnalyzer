@@ -76,12 +76,17 @@ int main(void)
 			// Reset tick
 			main_tick = 0;
 
+			// Check if screenshot is requested
+			#ifdef DEBUG_ENABLE
+				if(DIGITAL_IO_GetInput(&IO_3_3_SC) == 1)
+					menu_doScreenshot = 1;
+			#endif
 
 			/// RECORDING HANDLING
 			// If recording mode is active and there is something to record (current block is finished) write block to SD-Card
 			if(measureMode == measureModeRecording && fifo_finBlock[fifo_recordBlock] == 1){
 				// Timing measurement pin high
-				//DIGITAL_IO_SetOutputHigh(&IO_6_2);
+				//DIGITAL_IO_SetOutputHigh(&IO_6_2_TIMING);
 
 				// Record current block
 				record_block();
@@ -96,7 +101,7 @@ int main(void)
 					fifo_recordBlock = 0;
 
 				// Timing measurement pin low
-				//DIGITAL_IO_SetOutputLow(&IO_6_2);
+				//DIGITAL_IO_SetOutputLow(&IO_6_2_TIMING);
 			}
 
 

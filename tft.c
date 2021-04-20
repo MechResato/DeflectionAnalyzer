@@ -1553,13 +1553,13 @@ void TFT_display(void)
 	// If tft is active (TFT_init was executed and didn't fail) load initial logo and show DL
 	if(tft_active != 0)
 	{
+		// Get values from display before burst starts (is not possible during!)
+		TFT_display_get_values();
+
 		// Setup static part of the current menu - only needed once when the menu is changed
 		// ToDo: Do menu changes and scroll only with TFT_setMenu (or similar) and set TFT_refresh_static there. This way the additional 2 ORs dont have to be determined every time
 		if(TFT_refresh_static || TFT_last_MenuIdx != TFT_cur_MenuIdx || TFT_last_ScrollV != TFT_cur_ScrollV)
 			TFT_display_static();
-
-		// Get values from display before burst starts (is not possible during!)
-		TFT_display_get_values();
 
 
 		// Start Burst (start writing to the cmd-fifo as one stream of bytes, only sending the address once)
