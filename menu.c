@@ -447,6 +447,28 @@ textbox tbx_hour = {
 
 
 
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		Common elements of set submenus         -----------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+char str_submenu_header[25] = "";
+
+#define BTN_BACK_TAG 10
+control btn_back = {
+	.x = EVE_HSIZE-45,	.y = 5,
+	.w0 = 40,			.h0 = 30,
+	.mytag = BTN_BACK_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Back",
+	.controlType = Button,
+	.ignoreScroll = 1
+};
+
+
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //		CurveSet Elements         -----------------------------------------------------------------------------------------------------------------------------------------
@@ -471,7 +493,7 @@ uint8_t fit_result = 0;
 
 label lbl_curveset = {
 		.x = 20,		.y = 9,
-		.font = 27,		.options = 0,		.text = "Curve fit - Sensor 0",
+		.font = 27,		.options = 0,		.text = &str_submenu_header[0],//"Curve fit - Sensor 0",
 		.ignoreScroll = 0
 };
 
@@ -634,7 +656,7 @@ uint16_t filter_errorThreshold = 4095;
 
 label lbl_filterset = {
 		.x = 20,		.y = 9,
-		.font = 27,		.options = 0,		.text = "Filter set - Sensor 0",
+		.font = 27,		.options = 0,		.text = &str_submenu_header[0], //"Filter set - Sensor 0",
 		.ignoreScroll = 0
 };
 
@@ -752,25 +774,6 @@ textbox tbx_error_threshold = {
 	.numSrc.intSrc = &filter_errorThreshold,
 	.numSrc.srcOffset = NULL,
 	.numSrcFormat = "%d"
-};
-
-
-
-
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//		Common elements of set submenus         -----------------------------------------------------------------------------------------------------------------------------
-//
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#define BTN_BACK_TAG 10
-control btn_back = {
-	.x = EVE_HSIZE-45,	.y = 5,
-	.w0 = 40,			.h0 = 30,
-	.mytag = BTN_BACK_TAG,	.font = 27, .options = 0, .state = 0,
-	.text = "Back",
-	.controlType = Button,
-	.ignoreScroll = 1
 };
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1399,6 +1402,9 @@ void curveset_prepare(volatile sensor* sens){
 
 	// Determine fitted polynomial for the first time
 	fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+
+	// Change sensor number in header
+	sprintf(lbl_curveset.text, "Curve set - Sensor %d", (curveset_sens->index+1));
 }
 void curveset_setEditMode(uint8_t editMode){
 	/// Changes the GUI to data point editing mode and back (disable/enable of textboxes and buttons)
@@ -1822,6 +1828,10 @@ void filterset_prepare(volatile sensor* sens){
 
 	// Set current error threshold to retrieved value (we use a separate value in order to modify it dynamically)
 	filter_errorThreshold = filterset_sens->errorThreshold;
+
+	// Change sensor number in header
+	sprintf(lbl_filterset.text, "Filter set - Sensor %d", (filterset_sens->index+1));
+
 }
 void filterset_setEditMode(uint8_t editMode){
 	/// Changes the GUI to error threshold editing mode and back (disable/enable of textboxes and buttons)

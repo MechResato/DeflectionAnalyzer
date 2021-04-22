@@ -105,7 +105,7 @@ uint8_t filename_rec_curLength;
 #define FIFO_BITS_ONE_BLOCK (FIFO_BLOCK_SIZE-1)		         // = 0b000 0111 1111 111 for 1024BS. Represents the used bits of the uint16_t which represents the index in one block. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
 #define FIFO_BITS_ALL_BLOCK	((FIFO_BLOCK_SIZE*FIFO_BLOCKS)-1)// = 0b000 0011 1111 1111 for 1024BS and 4B. Represents the used bits of the uint16_t which represents the index in whole buffer. Use '&' to ignore higher bits
 #define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE, and must be adapted if more or less sensors are recorded.
-#define FIFO_LINE_SIZE_PAD 	2				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
+#define FIFO_LINE_SIZE_PAD 	0				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
 volatile uint8_t volatile * volatile fifo_buf;
 volatile uint16_t fifo_writeBufIdx;
 volatile uint8_t fifo_writeBlock;
@@ -114,7 +114,7 @@ extern volatile uint8_t fifo_finBlock[];
 
 /// BIN to CSV conversion
 // The header text to be written once at first line of CSV file. Must include alle coumns of all sensors! Do not add the "Time" column or the line break at the end (will be automatically added).
-#define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;EO"
+#define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;EO;S2_RAW;S2_FILTERED;S2_CONVERTED;EO"
 // ... used for every sensor ... TODO
 #define RECORD_CSV_ARGUMENTS	sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured
 // ... used for every sensor ... TODO

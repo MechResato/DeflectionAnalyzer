@@ -273,7 +273,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 		// Get file-info to check if it exists
 		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
 		if(res == FR_OK){
-			sprintf(buff, "S%dBAK.CAL", sens->index);
+			sprintf(buff, "S%dBAK.CAL", (sens->index+1));
 			res = f_rename((char*)&sens->fitFilename[0], buff);
 			printf("Backup CAL file to %s: %d\n", buff, res);
 		}
@@ -290,7 +290,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 			// Single loop do-while slope to handle errors clean with break; (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 			do{
 				// Write header
-				f_printf(&fil_w, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", sens->index, sens->name);
+				f_printf(&fil_w, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", (sens->index+1), sens->name);
 				printf("Write header\n");
 
 				// Write fit order comment and value in separate lines
@@ -651,6 +651,9 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 					char seperator = ';';
 					int_buffer_t raw = 0;
 
+					// Add current time to buffer
+					sprintf( csv_line_buff, "%.3f;",	curTimeO);
+
 					// For each sensor - read corresponding bits to sensor buffer, apply filter, convert value and write to CSV file
 					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
 
@@ -678,8 +681,8 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 						//sprintf(csv_line_buff+strlen(csv_line_buff), "%.3f;%d;%.1f;%.2f;%d%c", curTimeO, sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured, seperator);
 						sprintf(
 							csv_line_buff+strlen(csv_line_buff),		// Add sensor data to end of buffer
-							"%.3f;"   RECORD_CSV_FORMAT     "%c",		// Concatenate format (time, [values from sensor] separator[; or \n])
-							curTimeO, RECORD_CSV_ARGUMENTS, seperator	// Arguments	->	  (time, [values from sensor] separator[; or \n])
+							RECORD_CSV_FORMAT     "%c",		// Concatenate format ([values from sensor] separator[; or \n])
+							RECORD_CSV_ARGUMENTS, seperator	// Arguments	->	  ([values from sensor] separator[; or \n])
 						);
 
 						//printf("\n\tWriting sensor %d: (raw%d) %s",i ,raw, csv_line_buff);
@@ -1108,7 +1111,28 @@ int8_t record_stop(uint8_t flushData){
 
 		// Flush remaining Blocks and data to SD-card
 		if(flushData){
-			; // Todo Write last flush code
+			// Write blocks till an unfinished block is found
+			while(1){
+				if(fifo_finBlock[fifo_recordBlock] == 1){
+					printf("Write finished block %d\n", fifo_recordBlock);
+
+					// Record current block
+					record_block();
+
+					// Mark Block as processed (if a block isn't processed before the measurement handler tries to write to it again the record fails)
+					fifo_finBlock[fifo_recordBlock] = 0;
+
+					// Mark next block as current record block
+					fifo_recordBlock++;
+					// Overleap correction of the current block index
+					if(fifo_recordBlock == FIFO_BLOCKS)
+						fifo_recordBlock = 0;
+				}
+				else
+					// No finish block left - stop
+					break;
+			}
+
 		}
 
 		// Free Memory
