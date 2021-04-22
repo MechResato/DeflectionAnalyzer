@@ -102,6 +102,7 @@
  **********************************************************************************************************************/
 
  extern ADC_MEASUREMENT_CHANNEL_t ADC_MEASUREMENT_Channel_A_handle;
+ extern ADC_MEASUREMENT_CHANNEL_t ADC_MEASUREMENT_Channel_B_handle;
 
 /***********************************************************************************************************************
  * EXTERN DECLARATIONS

@@ -26,6 +26,7 @@ volatile uint8_t main_tick = 0; // Trigger tft display function. Is set every ti
 
 ///*  MEASUREMENTs */
 volatile uint32_t measurementCounter = 0; // Count of executed measurements
+volatile uint8_t measurementCurSensor = 0;
 
 // Sensor 1 Front
 #define S1_BUF_SIZE (480-20-20) // =440 values stored, new every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
@@ -35,7 +36,7 @@ float_buffer_t s1_buf_2conv  [S1_BUF_SIZE] = { 0.0 };
 #define S1_FILENAME_CURLEN 6
 char    s1_filename_cal[STR_SPEC_MAXLEN] = "S1.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
 volatile sensor sensor1 = {
-	.index = 1,
+	.index = 0,
 	.name = "Front",
 	.adcChannel = &ADC_MEASUREMENT_Channel_A,
 	.bufIdx = 0,
@@ -61,11 +62,11 @@ int_buffer_t   s2_buf_0raw   [S2_BUF_SIZE] = { 0 }; // all elements 0
 float_buffer_t s2_buf_1filter[S2_BUF_SIZE] = { 0.0 };
 float_buffer_t s2_buf_2conv  [S2_BUF_SIZE] = { 0.0 };
 #define S2_FILENAME_CURLEN 6
-char    s2_filename_spec[STR_SPEC_MAXLEN] = "S2.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
+char    s2_filename_cal[STR_SPEC_MAXLEN] = "S2.CAL"; // Note: File extension must be 3 characters long or an error will occur (fatfs lib?)
 volatile sensor sensor2 = {
-	.index = 2,
+	.index = 1,
 	.name = "Rear",
-	.adcChannel = &ADC_MEASUREMENT_Channel_A,
+	.adcChannel = &ADC_MEASUREMENT_Channel_B,
 	.bufIdx = 0,
 	.bufMaxIdx = S2_BUF_SIZE-1,
 	.bufRaw    = (int_buffer_t*)&s2_buf_0raw,
@@ -75,7 +76,7 @@ volatile sensor sensor2 = {
 	.errorThreshold = 3900, // Raw value above this threshold will be considered invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	.avgFilterOrder = 5,
 	.avgFilterSum = 0.0,
-	.fitFilename = s2_filename_spec,
+	.fitFilename = s2_filename_cal,
 	.fitFilename_curLen = S2_FILENAME_CURLEN,
 	.fitOrder = 2,
 	.fitCoefficients[0] = 0,
@@ -85,8 +86,8 @@ volatile sensor sensor2 = {
 };
 
 // Array of all sensor objects to be used in measurement handler
-//volatile sensor* sensors[SENSORS_SIZE] = {&sensor1, &sensor2};
-volatile sensor* sensors[1] = {&sensor1}; // Temporarily deactivate sensor 2
+volatile sensor* sensors[SENSORS_SIZE] = {&sensor1, &sensor2};
+//volatile sensor* sensors[1] = {&sensor1}; // Temporarily deactivate sensor 2
 
 
 /* LOG FIFO */

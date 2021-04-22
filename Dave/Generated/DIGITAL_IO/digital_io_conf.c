@@ -119,7 +119,7 @@ const DIGITAL_IO_t IO_3_3_SC =
   .gpio_port = XMC_GPIO_PORT3,
   .gpio_pin = 3U,
   .gpio_config = {
-    .mode = XMC_GPIO_MODE_INPUT_TRISTATE,
+    .mode = XMC_GPIO_MODE_INPUT_PULL_DOWN,
 
   },
   .hwctrl = XMC_GPIO_HWCTRL_DISABLED

@@ -523,11 +523,16 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 			else{
 				printf("CAL file not open!");
 			}
+
 		}
+		else{
+			printf("File not found: %d", res);
+		}
+
 
 	}
 	else{
-		printf("File not found: %d", res);
+		printf("SD-Card not ready: %d", res);
 	}
 
 	// Clean update of filter (the order might be changed)

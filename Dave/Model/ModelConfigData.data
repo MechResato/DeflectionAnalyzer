@@ -276,4 +276,6 @@
   <hwConnections href="APPS/DIGITAL_IO/v4_0_16/DIGITAL_IO_6.app#//@connections.1"/>
   <hwConnections href="APPS/DIGITAL_IO/v4_0_16/DIGITAL_IO_7.app#//@connections.0"/>
   <hwConnections href="APPS/DIGITAL_IO/v4_0_16/DIGITAL_IO_7.app#//@connections.1"/>
+  <hwConnections href="APPS/ADC_MEASUREMENT/v4_1_22/ADC_MEASUREMENT_0.app#//@connections.107"/>
+  <hwConnections href="APPS/ADC_MEASUREMENT/v4_1_22/ADC_MEASUREMENT_0.app#//@connections.55"/>
 </ApplicationModel:ApplicationData>

@@ -298,7 +298,6 @@ label lbl_calibrate = {
 		.ignoreScroll = 0
 };
 
-//char* const chptr = (char* const)&sensor1.filename_spec;
 #define TBX_SENSOR1_TAG 21
 textbox tbx_sensor1 = {
 	.x = M_COL_2,
@@ -345,33 +344,52 @@ control btn_filterset_S1 = {
 	.ignoreScroll = 0
 };
 
-#define STR_S2_LINSPEC_MAXLEN 20
-char str_s2_linspec[STR_S2_LINSPEC_MAXLEN] = "s2.lin";
-uint8_t str_s2_linspec_curLength = 6;
 #define TBX_SENSOR2_TAG 24
 textbox tbx_sensor2 = {
 	.x = M_COL_2,
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
-	.width = 120,
+	.width = EVE_HSIZE - (M_COL_2) - 130 - 25,
 	.labelOffsetX = 130,
 	.labelText = "Sensor2:   CAL File",
 	.mytag = TBX_SENSOR2_TAG,
-	.text = str_s2_linspec,
-	.text_maxlen = STR_S2_LINSPEC_MAXLEN,
-	.text_curlen = &str_s2_linspec_curLength,
+	.text = s2_filename_cal,
+	.text_maxlen = STR_SPEC_MAXLEN,
+	.text_curlen = (uint8_t*)&sensor2.fitFilename_curLen,
 	.keypadType = Standard,
 	.active = 0,
 	.numSrc.srcType = srcTypeNone
 };
-#define BTN_LINSENSOR2_TAG 25
-control btn_linSensor2 = {
-	.x = M_COL_4,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
+
+label lbl_curveset_S2 = {
+		.x = 205,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) + FONT_COMP*1,
+		.font = 26,		.options = 0,		.text = "Curve fit:",
+		.ignoreScroll = 0
+};
+#define BTN_CURVESET_S2_TAG 25
+control btn_curveset_S2 = {
+	.x = 270,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 55,		.h0 = 31,
-	.mytag = BTN_LINSENSOR2_TAG,	.font = 27,	.options = 0, .state = 0,
+	.mytag = BTN_CURVESET_S2_TAG,	.font = 27,	.options = 0, .state = 0,
 	.text = "Set",
 	.controlType = Button,
 	.ignoreScroll = 0
 };
+
+label lbl_filterset_S2 = {
+		.x = 355,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) + FONT_COMP*1,
+		.font = 26,		.options = 0,		.text = "Filter:",
+		.ignoreScroll = 0
+};
+#define BTN_FILTERSET_S2_TAG 26
+control btn_filterset_S2 = {
+	.x = EVE_HSIZE - 25 - 55,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 31,
+	.mytag = BTN_FILTERSET_S2_TAG,	.font = 27,	.options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+
 
 
 
@@ -623,12 +641,12 @@ label lbl_filterset = {
 // Current maximum error between filtered and unfiltered values
 float_buffer_t filterset_maxError = 0;
 label lbl_filterErrorText = {
-		.x = M_COL_3 + 40,		.y = 9 + FONT_COMP,
+		.x = M_COL_2 + 60,		.y = 9 + FONT_COMP,
 		.font = 26,		.options = 0,		.text = "Max error: ",
 		.ignoreScroll = 0
 };
 label lbl_filterError = {
-		.x = M_COL_3 + 105,		.y = 9 + FONT_COMP,
+		.x = M_COL_2 + 60 + 65,		.y = 9 + FONT_COMP,
 		.font = 26,		.options = 0,		.text = "%d.%.2d mm",
 		.numSrc.srcType = srcTypeFloat,
 		.numSrc.floatSrc = (float_buffer_t*)&filterset_maxError, //(ignore volatile here)
@@ -682,7 +700,15 @@ control btn_filter_setchange = {
 	.controlType = Button,
 	.ignoreScroll = 0
 };
-
+#define BTN_FILTERERROR_RESET 14
+control btn_filterError_reset = {
+	.x = M_COL_3 + 105 + 26	+ 5	,	.y = 5,
+	.w0 = 50				,	.h0 = 30,
+	.mytag = BTN_FILTERERROR_RESET,	.font = 27, .options = 0, .state = 0,
+	.text = "Reset",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
 
 /// Textboxes
 #define STR_FILTER_ORDER_MAXLEN 3
@@ -854,18 +880,22 @@ void menu_display_0monitor(void){
 	TFT_control(&tgl_graphMode);
 
 	/////////////// Debug Values
-	//EVE_cmd_number_burst(470, 10, 26, EVE_OPT_RIGHTX, display_list_size); /* number of bytes written to the display-list by the command co-pro */
-	TFT_label(1, &lbl_DLsize_val);
+	//TFT_label(1, &lbl_DLsize_val);
 
 	// Write current sensor value with unit
 	TFT_label(1, &lbl_sensor_val);
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	if(inputType == 4)
-		TFT_graph_pixeldata_f(&gph_monitor, &s1_buf_2conv[0], S1_BUF_SIZE, (uint16_t*)&sensor1.bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
-	else
-		TFT_graph_pixeldata_i(&gph_monitor, &s1_buf_0raw[0], S1_BUF_SIZE, (uint16_t*)&sensor1.bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+	// TODO: This could me more automated
+	if(inputType == 0)
+		TFT_graph_pixeldata_i(&gph_monitor, sensors[measurementCurSensor]->bufRaw, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+	else if(inputType == 1)
+		TFT_graph_pixeldata_f(&gph_monitor, sensors[measurementCurSensor]->bufConv, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+	else if(inputType == 2)
+		TFT_graph_pixeldata_i(&gph_monitor, sensors[measurementCurSensor]->bufRaw, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+	else if(inputType == 3)
+		TFT_graph_pixeldata_f(&gph_monitor, sensors[measurementCurSensor]->bufConv, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 
 }
 void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -899,34 +929,60 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				*toggle_lock = 42;
 
 				// Switch signal type
-				//InputType++;
-				if(inputType == 0){ inputType = 4; }
-				else{ inputType = 0; }
+				inputType++;
+				if(inputType > 3){ inputType = 0; }
 
 				// Switch label of button to new input type
 				if(inputType == 0){
-					btn_input.text = "Raw1";
+					measurementCurSensor = sensor1.index;
+					btn_input.text = "S1 Raw";
 					lbl_sensor_val.text = "%d";
 					lbl_sensor_val.numSrc.srcType = srcTypeInt;
-					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)&s1_buf_0raw;
+					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)sensor1.bufRaw;
+					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
 					lbl_sensor_val.fracExp = 1;
 
 					gph_monitor.amp_max = 5.2;
 					gph_monitor.y_max = 4095.0;
 					gph_monitor.y_label = "V";
 				}
-				else if(inputType == 1){	btn_input.text = "Imp";	}
-				else if(inputType == 2){	btn_input.text = "Saw";	}
-				else if(inputType == 3){	btn_input.text = "Sine"; }
-				else{
-					btn_input.text = "Sensor1";
+				else if(inputType == 1){
+					measurementCurSensor = sensor1.index;
+					btn_input.text = "S1";
 					lbl_sensor_val.text = "%d.%.2d mm";
 					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
-					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)&s1_buf_2conv;
+					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor1.bufConv;
+					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
 					lbl_sensor_val.fracExp = 2;
 
-					gph_monitor.amp_max = 70;
-					gph_monitor.y_max = 70;
+					gph_monitor.amp_max = 165;
+					gph_monitor.y_max = 165;
+					gph_monitor.y_label = "mm";
+				}
+				else if(inputType == 2){
+					measurementCurSensor = sensor2.index;
+					btn_input.text = "S2 Raw";
+					lbl_sensor_val.text = "%d";
+					lbl_sensor_val.numSrc.srcType = srcTypeInt;
+					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)sensor2.bufRaw;
+					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
+					lbl_sensor_val.fracExp = 1;
+
+					gph_monitor.amp_max = 5.2;
+					gph_monitor.y_max = 4095.0;
+					gph_monitor.y_label = "V";
+				}
+				else if(inputType == 3){
+					measurementCurSensor = sensor2.index;
+					btn_input.text = "S2";
+					lbl_sensor_val.text = "%d.%.2d mm";
+					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
+					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor2.bufConv;
+					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
+					lbl_sensor_val.fracExp = 2;
+
+					gph_monitor.amp_max = 165;
+					gph_monitor.y_max = 165;
 					gph_monitor.y_label = "mm";
 				}
 
@@ -1065,10 +1121,12 @@ void menu_display_static_2setup1(void){
 	/// Sensor curve fit section
 	TFT_label(1, &lbl_calibrate);
 	TFT_textbox_static(1, &tbx_sensor1);
-	TFT_label(1, &lbl_curveset);
+	//TFT_label(1, &lbl_curveset);
 	TFT_label(1, &lbl_curveset_S1);
 	TFT_label(1, &lbl_filterset_S1);
 	TFT_textbox_static(1, &tbx_sensor2);
+	TFT_label(1, &lbl_curveset_S2);
+	TFT_label(1, &lbl_filterset_S2);
 }
 void menu_display_2setup1(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
@@ -1079,7 +1137,8 @@ void menu_display_2setup1(void){
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 	TFT_control(&btn_curveset_S1);
 	TFT_control(&btn_filterset_S1);
-	TFT_control(&btn_linSensor2);
+	TFT_control(&btn_curveset_S2);
+	TFT_control(&btn_filterset_S2);
 
 	// Set Color
 	TFT_setColor(1, BLACK, -1, -1, -1);
@@ -1141,18 +1200,6 @@ void menu_touch_2setup1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				TFT_setMenu(menu_filterset.index);
 			}
 			break;
-		case BTN_LINSENSOR2_TAG:
-			if(*toggle_lock == 0) {
-				printf("Button LinS1\n");
-				*toggle_lock = 42;
-
-				// Prepare linSet menu for current sensor
-				//curveset_prepare(&InputBuffer1[0], &sensor1.bufferIdx);
-
-				// Change menu
-				//TFT_setMenu(menu_curveset.index);
-			}
-			break;
 		case TBX_SENSOR2_TAG:
 			if(*toggle_lock == 0) {
 				printf("Textbox S2\n");
@@ -1160,6 +1207,30 @@ void menu_touch_2setup1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 
 				// Activate Keypad and set cursor to end
 				TFT_textbox_setStatus(&tbx_sensor2, 1, -1);
+			}
+			break;
+		case BTN_CURVESET_S2_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button CurveFit S2\n");
+				*toggle_lock = 42;
+
+				// Prepare linSet menu for current sensor
+				curveset_prepare(&sensor2);
+
+				// Change menu
+				TFT_setMenu(menu_curveset.index);
+			}
+			break;
+		case BTN_FILTERSET_S2_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button FilterSet S2\n");
+				*toggle_lock = 42;
+
+				// Prepare linSet menu for current sensor
+				filterset_prepare(&sensor2);
+
+				// Change menu
+				TFT_setMenu(menu_filterset.index);
 			}
 			break;
 		default:
@@ -1267,7 +1338,7 @@ void curveset_prepare(volatile sensor* sens){
 	// Check if CAL file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
 	DP_size = 0;
-	record_readCalFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	record_readCalFile(sens, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
 	// If there are still no data points - use default ones
 	if(DP_size == 0){
 		// Allocate and set the y-value array
@@ -1537,7 +1608,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				curveset_sens->fitOrder = fit_order;
 
 				// Write Spec file
-				//record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
 				free(tbx_act.numSrc.floatSrc);
@@ -1725,7 +1796,7 @@ void filterset_prepare(volatile sensor* sens){
 	// Check if spec file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
 	DP_size = 0;
-	record_readCalFile(&sensor1, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	record_readCalFile(sens, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
 	// If there are still no data points - use default ones
 	if(DP_size == 0){
 		// Allocate and set the y-value array
@@ -1840,11 +1911,13 @@ void menu_display_filterset(void){
 		float_buffer_t curRawConv = poly_calc(filterset_sens->bufRaw[filterset_sens->bufIdx], filterset_sens->fitCoefficients, filterset_sens->fitOrder);
 
 		// Calculate error
-		float_buffer_t err = fabsf(curRawConv - filterset_sens->bufConv[filterset_sens->bufIdx]);
+		float_buffer_t err = fabsf(fabsf(curRawConv) - fabsf(filterset_sens->bufConv[filterset_sens->bufIdx]));
 
 		// Check if error between converted unfiltered raw value and converted filtered raw value is bigger than the currently highest
-		if(err > filterset_maxError)
+		if(err > filterset_maxError){
 			filterset_maxError = err;
+			printf("NewMax: %.2f, curRC %.2f, curFC %.2f\n", err, curRawConv, filterset_sens->bufConv[filterset_sens->bufIdx]);
+		}
 	}
 	// Remember the last value that was tested
 	lastFilterErrorIndex = filterset_sens->bufIdx;
@@ -1867,6 +1940,7 @@ void menu_display_filterset(void){
 	TFT_control(&btn_filter_down); //	 - change curve fit function
 	TFT_control(&btn_filter_up);
 	TFT_control(&btn_filter_setchange);
+	TFT_control(&btn_filterError_reset);
 
 	// Data point controls
 	TFT_textbox_display(&tbx_error_threshold);
@@ -1940,6 +2014,15 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 					// Do a clean filter value calculation to sync it
 					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
 				}
+			}
+			break;
+		case BTN_FILTERERROR_RESET:
+			if(*toggle_lock == 0) {
+				printf("Button filter error reset\n");
+				*toggle_lock = 42;
+
+				// Reset filter
+				filterset_maxError = 0;
 			}
 			break;
 		case BTN_FILTER_SETCHANGE_TAG:

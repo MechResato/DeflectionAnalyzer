@@ -2,7 +2,7 @@
 <ResourceModel:App xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ResourceModel="http://www.infineon.com/Davex/Resource.ecore" name="ADC_MEASUREMENT" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0" description="Incorporates analog to digital conversion for the required measurements." mode="NOTSHARABLE" version="4.1.22" minDaveVersion="4.0.0" instanceLabel="ADC_MEASUREMENT_0" appLabel="" containingProxySignal="true">
   <properties singleton="true" provideInit="true"/>
   <virtualSignals name="Channel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a" hwSignal="gch" hwResource="//@hwResources.54"/>
-  <virtualSignals name="Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b" hwSignal="gch" hwResource="//@hwResources.55" required="false"/>
+  <virtualSignals name="Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b" hwSignal="gch" hwResource="//@hwResources.55"/>
   <virtualSignals name="Channel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c" hwSignal="gch" hwResource="//@hwResources.56" required="false"/>
   <virtualSignals name="Channel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d" hwSignal="gch" hwResource="//@hwResources.57" required="false"/>
   <virtualSignals name="Channel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e" hwSignal="gch" hwResource="//@hwResources.58" required="false"/>
@@ -28,7 +28,7 @@
   <virtualSignals name="Channel_Y" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_y" hwSignal="gch" hwResource="//@hwResources.78" required="false"/>
   <virtualSignals name="Channel_Z" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_z" hwSignal="gch" hwResource="//@hwResources.79" required="false"/>
   <virtualSignals name="pad_signal_Channel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_a" hwSignal="pad" hwResource="//@hwResources.2"/>
-  <virtualSignals name="pad_signal_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_b" hwSignal="pad" hwResource="//@hwResources.3" required="false"/>
+  <virtualSignals name="pad_signal_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_b" hwSignal="pad" hwResource="//@hwResources.3"/>
   <virtualSignals name="pad_signal_Channel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_c" hwSignal="pad" hwResource="//@hwResources.4" required="false"/>
   <virtualSignals name="pad_signal_Channel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_d" hwSignal="pad" hwResource="//@hwResources.5" required="false"/>
   <virtualSignals name="pad_signal_Channel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_e" hwSignal="pad" hwResource="//@hwResources.6" required="false"/>
@@ -80,7 +80,7 @@
   <virtualSignals name="Channel_Y_pin_signal" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_pin_pad_signal_y" hwSignal="pin" hwResource="//@hwResources.52"/>
   <virtualSignals name="Channel_Z_pin_signal" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_pin_pad_signal_z" hwSignal="pin" hwResource="//@hwResources.53"/>
   <virtualSignals name="result_register_Channel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a_result" hwSignal="res_sel" hwResource="//@hwResources.80"/>
-  <virtualSignals name="result_register_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result" hwSignal="res_sel" hwResource="//@hwResources.81" required="false"/>
+  <virtualSignals name="result_register_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result" hwSignal="res_sel" hwResource="//@hwResources.81"/>
   <virtualSignals name="result_register_Channel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c_result" hwSignal="res_sel" hwResource="//@hwResources.82" required="false"/>
   <virtualSignals name="result_register_Channel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d_result" hwSignal="res_sel" hwResource="//@hwResources.83" required="false"/>
   <virtualSignals name="result_register_Channel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e_result" hwSignal="res_sel" hwResource="//@hwResources.84" required="false"/>
@@ -106,7 +106,7 @@
   <virtualSignals name="result_register_Channel_Y" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_y_result" hwSignal="res_sel" hwResource="//@hwResources.104" required="false"/>
   <virtualSignals name="result_register_Channel_Z" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_z_result" hwSignal="res_sel" hwResource="//@hwResources.105" required="false"/>
   <virtualSignals name="channel_selectChannel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a_select" hwSignal="select" hwResource="//@hwResources.54"/>
-  <virtualSignals name="channel_selectChannel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_select" hwSignal="select" hwResource="//@hwResources.55" required="false"/>
+  <virtualSignals name="channel_selectChannel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_select" hwSignal="select" hwResource="//@hwResources.55"/>
   <virtualSignals name="channel_selectChannel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c_select" hwSignal="select" hwResource="//@hwResources.56" required="false"/>
   <virtualSignals name="channel_selectChannel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d_select" hwSignal="select" hwResource="//@hwResources.57" required="false"/>
   <virtualSignals name="channel_selectChannel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e_select" hwSignal="select" hwResource="//@hwResources.58" required="false"/>
@@ -132,7 +132,7 @@
   <virtualSignals name="channel_selectChannel_Y" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_y_select" hwSignal="select" hwResource="//@hwResources.78" required="false"/>
   <virtualSignals name="channel_selectChannel_Z" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_z_select" hwSignal="select" hwResource="//@hwResources.79" required="false"/>
   <virtualSignals name="result_select_Channel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a_result_select" hwSignal="res_sel" hwResource="//@hwResources.54"/>
-  <virtualSignals name="result_select_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result_select" hwSignal="res_sel" hwResource="//@hwResources.55" required="false"/>
+  <virtualSignals name="result_select_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result_select" hwSignal="res_sel" hwResource="//@hwResources.55"/>
   <virtualSignals name="result_select_Channel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c_result_select" hwSignal="res_sel" hwResource="//@hwResources.56" required="false"/>
   <virtualSignals name="result_select_Channel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d_result_select" hwSignal="res_sel" hwResource="//@hwResources.57" required="false"/>
   <virtualSignals name="result_select_Channel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e_result_select" hwSignal="res_sel" hwResource="//@hwResources.58" required="false"/>
@@ -231,7 +231,9 @@
   <hwResources name="Channel_A_pin" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channel_pin#1" resourceGroupUri="resources/48.0.0/port/p/15/pad/2" mResGrpUri="port/p/*/pad/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/port14/port14_14.dd#//@provided.12"/>
   </hwResources>
-  <hwResources name="Channel_B_pin" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channel_pin#2" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
+  <hwResources name="Channel_B_pin" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channel_pin#2" resourceGroupUri="port/p/*/pad/*" mResGrpUri="port/p/*/pad/*">
+    <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/port14/port14_14.dd#//@provided.15"/>
+  </hwResources>
   <hwResources name="Channel_C_pin" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channel_pin#3" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
   <hwResources name="Channel_D_pin" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channel_pin#4" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
   <hwResources name="Channel_E_pin" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channel_pin#5" resourceGroupUri="" required="false" mResGrpUri="port/p/*/pad/*"/>
@@ -259,7 +261,9 @@
   <hwResources name="pin_Channel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_pin_pad#1" resourceGroupUri="devicepackage/0/37" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.35"/>
   </hwResources>
-  <hwResources name="pin_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_pin_pad#2" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
+  <hwResources name="pin_Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_pin_pad#2" resourceGroupUri="devicepackage/0/40" constraintType="GLOBAL_RESOURCE" mResGrpUri="devicepackage/0/*">
+    <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/DEVICEPACKAGE/DEVICEPACKAGE_0.dd#//@provided.47"/>
+  </hwResources>
   <hwResources name="pin_Channel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_pin_pad#3" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
   <hwResources name="pin_Channel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_pin_pad#4" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
   <hwResources name="pin_Channel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_pin_pad#5" resourceGroupUri="" required="false" mResGrpUri="devicepackage/0/*"/>
@@ -287,7 +291,9 @@
   <hwResources name="Channel_A" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channels#1" resourceGroupUri="peripheral/vadc/0/group/*/ch/*" mResGrpUri="peripheral/vadc/0/group/*/ch/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/vadc/vadc_0.dd#//@provided.22"/>
   </hwResources>
-  <hwResources name="Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channels#2" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/ch/*"/>
+  <hwResources name="Channel_B" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channels#2" resourceGroupUri="peripheral/vadc/0/group/*/ch/*" mResGrpUri="peripheral/vadc/0/group/*/ch/*">
+    <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/vadc/vadc_0.dd#//@provided.42"/>
+  </hwResources>
   <hwResources name="Channel_C" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channels#3" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/ch/*"/>
   <hwResources name="Channel_D" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channels#4" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/ch/*"/>
   <hwResources name="Channel_E" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_channels#5" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/ch/*"/>
@@ -315,7 +321,9 @@
   <hwResources name="Channel_A Result" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_result_reg#1" resourceGroupUri="peripheral/vadc/0/group/*/*/*" mResGrpUri="peripheral/vadc/0/group/*/*/*">
     <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/vadc/vadc_0.dd#//@provided.2"/>
   </hwResources>
-  <hwResources name="Channel_B Result" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_result_reg#2" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/*/*"/>
+  <hwResources name="Channel_B Result" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_result_reg#2" resourceGroupUri="peripheral/vadc/0/group/*/*/*" mResGrpUri="peripheral/vadc/0/group/*/*/*">
+    <downwardMapList xsi:type="ResourceModel:ResourceGroup" href="../../../HW_RESOURCES/vadc/vadc_0.dd#//@provided.48"/>
+  </hwResources>
   <hwResources name="Channel_C Result" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_result_reg#3" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/*/*"/>
   <hwResources name="Channel_D Result" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_result_reg#4" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/*/*"/>
   <hwResources name="Channel_E Result" URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/rarray_hwres_adc_measurement_result_reg#5" resourceGroupUri="" required="false" mResGrpUri="peripheral/vadc/0/group/*/*/*"/>
@@ -401,7 +409,7 @@
     <srcVirtualSignal href="../../GLOBAL_ADC/v4_0_20/GLOBAL_ADC_0.app#//@virtualSignals.0"/>
   </connections>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_a/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a" systemDefined="true" sourceSignal="pad_signal_Channel_A" targetSignal="Channel_A" srcVirtualSignal="//@virtualSignals.26" targetVirtualSignal="//@virtualSignals.0"/>
-  <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_b/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b" systemDefined="true" sourceSignal="pad_signal_Channel_B" targetSignal="Channel_B" required="false" srcVirtualSignal="//@virtualSignals.27" targetVirtualSignal="//@virtualSignals.1"/>
+  <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_b/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b" systemDefined="true" sourceSignal="pad_signal_Channel_B" targetSignal="Channel_B" srcVirtualSignal="//@virtualSignals.27" targetVirtualSignal="//@virtualSignals.1"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_c/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c" systemDefined="true" sourceSignal="pad_signal_Channel_C" targetSignal="Channel_C" required="false" srcVirtualSignal="//@virtualSignals.28" targetVirtualSignal="//@virtualSignals.2"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_d/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d" systemDefined="true" sourceSignal="pad_signal_Channel_D" targetSignal="Channel_D" required="false" srcVirtualSignal="//@virtualSignals.29" targetVirtualSignal="//@virtualSignals.3"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_pin_signal_e/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e" systemDefined="true" sourceSignal="pad_signal_Channel_E" targetSignal="Channel_E" required="false" srcVirtualSignal="//@virtualSignals.30" targetVirtualSignal="//@virtualSignals.4"/>
@@ -453,7 +461,7 @@
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_y_analog_io_pin/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_y" systemDefined="true" targetSignal="Channel_Y" required="false" targetVirtualSignal="//@virtualSignals.24" containingProxySignal="true"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_z_analog_io_pin/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_z" systemDefined="true" targetSignal="Channel_Z" required="false" targetVirtualSignal="//@virtualSignals.25" containingProxySignal="true"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a_result_select/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_a_result" systemDefined="true" sourceSignal="result_select_Channel_A" targetSignal="result_register_Channel_A" srcVirtualSignal="//@virtualSignals.130" targetVirtualSignal="//@virtualSignals.78"/>
-  <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result_select/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result" systemDefined="true" sourceSignal="result_select_Channel_B" targetSignal="result_register_Channel_B" required="false" srcVirtualSignal="//@virtualSignals.131" targetVirtualSignal="//@virtualSignals.79"/>
+  <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result_select/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_b_result" systemDefined="true" sourceSignal="result_select_Channel_B" targetSignal="result_register_Channel_B" srcVirtualSignal="//@virtualSignals.131" targetVirtualSignal="//@virtualSignals.79"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c_result_select/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_c_result" systemDefined="true" sourceSignal="result_select_Channel_C" targetSignal="result_register_Channel_C" required="false" srcVirtualSignal="//@virtualSignals.132" targetVirtualSignal="//@virtualSignals.80"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d_result_select/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_d_result" systemDefined="true" sourceSignal="result_select_Channel_D" targetSignal="result_register_Channel_D" required="false" srcVirtualSignal="//@virtualSignals.133" targetVirtualSignal="//@virtualSignals.81"/>
   <connections URI="http://resources/4.1.22/app/ADC_MEASUREMENT/0/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e_result_select/http://resources/4.1.22/app/ADC_MEASUREMENT/0/vs_adc_measurement_channel_e_result" systemDefined="true" sourceSignal="result_select_Channel_E" targetSignal="result_register_Channel_E" required="false" srcVirtualSignal="//@virtualSignals.134" targetVirtualSignal="//@virtualSignals.82"/>

@@ -80,7 +80,7 @@ void Adc_Measurement_Handler(void){
 			// Read value from sensor (or generated test if defined)
 			#if defined(INPUT_STANDARD)
 				// Get raw input from ADC
-				sens->bufRaw[sensBufIdx] = ADC_MEASUREMENT_GetResult(sens->adcChannel);
+				sens->bufRaw[sensBufIdx] = ADC_MEASUREMENT_GetResult(sens->adcChannel);//(&ADC_MEASUREMENT_Channel_A);
 			#elif defined(INPUT_TESTIMPULSE)
 			// 1 TestImpulse
 				if(sensBufIdx % (S1_BUF_SIZE/5)) sens->bufRaw[sensBufIdx] = 0;

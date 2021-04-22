@@ -100,11 +100,14 @@
  **********************************************************************************************************************/
 
 
-#define ADC_MEASUREMENT_MAXCHANNELS (1U)
+#define ADC_MEASUREMENT_MAXCHANNELS (2U)
 
 #define Adc_Measurement_Handler IRQ_Hdlr_16
 #define ADC_MEASUREMENT_Channel_A (ADC_MEASUREMENT_Channel_A_handle)
 #define ADC_MEASUREMENT_Channel_A_RES (VADC_G2->RES[0])
+
+#define ADC_MEASUREMENT_Channel_B (ADC_MEASUREMENT_Channel_B_handle)
+#define ADC_MEASUREMENT_Channel_B_RES (VADC_G1->RES[3])
 
 
 #define ADC_MEASUREMENT_CPU_4X

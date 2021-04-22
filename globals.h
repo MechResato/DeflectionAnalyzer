@@ -32,6 +32,7 @@ typedef float float_buffer_t;
 volatile uint32_t _msCounter;
 volatile uint8_t main_tick;
 volatile uint32_t measurementCounter;
+volatile uint8_t measurementCurSensor;
 
 // Record screenshot marker, can only be used in debug mode
 #ifdef DEBUG_ENABLE
@@ -79,14 +80,14 @@ extern float_buffer_t s1_buf_1filter[];
 extern float_buffer_t s1_buf_2conv[];
 
 // Sensor 2 Rear
-char s2_filename_spec[STR_SPEC_MAXLEN];
+char s2_filename_cal[STR_SPEC_MAXLEN];
 volatile sensor sensor2;
 extern int_buffer_t s2_buf_0raw[];
 extern float_buffer_t s2_buf_1filter[];
 extern float_buffer_t s2_buf_2conv[];
 
 // Array of all sensor objects to be used in measurement handler
-#define SENSORS_SIZE 1
+#define SENSORS_SIZE 2
 extern volatile sensor* sensors[];
 
 /*  RECORDING FIFO AND FILENAME */
