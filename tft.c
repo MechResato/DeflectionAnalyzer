@@ -1,81 +1,100 @@
 /*
 @file    		tft.c
-@brief   		Implementation of display communication using the EVE Library. Meant to display a menu and a dynamic graph (implemented for XMC4700 and DAVE)
+@brief   		Implementation of an menu framework the EVE Library of Rudolph Riedel. Meant to display and manage menus, their elements and dynamic graphs (implemented for XMC4700 and DAVE)
 @version 		2.0 (base lib version was 1.13)
 @date    		2020-09-05
 @initialauthor  Rudolph Riedel
-@author 		RS (Rene Santeler & Stefan Reinmüller) @ MCI 2020/21 (initially created by Rudolph Riedel, completely reworked by RS )
+@author 		Rene Santeler (V2.0 together with Stefan Reinmüller) @ MCI 2020/21 (initially created by Rudolph Riedel, completely reworked by RS )
 
 @section History
 2.0 (adapted from Rudolph Riedel base version 1.13 - below changes are from RS 2020/21)
 - Added color scheme, adaptable banner, dynamic graph implementation (TFT_graph_static & TFT_graph_stepdata), a display init which adds the static part of a graph to static DL (TFT_graph_static), a display init to show a bitmap (TFT_display_init_screen), ...
 - Adapted TFT_init to only do the most necessary thins for init (no static DL creation! you need to call one afterwards before using TFT_display!)
+- by Rene Santeler & Stefan Reinmüller
 2.1
 - Added menu structure (ToDo: explain changes)
 - Added keypad and swipe feature
-- Added TFT elements (TFT_label, TFT_header, TFT_textbox, TFT_control, TFT_graph_stepdata)
+- Added TFT elements (TFT_label, TFT_header, TFT_textbox, TFT_control, TFT_graph_...)
+- by Rene Santeler
 
-// See https://brtchip.com/eve-toolchains/ for helpful Tools
+See https://brtchip.com/eve-toolchains/ for helpful Tools
  */
-////// TODO: Early on all display_static functions were build to be able to use or not use burst mode. For now they are set to always use burst. If no problems with this occur, the functions can be stripped of this functionality.
+////// TODO: Early on all display_static functions were build to be able to use, or not use burst mode. For now they are set to always use burst. If no problems with this occur, the functions can be stripped of this functionality.
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <globals.h>
 #include "Libraries/FT800-FT813-5.x/EVE.h"
 #include "tft_data.h"
+#include "globals.h"
+// Note: The globals must implement the types int_buffer_t (e.g. uint16_t) float_buffer_t (e.g. float) and the function poly_calc
 #include "menu.h"
+// Note: This TFT "framework" has to be used by an "menu" module which actually defines the user/menu code. It must implement following:
+// 	Defines: TFT_MENU_SIZE (overall size of the menu_objects), TFT_MAIN_MENU_SIZE (highest index used to represent main menus, available by swiping - rest are sub-menus)
+//  Menu function pointer arrays: TFT_display_cur_Menu__fptr_arr, TFT_touch_cur_Menu__fptr_arr, TFT_display_static_cur_Menu__fptr_arr (at the end of the menu control functions (TFT_display_static, TFT_display and TFT_touch) the function referenced to this pointer is executed)
+//  Menu objects and the covering array: An object for every menu, representing it's size, header and behavior, as as well as the array "menu_objects" which holds all of them ordered
+//  TFT_display_get_values(): Used to get data from the display
 #include "tft.h"
 
-
-
-
-/////////// General Variables
-static uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful of TFT_init wasn't called
-static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
-static char str_buf[100] = ""; // Character buffer used by str_insert and TFT_label
-
-// Memory-map definitions
-#define MEM_LOGO 0x00000000 // Start-address of logo, needs about 20228 bytes of memory. Will be written by TFT_display_init_screen and overwritten by TFT_graph_static (and everything else...)
-#define MEM_DL_STATIC (EVE_RAM_G_SIZE - 4096) // 0xff000 -> Start-address of the static part of the display-list. Defined as the upper 4k of gfx-mem (WARNING: If static part gets bigger than 4k it gets clipped. IF dynamic part gets so big that it touches the last 4k (1MiB-4k) it overwrites the static part)
-static uint32_t num_dl_static; // Amount of bytes in the static part of our display-list
-
-
-/////////// Menu function pointers - At the end of the TFT_display_static, TFT_display and TFT_touch the function referenced to this pointer is executed
-extern menu* menu_objects[TFT_MENU_SIZE]; // An array of menu structs that hold information general about the menus (see menu struct in tft.h for definition and menu.c for initialization)
+/////////// External variables /////////////////////////////////////////////////////////////////
+// TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
+// TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
+// An array of menu struct's that holds general information about the menus (see menu struct in tft.h for definition and menu.c for initialization)
+extern menu* menu_objects[TFT_MENU_SIZE];
+/// Menu function pointers - At the end of the TFT_display_static, TFT_display and TFT_touch the function referenced to this pointer is executed
 extern void (*TFT_display_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
 extern void (*TFT_touch_cur_Menu__fptr_arr[TFT_MENU_SIZE])(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y);
 extern void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void);
-// TFT_MENU_SIZE is declared in menu.c and must be changed if menus are added or removed
-// TFT_MAIN_MENU_SIZE is declared in menu.c. It states to where the main menus (accessible via swipe an background) are listed. All higher menus are considered submenus (control on how to get there is on menu.c)
+// Function to get values from the display
+extern void TFT_display_get_values(void);
+// Function to calculate the result of an polynomial
+extern float poly_calc (float c_x, float* f_coefficients, uint8_t order);
+// Source type definitions
+#ifndef int_buffer_t
+	typedef uint16_t int_buffer_t;
+#endif
+#ifndef float_buffer_t
+	typedef float float_buffer_t;
+#endif
+
+
+/////////// Internal variables /////////////////////////////////////////////////////////////////
+/// General Variables
+static uint8_t tft_active = 0;  // Prevents TFT_display of doing anything if EVE_init isn't successful or TFT_init wasn't called
+static uint8_t toggle_lock = 0; // "Debouncing of touches" -> If something is touched, this is set to prevent button evaluations. As soon as the is nothing pressed any more this is reset to 0
+static char str_buf[100] = "";  // Character buffer used by str_insert and TFT_label
+
+/// Menu control
 static int8_t TFT_cur_MenuIdx = 2; // Index of currently used menu (TFT_display, TFT_touch, ...).
 static int8_t TFT_last_MenuIdx = -1; // Index of last used menu (TFT_display_static). If this differs from TFT_cur_MenuIdx the initial TFT_display_static function of the menu is executed. Also helpful to determine what was the last menu during the TFT_display_static.
 static uint32_t keypadControlKeyBgColor = MAIN_BTNCOLOR;
 static uint32_t keypadControlKeyFgColor = MAIN_BTNCTSCOLOR;
 static uint32_t mainBgColor = MAIN_BGCOLOR;
 
-/////////// Scroll feature
+/// Memory-map definitions
+#define MEM_LOGO 0x00000000 // Start-address of logo, needs about 20228 bytes of memory. Will be written by TFT_display_init_screen and overwritten by TFT_graph_static (and everything else...)
+#define MEM_DL_STATIC (EVE_RAM_G_SIZE - 4096) // 0xff000 -> Start-address of the static part of the display-list. Defined as the upper 4k of gfx-mem (WARNING: If static part gets bigger than 4k it gets clipped. IF dynamic part gets so big that it touches the last 4k (1MiB-4k) it overwrites the static part)
+static uint32_t num_dl_static; // Amount of bytes in the static part of our display-list
+
+/// Scroll feature
 static int8_t TFT_refresh_static = 0;
 static int16_t TFT_cur_ScrollV = 0;
 static int16_t TFT_last_ScrollV = 0;
 static int16_t TFT_UpperBond = 0; 	// Defines up to which point elements are displayed. Needed to not scroll elements from main area into header or similar. Set by TFT_header, used by all element display functions.
 
-
-/////////// Swipe feature (TFT_touch)
+/// Swipe feature (TFT_touch)
 static SwipeDetection swipeDetect = None;
 static uint8_t swipeInProgress = 0;
 static uint8_t swipeEvokedBy = 0; 			 // The tag that initiated the swipe (needed to run an action based on which element was initially touched when the swipe began)
 static int32_t swipeInitialTouch_X = 32768;  // X position of the initial touch of an swipe
 static int32_t swipeInitialTouch_Y = 32768;
 static uint8_t swipeEndOfTouch_Debounce = 0; // Counts the number of successive cycles without an touch (tag 0). Used to determine when an swipe is finished
-int32_t swipeDistance_X = 0;		  		 // Distance (in px) between the initial touch and the current position of an swipe
-int32_t swipeDistance_Y = 0;
+static int32_t swipeDistance_X = 0;		  	 // Distance (in px) between the initial touch and the current position of an swipe
+static int32_t swipeDistance_Y = 0;
 
-
-/////////// Keypad feature (TFT_touch)
+/// Keypad feature (TFT_touch)
 static keypadTypes keypadType = Standard;
 static uint8_t keypadActive = 0;
 static uint8_t keypadEvokedBy = 0;					// The tag that initiated the keypad (needed to only edit this element with the keypad)
@@ -85,7 +104,7 @@ static uint8_t keypadShiftActive = 0; 				// Determines the shown set of charact
 static uint8_t keypadEndOfKeypress_Debounce = 0; 	// Counts the number of successive cycles without an touch (tag 0). Used to determine when an keypress is finished
 static uint8_t keypadInitialLock = 0; 				// When keyboard is activated the keypadInitialLock is set so it only starts accepting input after the finger is first lifted (otherwise it would recognize the random button the aligns with the activating button as a keypress)
 static const char backspace_char = 46; 				// The code that needs to be used for the selected backspace character. It is the offset of the extended ASCII code ('<<' = 174, minus the offset of 128 => 46). Need to use font 19 for extended ASCII characters!
-#define KEYPAD_ACTIVE_TARGET_HEIGTH 72			// target offset of the text from upper border of the TFT (position so that it can easily be edited/seen) in pixel
+#define KEYPAD_ACTIVE_TARGET_HEIGTH 72				// target offset of the text from upper border of the TFT (position so that it can easily be edited/seen) in pixel
 // TAG ASSIGNMENT
 //		0		No touch
 //		1		Background (swipe area)
@@ -96,7 +115,7 @@ static const char backspace_char = 46; 				// The code that needs to be used for
 //		127		Keyboard Backspace (displayed character is different, see 'backspace_char'!)
 //		128		Keyboard Enter
 
-/////////// Textbox feature
+/// Textbox feature
 static uint8_t textbox_cursor_pos = 0;
 
 // Array of function pointers for every used "EVE_cmd_dl..." function. First one is normal, second one is to be used within a burst mode.
@@ -106,6 +125,28 @@ static void (*EVE_cmd_text_var__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t,
 static void (*EVE_cmd_number__fptr_arr[])(int16_t, int16_t, int16_t, uint16_t, int32_t) = {EVE_cmd_number, EVE_cmd_number_burst};
 
 
+
+
+static void str_insert(char* target, uint8_t* len, char ch, int8_t pos){
+	/// Insert a character 'ch' at given position 'pos' of a string 'target'.
+	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
+
+
+	// Copy actual text in front of the new char to the buffer
+	strncpy(str_buf, target, pos);
+
+	// Copy the rest of the text one character behind the new on
+	strcpy(&str_buf[pos+1], &target[pos]);
+
+	// Add new character
+	str_buf[pos] = ch;
+
+	// Copy buffer back to target
+	strcpy(target,str_buf);
+
+	// Increase length
+	(*len)++;
+}
 
 void TFT_keypad_open(uint8_t evokedBy, enum keypadTypes type){
 	/// Open a keypad for the according evoker (control element - e.g. tag of an textbox)
@@ -134,28 +175,6 @@ void TFT_keypad_close(){
 	keypadKeypressFinished = 0;
 }
 
-
-
-void str_insert(char* target, uint8_t* len, char ch, int8_t pos){
-	/// Insert a character 'ch' at given position 'pos' of a string 'target'.
-	/// Note: 'len' will be automatically increased (string gets longer)! Does not work for strings longer than 99 characters
-
-
-	// Copy actual text in front of the new char to the buffer
-	strncpy(str_buf, target, pos);
-
-	// Copy the rest of the text one character behind the new on
-	strcpy(&str_buf[pos+1], &target[pos]);
-
-	// Add new character
-	str_buf[pos] = ch;
-
-	// Copy buffer back to target
-	strcpy(target,str_buf);
-
-	// Increase length
-	(*len)++;
-}
 
 void TFT_setMenu(int16_t idx){
 	/// Set the current menu to the one of given index and reset environment (keypad, scroll, upperbond)
@@ -375,7 +394,6 @@ void TFT_control(control* ctrl){
 }
 
 
-
 void TFT_textbox_static(uint8_t burst, textbox* tbx){
 	/// Write the non-dynamic parts of an textbox to the TFT (background & frame). Can be used once during init of a static background or at recurring display list build in TFT_display()
 	/// If mytag is 0 the textbox is considered read only with grey background. Else its read/write with white background
@@ -523,7 +541,6 @@ uint8_t TFT_textbox_touch(textbox* tbx){
 
 	return 0;
 }
-
 
 void TFT_textbox_display(textbox* tbx){
 	/// Write the dynamic parts of an textbox to the TFT (text & cursor). Used at recurring display list build in TFT_display()
@@ -725,10 +742,7 @@ void TFT_textbox_setStatus(textbox* tbx, uint8_t active, int16_t cursorPos){
 
 
 
-
-
-
-void TFT_graph_static(uint8_t burst, graph* gph){
+void TFT_graph_static(uint8_t burst, graph* gph, uint32_t axisColor, uint32_t gridColor){
 	/// Write the non-dynamic parts of an Graph to the TFT (axes & labels, grids and values, axis-arrows but no data). Can be used once during init of a static background or at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
 	///
 	///  burst	... determines if the normal or the burst version of the EVE Library is used to transmit DL command (0 = normal, 1 = burst).
@@ -774,7 +788,7 @@ void TFT_graph_static(uint8_t burst, graph* gph){
 	float heightPerSection = (float)(gph->height)/gph->h_grid_lines;
 
 	/// Axes LABELS
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | axisColor);
 	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding              + h_ax_lbl_comp_x, gph->y + gph->padding               - h_ax_lbl_comp_y, axis_lbl_txt_size, 0, gph->y_label);
 	(*EVE_cmd_text__fptr_arr[burst])(gph->x + gph->padding + gph->width + v_ax_lbl_comp_x, gph->y + gph->padding + gph->height - v_ax_lbl_comp_y, axis_lbl_txt_size, EVE_OPT_RIGHTX, gph->x_label);
 
@@ -790,7 +804,7 @@ void TFT_graph_static(uint8_t burst, graph* gph){
 
 	/// GRID lines
 	(*EVE_cmd_dl__fptr_arr[burst])(LINE_WIDTH(grid_linewidth)); /* size is in 1/16 pixel */
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_GRIDCOLOR);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | gridColor);
 	// vertical grid
 	for(int i=1; i<=(int)floor(gph->v_grid_lines); i++){
 		// y-position at upper and lower corner; x-position from left with padding and width of graph divided by number of gridlines - times current line
@@ -806,7 +820,7 @@ void TFT_graph_static(uint8_t burst, graph* gph){
 	(*EVE_cmd_dl__fptr_arr[burst])(DL_END);
 
 	/// Grid VALUES
-	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | GRAPH_AXISCOLOR);
+	(*EVE_cmd_dl__fptr_arr[burst])(DL_COLOR_RGB | axisColor);
 	// vertical grid (x)
 	for(int i=1; i<=(int)ceil(gph->v_grid_lines); i++){ // "ceil" and "i-1" at val -> print also the 0 value
 		// Calc time at current vertical line
@@ -924,7 +938,6 @@ void TFT_graph_pixeldata_i(graph* gph, int_buffer_t buf[], uint16_t buf_size, ui
 
 }
 
-
 void TFT_graph_pixeldata_f(graph* gph, float_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
 	/// This is a copy of the above function! It taken a float buffer and will later be merged to its origin.
 	/// TODO: Make this a "generic" function (C equivalent)
@@ -978,7 +991,6 @@ void TFT_graph_pixeldata_f(graph* gph, float_buffer_t buf[], uint16_t buf_size, 
 	/////////////// GRAPH END
 
 }
-
 
 void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor){
 	/// Write the dynamic parts of an Graph to the TFT (data and markers). Used at recurring display list build in TFT_display() completely coded by RS 02.01.2021.
@@ -1313,7 +1325,6 @@ void TFT_display_init_screen(void) {
 		EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
 	}
 }
-
 
 
 void TFT_display_static(void) {

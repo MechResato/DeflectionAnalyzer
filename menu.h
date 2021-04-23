@@ -2,7 +2,7 @@
  * menu.h
  *
  *  Created on: 25 Feb 2021
- *      Author: Admin
+ *      Author: RS
  */
 
 #include <tft.h>

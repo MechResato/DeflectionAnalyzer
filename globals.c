@@ -19,8 +19,6 @@
 #endif
 
 ///*  SYSTEM VARIABLEs */
-// Counter used for function delay_ms
-//volatile uint32_t _msCounter = 0;
 volatile uint8_t main_tick = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
 
 
@@ -105,10 +103,10 @@ volatile uint8_t fifo_finBlock[FIFO_BLOCKS] = {0};		// An array with an element 
 
 ///*  MENU AND USER INTERFACE */
 sdStates sdState = sdNone;
-measureModes measureMode = measureModeMonitoring;
+volatile measureModes measureMode = measureModeMonitoring;
 
 ///* DEBUG */
-// Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debugcode when actual data is there...)
+// Debug value - is set to 1 if the sensor buffer gets full the first time (used to only run debug code when actual data is there...)
 volatile uint8_t frameover = 0; 		// Used by: measure.c, tft.c
 
 

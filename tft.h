@@ -1,7 +1,10 @@
-// Initially created by Rudolph Riedel, completely reworked by RS @ MCI 2020/21
+// Concept based on library example created by Rudolph Riedel,
+// Implemented by RS @ MCI 2020/21
 
 #ifndef TFT_H_
 #define TFT_H_
+
+#include "FT800-FT813-5.x/EVE.h"
 
 // Simple pre-defined colors
 #define RED			0xff0000UL
@@ -33,9 +36,10 @@
 #define FLOAT_TO_INT16(x) ((x)>=0?(int16_t)((x)+0.5):(int16_t)((x)-0.5))
 #endif
 
-// int_buffer_t and float_buffer_t is defined in globals files
+
 
 /// Source definition for display elements: Some Elements can be associated to a source via a pointer. This source might be an integer or an float. This is a way to achieve the possible use of both.
+// Note: int_buffer_t and float_buffer_t is defined in globals files
 enum srcTypes{srcTypeNone=0, srcTypeInt, srcTypeFloat};
 typedef enum srcTypes srcTypes;
 //#define SRC_MAXSIZE 4 	// The size in bytes of the biggest value used in union below! This will be used to compare
@@ -48,11 +52,6 @@ typedef struct {
 	uint16_t* srcOffset;		// Offset (index) of src. Only needed for array sources (the actual byte offset will be calculated based on srcType)
 	//char lastVal[SRC_MAXSIZE];
 } srcDefinition;
-
-/// Code to only refresh text if needed - might or might not be used in the future
-// && memcmp(lbl->numSrc.intSrc, lbl->numSrc.lastVal, INT_BUFFER_SIZE) != 0
-// Save current value
-//memcpy(lbl->numSrc.lastVal, lbl->numSrc.intSrc, INT_BUFFER_SIZE);
 
 
 // Menu definition
@@ -74,8 +73,6 @@ void TFT_header(uint8_t burst, menu* men);
 // Swipe feature
 enum SwipeDetection{None=0, Up, Down, Left, Right};
 typedef enum SwipeDetection SwipeDetection;
-extern int32_t swipeDistance_X;		  // Distance (in px) between the initial touch and the current position of an swipe
-extern int32_t swipeDistance_Y;
 
 // Keypad feature
 enum keypadTypes{Standard=0, Numeric, Filename};
@@ -171,7 +168,7 @@ typedef struct {
 	float v_grid_lines; 	// Number of vertical grid lines
 	uint8_t graphmode;		// 0 = frame-mode, 1 = roll-mode
 } graph;
-void TFT_graph_static(uint8_t burst, graph* gph);
+void TFT_graph_static(uint8_t burst, graph* gph, uint32_t axisColor, uint32_t gridColor);
 void TFT_graph_pixeldata_i(graph* gph, int_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
 void TFT_graph_pixeldata_f(graph* gph, float_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor);
 void TFT_graph_stepdata(graph* gph, int_buffer_t cy_buf[], uint16_t cy_buf_size, float cx_step, uint32_t datacolor);

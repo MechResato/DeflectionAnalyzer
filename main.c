@@ -103,6 +103,10 @@ int main(void)
 				// Timing measurement pin low
 				//DIGITAL_IO_SetOutputLow(&IO_6_2_TIMING);
 			}
+			// If an error was detected during the measurement handler (usually block crash)
+			else if(measureMode == measureModeRecordError)
+				// Stop recording
+				record_stop(1);
 
 
 			/// TFT HANDLING

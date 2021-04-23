@@ -10,15 +10,22 @@
 #include <stdint.h>
 #include <malloc.h>
 #include <math.h>
-#include <globals.h>
-#include <measure.h>
-#include <record.h>
+#include "globals.h"
+#include "measure.h"
 
-
-
-extern volatile uint8_t volatile * volatile fifo_buf;
-
-
+/// Implemented in globals:
+// struct's: sensor
+// #define's: FIFO_LINE_SIZE_PAD, FIFO_BITS_ALL_BLOCK, FIFO_BITS_ONE_BLOCK, FIFO_BLOCKS, SENSOR_RAW_SIZE, SENSORS_SIZE and
+//            POSTPROCESS_INTERPOLATE_ERRORS or POSTPROCESS_CHANGEORDER_AT_ERRORS,
+//            INPUT_STANDARD or other STANDARD_...
+extern volatile uint8_t main_tick;			// triggers main slope execution
+extern volatile sensor* sensors[];			// array of all sensors that need to be evaluated
+extern volatile measureModes measureMode;	// state of the measurement (purpose: none, monitoring or recording)
+/// FIFO-variables
+extern volatile uint8_t volatile * volatile fifo_buf;	// FIFO buffer
+extern volatile uint16_t fifo_writeBufIdx;				// index in FIFO buffer
+extern volatile uint8_t fifo_writeBlock;				// current block to write
+extern volatile uint8_t fifo_finBlock[];				// array of which block is finished an can be recorded
 
 
 /// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
@@ -34,13 +41,15 @@ extern volatile uint8_t volatile * volatile fifo_buf;
 	/* Calculate average and return it */										\
 	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / divider;
 
-/// Convert raw value to adapted value and save it
-// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
+/// Compute filtered raw value to converted value and save it
 #define MEASURE_POLYCONVERSION(sens, sensBufIdx)		\
+	/* Sum and result value, stored in register to
+	 *  enhance speed (multiple successive access). Use
+	 *  first coefficient (constant) as init value.*/	\
 	register float result = sens->fitCoefficients[0];	\
 	register float pow_x = 1;							\
 	/* Calculate every term and add it to the result*/	\
-	for(uint8_t i = 1; i < sens->fitOrder+1; i++){		\
+	for(register uint8_t i = 1; i < sens->fitOrder+1; i++){		\
 		pow_x *= sens->bufFilter[sensBufIdx];			\
 		result += sens->fitCoefficients[i] * pow_x; 	\
 	}													\
@@ -59,7 +68,7 @@ void Adc_Measurement_Handler(void){
 	//DIGITAL_IO_SetOutputHigh(&IO_6_2);
 
 
-
+	// Check
 	uint8_t sensIdx = 0;
 	volatile sensor* sens;
 	uint16_t sensBufIdx;
@@ -72,7 +81,6 @@ void Adc_Measurement_Handler(void){
 			// Increment current Buffer index and set back to 0 if greater than size of array
 			sensBufIdx = sens->bufIdx = sens->bufIdx + 1;
 			if(sensBufIdx > sens->bufMaxIdx){
-				frameover = 1;
 				sensBufIdx = sens->bufIdx = 0;
 			}
 
@@ -141,7 +149,7 @@ void Adc_Measurement_Handler(void){
 			// Check if the write block has been recorded, if not a "crash" occurs and the process must be stopped
 			if(fifo_finBlock[fifo_writeBlock] == 1){
 				// Stop recording
-				record_stop(1);
+				measureMode = measureModeRecordError;
 			}
 		}
 	}

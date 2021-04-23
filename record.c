@@ -2,7 +2,7 @@
  * record.c
  *
  *  Created on: 25 Feb 2021
- *      Author: Admin
+ *      Author: RS
  */
 
 
@@ -15,20 +15,35 @@
 #include <float.h>
 #include <DAVE.h>
 #include "globals.h"
-#include "measure.h"
 #include "record.h"
 
+//// External variables
+
+/// Implemented in globals:
+// struct's:  sensor
+// type's:	  int_buffer_t (e.g. uint16_t), float_buffer_t (e.g. float),
+// #define's: FIFO_LINE_SIZE_PAD, FIFO_BLOCKS, SENSOR_RAW_SIZE, SENSORS_SIZE and
+//			  FILENAME_BUFFER_LENGTH
+extern sdStates sdState;				  // state of sd-card (purpose: none, mounted, open or error)
+extern volatile measureModes measureMode; // state of the measurement (purpose: none, monitoring or recording)
+// FIFO-variables
+extern volatile uint8_t volatile * volatile fifo_buf;	// FIFO buffer
+extern volatile uint16_t fifo_writeBufIdx;				// index in FIFO buffer
+extern volatile uint8_t fifo_writeBlock;				// current block to write to RAM
+extern volatile uint8_t fifo_recordBlock;				// current block to be recorded to sd-card
+extern volatile uint8_t fifo_finBlock[];				// array of which block is finished an can be recorded
+/// Implemented in measure:
+extern void measure_postProcessing(volatile sensor* sens);
+
+
+//// Internal variables
+/// FATFS variables
 DSTATUS diskStatus;
-static FATFS fs; // File system object (volume work area)
-static FIL fil_r; // File object used for read only
-static FIL fil_w; // File object used for write only
+static FATFS fs; 	// File system object (volume work area)
+static FIL fil_r; 	// File object used for read only
+static FIL fil_w; 	// File object used for write only
 //static FILINFO fno; // File information object
-
-/// External variables
-extern sdStates sdState;
-extern measureModes measureMode;
-
-/// Internal functions
+//// Internal functions
 static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode);
 static FRESULT record_closeFile(objFIL objFILrw);
 static int8_t record_checkEndOfFile(objFIL objFILrw);
@@ -98,9 +113,9 @@ void record_mountDisk(uint8_t mount){
 
 }
 
-/// Note: This implementation allows only one read and one write file to be open at the same time!
 static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode){
 	/// Used to open a file on the read or write FIL struct for read/write access. If another file is still open it will be closed automatically!
+	/// Note: This implementation allows only one read and one write file to be open at the same time!
 	/// Todo
 
 	// FATFS result code
@@ -217,6 +232,119 @@ static int8_t record_checkEndOfFile(objFIL objFILrw){
 	return -1;
 }
 
+static int8_t record_backupFile(const char* path){
+	/// Check if the given file (in root directory) already exists. If yes, it renames the existing file to a pattern "[oldName]00.[fileExtesion]" where 00 is the next not used number between 1 and 99
+	/// Limitations: Only use 3 character file extensions! No sub-folders are supported because the length is checked (except LFN (Long File Names -> FF_USE_LFN) are activated)
+	/// Returns 1 if OK, 0 = error
+	///
+	/// path	...	The path/filename to be checked with extension
+	///
+	///	Uses globals variables: ToDo
+	///
+
+
+	FRESULT res = 0; /* API result code */
+
+	// Initial log line
+	printf("\trecord_backupFile:\n");
+
+	// Only start if given name is longer than 4 characters (e.g. 'n.csv')
+	if(strlen(path) > 4 && (strlen(path) <= 10 || FF_USE_LFN == 1)){
+
+		// Marker used to detect problems while generating the filename/renaming
+		char new_filename[FILENAME_BUFFER_LENGTH]; //
+		char base_rename[FILENAME_BUFFER_LENGTH];  //
+		char extension[4];
+
+		// Copy extension
+		extension[3] = '\0';
+		extension[2] = path[strlen(path)-1];
+		extension[1] = path[strlen(path)-2];
+		extension[0] = path[strlen(path)-3];
+
+		// Copy path to new_filename
+		sprintf(new_filename, path);
+
+		/// Check if file already exists - if so rename it
+		// Get file-info to check if it exists
+		res = f_stat(new_filename, NULL);
+		if(res == FR_OK){
+			/// File already exists, we need to find a new name and rename the old file
+
+			// Extract base of filename (without extension)
+			snprintf(base_rename, strlen(new_filename)-3, new_filename);
+
+			// Add two numbers '01' and file extension
+			sprintf(new_filename, "%s01.%s", base_rename, extension);
+
+			// Debug message
+			printf("\tFile already exists, try name: %s (%s)\n", new_filename, base_rename);
+
+			// Check if a not yet used name is found - if not (still exists) increase file numbers and try again
+			uint8_t i = 1;
+			do{
+				// Check if file exists
+				res = f_stat(new_filename, NULL);
+				if(res == FR_OK){
+					// File already exists, generate filename with next number and try again
+					i++;
+					sprintf(new_filename, "%s%02d.%s", base_rename, i, extension);
+					printf("\tFile already exists, try name: %s\n", new_filename);
+				}
+				else if (res == FR_NO_FILE){
+					/// A unique name was found - rename!
+
+					// Add extension to the base name in order to use it for renaming
+					sprintf(&base_rename[strlen(base_rename)], ".%s", extension);
+
+					// Rename file
+					printf("\tNew filename found, rename %s to %s\n", base_rename, new_filename);
+					res = f_rename(base_rename, new_filename);
+					if(res == FR_OK){
+						// Rename successful
+						printf("\t Renamed file\n");
+
+						// The actual new record file shall be named without numbers,
+						// therefore just use the base name as new filename
+						sprintf(new_filename, base_rename);
+
+						// Renaming was successful
+						return 1;
+					}
+					else{
+						// Rename failed - start not successful
+						printf("\t Rename failed %d\n", res);
+					}
+
+					// Tried renaming - now stop while loop
+					break;
+				}
+				else{
+					// Actual errors at file check only occur if all is lost - stop while loop
+					printf("\t Check file error: %d\n", res);
+					break;
+				}
+			}while(i < 100);
+		}
+		else if(res == FR_NO_FILE){
+			// File doesn't exist - no renaming necessary
+			printf("\t Filename is already unique - OK\n");
+			return 1;
+		}
+		else{
+			// Actual errors at file check only occur if all is lost - stop while loop
+			printf("\t Check file error: %d\n", res);
+		}
+
+
+
+	}
+
+
+	// Return 0 - Failed!
+	printf("record_backupFile failed\n");
+	return 0;
+}
 
 
 
@@ -544,6 +672,274 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 
 
+uint8_t record_openBMP(const char* path){
+	///
+	///
+
+
+	// FATFS result code and two string buffers for comment and values
+	FRESULT res = 0;
+	UINT bw;
+	char buff[400];
+	// The Header of an 480x272 pixel sized 32bit bitmap
+	#define BMP_HEADER_ARGB8_32BIT_SIZE 54
+	const uint8_t bmp_header_argb8_32bit[BMP_HEADER_ARGB8_32BIT_SIZE] =
+	{
+		0x42, 0x4D, 0x38, 0xF8, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, // Header itself - 14Byte: 2B FileType, 4B FileSize, 2B Reserved, 2B Reserved, 4B PixelDataOffset
+		0x28, 0x00, 0x00, 0x00,	0xE0, 0x01,	0x00, 0x00, 0xF0, 0xFE, 0xFF, 0xFF, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00,  // Info Header - 40Byte (see)
+		0x02, 0xF8,	0x07, 0x00, 0x12, 0x0B,	0x00, 0x00,	0x12, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+
+
+	// Initial log line
+	printf("\nrecord_openBMP:\n");
+
+	// Try to mount disk
+	record_mountDisk(1);
+
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	if(sdState == sdMounted || sdState == sdFileOpen){
+
+		/// Check if file already exists - if so rename it
+		// Get file-info to check if it exists
+		res = f_stat(path, NULL); // Use &fno if actual file-info is needed
+		if(res == FR_OK){
+			sprintf(buff, "BACKUP.BMP");
+			res = f_rename(path, buff);
+			printf("Backup BMP file to %s: %d\n", buff, res);
+		}
+		else{
+			printf("File not found: %d\n", res);
+		}
+
+		// Open/Create File
+		record_openFile(path, objFILwrite, 0);
+
+		// If file is ready to be written to ...
+		if(sdState == sdFileOpen){
+			// Write Header
+			res = f_write(&fil_w, bmp_header_argb8_32bit, BMP_HEADER_ARGB8_32BIT_SIZE, &bw);
+			if (res != FR_OK || bw <= 0)
+				printf("\t BMP write failed %d (bw=%d)\n", res, bw);
+			printf("Write BMP File open\n");
+			return 1;
+		}
+		else{
+			printf("Write BMP File not open\n");
+			return 0;
+		}
+	}
+	else{
+		printf("No SD-Card mounted\n");
+		return 0;
+	}
+
+}
+
+void record_writeBMP(uint32_t* data, uint16_t size){
+	///
+	///
+
+	// FATFS result code and two string buffers for comment and values
+	FRESULT res = 0;
+	UINT bw;
+
+	// Write pixel
+	res = f_write(&fil_w, data, size, &bw);
+	if (res != FR_OK || bw <= 0)
+		printf("\t BMP write failed %d (bw=%d)\n", res, bw);
+}
+
+void record_closeBMP(){
+	///
+	///
+
+
+	// Initial log line
+	printf("\nrecord_closeBMP:\n");
+
+	// If the SD card is ready, backup existing file, try to open the new one and write specifications
+	if(sdState == sdMounted || sdState == sdFileOpen){
+
+		// Close file
+		record_closeFile(objFILwrite);
+
+		// Add a line break to console
+		printf("\n");
+	}
+}
+
+
+
+int8_t record_start(){
+	/// Check if ready for recording, rename existing record file, open new file, allocate memory for the FIFO and change measuring mode.
+	/// This needs to be executed ONCE before record_block() is used!
+	/// Returns 1 if OK, 0 = error
+	///
+	/// No Inputs.
+	///
+	///	Uses globals variables: filename_rec, ToDo
+	///
+
+
+	// Initial log line
+	printf("\nrecord_start:\n");
+
+	// Try to mount disk
+	record_mountDisk(1);
+
+	//// -------------------------------------------------
+	//// If the SD card is ready, backup possible existing file, try to open the new one, allocate fifo_buf and mark everything accordingly
+	if(sdState == sdMounted){
+
+		// Buffer to store and modify the filename
+		char filename[FILENAME_BUFFER_LENGTH];
+
+		// Copy filename and change file extension to .BIN
+		sprintf(filename, filename_rec);
+		filename[strlen(filename)-1] = 'N';
+		filename[strlen(filename)-2] = 'I';
+		filename[strlen(filename)-3] = 'B';
+
+		// Check filename for uniqueness and rename existing file if needed
+		int8_t fil_OK = record_backupFile(filename);
+
+		// If the filename was already unique or the existing file was renamed - actually start/init the recording
+		if(fil_OK){
+			// Open/Create File
+			record_openFile(filename, objFILwrite, 0);
+
+			// If file is successfully opened...
+			if(sdState == sdFileOpen){
+				// Allocate memory for the log FIFO
+				fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+
+				// Reset fifo control variables
+				fifo_writeBufIdx = 0;
+				fifo_writeBlock = 0;
+				fifo_recordBlock = 0;
+				for(uint8_t i = 0; i < FIFO_BLOCKS; i++)
+					fifo_finBlock[i] = 0;
+
+				// Check for allocation errors
+				if(fifo_buf == NULL){
+					printf("Memory allocation failed!\n");
+				}
+				else{
+					printf("Memory allocated!\n");
+
+					// Set whole buffer null to avoid padding bytes being random
+					memset((uint8_t*)fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
+
+					// Everything is OK - change mode (this enables actual storing and flushing of values)
+					measureMode = measureModeRecording;
+
+					// Return 1 - Success!
+					printf("recording started\n");
+					return 1;
+				}
+			}
+		}
+
+	}
+
+	// Return 0 - Failed!
+	printf("recording start failed\n");
+	return 0;
+}
+
+void record_block(){
+	/// Record the current block (fifo_recordBlock) of the FIFO to the SD-card
+	/// No inputs or output (performance)
+	///
+	///	Uses record-global variables: fil
+	///	Uses globals variables: fifo_buf, fifo_recordBlock, FIFO_BLOCK_SIZE
+
+
+	FRESULT res = 0; /* API result code */
+	UINT bw; /* Bytes written */
+
+	// Write a FIFO_BLOCK_SIZE sized block to the beginning of the current block
+	res = f_write(
+			&fil_w,
+			(void*)(fifo_buf + (fifo_recordBlock*FIFO_BLOCK_SIZE)),
+			FIFO_BLOCK_SIZE,
+			&bw
+		  );
+
+	// If error occurred or there are less bytes written that should be - stop recording
+	if (res != FR_OK || bw != FIFO_BLOCK_SIZE){
+		printf("Recording of block %d failed! Stopping record\n", fifo_recordBlock);
+		record_stop(0);
+	}
+
+}
+
+int8_t record_stop(uint8_t flushData){
+	/// Check if file is open, flush remaining data to SD-card, free memory of the FIFO and change measuring mode.
+	/// This needs to be executed ONCE after the last record_block() execution!
+	/// Returns 1 if OK, 0 = error
+	///
+	/// flushData	...	If this is 1 the function will try to write the not yet written blocks to SD-card
+	///
+	///	Uses globals variables: sdState, measureMode, fifo_buf, ToDo
+	///
+
+
+	// Initial log line
+	printf("\nrecord_stop(flushData=%d):\n", flushData);
+
+	// If a file is open, close it
+	if(sdState == sdFileOpen){
+		// Everything is OK - change mode (this enables actual storing and flushing of values)
+		measureMode = measureModeMonitoring;
+
+		// Flush remaining Blocks and data to SD-card
+		if(flushData){
+			// Write blocks till an unfinished block is found
+			while(1){
+				if(fifo_finBlock[fifo_recordBlock] == 1){
+					printf("Write finished block %d\n", fifo_recordBlock);
+
+					// Record current block
+					record_block();
+
+					// Mark Block as processed (if a block isn't processed before the measurement handler tries to write to it again the record fails)
+					fifo_finBlock[fifo_recordBlock] = 0;
+
+					// Mark next block as current record block
+					fifo_recordBlock++;
+					// Overleap correction of the current block index
+					if(fifo_recordBlock == FIFO_BLOCKS)
+						fifo_recordBlock = 0;
+				}
+				else
+					// No finish block left - stop
+					break;
+			}
+
+		}
+
+		// Free Memory
+		free((uint8_t*)fifo_buf);
+
+		// Close File
+		record_closeFile(objFILwrite);
+
+		// If everything is OK
+		if(sdState == sdMounted){
+			// Return 1 - Stop successful!
+			printf("recording stopped\n");
+			return 1;
+		}
+
+	}
+
+	// Return 0 - Stop failed!
+	printf("recording stop failed\n");
+	return 0;
+}
+
 void record_convertBinFile(const char* filename, sensor** sensArray){
 	/// Read the .BIN file (path) and write a corresponding .CSV file. The base name of both file will be same (error if not possible).
 	/// Therefore only the base name of 'filename' is used, extensions are changed as needed (a parameter "test.csv" or "test.bin" will lead to the same result!).
@@ -724,636 +1120,3 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 
 
 }
-
-
-///// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
-//if(sensArray[i]->errorOccured != 0){
-//	// Get oldest index
-//	int32_t oldIdx = sensArray[i]->bufIdx - sensArray[i]->avgFilterOrder;
-//	if(oldIdx < 0) oldIdx += sensArray[i]->bufMaxIdx+1;
-//	// Decrease error counter
-//	if(sensArray[i]->bufRaw[oldIdx] == 0)
-//		sensArray[i]->errorOccured--;
-//}
-//
-///// Check if newest value in filter interval (to be added) is an error, if so increase error counter, null raw value
-///// null raw value and limit max amount of errors possible
-//if(raw > sensArray[i]->errorThreshold){
-//	// Increment Count of errors in filter interval
-//	sensArray[i]->errorOccured++;
-//
-//	// Set raw value to 0
-//	sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
-//
-//	// If more errors occurred than can be compensated by the avg filter, limit it to stay in interval
-//	if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder)
-//		sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
-//}
-//
-//
-//// If no errors in filter interval - use avgFilterOrder as average divider
-//// Else if errors in filter interval - use filter order compensated by number of errors occurred (number of actual values in interval, used) as divider
-//if(sensArray[i]->errorOccured == 0)
-//	compFilterOrder = sensArray[i]->avgFilterOrder;
-//else
-//	compFilterOrder = sensArray[i]->avgFilterOrder - sensArray[i]->errorOccured;
-//
-//
-///// Post processing: Calculate filtered/converted value and fill corresponding buffers
-//#if POSTPROCESS_BUGGED_VALUES == 1
-//// Always calculate filtered and converted value if possible (even if current value was an error)
-//if(compFilterOrder){
-//#else
-//// Only calculate filtered and converted value if no error are in filter interval
-//if(compFilterOrder && sensArray[i]->bufRaw[sensArray[i]->bufIdx] != 0){
-//#endif
-//	// Set current filter value
-//	measure_movAvgFilter(sensArray[i], compFilterOrder);
-//
-//	// Set current converted value
-//	measure_polyConversion(sensArray[i], sensArray[i]->bufIdx);
-//}
-//// compFilterOrder is 0 - no data available
-//else{
-//	// Set current filter value to 0 (current value is unusable)
-//	measure_movAvgFilter(sensArray[i], 1); // Only to keep sum up to date - result must be ignored
-//	sensArray[i]->bufFilter[sensArray[i]->bufIdx] = 0;
-//
-//	// Set current converted value to 0 (current value is unusable)
-//	sensArray[i]->bufConv[sensArray[i]->bufIdx] = 0;
-//}
-
-
-
-
-uint8_t record_openBMP(const char* path){
-	///
-	///
-
-
-	// FATFS result code and two string buffers for comment and values
-	FRESULT res = 0;
-	UINT bw;
-	char buff[400];
-	// The Header of an 480x272 pixel sized 32bit bitmap
-	#define BMP_HEADER_ARGB8_32BIT_SIZE 54
-	const uint8_t bmp_header_argb8_32bit[BMP_HEADER_ARGB8_32BIT_SIZE] =
-	{
-		0x42, 0x4D, 0x38, 0xF8, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, // Header itself - 14Byte: 2B FileType, 4B FileSize, 2B Reserved, 2B Reserved, 4B PixelDataOffset
-		0x28, 0x00, 0x00, 0x00,	0xE0, 0x01,	0x00, 0x00, 0xF0, 0xFE, 0xFF, 0xFF, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00,  // Info Header - 40Byte (see)
-		0x02, 0xF8,	0x07, 0x00, 0x12, 0x0B,	0x00, 0x00,	0x12, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-	};
-
-
-	// Initial log line
-	printf("\nrecord_openBMP:\n");
-
-	// Try to mount disk
-	record_mountDisk(1);
-
-	// If the SD card is ready, backup existing file, try to open the new one and write specifications
-	if(sdState == sdMounted || sdState == sdFileOpen){
-
-		/// Check if file already exists - if so rename it
-		// Get file-info to check if it exists
-		res = f_stat(path, NULL); // Use &fno if actual file-info is needed
-		if(res == FR_OK){
-			sprintf(buff, "BACKUP.BMP");
-			res = f_rename(path, buff);
-			printf("Backup BMP file to %s: %d\n", buff, res);
-		}
-		else{
-			printf("File not found: %d\n", res);
-		}
-
-		// Open/Create File
-		record_openFile(path, objFILwrite, 0);
-
-		// If file is ready to be written to ...
-		if(sdState == sdFileOpen){
-			// Write Header
-			res = f_write(&fil_w, bmp_header_argb8_32bit, BMP_HEADER_ARGB8_32BIT_SIZE, &bw);
-			if (res != FR_OK || bw <= 0)
-				printf("\t BMP write failed %d (bw=%d)\n", res, bw);
-			printf("Write BMP File open\n");
-			return 1;
-		}
-		else{
-			printf("Write BMP File not open\n");
-			return 0;
-		}
-	}
-	else{
-		printf("No SD-Card mounted\n");
-		return 0;
-	}
-
-}
-
-void record_writeBMP(uint32_t* data, uint16_t size){
-	///
-	///
-
-	// FATFS result code and two string buffers for comment and values
-	FRESULT res = 0;
-	UINT bw;
-
-	// Write pixel
-	res = f_write(&fil_w, data, size, &bw);
-	if (res != FR_OK || bw <= 0)
-		printf("\t BMP write failed %d (bw=%d)\n", res, bw);
-}
-
-void record_closeBMP(){
-	///
-	///
-
-
-	// Initial log line
-	printf("\nrecord_closeBMP:\n");
-
-	// If the SD card is ready, backup existing file, try to open the new one and write specifications
-	if(sdState == sdMounted || sdState == sdFileOpen){
-
-		// Close file
-		record_closeFile(objFILwrite);
-
-		// Add a line break to console
-		printf("\n");
-	}
-}
-
-
-// If this is the first error after an valid value, calculate/store last OK value
-//							if(sensArray[i]->errorOccured == 1){
-//								// Calculate second to last index and check for over leap
-//								int32_t pre1Idx = sensBufIdx - 1;
-//								if(pre1Idx < 0) pre1Idx += sens->bufMaxIdx + 1;
-//
-//								// Store last valid value and slope, to be used till the next valid value comes
-//								sensArray[i]->errorLastValid = sensArray[i]->bufFilter[pre1Idx];
-//							}
-
-
-
-
-
-
-static int8_t record_backupFile(const char* path){
-	/// Check if the given file (in root directory) already exists. If yes, it renames the existing file to a pattern "[oldName]00.[fileExtesion]" where 00 is the next not used number between 1 and 99
-	/// Limitations: Only use 3 character file extensions! No sub-folders are supported because the length is checked (except LFN (Long File Names -> FF_USE_LFN) are activated)
-	/// Returns 1 if OK, 0 = error
-	///
-	/// path	...	The path/filename to be checked with extension
-	///
-	///	Uses globals variables: ToDo
-	///
-
-
-	FRESULT res = 0; /* API result code */
-
-	// Initial log line
-	printf("\trecord_backupFile:\n");
-
-	// Only start if given name is longer than 4 characters (e.g. 'n.csv')
-	if(strlen(path) > 4 && (strlen(path) <= 10 || FF_USE_LFN == 1)){
-
-		// Marker used to detect problems while generating the filename/renaming
-		char new_filename[FILENAME_BUFFER_LENGTH]; //
-		char base_rename[FILENAME_BUFFER_LENGTH];  //
-		char extension[4];
-
-		// Copy extension
-		extension[3] = '\0';
-		extension[2] = path[strlen(path)-1];
-		extension[1] = path[strlen(path)-2];
-		extension[0] = path[strlen(path)-3];
-
-		// Copy path to new_filename
-		sprintf(new_filename, path);
-
-		/// Check if file already exists - if so rename it
-		// Get file-info to check if it exists
-		res = f_stat(new_filename, NULL);
-		if(res == FR_OK){
-			/// File already exists, we need to find a new name and rename the old file
-
-			// Extract base of filename (without extension)
-			snprintf(base_rename, strlen(new_filename)-3, new_filename);
-
-			// Add two numbers '01' and file extension
-			sprintf(new_filename, "%s01.%s", base_rename, extension);
-
-			// Debug message
-			printf("\tFile already exists, try name: %s (%s)\n", new_filename, base_rename);
-
-			// Check if a not yet used name is found - if not (still exists) increase file numbers and try again
-			uint8_t i = 1;
-			do{
-				// Check if file exists
-				res = f_stat(new_filename, NULL);
-				if(res == FR_OK){
-					// File already exists, generate filename with next number and try again
-					i++;
-					sprintf(new_filename, "%s%02d.%s", base_rename, i, extension);
-					printf("\tFile already exists, try name: %s\n", new_filename);
-				}
-				else if (res == FR_NO_FILE){
-					/// A unique name was found - rename!
-
-					// Add extension to the base name in order to use it for renaming
-					sprintf(&base_rename[strlen(base_rename)], ".%s", extension);
-
-					// Rename file
-					printf("\tNew filename found, rename %s to %s\n", base_rename, new_filename);
-					res = f_rename(base_rename, new_filename);
-					if(res == FR_OK){
-						// Rename successful
-						printf("\t Renamed file\n");
-
-						// The actual new record file shall be named without numbers,
-						// therefore just use the base name as new filename
-						sprintf(new_filename, base_rename);
-
-						// Renaming was successful
-						return 1;
-					}
-					else{
-						// Rename failed - start not successful
-						printf("\t Rename failed %d\n", res);
-					}
-
-					// Tried renaming - now stop while loop
-					break;
-				}
-				else{
-					// Actual errors at file check only occur if all is lost - stop while loop
-					printf("\t Check file error: %d\n", res);
-					break;
-				}
-			}while(i < 100);
-		}
-		else if(res == FR_NO_FILE){
-			// File doesn't exist - no renaming necessary
-			printf("\t Filename is already unique - OK\n");
-			return 1;
-		}
-		else{
-			// Actual errors at file check only occur if all is lost - stop while loop
-			printf("\t Check file error: %d\n", res);
-		}
-
-
-
-	}
-
-
-	// Return 0 - Failed!
-	printf("record_backupFile failed\n");
-	return 0;
-}
-
-int8_t record_start(){
-	/// Check if ready for recording, rename existing record file, open new file, allocate memory for the FIFO and change measuring mode.
-	/// This needs to be executed ONCE before record_block() is used!
-	/// Returns 1 if OK, 0 = error
-	///
-	/// No Inputs.
-	///
-	///	Uses globals variables: filename_rec, ToDo
-	///
-
-
-	// Initial log line
-	printf("\nrecord_start:\n");
-
-	// Try to mount disk
-	record_mountDisk(1);
-
-	//// -------------------------------------------------
-	//// If the SD card is ready, backup possible existing file, try to open the new one, allocate fifo_buf and mark everything accordingly
-	if(sdState == sdMounted){
-
-		// Buffer to store and modify the filename
-		char filename[FILENAME_BUFFER_LENGTH];
-
-		// Copy filename and change file extension to .BIN
-		sprintf(filename, filename_rec);
-		filename[strlen(filename)-1] = 'N';
-		filename[strlen(filename)-2] = 'I';
-		filename[strlen(filename)-3] = 'B';
-
-		// Check filename for uniqueness and rename existing file if needed
-		int8_t fil_OK = record_backupFile(filename);
-
-		// If the filename was already unique or the existing file was renamed - actually start/init the recording
-		if(fil_OK){
-			// Open/Create File
-			record_openFile(filename, objFILwrite, 0);
-
-			// If file is successfully opened...
-			if(sdState == sdFileOpen){
-				// Allocate memory for the log FIFO
-				fifo_buf = (volatile uint8_t volatile * volatile)malloc(FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-
-				// Reset fifo control variables
-				fifo_writeBufIdx = 0;
-				fifo_writeBlock = 0;
-				fifo_recordBlock = 0;
-				for(uint8_t i = 0; i < FIFO_BLOCKS; i++)
-					fifo_finBlock[i] = 0;
-
-				// Check for allocation errors
-				if(fifo_buf == NULL){
-					printf("Memory allocation failed!\n");
-				}
-				else{
-					printf("Memory allocated!\n");
-
-					// Set whole buffer null to avoid padding bytes being random
-					memset((uint8_t*)fifo_buf, 0, FIFO_BLOCK_SIZE*FIFO_BLOCKS);
-
-					// Everything is OK - change mode (this enables actual storing and flushing of values)
-					measureMode = measureModeRecording;
-
-					// Return 1 - Success!
-					printf("recording started\n");
-					return 1;
-				}
-			}
-		}
-
-	}
-
-	// Return 0 - Failed!
-	printf("recording start failed\n");
-	return 0;
-}
-
-int8_t record_stop(uint8_t flushData){
-	/// Check if file is open, flush remaining data to SD-card, free memory of the FIFO and change measuring mode.
-	/// This needs to be executed ONCE after the last record_block() execution!
-	/// Returns 1 if OK, 0 = error
-	///
-	/// flushData	...	If this is 1 the function will try to write the not yet written blocks to SD-card
-	///
-	///	Uses globals variables: sdState, measureMode, fifo_buf, ToDo
-	///
-
-
-	// Initial log line
-	printf("\nrecord_stop(flushData=%d):\n", flushData);
-
-	// If a file is open, close it
-	if(sdState == sdFileOpen){
-		// Everything is OK - change mode (this enables actual storing and flushing of values)
-		measureMode = measureModeMonitoring;
-
-		// Flush remaining Blocks and data to SD-card
-		if(flushData){
-			// Write blocks till an unfinished block is found
-			while(1){
-				if(fifo_finBlock[fifo_recordBlock] == 1){
-					printf("Write finished block %d\n", fifo_recordBlock);
-
-					// Record current block
-					record_block();
-
-					// Mark Block as processed (if a block isn't processed before the measurement handler tries to write to it again the record fails)
-					fifo_finBlock[fifo_recordBlock] = 0;
-
-					// Mark next block as current record block
-					fifo_recordBlock++;
-					// Overleap correction of the current block index
-					if(fifo_recordBlock == FIFO_BLOCKS)
-						fifo_recordBlock = 0;
-				}
-				else
-					// No finish block left - stop
-					break;
-			}
-
-		}
-
-		// Free Memory
-		free((uint8_t*)fifo_buf);
-
-		// Close File
-		record_closeFile(objFILwrite);
-
-		// If everything is OK
-		if(sdState == sdMounted){
-			// Return 1 - Stop successful!
-			printf("recording stopped\n");
-			return 1;
-		}
-
-	}
-
-	// Return 0 - Stop failed!
-	printf("recording stop failed\n");
-	return 0;
-}
-
-void record_block(){
-	/// Record the current block (fifo_recordBlock) of the FIFO to the SD-card
-	/// No inputs or output (performance)
-	///
-	///	Uses record-global variables: fil
-	///	Uses globals variables: fifo_buf, fifo_recordBlock, FIFO_BLOCK_SIZE
-
-
-	FRESULT res = 0; /* API result code */
-	UINT bw; /* Bytes written */
-
-	// Write a FIFO_BLOCK_SIZE sized block to the beginning of the current block
-	res = f_write(
-			&fil_w,
-			(void*)(fifo_buf + (fifo_recordBlock*FIFO_BLOCK_SIZE)),
-			FIFO_BLOCK_SIZE,
-			&bw
-		  );
-
-	// If error occurred or there are less bytes written that should be - stop recording
-	if (res != FR_OK || bw != FIFO_BLOCK_SIZE){
-		printf("Recording of block %d failed! Stopping record\n", fifo_recordBlock);
-		record_stop(0);
-	}
-
-}
-
-
-
-
-
-void record_line(){
-	///  Used to speed-test sd-cards with oscilloscope. TODO delete this
-	///
-
-	// All writes with transcent sd that are not equal to 512byte need 2ms every 512byte that are written! Exactly 512 needs this every time
-
-	//    1 chars const	transcent		 4.72us		res = f_write(&fil, "1" , 1, &bw);
-	//    2 chars const	transcent		 4.92us		res = f_write(&fil, "1.", 2, &bw);
-	//   10 chars const	transcent		 6.31us		res = f_write(&fil, "0123456789", 10, &bw);
-	//  100 chars const	transcent		21.96us		res = f_write(&fil, "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", 100, &bw);
-	//  512 chars const transcent		1985us  	but every 424ms (~85*512 Byte) the write takes 16150us once. Every 2.6s the write takes there are 3 to 4 subsequent very slow writes (e.g 6ms, 32ms, 25ms, 10ms = 76.4ms till return to normal operation, this varies from 70ms, 81ms up to 157ms)
-	//  512 chars const sandisk			1036.00us	but every 310ms (~62*512 Byte) the write takes 5500us once and another 2264us next before again doing 62 1ms cycles
-	// 1024 chars const transcent		1996us   	...
-	// 1024 chars const sandisk			1ms~1.4ms  	...
-	// 2048 chars const transcent		2112us   	...
-	// 2048 chars const sandisk			1ms~1.4ms  	...
-	//  256 chars const	transcent		abwechselnd 2.45ms und 49us
-
-
-	FRESULT res = 0; /* API result code */
-	UINT bw; /* Bytes written */
-	//char buff[512] = "1.14";
-
-	//float testF = 1.14;
-	//char* testC = "1.14";
-
-	//sprintf(buff,"%.2f", testF);
-	//res = f_write(&fil, "1" , 1, &bw);
-	res = f_write(&fil_w, "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234501234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234501234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123450123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345", 2048, &bw);
-	if (res != FR_OK){
-		sdState = sdMounted;
-		printf("record line failed\n");
-	}
-
-}
-
-void record_buffer(void)
-{
-	// Example from Infineon for test purpose. TODO delete this
-
-	float testf_w = 1.0/7.0;
-	float testf_r = 0.0;
-
-
-	FRESULT res; /* API result code */
-	UINT bw,br; /* Bytes written */
-	char buff[50];
-
-	record_mountDisk(1);
-
-	if (sdState == sdMounted) {
-		/* Create a new directory */
-		res = f_mkdir("Record");
-		if ((res == FR_OK) || (res == FR_EXIST))
-		{
-			/* Create a file as new */
-			res = f_open(&fil_w, "Record/log.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
-			if ((res == FR_OK) || (res == FR_EXIST))
-			{
-				/* Write a message */
-				sprintf(buff,"%08lX\n", *(unsigned long*)&testf_w);
-				printf("write: %s\n", buff);
-				res = f_write(&fil_w, buff, 13, &bw);
-				//sprintf(buff,"Current value 2 %5d\n", InputBuffer1[InputBuffer1_idx]);
-				//res = f_write(&fil_w, buff, 22, &bw);
-				if (res == FR_OK )
-				{
-					res = f_lseek(&fil_w, 0);
-
-					//sprintf(Buffer2,"%08lX",*(unsigned long*)&ADCValue2_float2);
-					printf("ori: %08lX, %f\n", *(unsigned long*)&testf_w, testf_w);
-					f_gets(buff, 25, &fil_w);
-					printf("gets: %s\n", buff);
-
-					uint32_t tmp = strtol(buff, NULL, 16);
-					testf_r = *(float*)&tmp;
-					printf("strtof: %08lX, %f, %d\n", tmp, testf_r, testf_r==testf_w);
-
-					//f_gets(buff, 25, &fil);
-					//printf("2 %s\n", buff);
-
-					/* Read the buffer from file */
-					//res = f_read(&fil, &buff[0], 15, &br);
-					//if(res == FR_OK)
-					//{
-					//	/* Go to location 15 */
-					//	res = f_lseek(&fil, 15);
-					//	if(res == FR_OK)
-					//	{
-					//		/* Add some more content to the file */
-					//		res = f_write(&fil_w, "\nWelcome to Infineon", 20, &bw);
-					//		if(res == FR_OK)
-					//		{
-					//
-					//		}
-					//	}
-					//}
-				}
-				else{
-					printf("Write Failed\n");
-				}
-			}
-			diskStatus = disk_status(fs.pdrv);
-			printf("disk_status open = %d\n", diskStatus);
-
-
-			res = f_close(&fil_w);
-			printf("f_close 1: %d\n", res);
-			res = f_close(&fil_w);
-			printf("f_close 2: %d\n", res);
-		}
-		diskStatus = disk_status(fs.pdrv);
-		printf("disk_status mount = %d\n", diskStatus);
-
-
-		res = f_unmount("0:");
-	}
-
-
-	br = 0;
-	bw = 0;
-	br = bw;
-	bw = br;
-
-	//res = f_stat("Record", NULL); //FR_NOT_ENABLED
-	//printf("f_stat = %d\n", res);
-}
-
-
-
-
-/* Register work area */
-//res = f_mount(&fs, "0:", 1);
-//if (res == FR_OK)
-//{
-//	/* Create a new directory */
-//	res = f_mkdir("Record");
-//	if ((res == FR_OK) || (res == FR_EXIST))
-//	{
-//		/* Create a file as new */
-//		res = f_open(&fil, "Record/log.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
-//		if ((res == FR_OK) || (res == FR_EXIST))
-//		{
-//			/* Write a message */
-//			sprintf(buff,"Current value %d\n", InputBuffer1[InputBuffer1_idx]);
-//			res = f_write(&fil, buff, 15, &bw);
-//			if (res == FR_OK )
-//			{
-//				res = f_lseek(&fil, 0);
-//				/* Read the buffer from file */
-//				res = f_read(&fil, &buff[0], 15, &br);
-//				if(res == FR_OK)
-//				{
-//					/* Go to location 15 */
-//					res = f_lseek(&fil, 15);
-//					if(res == FR_OK)
-//					{
-//						/* Add some more content to the file */
-//						res = f_write(&fil, "\nWelcome to Infineon", 20, &bw);
-//						if(res == FR_OK)
-//						{
-//
-//						}
-//					}
-//				}
-//			}
-//		}
-//		f_close(&fil);
-//	}
-//	res = f_unmount("0:");
-//}

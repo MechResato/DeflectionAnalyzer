@@ -13,8 +13,7 @@
 #include <math.h>
 #include <DAVE.h>
 #include "globals.h"
-#include "tft.h"
-#include "FT800-FT813-5.x/EVE.h"
+#include "tft.h" // includes display EVE Library EVE.h
 #include "polyfit/polyfit.h"
 #include "record.h"
 #include "menu.h"
@@ -868,7 +867,7 @@ void menu_display_static_0monitor(void){
 	TFT_label(1, &lbl_sensor);
 
 	/// Write the static part of the Graph to the display list
-	TFT_graph_static(1, &gph_monitor);
+	TFT_graph_static(1, &gph_monitor, GRAPH_AXISCOLOR, GRAPH_GRIDCOLOR);
 
 }
 void menu_display_0monitor(void){
@@ -1521,7 +1520,7 @@ void menu_display_static_curveset(void){
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
 	/// Write the static part of the Graph to the display list
-	TFT_graph_static(1, &gph_curveset);
+	TFT_graph_static(1, &gph_curveset, GRAPH_AXISCOLOR, GRAPH_GRIDCOLOR);
 
 	TFT_textbox_static(1, &tbx_dp);
 	TFT_textbox_static(1, &tbx_nom);
@@ -1865,7 +1864,7 @@ void menu_display_static_filterset(void){
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
 	/// Write the static part of the Graph to the display list
-	TFT_graph_static(1, &gph_filterset);
+	TFT_graph_static(1, &gph_filterset, GRAPH_AXISCOLOR, GRAPH_GRIDCOLOR);
 
 	TFT_textbox_static(1, &tbx_filter_order);
 	TFT_textbox_static(1, &tbx_error_threshold);

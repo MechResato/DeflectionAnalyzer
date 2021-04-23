@@ -9,8 +9,8 @@
 
 int polyfit(const float* const dependentValues,
             const float* const independentValues,
-            unsigned int        countOfElements,
-            unsigned int        order,
+            unsigned int       countOfElements,
+            unsigned int       order,
             float*             coefficients);
 
 #endif // POLYFIT_H_INCLUDED

@@ -60,7 +60,7 @@ typedef struct {
 	int_buffer_t*   bufRaw;
 	float_buffer_t* bufFilter;
 	float_buffer_t* bufConv;
-	uint8_t	 	  errorOccured;	  		// Number of error-measurements that occurred since last valid value. If this is 0 the curent value is valid.
+	uint8_t	 	  errorOccured;	  		// Number of error-measurements that occurred since last valid value. If this is 0 the current value is valid.
 	int_buffer_t  errorThreshold; 		// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	int32_t		  errorLastValid;
 	float     avgFilterSum;
@@ -113,7 +113,7 @@ volatile uint8_t fifo_recordBlock;
 extern volatile uint8_t fifo_finBlock[];
 
 /// BIN to CSV conversion
-// The header text to be written once at first line of CSV file. Must include alle coumns of all sensors! Do not add the "Time" column or the line break at the end (will be automatically added).
+// The header text to be written once at first line of CSV file. Must include all columns of all sensors! Do not add the "Time" column or the line break at the end (will be automatically added).
 #define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;EO;S2_RAW;S2_FILTERED;S2_CONVERTED;EO"
 // ... used for every sensor ... TODO
 #define RECORD_CSV_ARGUMENTS	sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured
@@ -122,9 +122,9 @@ extern volatile uint8_t fifo_finBlock[];
 
 /*  MENU AND USER INTERFACE */
 // Data Acquisition Mode
-enum measureModes{measureModeNone=0, measureModeMonitoring, measureModeRecording};
+enum measureModes{measureModeNone=0, measureModeMonitoring, measureModeRecording, measureModeRecordError};
 typedef enum measureModes measureModes;
-measureModes measureMode;
+volatile measureModes measureMode;
 
 // SD-Card handling
 enum sdStates{sdNone=0, sdMounted, sdFileOpen, sdError};
