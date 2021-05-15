@@ -52,23 +52,23 @@ void (*TFT_display_static_cur_Menu__fptr_arr[TFT_MENU_SIZE])(void) = {
 };
 
 
-
-#define M_0_UPPERBOND 66 // deepest coordinate (greatest number) of the header
+/////////// Menu definition structs - Define header, share and color of the menu
+#define M_0_UPPERBOND 65
 menu menu_0monitor = {
 		.index = 0,
 		.headerText = "Monitoring",
-		.upperBond = M_0_UPPERBOND,
+		.upperBond = M_0_UPPERBOND, // deepest coordinate (greatest number) of the header
 		.headerLayout = {M_0_UPPERBOND, 320, 50, 360}, //[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
-#define M_1_UPPERBOND 66  // deepest coordinate (greatest number) of the header
+#define M_1_UPPERBOND 65  // deepest coordinate (greatest number) of the header
 menu menu_1dashboard = {
 		.index = 1,
 		.headerText = "Dashboard",
-		.upperBond = M_1_UPPERBOND,
+		.upperBond = M_1_UPPERBOND, // deepest coordinate (greatest number) of the header
 		.headerLayout = {M_1_UPPERBOND, 280, 50, 320}, //[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
@@ -78,8 +78,8 @@ menu menu_1dashboard = {
 #define M_SETUP_UPPERBOND 65 // deepest coordinate (greatest number) of the header
 menu menu_2setup1 = {
 		.index = 2,
-		.headerText = "Setup1",
-		.upperBond = M_SETUP_UPPERBOND,
+		.headerText = "Setup I",
+		.upperBond = M_SETUP_UPPERBOND, // deepest coordinate (greatest number) of the header
 		.headerLayout = {M_SETUP_UPPERBOND, 240, 50, 280}, //[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
@@ -89,26 +89,26 @@ menu menu_2setup1 = {
 #define M_SETUP_UPPERBOND 65 // deepest coordinate (greatest number) of the header
 menu menu_3setup2 = {
 		.index = 3,
-		.headerText = "Setup2",
-		.upperBond = M_SETUP_UPPERBOND,
+		.headerText = "Setup II",
+		.upperBond = M_SETUP_UPPERBOND, // deepest coordinate (greatest number) of the header
 		.headerLayout = {M_SETUP_UPPERBOND, 240, 50, 280}, //[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
-#define M_LINSET_UPPERBOND 40 // deepest coordinate (greatest number) of the header
+#define M_LINSET_UPPERBOND 40
 menu menu_curveset = {
 		.index = 4,
 		.headerText = "",
-		.upperBond = 0, // removed upper bond because header is written every TFT_display() in this submenu (on top -> no overlay possible)
+		.upperBond = 0, // removed upper bond because header is written every TFT_display() in this submenu (alwayson top -> no overlay possible)
 		.headerLayout = {0, EVE_HSIZE-65, M_LINSET_UPPERBOND, EVE_HSIZE-50}, //[Y1,X1,Y2,X2]
 		.bannerColor = MAIN_BANNERCOLOR,
 		.dividerColor = MAIN_DIVIDERCOLOR,
 		.headerColor = MAIN_TEXTCOLOR,
 };
 
-#define M_LINSET_UPPERBOND 40 // deepest coordinate (greatest number) of the header
+#define M_LINSET_UPPERBOND 40
 menu menu_filterset = {
 		.index = 5,
 		.headerText = "",
@@ -120,6 +120,7 @@ menu menu_filterset = {
 };
 
 
+/////////// Menu definitions array - Groups all menu definitions
 menu* menu_objects[TFT_MENU_SIZE] = {&menu_0monitor, &menu_1dashboard, &menu_2setup1, &menu_3setup2, &menu_curveset, &menu_filterset};
 
 
@@ -139,6 +140,7 @@ menu* menu_objects[TFT_MENU_SIZE] = {&menu_0monitor, &menu_1dashboard, &menu_2se
 #define M_COL_3 200		// Suggestion ...
 #define M_COL_4 400
 #define FONT_COMP 3		// In order to get text of different fonts to the same level an adjustment is need
+#define G_PADDING 12		// Graph inner padding
 #ifndef TEXTBOX_PAD_V		// This should be defined in tft.c
 #define TEXTBOX_PAD_V 8		// offset of the text from vertical border in pixel
 #endif
@@ -147,9 +149,11 @@ menu* menu_objects[TFT_MENU_SIZE] = {&menu_0monitor, &menu_1dashboard, &menu_2se
 uint16_t display_list_size = 0; // Current size of the display-list from register. Used by the TFT_display() menu specific functions
 uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). Used by the TFT_display() menu specific functions
 
+// Temporary value for deflection
+float_buffer_t f_deflection = 0.0;
+float_buffer_t r_deflection = 0.0;
 
-
-
+int_buffer_t record_time = 0;
 
 
 
@@ -168,7 +172,7 @@ uint8_t inputType = 0;
 
 #define BTN_INPUT_TAG 13
 control btn_input = {
-	.x = 180,		.y = 15,
+	.x = 180,		.y = 17,
 	.w0 = 70,		.h0 = 30,
 	.mytag = BTN_INPUT_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Raw1",
@@ -178,7 +182,7 @@ control btn_input = {
 
 #define BTN_GRAPHMODE_TAG 12
 control tgl_graphMode = {
-	.x = 270,		.y = 24,
+	.x = 270,		.y = 26,
 	.w0 = 60,		.h0 = 27,
 	.mytag = BTN_GRAPHMODE_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Frame",
@@ -186,27 +190,14 @@ control tgl_graphMode = {
 	.ignoreScroll = 1
 };
 
-label lbl_DLsize = {
-		.x = 360,		.y = 10,
-		.font = 26,		.options = 0,	.text = "DL-size:",
-		.ignoreScroll = 1,
-		.numSrc.srcType = srcTypeNone
-};
-label lbl_DLsize_val = {
-		.x = 470,		.y = 10,
-		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d",
-		.ignoreScroll = 1,
-		.numSrc.srcType = srcTypeInt, .numSrc.intSrc = &display_list_size, .numSrc.srcOffset = NULL
-};
-
 label lbl_sensor = {
-		.x = 360,		.y = 25,
-		.font = 26,		.options = 0,	.text = "Sensor:",
+		.x = 360,		.y = 25, //10&25 for 2 lines
+		.font = 26,		.options = 0,	.text = "Value:",
 		.ignoreScroll = 1,
 		.numSrc.srcType = srcTypeNone
 };
 label lbl_sensor_val = {
-		.x = 470,		.y = 25,
+		.x = 470,		.y = 25, //10&25 for 2 lines
 		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d",//.text = "%d.%.2d V",
 		.ignoreScroll = 1,
 		.numSrc.srcType = srcTypeInt, //srcTypeFloat,
@@ -215,9 +206,22 @@ label lbl_sensor_val = {
 		.fracExp = 2
 };
 
+label lbl_misc = {
+		.x = 360,		.y = 25,
+		.font = 26,		.options = 0,	.text = "DL-size:",
+		.ignoreScroll = 1,
+		.numSrc.srcType = srcTypeNone
+};
+label lbl_misc_val = {
+		.x = 470,		.y = 25,
+		.font = 26,		.options = EVE_OPT_RIGHTX,	.text = "%d",
+		.ignoreScroll = 1,
+		.numSrc.srcType = srcTypeInt, .numSrc.intSrc = &display_list_size, .numSrc.srcOffset = NULL
+};
+
+
 
 // Graph position and size. Here -> quick an dirty estimation where x, y, width and height must be to fill the whole main area
-#define G_PADDING 10 //
 graph gph_monitor = {
 	.x = 10,																 // 10 px from left to leave some room
 	.y = (M_0_UPPERBOND + 15),												// end of banner plus 10 to leave some room  (for Y1=66: 66+15=81)
@@ -245,22 +249,67 @@ graph gph_monitor = {
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define BTN_STARTREC_TAG 10
 control btn_startRec = {
-	.x = M_COL_3,	.y = M_UPPER_PAD + M_1_UPPERBOND,
-	.w0 = 55,		.h0 = 31,
-	.mytag = BTN_STARTREC_TAG,	.font = 27,	.options = 0, .state = 0,
-	.text = "Start",
+	.x = 350,	.y = M_UPPER_PAD + M_1_UPPERBOND + 7,
+	.w0 = 90,		.h0 = 60,
+	.mytag = BTN_STARTREC_TAG,	.font = 28,	.options = 0, .state = 0,
+	.text = "Record",
 	.controlType = Button,
 	.ignoreScroll = 1
 };
 
 label lbl_record = {
 	.x = M_COL_1,		.y = M_UPPER_PAD + M_1_UPPERBOND,
-	.font = 27,		.options = 0,		.text = "Record",
+	.font = 27,		.options = 0,		.text = "",
 	.ignoreScroll = 0
 };
 
+label lbl_record_time = {
+	.x = 370,	.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*2),
+	.font = 27,		.options = 0,		.text = "%d sec",
+	.ignoreScroll = 0,
+	.numSrc.srcType = srcTypeInt,
+	.numSrc.intSrc = (int_buffer_t*)&record_time,
+	.numSrc.srcOffset = NULL,
+	.fracExp = 1
+};
 
+label lbl_dash_f = { //deflection front
+		.x = M_COL_1,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0),
+		.font = 30,		.options = 0,		.text = "Front",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeNone,
+		.numSrc.floatSrc = NULL,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 0
+};
+label lbl_dash_r = { //deflection rear
+		.x = 200,					.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0),
+		.font = 30,		.options = 0,		.text = "Rear",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeNone,
+		.numSrc.floatSrc = NULL,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 0
+};
 
+label lbl_dash_f_d = { //deflection front value
+		.x = M_COL_1,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),//.x = 130,		.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*3),
+		.font = 30,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&f_deflection,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+label lbl_dash_r_d = { //deflection rear value
+		.x = 200,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),//.x = 130,		.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*2),
+		.font = 30,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&r_deflection,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
 
 
 
@@ -303,7 +352,7 @@ textbox tbx_sensor1 = {
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = EVE_HSIZE - (M_COL_2) - 130 - 25,
 	.labelOffsetX = 130,
-	.labelText = "Sensor1:   CAL File",
+	.labelText = "S1 Front:   CAL File",
 	.mytag = TBX_SENSOR1_TAG,
 	.text = s1_filename_cal,
 	.text_maxlen = STR_SPEC_MAXLEN,
@@ -349,7 +398,7 @@ textbox tbx_sensor2 = {
 	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.width = EVE_HSIZE - (M_COL_2) - 130 - 25,
 	.labelOffsetX = 130,
-	.labelText = "Sensor2:   CAL File",
+	.labelText = "S2 Rear:   CAL File",
 	.mytag = TBX_SENSOR2_TAG,
 	.text = s2_filename_cal,
 	.text_maxlen = STR_SPEC_MAXLEN,
@@ -398,6 +447,156 @@ control btn_filterset_S2 = {
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+//		Sag section
+#define REARXOFFSET 60
+#define FRONTXOFFSET 60
+#define ROWHEADERXOFFSET 90
+label lbl_sag_header = {
+		.x = M_COL_1,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
+		.font = 27,		.options = 0,		.text = "Sag:",
+		.ignoreScroll = 0
+};
+
+//float_buffer_t f_unloaded = 0.0;
+//float_buffer_t r_unloaded = 0.0;
+//float_buffer_t f_sag = 0.0;
+//float_buffer_t r_sag = 0.0;
+
+
+label lbl_front = {
+		.x = M_COL_2+FRONTXOFFSET,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
+		.font = 26,		.options = 0,		.text = "Front:",
+		.ignoreScroll = 0
+};
+label lbl_rear = {
+		.x = M_COL_4-REARXOFFSET,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
+		.font = 26,		.options = 0,		.text = "Rear:",
+		.ignoreScroll = 0
+};
+
+
+
+label lbl_unloaded = { // origin point
+		.x = M_COL_1+ROWHEADERXOFFSET,			.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2),
+		.font = 26,		.options = 0,		.text = "Unloaded",
+		.ignoreScroll = 0
+};
+label lbl_sag = { //operating point offset
+		.x = M_COL_1+ROWHEADERXOFFSET,			.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3),
+		.font = 26,		.options = 0,		.text = "Driver Sag",
+		.ignoreScroll = 0
+};
+label lbl_deflection = { //deflection
+		.x = M_COL_1+ROWHEADERXOFFSET,			.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4),
+		.font = 26,		.options = 0,		.text = "Deflection",
+		.ignoreScroll = 0
+};
+
+// Definition of table separator lines
+#define TBL_H_X1 (M_COL_1 + ROWHEADERXOFFSET)
+#define TBL_H_Y1 (M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - (M_ROW_DIST/2) + 2)
+#define TBL_H_X2 (M_COL_4 + 55)
+#define TBL_H_Y2 (M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - (M_ROW_DIST/2) + 2)
+#define TBL_V_X1 (M_COL_2 + FRONTXOFFSET - 8)
+#define TBL_V_Y1 (M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1))
+#define TBL_V_X2 (M_COL_2 + FRONTXOFFSET - 8)
+#define TBL_V_Y2 (M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4) + (M_ROW_DIST/2))
+
+label lbl_f_unloaded = { // origin point front
+		.x = M_COL_2+FRONTXOFFSET,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2),
+		.font = 26,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&sensor1.originPoint,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+label lbl_r_unloaded = { // origin point rear
+		.x = M_COL_4-REARXOFFSET,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2),
+		.font = 26,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&sensor2.originPoint,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+
+label lbl_f_sag = { //operating point offset front
+		.x = M_COL_2+FRONTXOFFSET,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3),
+		.font = 26,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&sensor1.operatingPoint,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+label lbl_r_sag = { //operating point offset rear
+		.x = M_COL_4-REARXOFFSET,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3),
+		.font = 26,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&sensor2.operatingPoint,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+
+label lbl_f_deflection = { //deflection front
+		.x = M_COL_2+FRONTXOFFSET,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4),
+		.font = 26,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&f_deflection,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+label lbl_r_deflection = { //deflection rear
+		.x = M_COL_4-REARXOFFSET,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*4),
+		.font = 26,		.options = 0,		.text = "%d.%.1d mm",
+		.ignoreScroll = 0,
+		.numSrc.srcType = srcTypeFloat,
+		.numSrc.floatSrc = (float_buffer_t*)&r_deflection,
+		.numSrc.srcOffset = NULL,
+		.fracExp = 1
+};
+
+#define BTN_F_UNLOADED_TAG 11
+control btn_f_unloaded = {
+	.x = M_COL_3+FRONTXOFFSET+5,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 30,
+	.mytag = BTN_F_UNLOADED_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+#define BTN_R_UNLOADED_TAG 12
+control btn_r_unloaded = {
+	.x = M_COL_4,					.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*2) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 30,
+	.mytag = BTN_R_UNLOADED_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+#define BTN_F_SAG_TAG 13
+control btn_f_sag = {
+	.x = M_COL_3+FRONTXOFFSET+5,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 30,
+	.mytag = BTN_F_SAG_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+#define BTN_R_SAG_TAG 14
+control btn_r_sag = {
+	.x = M_COL_4,					.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*3) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.w0 = 55,		.h0 = 30,
+	.mytag = BTN_R_SAG_TAG,	.font = 27, .options = 0, .state = 0,
+	.text = "Set",
+	.controlType = Button,
+	.ignoreScroll = 0
+};
+
+// Section Backlight
 label lbl_backlight = {
 		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0),
 		.font = 27,		.options = 0,		.text = "Backlight",
@@ -406,7 +605,7 @@ label lbl_backlight = {
 
 #define BTN_DIMMER_TAG 10
 control btn_dimmmer = {
-	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0) - TEXTBOX_PAD_V + FONT_COMP*1,
+	.x = M_COL_1+ROWHEADERXOFFSET,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*0) - TEXTBOX_PAD_V + FONT_COMP*1,
 	.w0 = 80,		.h0 = 30,
 	.mytag = BTN_DIMMER_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "Dimmer",
@@ -414,39 +613,7 @@ control btn_dimmmer = {
 	.ignoreScroll = 0
 };
 
-
-label lbl_RTC = {
-		.x = M_COL_1,		.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),
-		.font = 27,		.options = 0,		.text = "RTC",
-		.ignoreScroll = 0
-};
-
-//int_buffer_t hour_val[4] = {1, 22, 333, 444};
-//uint8_t hour_val_idx = 0;
-#define STR_HOUR_MAXLEN 18
-char str_hour[STR_HOUR_MAXLEN] = "12:13:26 24.03.21";
-uint8_t str_hour_curLength = 17;
-#define TBX_HOUR_TAG 25
-textbox tbx_hour = {
-	.x = M_COL_2,	.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1) - TEXTBOX_PAD_V + FONT_COMP*1,
-	.width = 120,
-	.labelOffsetX = 130,
-	.labelText = "HH:mm:ss dd.MM.yy",
-	.mytag = TBX_HOUR_TAG,
-	.text = str_hour,
-	.text_maxlen = STR_HOUR_MAXLEN,
-	.text_curlen = &str_hour_curLength,
-	.keypadType = Numeric,
-	.active = 0,
-	.numSrc.srcType = srcTypeNone,
-	//.numSrcFormat = "%d",
-	//.numSrc.intSrc = &hour_val[0],
-	//.numSrc.srcOffset = (uint16_t*)&hour_val_idx
-};
-
-
-
-
+// RTC currently unused (Fromat "HH:mm:ss dd.MM.yy")
 
 
 
@@ -502,7 +669,7 @@ label lbl_fitorder = {
 		.ignoreScroll = 0
 };
 
-#define G_PADDING 10 //
+
 graph gph_curveset = {
 	.x = 10,		// 10 px from left to leave some room
 	.y = 30 + M_UPPER_PAD,		// end of banner plus 10 to leave some room  (e.g. for Y1=66: 66+15=81)
@@ -600,9 +767,9 @@ char str_nom[STR_NOM_MAXLEN] = "4095";
 uint8_t str_nom_curLength = 4;
 //#define TBX_NOM_TAG 0
 textbox tbx_nom = {
-	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 8,
+	.x = (M_COL_1/2) + 75 + 36 + 1 + 25 + 1 + 30 + 5,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
-	.width = 50,
+	.width = 53,
 	.labelOffsetX = 58,
 	.labelText = "Nominal:",
 	.mytag = 0,
@@ -676,7 +843,6 @@ label lbl_filterError = {
 		.ignoreScroll = 0
 };
 
-#define G_PADDING 10 //
 graph gph_filterset = {
 	.x = 10,		// 10 px from left to leave some room
 	.y = 30 + M_UPPER_PAD,		// end of banner plus 10 to leave some room  (e.g. for Y1=66: 66+15=81)
@@ -732,20 +898,20 @@ control btn_filterError_reset = {
 };
 
 /// Textboxes
-#define STR_FILTER_ORDER_MAXLEN 3
-char str_filter_order[STR_FILTER_ORDER_MAXLEN] = "0";
-uint8_t str_filter_order_curLength = 1;
-#define TBX_FILTER_ORDER_TAG 24
-textbox tbx_filter_order = {
+#define STR_FILTER_INTERVAL_MAXLEN 3
+char str_filter_interval[STR_FILTER_INTERVAL_MAXLEN] = "0";
+uint8_t str_filter_interval_curLength = 1;
+#define TBX_FILTER_INTERVAL_TAG 24
+textbox tbx_filter_interval = {
 	.x = M_COL_1,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.width = 40,
 	.labelOffsetX = 80,
-	.labelText = "Filter Order:",
+	.labelText = "Filter Interval:",
 	.mytag = 0,
-	.text = str_filter_order,
-	.text_maxlen = STR_FILTER_ORDER_MAXLEN,
-	.text_curlen = &str_filter_order_curLength,
+	.text = str_filter_interval,
+	.text_maxlen = STR_FILTER_INTERVAL_MAXLEN,
+	.text_curlen = &str_filter_interval_curLength,
 	.keypadType = Numeric,
 	.active = 0,
 	.numSrc.srcType = srcTypeInt,
@@ -857,14 +1023,14 @@ void menu_display_static_0monitor(void){
 	TFT_setMenu(menu_0monitor.index);
 
 	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_0monitor);
+	TFT_header_static(1, &menu_0monitor);
 
 	// Set Color
 	TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
 	// Add the static text
-	TFT_label(1, &lbl_DLsize);
-	TFT_label(1, &lbl_sensor);
+	TFT_label_display(1, &lbl_sensor);
+	//TFT_label_display(1, &lbl_misc);
 
 	/// Write the static part of the Graph to the display list
 	TFT_graph_static(1, &gph_monitor, GRAPH_AXISCOLOR, GRAPH_GRIDCOLOR);
@@ -878,14 +1044,14 @@ void menu_display_0monitor(void){
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
 	// Buttons
-	TFT_control(&btn_input);
-	TFT_control(&tgl_graphMode);
+	TFT_control_display(&btn_input);
+	TFT_control_display(&tgl_graphMode);
 
 	/////////////// Debug Values
 	//TFT_label(1, &lbl_DLsize_val);
 
 	// Write current sensor value with unit
-	TFT_label(1, &lbl_sensor_val);
+	TFT_label_display(1, &lbl_sensor_val);
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
@@ -950,15 +1116,15 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				}
 				else if(inputType == 1){
 					measurementCurSensor = sensor1.index;
-					btn_input.text = "S1";
+					btn_input.text = "S1 Front";
 					lbl_sensor_val.text = "%d.%.2d mm";
 					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
 					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor1.bufConv;
 					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
 					lbl_sensor_val.fracExp = 2;
 
-					gph_monitor.amp_max = 165;
-					gph_monitor.y_max = 165;
+					gph_monitor.amp_max = 160;
+					gph_monitor.y_max = 160;
 					gph_monitor.y_label = "mm";
 				}
 				else if(inputType == 2){
@@ -976,15 +1142,15 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				}
 				else if(inputType == 3){
 					measurementCurSensor = sensor2.index;
-					btn_input.text = "S2";
+					btn_input.text = "S2 Rear";
 					lbl_sensor_val.text = "%d.%.2d mm";
 					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
 					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor2.bufConv;
 					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
 					lbl_sensor_val.fracExp = 2;
 
-					gph_monitor.amp_max = 165;
-					gph_monitor.y_max = 165;
+					gph_monitor.amp_max = 160;
+					gph_monitor.y_max = 160;
 					gph_monitor.y_label = "mm";
 				}
 
@@ -1005,7 +1171,7 @@ void menu_display_static_1dash(void){
 	TFT_setMenu(menu_1dashboard.index);
 
 	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_1dashboard);
+	TFT_header_static(1, &menu_1dashboard);
 
 	// Add the static text
 	//EVE_cmd_dl_burst(TAG(0)); /* do not use the following objects for touch-detection */
@@ -1015,28 +1181,70 @@ void menu_display_static_1dash(void){
 
 	// Text
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	TFT_label(1, &lbl_record);
+	TFT_label_display(1, &lbl_record);
 }
 void menu_display_1dash(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
 	/// This menu ...
 
 
+	// Calculate current deflection
+	f_deflection = (float)sensor1.bufConv[sensor1.bufIdx] - sensor1.originPoint - sensor1.operatingPoint;
+	r_deflection = (float)sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint - sensor2.operatingPoint;
+
 	// Change record button name if needed
 	static measureModes lastMeasMode;
 	if(measureMode != lastMeasMode){
 		lastMeasMode = measureMode;
-		if(measureMode == measureModeMonitoring)
-			btn_startRec.text = "Start";
-		else if(measureMode == measureModeRecording)
+		if(measureMode == measureModeMonitoring){
+			btn_startRec.text = "Record";
+			btn_startRec.state = 0;
+		}
+		else if(measureMode == measureModeRecording){
 			btn_startRec.text = "Stop";
+		}
+
+		// If button is disabled show wait
+		if(btn_startRec.mytag == 0){
+			btn_startRec.text = "Wait...";
+			btn_startRec.state = EVE_OPT_FLAT;
+
+			// Invalidate last measure mode - this will trigger a change of text next time this starts
+			lastMeasMode = measureModeNone;
+		}
 	}
 
 	/////////////// Display BUTTONS and Toggles
-	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+
 
 	// Button start recording
-	TFT_control(&btn_startRec);
+	if(lastMeasMode == measureModeRecording)
+		TFT_setColor(1, MAIN_BTNTXTCOLOR, RED_1, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	else if(lastMeasMode == measureModeMonitoring)
+		TFT_setColor(1, MAIN_BTNTXTCOLOR, GREEN_2, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	else
+		TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
+	TFT_control_display(&btn_startRec);
+
+	// Rear deflection
+	if(r_deflection >= 0)
+		TFT_setColor(1, GREEN_1, -1, -1, -1);
+	else
+		TFT_setColor(1, RED_1, -1, -1, -1);
+	TFT_label_display(1, &lbl_dash_r_d);
+
+	// Front deflection
+	if(f_deflection >= 0)
+		TFT_setColor(1, GREEN_1, -1, -1, -1);
+	else
+		TFT_setColor(1, RED_1, -1, -1, -1);
+	TFT_label_display(1, &lbl_dash_f_d);
+
+	// Deflection Headers and record time
+	TFT_setColor(1, BLACK, -1, -1, -1);
+	TFT_label_display(1, &lbl_dash_f);
+	TFT_label_display(1, &lbl_dash_r);
+	TFT_label_display(1, &lbl_record_time);
 
 	// Debug
 	//TFT_setColor(1, MAIN_TEXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
@@ -1057,21 +1265,39 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 				printf("Button StartRec\n");
 				*toggle_lock = 42;
 
-				//record_convertBinFile("LOG.BIN", (sensor**)&sensors);
-
-				// Start recording
+				// Start/Stop recording
 				if(measureMode == measureModeMonitoring){
+					// Start recording
 					measurementCounter = 0;
 					int8_t res = record_start();
-					if(res != 1)
+
+					// Error handling
+					if(res != 1){
 						printf("Start failed\n");
+					}
 				}
 				else if(measureMode == measureModeRecording){
+					// Stop recording
 					int8_t res = record_stop(1);
-					if(res != 1)
+
+					// Check if stop was successful
+					if(res != 1){
+						// Error handling
 						printf("Stop failed\n");
-					else
+					}
+					else{
+						// Finish record
+
+						// Set text of button to wait, disable button and trigger one last display refresh
+						btn_startRec.mytag = 0;
+						TFT_display();
+
+						// Start conversion of BIN to CSV file
 						record_convertBinFile(filename_rec, (sensor**)&sensors);
+
+						// Enable Button
+						btn_startRec.mytag = BTN_STARTREC_TAG;
+					}
 				}
 			}
 			break;
@@ -1110,25 +1336,25 @@ void menu_display_static_2setup1(void){
 	TFT_setMenu(menu_2setup1.index);
 
 	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_2setup1);
+	TFT_header_static(1, &menu_2setup1);
 
 	// Set Color
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
 	/// Recording section
-	TFT_label(1, &lbl_recording);
+	TFT_label_display(1, &lbl_recording);
 	// Filename
 	TFT_textbox_static(1, &tbx_filename);
 
 	/// Sensor curve fit section
-	TFT_label(1, &lbl_calibrate);
+	TFT_label_display(1, &lbl_calibrate);
 	TFT_textbox_static(1, &tbx_sensor1);
 	//TFT_label(1, &lbl_curveset);
-	TFT_label(1, &lbl_curveset_S1);
-	TFT_label(1, &lbl_filterset_S1);
+	TFT_label_display(1, &lbl_curveset_S1);
+	TFT_label_display(1, &lbl_filterset_S1);
 	TFT_textbox_static(1, &tbx_sensor2);
-	TFT_label(1, &lbl_curveset_S2);
-	TFT_label(1, &lbl_filterset_S2);
+	TFT_label_display(1, &lbl_curveset_S2);
+	TFT_label_display(1, &lbl_filterset_S2);
 }
 void menu_display_2setup1(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
@@ -1137,10 +1363,10 @@ void menu_display_2setup1(void){
 
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	TFT_control(&btn_curveset_S1);
-	TFT_control(&btn_filterset_S1);
-	TFT_control(&btn_curveset_S2);
-	TFT_control(&btn_filterset_S2);
+	TFT_control_display(&btn_curveset_S1);
+	TFT_control_display(&btn_filterset_S1);
+	TFT_control_display(&btn_curveset_S2);
+	TFT_control_display(&btn_filterset_S2);
 
 	// Set Color
 	TFT_setColor(1, BLACK, -1, -1, -1);
@@ -1249,41 +1475,65 @@ void menu_touch_2setup1(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 //		Setup2              --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void menu_display_static_3setup2(void){
 	// Set configuration for current menu
 	TFT_setMenu(menu_3setup2.index);
 
 	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_3setup2);
+	TFT_header_static(1, &menu_3setup2);
 
 	// Set Color
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
-	// RTC
-	TFT_label(1, &lbl_RTC);
-	TFT_textbox_static(1, &tbx_hour);
-
 	/// Backlight
-	TFT_label(1, &lbl_backlight);
+	TFT_label_display(1, &lbl_backlight);
+
+	/// Sag setup
+	// Column Header
+	TFT_label_display(1, &lbl_sag_header);
+	TFT_label_display(1, &lbl_front);
+	TFT_label_display(1, &lbl_rear);
+	// Row Header
+	TFT_label_display(1, &lbl_unloaded);
+	TFT_label_display(1, &lbl_sag);
+	TFT_label_display(1, &lbl_deflection);
+
+	// Main values
+	TFT_label_display(1, &lbl_f_unloaded);
+	TFT_label_display(1, &lbl_r_unloaded);
+	TFT_label_display(1, &lbl_f_sag);
+	TFT_label_display(1, &lbl_r_sag);
+
+	// Draw seperator Lines
+	TFT_primitive(1, EVE_LINES, 0, 0, TBL_H_X1, TBL_H_Y1, TBL_H_X2, TBL_H_Y2);
+	TFT_primitive(1, EVE_LINES, 0, 0, TBL_V_X1, TBL_V_Y1, TBL_V_X2, TBL_V_Y2);
 }
 void menu_display_3setup2(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
 	/// This menu ...
 
 
+	// Calculate current deflection
+	f_deflection = (float)sensor1.bufConv[sensor1.bufIdx] - sensor1.originPoint - sensor1.operatingPoint;
+	r_deflection = (float)sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint - sensor2.operatingPoint;
+
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
-	TFT_control(&btn_dimmmer);
+	TFT_control_display(&btn_dimmmer);
+
+	// Sag setup buttons
+	TFT_control_display(&btn_f_unloaded);
+	TFT_control_display(&btn_r_unloaded);
+	TFT_control_display(&btn_f_sag);
+	TFT_control_display(&btn_r_sag);
 
 	// Set Color
 	TFT_setColor(1, BLACK, -1, -1, -1);
 
-	// Filename textbox
-	//TFT_textbox_display(20, 70, 20, filename_rec);
-	TFT_textbox_display(&tbx_hour);
+	// Current deflection in sag section
+	TFT_label_display(1, &lbl_f_deflection);
+	TFT_label_display(1, &lbl_r_deflection);
 }
-
 void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
 	/// Menu specific touch code. This will run if the corresponding menu is active and the main tft_touch() registers an unknown tag value
 	/// Do not use predefined TAG values! See tft.c "TAG ASSIGNMENT"!
@@ -1308,17 +1558,60 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 
 			}
 			break;
-		// textbox
-		case TBX_HOUR_TAG:
+		// Set front origin/unloaded value
+		case BTN_F_UNLOADED_TAG:
 			if(*toggle_lock == 0) {
-				printf("Textbox Hour\n");
+				printf("Button front origin touched\n");
 				*toggle_lock = 42;
 
-				// Activate Keypad and set cursor to end
-				TFT_textbox_setStatus(&tbx_hour, 1, -1);
+				// Set current filtered raw value as origin value
+				sensor1.originPoint = sensor1.bufConv[sensor1.bufIdx];
+
+				// Refresh display (rest will be done in menu specific static_display code)
+				TFT_setMenu(-1);
 			}
+			break;
+		// Set rear origin/unloaded value
+		case BTN_R_UNLOADED_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button rear origin touched\n");
+				*toggle_lock = 42;
+
+				// Set current filtered raw value as origin value
+				sensor2.originPoint = sensor2.bufConv[sensor2.bufIdx];
+
+				// Refresh display (rest will be done in menu specific static_display code)
+				TFT_setMenu(-1);
+			}
+			break;
+		// Set front driver sag/operating point value
+		case BTN_F_SAG_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button front operating point touched\n");
+				*toggle_lock = 42;
+
+				// Set operating point as offset from origin to current position
+				sensor1.operatingPoint = sensor1.bufConv[sensor1.bufIdx] - sensor1.originPoint;
+				printf("curfil %.2f, orig %.2f \n", sensor1.bufConv[sensor1.bufIdx], sensor1.originPoint);
+
+				// Refresh display (rest will be done in menu specific static_display code)
+				TFT_setMenu(-1);
+			}
+			break;
+		// Set rear driver sag/operating point value
+		case BTN_R_SAG_TAG:
+			if(*toggle_lock == 0) {
+				printf("Button rear operating point touched\n");
+				*toggle_lock = 42;
+
+				// Set operating point as offset from origin to current position
+				sensor2.operatingPoint = sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint;
+
+				// Refresh display (rest will be done in menu specific static_display code)
+				TFT_setMenu(-1);
+			}
+			break;
 		default:
-			TFT_textbox_touch(&tbx_hour);
 			break;
 	}
 }
@@ -1560,19 +1853,19 @@ void menu_display_curveset(void){
 	TFT_graph_function(&gph_curveset, &coefficients[0], fit_order, 2, graphLine, GRAPH_DATA1COLOR);
 
 	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_curveset);
+	TFT_header_static(1, &menu_curveset);
 
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 	// Buttons
-	TFT_control(&btn_back); //	 - return from submenu
-	TFT_control(&btn_order); //	 - change curve fit function
-	TFT_control(&btn_setchange);
-	TFT_control(&btn_db_last);
-	TFT_control(&btn_db_next);
+	TFT_control_display(&btn_back); //	 - return from submenu
+	TFT_control_display(&btn_order); //	 - change curve fit function
+	TFT_control_display(&btn_setchange);
+	TFT_control_display(&btn_db_last);
+	TFT_control_display(&btn_db_next);
 	// Only show delete button if in edit mode
 	if(tbx_act.mytag != 0)
-		TFT_control(&btn_db_delete);
+		TFT_control_display(&btn_db_delete);
 
 
 	// Data point controls
@@ -1581,8 +1874,8 @@ void menu_display_curveset(void){
 	TFT_textbox_display(&tbx_act);
 
 	// Header labels
-	TFT_label(1, &lbl_curveset);
-	TFT_label(1, &lbl_fitorder);
+	TFT_label_display(1, &lbl_curveset);
+	TFT_label_display(1, &lbl_fitorder);
 
 }
 void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -1823,7 +2116,7 @@ void filterset_prepare(volatile sensor* sens){
 		printf("Memory malloc failed!\n");
 
 	// Link filter order textbox source to current sensor filter order
-	tbx_filter_order.numSrc.intSrc = &filterset_sens->avgFilterOrder;
+	tbx_filter_interval.numSrc.intSrc = &filterset_sens->avgFilterOrder;
 
 	// Set current error threshold to retrieved value (we use a separate value in order to modify it dynamically)
 	filter_errorThreshold = filterset_sens->errorThreshold;
@@ -1855,7 +2148,6 @@ void filterset_setEditMode(uint8_t editMode){
 
 }
 
-
 void menu_display_static_filterset(void){
 	// Set configuration for current menu
 	TFT_setMenu(menu_filterset.index);
@@ -1866,7 +2158,7 @@ void menu_display_static_filterset(void){
 	/// Write the static part of the Graph to the display list
 	TFT_graph_static(1, &gph_filterset, GRAPH_AXISCOLOR, GRAPH_GRIDCOLOR);
 
-	TFT_textbox_static(1, &tbx_filter_order);
+	TFT_textbox_static(1, &tbx_filter_interval);
 	TFT_textbox_static(1, &tbx_error_threshold);
 }
 void menu_display_filterset(void){
@@ -1940,25 +2232,25 @@ void menu_display_filterset(void){
 	TFT_graph_pixeldata_f(&gph_filterset, filterset_sens->bufFilter, filterset_sens->bufMaxIdx, &filterset_sens->bufIdx, GRAPH_DATA2COLOR);
 
 	/// Draw Banner and divider line on top
-	TFT_header(1, &menu_filterset);
+	TFT_header_static(1, &menu_filterset);
 
 	// Set button color for header
 	TFT_setColor(1, MAIN_BTNTXTCOLOR, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 	// Buttons
-	TFT_control(&btn_back); //	 - return from submenu
-	TFT_control(&btn_filter_down); //	 - change curve fit function
-	TFT_control(&btn_filter_up);
-	TFT_control(&btn_filter_setchange);
-	TFT_control(&btn_filterError_reset);
+	TFT_control_display(&btn_back); //	 - return from submenu
+	TFT_control_display(&btn_filter_down); //	 - change curve fit function
+	TFT_control_display(&btn_filter_up);
+	TFT_control_display(&btn_filter_setchange);
+	TFT_control_display(&btn_filterError_reset);
 
 	// Data point controls
 	TFT_textbox_display(&tbx_error_threshold);
-	TFT_textbox_display(&tbx_filter_order);
+	TFT_textbox_display(&tbx_filter_interval);
 
 	// Header labels
-	TFT_label(1, &lbl_filterset);
-	TFT_label(1, &lbl_filterErrorText);
-	TFT_label(1, &lbl_filterError);
+	TFT_label_display(1, &lbl_filterset);
+	TFT_label_display(1, &lbl_filterErrorText);
+	TFT_label_display(1, &lbl_filterError);
 
 }
 void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){

@@ -1,0 +1,3964 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "tft.c"
+  16              	 .section .text.TFT_keypad_open,"ax",%progbits
+  17              	 .align 1
+  18              	 .global TFT_keypad_open
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	TFT_keypad_open:
+  23              	 
+  24              	 
+  25              	 
+  26 0000 054A     	 ldr r2,.L4
+  27 0002 1378     	 ldrb r3,[r2]
+  28 0004 3BB9     	 cbnz r3,.L1
+  29 0006 0123     	 movs r3,#1
+  30 0008 1370     	 strb r3,[r2]
+  31 000a 044A     	 ldr r2,.L4+4
+  32 000c 1070     	 strb r0,[r2]
+  33 000e 044A     	 ldr r2,.L4+8
+  34 0010 1170     	 strb r1,[r2]
+  35 0012 044A     	 ldr r2,.L4+12
+  36 0014 1370     	 strb r3,[r2]
+  37              	.L1:
+  38 0016 7047     	 bx lr
+  39              	.L5:
+  40              	 .align 2
+  41              	.L4:
+  42 0018 00000000 	 .word .LANCHOR0
+  43 001c 00000000 	 .word .LANCHOR1
+  44 0020 00000000 	 .word .LANCHOR2
+  45 0024 00000000 	 .word .LANCHOR3
+  47              	 .section .text.TFT_keypad_close,"ax",%progbits
+  48              	 .align 1
+  49              	 .global TFT_keypad_close
+  50              	 .thumb
+  51              	 .thumb_func
+  53              	TFT_keypad_close:
+  54              	 
+  55              	 
+  56              	 
+  57 0000 044A     	 ldr r2,.L7
+  58 0002 0023     	 movs r3,#0
+  59 0004 1370     	 strb r3,[r2]
+  60 0006 044A     	 ldr r2,.L7+4
+  61 0008 1370     	 strb r3,[r2]
+  62 000a 044A     	 ldr r2,.L7+8
+  63 000c 1370     	 strb r3,[r2]
+  64 000e 044A     	 ldr r2,.L7+12
+  65 0010 1370     	 strb r3,[r2]
+  66 0012 7047     	 bx lr
+  67              	.L8:
+  68              	 .align 2
+  69              	.L7:
+  70 0014 00000000 	 .word .LANCHOR0
+  71 0018 00000000 	 .word .LANCHOR1
+  72 001c 00000000 	 .word .LANCHOR2
+  73 0020 00000000 	 .word .LANCHOR4
+  75              	 .section .text.TFT_setMenu,"ax",%progbits
+  76              	 .align 1
+  77              	 .global TFT_setMenu
+  78              	 .thumb
+  79              	 .thumb_func
+  81              	TFT_setMenu:
+  82              	 
+  83              	 
+  84 0000 08B5     	 push {r3,lr}
+  85 0002 0D4B     	 ldr r3,.L12
+  86 0004 0122     	 movs r2,#1
+  87 0006 1A70     	 strb r2,[r3]
+  88 0008 0C4B     	 ldr r3,.L12+4
+  89 000a 0028     	 cmp r0,#0
+  90 000c A8BF     	 it ge
+  91 000e 1870     	 strbge r0,[r3]
+  92 0010 93F90020 	 ldrsb r2,[r3]
+  93 0014 0A4B     	 ldr r3,.L12+8
+  94 0016 93F90030 	 ldrsb r3,[r3]
+  95 001a 9A42     	 cmp r2,r3
+  96 001c 0AD0     	 beq .L9
+  97 001e 094B     	 ldr r3,.L12+12
+  98 0020 53F82030 	 ldr r3,[r3,r0,lsl#2]
+  99 0024 1A89     	 ldrh r2,[r3,#8]
+ 100 0026 084B     	 ldr r3,.L12+16
+ 101 0028 1A80     	 strh r2,[r3]
+ 102 002a FFF7FEFF 	 bl TFT_keypad_close
+ 103 002e 074B     	 ldr r3,.L12+20
+ 104 0030 0022     	 movs r2,#0
+ 105 0032 1A80     	 strh r2,[r3]
+ 106              	.L9:
+ 107 0034 08BD     	 pop {r3,pc}
+ 108              	.L13:
+ 109 0036 00BF     	 .align 2
+ 110              	.L12:
+ 111 0038 00000000 	 .word .LANCHOR5
+ 112 003c 00000000 	 .word .LANCHOR6
+ 113 0040 00000000 	 .word .LANCHOR7
+ 114 0044 00000000 	 .word menu_objects
+ 115 0048 00000000 	 .word .LANCHOR8
+ 116 004c 00000000 	 .word .LANCHOR9
+ 118              	 .section .text.TFT_setColor,"ax",%progbits
+ 119              	 .align 1
+ 120              	 .global TFT_setColor
+ 121              	 .thumb
+ 122              	 .thumb_func
+ 124              	TFT_setColor:
+ 125              	 
+ 126              	 
+ 127 0000 70B5     	 push {r4,r5,r6,lr}
+ 128 0002 049C     	 ldr r4,[sp,#16]
+ 129 0004 1646     	 mov r6,r2
+ 130 0006 1D46     	 mov r5,r3
+ 131 0008 B0B1     	 cbz r0,.L15
+ 132 000a 0029     	 cmp r1,#0
+ 133 000c 03DB     	 blt .L16
+ 134 000e 41F08060 	 orr r0,r1,#67108864
+ 135 0012 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 136              	.L16:
+ 137 0016 002E     	 cmp r6,#0
+ 138 0018 02DB     	 blt .L17
+ 139 001a 3046     	 mov r0,r6
+ 140 001c FFF7FEFF 	 bl EVE_cmd_fgcolor_burst
+ 141              	.L17:
+ 142 0020 002D     	 cmp r5,#0
+ 143 0022 02DB     	 blt .L18
+ 144 0024 2846     	 mov r0,r5
+ 145 0026 FFF7FEFF 	 bl EVE_cmd_bgcolor_burst
+ 146              	.L18:
+ 147 002a 002C     	 cmp r4,#0
+ 148 002c 1BDB     	 blt .L14
+ 149 002e 2046     	 mov r0,r4
+ 150 0030 BDE87040 	 pop {r4,r5,r6,lr}
+ 151 0034 FFF7FEBF 	 b EVE_cmd_gradcolor_burst
+ 152              	.L15:
+ 153 0038 0029     	 cmp r1,#0
+ 154 003a 03DB     	 blt .L21
+ 155 003c 41F08060 	 orr r0,r1,#67108864
+ 156 0040 FFF7FEFF 	 bl EVE_cmd_dl
+ 157              	.L21:
+ 158 0044 002E     	 cmp r6,#0
+ 159 0046 02DB     	 blt .L22
+ 160 0048 3046     	 mov r0,r6
+ 161 004a FFF7FEFF 	 bl EVE_cmd_fgcolor
+ 162              	.L22:
+ 163 004e 002D     	 cmp r5,#0
+ 164 0050 02DB     	 blt .L23
+ 165 0052 2846     	 mov r0,r5
+ 166 0054 FFF7FEFF 	 bl EVE_cmd_bgcolor
+ 167              	.L23:
+ 168 0058 002C     	 cmp r4,#0
+ 169 005a 04DB     	 blt .L14
+ 170 005c 2046     	 mov r0,r4
+ 171 005e BDE87040 	 pop {r4,r5,r6,lr}
+ 172 0062 FFF7FEBF 	 b EVE_cmd_gradcolor
+ 173              	.L14:
+ 174 0066 70BD     	 pop {r4,r5,r6,pc}
+ 176              	 .global __aeabi_f2d
+ 177              	 .global __aeabi_d2iz
+ 178              	 .section .text.TFT_graph_static,"ax",%progbits
+ 179              	 .align 1
+ 180              	 .global TFT_graph_static
+ 181              	 .thumb
+ 182              	 .thumb_func
+ 184              	TFT_graph_static:
+ 185              	 
+ 186              	 
+ 187 0000 2DE9F04F 	 push {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 188 0004 8B46     	 mov fp,r1
+ 189 0006 9A46     	 mov r10,r3
+ 190 0008 4B88     	 ldrh r3,[r1,#2]
+ 191 000a C949     	 ldr r1,.L44
+ 192 000c DBED0A7A 	 flds s15,[fp,#40]
+ 193 0010 0C88     	 ldrh r4,[r1]
+ 194 0012 DFF83493 	 ldr r9,.L44+24
+ 195 0016 C74F     	 ldr r7,.L44+4
+ 196 0018 59F82050 	 ldr r5,[r9,r0,lsl#2]
+ 197 001c 1C1B     	 subs r4,r3,r4
+ 198 001e BBF80430 	 ldrh r3,[fp,#4]
+ 199 0022 2DED048B 	 fstmfdd sp!,{d8,d9}
+ 200 0026 09EE103A 	 fmsr s18,r3
+ 201 002a BBF80630 	 ldrh r3,[fp,#6]
+ 202 002e B8EE499A 	 fuitos s18,s18
+ 203 0032 08EE903A 	 fmsr s17,r3
+ 204 0036 8DB0     	 sub sp,sp,#52
+ 205 0038 42F08063 	 orr r3,r2,#67108864
+ 206 003c 89EE279A 	 fdivs s18,s18,s15
+ 207 0040 0646     	 mov r6,r0
+ 208 0042 1846     	 mov r0,r3
+ 209 0044 0293     	 str r3,[sp,#8]
+ 210 0046 A4B2     	 uxth r4,r4
+ 211 0048 DBED097A 	 flds s15,[fp,#36]
+ 212 004c F8EE688A 	 fuitos s17,s17
+ 213 0050 C8EEA78A 	 fdivs s17,s17,s15
+ 214 0054 A847     	 blx r5
+ 215 0056 BBF80810 	 ldrh r1,[fp,#8]
+ 216 005a BBF80230 	 ldrh r3,[fp,#2]
+ 217 005e BBF80000 	 ldrh r0,[fp]
+ 218 0062 57F82680 	 ldr r8,[r7,r6,lsl#2]
+ 219 0066 0844     	 add r0,r0,r1
+ 220 0068 1944     	 add r1,r1,r3
+ 221 006a 0630     	 adds r0,r0,#6
+ 222 006c DBF81030 	 ldr r3,[fp,#16]
+ 223 0070 0093     	 str r3,[sp]
+ 224 0072 1439     	 subs r1,r1,#20
+ 225 0074 00B2     	 sxth r0,r0
+ 226 0076 09B2     	 sxth r1,r1
+ 227 0078 1A22     	 movs r2,#26
+ 228 007a 0023     	 movs r3,#0
+ 229 007c C047     	 blx r8
+ 230 007e BBF80810 	 ldrh r1,[fp,#8]
+ 231 0082 BBF80020 	 ldrh r2,[fp]
+ 232 0086 BBF80230 	 ldrh r3,[fp,#2]
+ 233 008a BBF80400 	 ldrh r0,[fp,#4]
+ 234 008e 0A44     	 add r2,r2,r1
+ 235 0090 0B44     	 add r3,r3,r1
+ 236 0092 BBF80610 	 ldrh r1,[fp,#6]
+ 237 0096 0232     	 adds r2,r2,#2
+ 238 0098 163B     	 subs r3,r3,#22
+ 239 009a 1044     	 add r0,r0,r2
+ 240 009c 1944     	 add r1,r1,r3
+ 241 009e DBF80C30 	 ldr r3,[fp,#12]
+ 242 00a2 0093     	 str r3,[sp]
+ 243 00a4 09B2     	 sxth r1,r1
+ 244 00a6 1A22     	 movs r2,#26
+ 245 00a8 4FF40063 	 mov r3,#2048
+ 246 00ac 00B2     	 sxth r0,r0
+ 247 00ae C047     	 blx r8
+ 248 00b0 A148     	 ldr r0,.L44+8
+ 249 00b2 A847     	 blx r5
+ 250 00b4 BBF80830 	 ldrh r3,[fp,#8]
+ 251 00b8 BBF80000 	 ldrh r0,[fp]
+ 252 00bc C4F30E08 	 ubfx r8,r4,#0,#15
+ 253 00c0 1844     	 add r0,r0,r3
+ 254 00c2 48F08048 	 orr r8,r8,#1073741824
+ 255 00c6 C0F30E00 	 ubfx r0,r0,#0,#15
+ 256 00ca 48EAC030 	 orr r0,r8,r0,lsl#15
+ 257 00ce A847     	 blx r5
+ 258 00d0 BBF80820 	 ldrh r2,[fp,#8]
+ 259 00d4 BBF80030 	 ldrh r3,[fp]
+ 260 00d8 BBF80610 	 ldrh r1,[fp,#6]
+ 261 00dc 1344     	 add r3,r3,r2
+ 262 00de 04EB4200 	 add r0,r4,r2,lsl#1
+ 263 00e2 C3F30E03 	 ubfx r3,r3,#0,#15
+ 264 00e6 0844     	 add r0,r0,r1
+ 265 00e8 DB03     	 lsls r3,r3,#15
+ 266 00ea 43F08043 	 orr r3,r3,#1073741824
+ 267 00ee C0F30E00 	 ubfx r0,r0,#0,#15
+ 268 00f2 1843     	 orrs r0,r0,r3
+ 269 00f4 A847     	 blx r5
+ 270 00f6 BBF80030 	 ldrh r3,[fp]
+ 271 00fa BBF80800 	 ldrh r0,[fp,#8]
+ 272 00fe BBF80620 	 ldrh r2,[fp,#6]
+ 273 0102 C3F30E03 	 ubfx r3,r3,#0,#15
+ 274 0106 2044     	 add r0,r0,r4
+ 275 0108 1044     	 add r0,r0,r2
+ 276 010a DB03     	 lsls r3,r3,#15
+ 277 010c 43F08043 	 orr r3,r3,#1073741824
+ 278 0110 C0F30E00 	 ubfx r0,r0,#0,#15
+ 279 0114 1843     	 orrs r0,r0,r3
+ 280 0116 A847     	 blx r5
+ 281 0118 BBF80830 	 ldrh r3,[fp,#8]
+ 282 011c BBF80000 	 ldrh r0,[fp]
+ 283 0120 BBF80420 	 ldrh r2,[fp,#4]
+ 284 0124 00EB4300 	 add r0,r0,r3,lsl#1
+ 285 0128 1044     	 add r0,r0,r2
+ 286 012a BBF80620 	 ldrh r2,[fp,#6]
+ 287 012e 2344     	 add r3,r3,r4
+ 288 0130 1344     	 add r3,r3,r2
+ 289 0132 C3F30E03 	 ubfx r3,r3,#0,#15
+ 290 0136 C0F30E00 	 ubfx r0,r0,#0,#15
+ 291 013a 43EAC030 	 orr r0,r3,r0,lsl#15
+ 292 013e 40F08040 	 orr r0,r0,#1073741824
+ 293 0142 A847     	 blx r5
+ 294 0144 7D48     	 ldr r0,.L44+12
+ 295 0146 A847     	 blx r5
+ 296 0148 4AF08060 	 orr r0,r10,#67108864
+ 297 014c A847     	 blx r5
+ 298 014e 4FF0010A 	 mov r10,#1
+ 299              	.L26:
+ 300 0152 DBF82800 	 ldr r0,[fp,#40]
+ 301 0156 FFF7FEFF 	 bl __aeabi_f2d
+ 302 015a FFF7FEFF 	 bl floor
+ 303 015e FFF7FEFF 	 bl __aeabi_d2iz
+ 304 0162 8245     	 cmp r10,r0
+ 305 0164 33DC     	 bgt .L40
+ 306 0166 07EE90AA 	 fmsr s15,r10
+ 307 016a F8EEE77A 	 fsitos s15,s15
+ 308 016e BBF80820 	 ldrh r2,[fp,#8]
+ 309 0172 BBF80010 	 ldrh r1,[fp]
+ 310 0176 69EE277A 	 fmuls s15,s18,s15
+ 311 017a A018     	 adds r0,r4,r2
+ 312 017c FCEEE77A 	 ftouizs s15,s15
+ 313 0180 0A44     	 add r2,r2,r1
+ 314 0182 CDED037A 	 fsts s15,[sp,#12]
+ 315 0186 BDF80C30 	 ldrh r3,[sp,#12]
+ 316 018a 0393     	 str r3,[sp,#12]
+ 317 018c 1A44     	 add r2,r2,r3
+ 318 018e C0F30E00 	 ubfx r0,r0,#0,#15
+ 319 0192 C2F30E02 	 ubfx r2,r2,#0,#15
+ 320 0196 40F08040 	 orr r0,r0,#1073741824
+ 321 019a 40EAC230 	 orr r0,r0,r2,lsl#15
+ 322 019e A847     	 blx r5
+ 323 01a0 BBF80810 	 ldrh r1,[fp,#8]
+ 324 01a4 BBF80620 	 ldrh r2,[fp,#6]
+ 325 01a8 039B     	 ldr r3,[sp,#12]
+ 326 01aa 6018     	 adds r0,r4,r1
+ 327 01ac 0244     	 add r2,r2,r0
+ 328 01ae BBF80000 	 ldrh r0,[fp]
+ 329 01b2 0844     	 add r0,r0,r1
+ 330 01b4 1844     	 add r0,r0,r3
+ 331 01b6 C2F30E02 	 ubfx r2,r2,#0,#15
+ 332 01ba 42F08042 	 orr r2,r2,#1073741824
+ 333 01be C0F30E00 	 ubfx r0,r0,#0,#15
+ 334 01c2 42EAC030 	 orr r0,r2,r0,lsl#15
+ 335 01c6 A847     	 blx r5
+ 336 01c8 0AF1010A 	 add r10,r10,#1
+ 337 01cc C1E7     	 b .L26
+ 338              	.L40:
+ 339 01ce 4FF0010A 	 mov r10,#1
+ 340              	.L28:
+ 341 01d2 DBF82400 	 ldr r0,[fp,#36]
+ 342 01d6 FFF7FEFF 	 bl __aeabi_f2d
+ 343 01da FFF7FEFF 	 bl floor
+ 344 01de FFF7FEFF 	 bl __aeabi_d2iz
+ 345 01e2 8245     	 cmp r10,r0
+ 346 01e4 39DC     	 bgt .L41
+ 347 01e6 07EE90AA 	 fmsr s15,r10
+ 348 01ea F8EEE77A 	 fsitos s15,s15
+ 349 01ee BBF80800 	 ldrh r0,[fp,#8]
+ 350 01f2 BBF80030 	 ldrh r3,[fp]
+ 351 01f6 BBF80610 	 ldrh r1,[fp,#6]
+ 352 01fa 68EEA77A 	 fmuls s15,s17,s15
+ 353 01fe 0344     	 add r3,r3,r0
+ 354 0200 FCEEE77A 	 ftouizs s15,s15
+ 355 0204 2044     	 add r0,r0,r4
+ 356 0206 CDED037A 	 fsts s15,[sp,#12]
+ 357 020a BDF80C20 	 ldrh r2,[sp,#12]
+ 358 020e 0392     	 str r2,[sp,#12]
+ 359 0210 0844     	 add r0,r0,r1
+ 360 0212 C3F30E03 	 ubfx r3,r3,#0,#15
+ 361 0216 801A     	 subs r0,r0,r2
+ 362 0218 DB03     	 lsls r3,r3,#15
+ 363 021a 43F08043 	 orr r3,r3,#1073741824
+ 364 021e C0F30E00 	 ubfx r0,r0,#0,#15
+ 365 0222 1843     	 orrs r0,r0,r3
+ 366 0224 A847     	 blx r5
+ 367 0226 BBF80800 	 ldrh r0,[fp,#8]
+ 368 022a BBF80030 	 ldrh r3,[fp]
+ 369 022e BBF80410 	 ldrh r1,[fp,#4]
+ 370 0232 039A     	 ldr r2,[sp,#12]
+ 371 0234 0344     	 add r3,r3,r0
+ 372 0236 0B44     	 add r3,r3,r1
+ 373 0238 BBF80610 	 ldrh r1,[fp,#6]
+ 374 023c 2044     	 add r0,r0,r4
+ 375 023e 0844     	 add r0,r0,r1
+ 376 0240 C3F30E03 	 ubfx r3,r3,#0,#15
+ 377 0244 801A     	 subs r0,r0,r2
+ 378 0246 DB03     	 lsls r3,r3,#15
+ 379 0248 43F08043 	 orr r3,r3,#1073741824
+ 380 024c C0F30E00 	 ubfx r0,r0,#0,#15
+ 381 0250 1843     	 orrs r0,r0,r3
+ 382 0252 A847     	 blx r5
+ 383 0254 0AF1010A 	 add r10,r10,#1
+ 384 0258 BBE7     	 b .L28
+ 385              	.L41:
+ 386 025a 4FF00450 	 mov r0,#553648128
+ 387 025e A847     	 blx r5
+ 388 0260 0298     	 ldr r0,[sp,#8]
+ 389 0262 A847     	 blx r5
+ 390 0264 4FF0010A 	 mov r10,#1
+ 391              	.L30:
+ 392 0268 DBED0A9A 	 flds s19,[fp,#40]
+ 393 026c 19EE900A 	 fmrs r0,s19
+ 394 0270 FFF7FEFF 	 bl __aeabi_f2d
+ 395 0274 FFF7FEFF 	 bl ceil
+ 396 0278 FFF7FEFF 	 bl __aeabi_d2iz
+ 397 027c 8245     	 cmp r10,r0
+ 398 027e 65DC     	 bgt .L42
+ 399 0280 DBED087A 	 flds s15,[fp,#32]
+ 400 0284 C7EEA97A 	 fdivs s15,s15,s19
+ 401 0288 0AF1FF33 	 add r3,r10,#-1
+ 402 028c 08EE103A 	 fmsr s16,r3
+ 403 0290 B8EEC88A 	 fsitos s16,s16
+ 404 0294 67EE887A 	 fmuls s15,s15,s16
+ 405 0298 29EE088A 	 fmuls s16,s18,s16
+ 406 029c BCEEE77A 	 ftouizs s14,s15
+ 407 02a0 B8EE477A 	 fuitos s14,s14
+ 408 02a4 37EEC77A 	 fsubs s14,s15,s14
+ 409 02a8 B5EE407A 	 fcmpzs s14
+ 410 02ac F1EE10FA 	 fmstat
+ 411 02b0 17D1     	 bne .L31
+ 412 02b2 BBF80830 	 ldrh r3,[fp,#8]
+ 413 02b6 BBF80000 	 ldrh r0,[fp]
+ 414 02ba BBF80610 	 ldrh r1,[fp,#6]
+ 415 02be BCEEC88A 	 ftouizs s16,s16
+ 416 02c2 1844     	 add r0,r0,r3
+ 417 02c4 18EE103A 	 fmrs r3,s16
+ 418 02c8 0330     	 adds r0,r0,#3
+ 419 02ca 0344     	 add r3,r3,r0
+ 420 02cc 1846     	 mov r0,r3
+ 421 02ce FDEEE77A 	 ftosizs s15,s15
+ 422 02d2 1B4B     	 ldr r3,.L44+16
+ 423 02d4 CDED007A 	 fsts s15,[sp]
+ 424 02d8 0D31     	 adds r1,r1,#13
+ 425 02da 2144     	 add r1,r1,r4
+ 426 02dc 53F82650 	 ldr r5,[r3,r6,lsl#2]
+ 427 02e0 1DE0     	 b .L38
+ 428              	.L31:
+ 429 02e2 17EE900A 	 fmrs r0,s15
+ 430 02e6 FFF7FEFF 	 bl __aeabi_f2d
+ 431 02ea 04AD     	 add r5,sp,#16
+ 432 02ec 0B46     	 mov r3,r1
+ 433 02ee 0246     	 mov r2,r0
+ 434 02f0 1449     	 ldr r1,.L44+20
+ 435 02f2 2846     	 mov r0,r5
+ 436 02f4 FFF7FEFF 	 bl sprintf
+ 437 02f8 BBF80830 	 ldrh r3,[fp,#8]
+ 438 02fc BBF80000 	 ldrh r0,[fp]
+ 439 0300 BBF80610 	 ldrh r1,[fp,#6]
+ 440 0304 0095     	 str r5,[sp]
+ 441 0306 BCEEC88A 	 ftouizs s16,s16
+ 442 030a 1844     	 add r0,r0,r3
+ 443 030c 18EE103A 	 fmrs r3,s16
+ 444 0310 0330     	 adds r0,r0,#3
+ 445 0312 0344     	 add r3,r3,r0
+ 446 0314 0D31     	 adds r1,r1,#13
+ 447 0316 57F82650 	 ldr r5,[r7,r6,lsl#2]
+ 448 031a 1846     	 mov r0,r3
+ 449 031c 2144     	 add r1,r1,r4
+ 450              	.L38:
+ 451 031e 00B2     	 sxth r0,r0
+ 452 0320 09B2     	 sxth r1,r1
+ 453 0322 1422     	 movs r2,#20
+ 454 0324 0023     	 movs r3,#0
+ 455 0326 A847     	 blx r5
+ 456 0328 0AF1010A 	 add r10,r10,#1
+ 457 032c 9CE7     	 b .L30
+ 458              	.L45:
+ 459 032e 00BF     	 .align 2
+ 460              	.L44:
+ 461 0330 00000000 	 .word .LANCHOR9
+ 462 0334 00000000 	 .word .LANCHOR11
+ 463 0338 0300001F 	 .word 520093699
+ 464 033c 0900000E 	 .word 234881033
+ 465 0340 00000000 	 .word .LANCHOR12
+ 466 0344 00000000 	 .word .LC0
+ 467 0348 00000000 	 .word .LANCHOR10
+ 468              	.L42:
+ 469 034c 4FF0010A 	 mov r10,#1
+ 470              	.L34:
+ 471 0350 9BED098A 	 flds s16,[fp,#36]
+ 472 0354 18EE100A 	 fmrs r0,s16
+ 473 0358 FFF7FEFF 	 bl __aeabi_f2d
+ 474 035c FFF7FEFF 	 bl floor
+ 475 0360 FFF7FEFF 	 bl __aeabi_d2iz
+ 476 0364 8245     	 cmp r10,r0
+ 477 0366 50DC     	 bgt .L43
+ 478 0368 DBED067A 	 flds s15,[fp,#24]
+ 479 036c C7EE887A 	 fdivs s15,s15,s16
+ 480 0370 07EE10AA 	 fmsr s14,r10
+ 481 0374 B8EEC78A 	 fsitos s16,s14
+ 482 0378 67EE887A 	 fmuls s15,s15,s16
+ 483 037c 28EE888A 	 fmuls s16,s17,s16
+ 484 0380 BCEEE77A 	 ftouizs s14,s15
+ 485 0384 B8EE477A 	 fuitos s14,s14
+ 486 0388 37EEC77A 	 fsubs s14,s15,s14
+ 487 038c B5EE407A 	 fcmpzs s14
+ 488 0390 F1EE10FA 	 fmstat
+ 489 0394 15D1     	 bne .L35
+ 490 0396 BBF80830 	 ldrh r3,[fp,#8]
+ 491 039a BBF80610 	 ldrh r1,[fp,#6]
+ 492 039e BBF80000 	 ldrh r0,[fp]
+ 493 03a2 BCEEC88A 	 ftouizs s16,s16
+ 494 03a6 1944     	 add r1,r1,r3
+ 495 03a8 18EE103A 	 fmrs r3,s16
+ 496 03ac 2144     	 add r1,r1,r4
+ 497 03ae C91A     	 subs r1,r1,r3
+ 498 03b0 FDEEE77A 	 ftosizs s15,s15
+ 499 03b4 544B     	 ldr r3,.L46
+ 500 03b6 CDED007A 	 fsts s15,[sp]
+ 501 03ba 0738     	 subs r0,r0,#7
+ 502 03bc 53F82650 	 ldr r5,[r3,r6,lsl#2]
+ 503 03c0 1BE0     	 b .L39
+ 504              	.L35:
+ 505 03c2 17EE900A 	 fmrs r0,s15
+ 506 03c6 FFF7FEFF 	 bl __aeabi_f2d
+ 507 03ca 04AD     	 add r5,sp,#16
+ 508 03cc 0B46     	 mov r3,r1
+ 509 03ce 0246     	 mov r2,r0
+ 510 03d0 4E49     	 ldr r1,.L46+4
+ 511 03d2 2846     	 mov r0,r5
+ 512 03d4 FFF7FEFF 	 bl sprintf
+ 513 03d8 BBF80830 	 ldrh r3,[fp,#8]
+ 514 03dc BBF80610 	 ldrh r1,[fp,#6]
+ 515 03e0 BBF80000 	 ldrh r0,[fp]
+ 516 03e4 0095     	 str r5,[sp]
+ 517 03e6 BCEEC88A 	 ftouizs s16,s16
+ 518 03ea 1944     	 add r1,r1,r3
+ 519 03ec 18EE103A 	 fmrs r3,s16
+ 520 03f0 2144     	 add r1,r1,r4
+ 521 03f2 57F82650 	 ldr r5,[r7,r6,lsl#2]
+ 522 03f6 0738     	 subs r0,r0,#7
+ 523 03f8 C91A     	 subs r1,r1,r3
+ 524              	.L39:
+ 525 03fa 00B2     	 sxth r0,r0
+ 526 03fc 09B2     	 sxth r1,r1
+ 527 03fe 1422     	 movs r2,#20
+ 528 0400 0023     	 movs r3,#0
+ 529 0402 A847     	 blx r5
+ 530 0404 0AF1010A 	 add r10,r10,#1
+ 531 0408 A2E7     	 b .L34
+ 532              	.L43:
+ 533 040a 59F82650 	 ldr r5,[r9,r6,lsl#2]
+ 534 040e 4048     	 ldr r0,.L46+8
+ 535 0410 A847     	 blx r5
+ 536 0412 BBF80830 	 ldrh r3,[fp,#8]
+ 537 0416 BBF80000 	 ldrh r0,[fp]
+ 538 041a 1844     	 add r0,r0,r3
+ 539 041c 661D     	 adds r6,r4,#5
+ 540 041e 0530     	 adds r0,r0,#5
+ 541 0420 C6F30E06 	 ubfx r6,r6,#0,#15
+ 542 0424 C0F30E00 	 ubfx r0,r0,#0,#15
+ 543 0428 46EAC030 	 orr r0,r6,r0,lsl#15
+ 544 042c 40F08040 	 orr r0,r0,#1073741824
+ 545 0430 A847     	 blx r5
+ 546 0432 BBF80830 	 ldrh r3,[fp,#8]
+ 547 0436 BBF80000 	 ldrh r0,[fp]
+ 548 043a 1844     	 add r0,r0,r3
+ 549 043c C0F30E00 	 ubfx r0,r0,#0,#15
+ 550 0440 48EAC030 	 orr r0,r8,r0,lsl#15
+ 551 0444 A847     	 blx r5
+ 552 0446 BBF80830 	 ldrh r3,[fp,#8]
+ 553 044a BBF80000 	 ldrh r0,[fp]
+ 554 044e 1844     	 add r0,r0,r3
+ 555 0450 0538     	 subs r0,r0,#5
+ 556 0452 C0F30E00 	 ubfx r0,r0,#0,#15
+ 557 0456 46EAC030 	 orr r0,r6,r0,lsl#15
+ 558 045a 40F08040 	 orr r0,r0,#1073741824
+ 559 045e A847     	 blx r5
+ 560 0460 4FF00450 	 mov r0,#553648128
+ 561 0464 A847     	 blx r5
+ 562 0466 2A48     	 ldr r0,.L46+8
+ 563 0468 A847     	 blx r5
+ 564 046a BBF80830 	 ldrh r3,[fp,#8]
+ 565 046e BBF80000 	 ldrh r0,[fp]
+ 566 0472 BBF80420 	 ldrh r2,[fp,#4]
+ 567 0476 00EB4300 	 add r0,r0,r3,lsl#1
+ 568 047a 1044     	 add r0,r0,r2
+ 569 047c BBF80620 	 ldrh r2,[fp,#6]
+ 570 0480 2344     	 add r3,r3,r4
+ 571 0482 1344     	 add r3,r3,r2
+ 572 0484 0538     	 subs r0,r0,#5
+ 573 0486 0533     	 adds r3,r3,#5
+ 574 0488 C3F30E03 	 ubfx r3,r3,#0,#15
+ 575 048c C0F30E00 	 ubfx r0,r0,#0,#15
+ 576 0490 43EAC030 	 orr r0,r3,r0,lsl#15
+ 577 0494 40F08040 	 orr r0,r0,#1073741824
+ 578 0498 A847     	 blx r5
+ 579 049a BBF80830 	 ldrh r3,[fp,#8]
+ 580 049e BBF80000 	 ldrh r0,[fp]
+ 581 04a2 BBF80420 	 ldrh r2,[fp,#4]
+ 582 04a6 00EB4300 	 add r0,r0,r3,lsl#1
+ 583 04aa 1044     	 add r0,r0,r2
+ 584 04ac BBF80620 	 ldrh r2,[fp,#6]
+ 585 04b0 2344     	 add r3,r3,r4
+ 586 04b2 1344     	 add r3,r3,r2
+ 587 04b4 C3F30E03 	 ubfx r3,r3,#0,#15
+ 588 04b8 C0F30E00 	 ubfx r0,r0,#0,#15
+ 589 04bc 43EAC030 	 orr r0,r3,r0,lsl#15
+ 590 04c0 40F08040 	 orr r0,r0,#1073741824
+ 591 04c4 A847     	 blx r5
+ 592 04c6 BBF80820 	 ldrh r2,[fp,#8]
+ 593 04ca BBF80000 	 ldrh r0,[fp]
+ 594 04ce BBF80430 	 ldrh r3,[fp,#4]
+ 595 04d2 00EB4200 	 add r0,r0,r2,lsl#1
+ 596 04d6 1844     	 add r0,r0,r3
+ 597 04d8 BBF80630 	 ldrh r3,[fp,#6]
+ 598 04dc 1444     	 add r4,r4,r2
+ 599 04de 1C44     	 add r4,r4,r3
+ 600 04e0 0538     	 subs r0,r0,#5
+ 601 04e2 053C     	 subs r4,r4,#5
+ 602 04e4 C4F30E04 	 ubfx r4,r4,#0,#15
+ 603 04e8 C0F30E00 	 ubfx r0,r0,#0,#15
+ 604 04ec 44EAC030 	 orr r0,r4,r0,lsl#15
+ 605 04f0 40F08040 	 orr r0,r0,#1073741824
+ 606 04f4 A847     	 blx r5
+ 607 04f6 4FF00450 	 mov r0,#553648128
+ 608 04fa A847     	 blx r5
+ 609 04fc 0DB0     	 add sp,sp,#52
+ 610              	 
+ 611 04fe BDEC048B 	 fldmfdd sp!,{d8-d9}
+ 612 0502 BDE8F08F 	 pop {r4,r5,r6,r7,r8,r9,r10,fp,pc}
+ 613              	.L47:
+ 614 0506 00BF     	 .align 2
+ 615              	.L46:
+ 616 0508 00000000 	 .word .LANCHOR12
+ 617 050c 00000000 	 .word .LC0
+ 618 0510 0400001F 	 .word 520093700
+ 620              	 .section .text.TFT_header_static,"ax",%progbits
+ 621              	 .align 1
+ 622              	 .global TFT_header_static
+ 623              	 .thumb
+ 624              	 .thumb_func
+ 626              	TFT_header_static:
+ 627              	 
+ 628              	 
+ 629 0000 3C4B     	 ldr r3,.L49
+ 630 0002 73B5     	 push {r0,r1,r4,r5,r6,lr}
+ 631 0004 0D46     	 mov r5,r1
+ 632 0006 53F82040 	 ldr r4,[r3,r0,lsl#2]
+ 633 000a 0646     	 mov r6,r0
+ 634 000c 3A48     	 ldr r0,.L49+4
+ 635 000e A047     	 blx r4
+ 636 0010 3A48     	 ldr r0,.L49+8
+ 637 0012 A047     	 blx r4
+ 638 0014 A869     	 ldr r0,[r5,#24]
+ 639 0016 40F08060 	 orr r0,r0,#67108864
+ 640 001a A047     	 blx r4
+ 641 001c 3848     	 ldr r0,.L49+12
+ 642 001e A047     	 blx r4
+ 643 0020 6889     	 ldrh r0,[r5,#10]
+ 644 0022 C0F30E00 	 ubfx r0,r0,#0,#15
+ 645 0026 40F08040 	 orr r0,r0,#1073741824
+ 646 002a A047     	 blx r4
+ 647 002c 6B89     	 ldrh r3,[r5,#10]
+ 648 002e A889     	 ldrh r0,[r5,#12]
+ 649 0030 C3F30E03 	 ubfx r3,r3,#0,#15
+ 650 0034 43F08043 	 orr r3,r3,#1073741824
+ 651 0038 C0F30E00 	 ubfx r0,r0,#0,#15
+ 652 003c 43EAC030 	 orr r0,r3,r0,lsl#15
+ 653 0040 A047     	 blx r4
+ 654 0042 EB89     	 ldrh r3,[r5,#14]
+ 655 0044 288A     	 ldrh r0,[r5,#16]
+ 656 0046 C3F30E03 	 ubfx r3,r3,#0,#15
+ 657 004a 43F08043 	 orr r3,r3,#1073741824
+ 658 004e C0F30E00 	 ubfx r0,r0,#0,#15
+ 659 0052 43EAC030 	 orr r0,r3,r0,lsl#15
+ 660 0056 A047     	 blx r4
+ 661 0058 E889     	 ldrh r0,[r5,#14]
+ 662 005a C0F30E00 	 ubfx r0,r0,#0,#15
+ 663 005e 40F08140 	 orr r0,r0,#1082130432
+ 664 0062 40F4E000 	 orr r0,r0,#7340032
+ 665 0066 A047     	 blx r4
+ 666 0068 4FF00450 	 mov r0,#553648128
+ 667 006c A047     	 blx r4
+ 668 006e E869     	 ldr r0,[r5,#28]
+ 669 0070 40F08060 	 orr r0,r0,#67108864
+ 670 0074 A047     	 blx r4
+ 671 0076 2348     	 ldr r0,.L49+16
+ 672 0078 A047     	 blx r4
+ 673 007a 6889     	 ldrh r0,[r5,#10]
+ 674 007c C0F30E00 	 ubfx r0,r0,#0,#15
+ 675 0080 40F08040 	 orr r0,r0,#1073741824
+ 676 0084 A047     	 blx r4
+ 677 0086 6B89     	 ldrh r3,[r5,#10]
+ 678 0088 A889     	 ldrh r0,[r5,#12]
+ 679 008a C3F30E03 	 ubfx r3,r3,#0,#15
+ 680 008e 43F08043 	 orr r3,r3,#1073741824
+ 681 0092 C0F30E00 	 ubfx r0,r0,#0,#15
+ 682 0096 43EAC030 	 orr r0,r3,r0,lsl#15
+ 683 009a A047     	 blx r4
+ 684 009c EB89     	 ldrh r3,[r5,#14]
+ 685 009e 288A     	 ldrh r0,[r5,#16]
+ 686 00a0 C3F30E03 	 ubfx r3,r3,#0,#15
+ 687 00a4 43F08043 	 orr r3,r3,#1073741824
+ 688 00a8 C0F30E00 	 ubfx r0,r0,#0,#15
+ 689 00ac 43EAC030 	 orr r0,r3,r0,lsl#15
+ 690 00b0 A047     	 blx r4
+ 691 00b2 E889     	 ldrh r0,[r5,#14]
+ 692 00b4 C0F30E00 	 ubfx r0,r0,#0,#15
+ 693 00b8 40F08140 	 orr r0,r0,#1082130432
+ 694 00bc 40F4E000 	 orr r0,r0,#7340032
+ 695 00c0 A047     	 blx r4
+ 696 00c2 4FF00450 	 mov r0,#553648128
+ 697 00c6 A047     	 blx r4
+ 698 00c8 286A     	 ldr r0,[r5,#32]
+ 699 00ca 40F08060 	 orr r0,r0,#67108864
+ 700 00ce A047     	 blx r4
+ 701 00d0 6B68     	 ldr r3,[r5,#4]
+ 702 00d2 0093     	 str r3,[sp]
+ 703 00d4 0C4B     	 ldr r3,.L49+20
+ 704 00d6 1420     	 movs r0,#20
+ 705 00d8 53F82650 	 ldr r5,[r3,r6,lsl#2]
+ 706 00dc 0F21     	 movs r1,#15
+ 707 00de 1E22     	 movs r2,#30
+ 708 00e0 0023     	 movs r3,#0
+ 709 00e2 A847     	 blx r5
+ 710 00e4 4FF04070 	 mov r0,#50331648
+ 711 00e8 2346     	 mov r3,r4
+ 712 00ea 02B0     	 add sp,sp,#8
+ 713              	 
+ 714 00ec BDE87040 	 pop {r4,r5,r6,lr}
+ 715 00f0 1847     	 bx r3
+ 716              	.L50:
+ 717 00f2 00BF     	 .align 2
+ 718              	.L49:
+ 719 00f4 00000000 	 .word .LANCHOR10
+ 720 00f8 01000003 	 .word 50331649
+ 721 00fc 1000000E 	 .word 234881040
+ 722 0100 0700001F 	 .word 520093703
+ 723 0104 0400001F 	 .word 520093700
+ 724 0108 00000000 	 .word .LANCHOR11
+ 726              	 .global __aeabi_dadd
+ 727              	 .global __aeabi_dsub
+ 728              	 .section .text.TFT_label_display,"ax",%progbits
+ 729              	 .align 1
+ 730              	 .global TFT_label_display
+ 731              	 .thumb
+ 732              	 .thumb_func
+ 734              	TFT_label_display:
+ 735              	 
+ 736              	 
+ 737 0000 2DE9F04F 	 push {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 738 0004 2DED028B 	 fstmfdd sp!,{d8}
+ 739 0008 4B7E     	 ldrb r3,[r1,#25]
+ 740 000a 4D88     	 ldrh r5,[r1,#2]
+ 741 000c 87B0     	 sub sp,sp,#28
+ 742 000e 0746     	 mov r7,r0
+ 743 0010 0C46     	 mov r4,r1
+ 744 0012 6BB9     	 cbnz r3,.L52
+ 745 0014 674B     	 ldr r3,.L75
+ 746 0016 1988     	 ldrh r1,[r3]
+ 747 0018 674B     	 ldr r3,.L75+4
+ 748 001a 6D1A     	 subs r5,r5,r1
+ 749 001c B3F90030 	 ldrsh r3,[r3]
+ 750 0020 ADB2     	 uxth r5,r5
+ 751 0022 9D42     	 cmp r5,r3
+ 752 0024 40F3C180 	 ble .L51
+ 753 0028 B5F5887F 	 cmp r5,#272
+ 754 002c 80F0BD80 	 bcs .L51
+ 755              	.L52:
+ 756 0030 624B     	 ldr r3,.L75+8
+ 757 0032 4FF04070 	 mov r0,#50331648
+ 758 0036 53F82730 	 ldr r3,[r3,r7,lsl#2]
+ 759 003a 9847     	 blx r3
+ 760 003c 267B     	 ldrb r6,[r4,#12]
+ 761 003e 002E     	 cmp r6,#0
+ 762 0040 00F0A780 	 beq .L56
+ 763 0044 012E     	 cmp r6,#1
+ 764 0046 1FD1     	 bne .L57
+ 765 0048 E388     	 ldrh r3,[r4,#6]
+ 766 004a D4F814C0 	 ldr ip,[r4,#20]
+ 767 004e B4F90000 	 ldrsh r0,[r4]
+ 768 0052 B4F90420 	 ldrsh r2,[r4,#4]
+ 769 0056 DFF868E1 	 ldr lr,.L75+12
+ 770 005a 29B2     	 sxth r1,r5
+ 771 005c A568     	 ldr r5,[r4,#8]
+ 772 005e 43F48053 	 orr r3,r3,#4096
+ 773 0062 8DE86000 	 stmia sp,{r5,r6}
+ 774 0066 BCF1000F 	 cmp ip,#0
+ 775 006a 02D1     	 bne .L58
+ 776 006c 2469     	 ldr r4,[r4,#16]
+ 777 006e 2488     	 ldrh r4,[r4]
+ 778 0070 04E0     	 b .L74
+ 779              	.L58:
+ 780 0072 BCF80050 	 ldrh r5,[ip]
+ 781 0076 2469     	 ldr r4,[r4,#16]
+ 782 0078 34F81540 	 ldrh r4,[r4,r5,lsl#1]
+ 783              	.L74:
+ 784 007c 0294     	 str r4,[sp,#8]
+ 785 007e 9BB2     	 uxth r3,r3
+ 786 0080 5EF82740 	 ldr r4,[lr,r7,lsl#2]
+ 787 0084 A047     	 blx r4
+ 788 0086 90E0     	 b .L51
+ 789              	.L57:
+ 790 0088 022E     	 cmp r6,#2
+ 791 008a 40F08E80 	 bne .L51
+ 792 008e 6269     	 ldr r2,[r4,#20]
+ 793 0090 2369     	 ldr r3,[r4,#16]
+ 794 0092 12B1     	 cbz r2,.L71
+ 795 0094 1288     	 ldrh r2,[r2]
+ 796 0096 03EB8203 	 add r3,r3,r2,lsl#2
+ 797              	.L71:
+ 798 009a 1868     	 ldr r0,[r3]
+ 799 009c 05A9     	 add r1,sp,#20
+ 800 009e FFF7FEFF 	 bl modff
+ 801 00a2 DDED057A 	 flds s15,[sp,#20]
+ 802 00a6 E688     	 ldrh r6,[r4,#6]
+ 803 00a8 454B     	 ldr r3,.L75+12
+ 804 00aa B4F80080 	 ldrh r8,[r4]
+ 805 00ae 53F82770 	 ldr r7,[r3,r7,lsl#2]
+ 806 00b2 B4F80490 	 ldrh r9,[r4,#4]
+ 807 00b6 D4F808B0 	 ldr fp,[r4,#8]
+ 808 00ba F5EEC07A 	 fcmpezs s15
+ 809 00be 46F48056 	 orr r6,r6,#4096
+ 810 00c2 F1EE10FA 	 fmstat
+ 811 00c6 08EE100A 	 fmsr s16,r0
+ 812 00ca ADB2     	 uxth r5,r5
+ 813 00cc B6B2     	 uxth r6,r6
+ 814 00ce 17EE900A 	 fmrs r0,s15
+ 815 00d2 06DB     	 blt .L69
+ 816 00d4 FFF7FEFF 	 bl __aeabi_f2d
+ 817 00d8 0022     	 movs r2,#0
+ 818 00da 3A4B     	 ldr r3,.L75+16
+ 819 00dc FFF7FEFF 	 bl __aeabi_dadd
+ 820 00e0 05E0     	 b .L72
+ 821              	.L69:
+ 822 00e2 FFF7FEFF 	 bl __aeabi_f2d
+ 823 00e6 0022     	 movs r2,#0
+ 824 00e8 364B     	 ldr r3,.L75+16
+ 825 00ea FFF7FEFF 	 bl __aeabi_dsub
+ 826              	.L72:
+ 827 00ee FFF7FEFF 	 bl __aeabi_d2iz
+ 828 00f2 0FFA80FA 	 sxth r10,r0
+ 829 00f6 207E     	 ldrb r0,[r4,#24]
+ 830 00f8 07EE900A 	 fmsr s15,r0
+ 831 00fc F8EE677A 	 fuitos s15,s15
+ 832 0100 17EE900A 	 fmrs r0,s15
+ 833 0104 FFF7FEFF 	 bl pow10f
+ 834 0108 07EE900A 	 fmsr s15,r0
+ 835 010c 68EE277A 	 fmuls s15,s16,s15
+ 836 0110 237E     	 ldrb r3,[r4,#24]
+ 837 0112 F0EEE77A 	 fabss s15,s15
+ 838 0116 F5EEC07A 	 fcmpezs s15
+ 839 011a 07EE903A 	 fmsr s15,r3
+ 840 011e F8EE677A 	 fuitos s15,s15
+ 841 0122 F1EE10FA 	 fmstat
+ 842 0126 17EE900A 	 fmrs r0,s15
+ 843 012a 10DB     	 blt .L70
+ 844 012c FFF7FEFF 	 bl pow10f
+ 845 0130 07EE900A 	 fmsr s15,r0
+ 846 0134 28EE278A 	 fmuls s16,s16,s15
+ 847 0138 F0EEC87A 	 fabss s15,s16
+ 848 013c 17EE900A 	 fmrs r0,s15
+ 849 0140 FFF7FEFF 	 bl __aeabi_f2d
+ 850 0144 0022     	 movs r2,#0
+ 851 0146 1F4B     	 ldr r3,.L75+16
+ 852 0148 FFF7FEFF 	 bl __aeabi_dadd
+ 853 014c 0FE0     	 b .L73
+ 854              	.L70:
+ 855 014e FFF7FEFF 	 bl pow10f
+ 856 0152 07EE900A 	 fmsr s15,r0
+ 857 0156 28EE278A 	 fmuls s16,s16,s15
+ 858 015a F0EEC87A 	 fabss s15,s16
+ 859 015e 17EE900A 	 fmrs r0,s15
+ 860 0162 FFF7FEFF 	 bl __aeabi_f2d
+ 861 0166 0022     	 movs r2,#0
+ 862 0168 164B     	 ldr r3,.L75+16
+ 863 016a FFF7FEFF 	 bl __aeabi_dsub
+ 864              	.L73:
+ 865 016e FFF7FEFF 	 bl __aeabi_d2iz
+ 866 0172 0223     	 movs r3,#2
+ 867 0174 00B2     	 sxth r0,r0
+ 868 0176 0193     	 str r3,[sp,#4]
+ 869 0178 0390     	 str r0,[sp,#12]
+ 870 017a CDF800B0 	 str fp,[sp]
+ 871 017e CDF808A0 	 str r10,[sp,#8]
+ 872 0182 0FFA88F0 	 sxth r0,r8
+ 873 0186 29B2     	 sxth r1,r5
+ 874 0188 0FFA89F2 	 sxth r2,r9
+ 875 018c 3346     	 mov r3,r6
+ 876 018e B847     	 blx r7
+ 877 0190 0BE0     	 b .L51
+ 878              	.L56:
+ 879 0192 A168     	 ldr r1,[r4,#8]
+ 880 0194 B4F90000 	 ldrsh r0,[r4]
+ 881 0198 B4F90420 	 ldrsh r2,[r4,#4]
+ 882 019c E388     	 ldrh r3,[r4,#6]
+ 883 019e 0091     	 str r1,[sp]
+ 884 01a0 0949     	 ldr r1,.L75+20
+ 885 01a2 51F82740 	 ldr r4,[r1,r7,lsl#2]
+ 886 01a6 29B2     	 sxth r1,r5
+ 887 01a8 A047     	 blx r4
+ 888              	.L51:
+ 889 01aa 07B0     	 add sp,sp,#28
+ 890              	 
+ 891 01ac BDEC028B 	 fldmfdd sp!,{d8}
+ 892 01b0 BDE8F08F 	 pop {r4,r5,r6,r7,r8,r9,r10,fp,pc}
+ 893              	.L76:
+ 894              	 .align 2
+ 895              	.L75:
+ 896 01b4 00000000 	 .word .LANCHOR9
+ 897 01b8 00000000 	 .word .LANCHOR8
+ 898 01bc 00000000 	 .word .LANCHOR10
+ 899 01c0 00000000 	 .word .LANCHOR13
+ 900 01c4 0000E03F 	 .word 1071644672
+ 901 01c8 00000000 	 .word .LANCHOR11
+ 903              	 .section .text.TFT_control_display,"ax",%progbits
+ 904              	 .align 1
+ 905              	 .global TFT_control_display
+ 906              	 .thumb
+ 907              	 .thumb_func
+ 909              	TFT_control_display:
+ 910              	 
+ 911              	 
+ 912 0000 7FB5     	 push {r0,r1,r2,r3,r4,r5,r6,lr}
+ 913 0002 C37D     	 ldrb r3,[r0,#23]
+ 914 0004 4588     	 ldrh r5,[r0,#2]
+ 915 0006 0446     	 mov r4,r0
+ 916 0008 5BB9     	 cbnz r3,.L78
+ 917 000a 204B     	 ldr r3,.L83
+ 918 000c 1988     	 ldrh r1,[r3]
+ 919 000e 204B     	 ldr r3,.L83+4
+ 920 0010 6D1A     	 subs r5,r5,r1
+ 921 0012 B3F90030 	 ldrsh r3,[r3]
+ 922 0016 ADB2     	 uxth r5,r5
+ 923 0018 9D42     	 cmp r5,r3
+ 924 001a 35DD     	 ble .L77
+ 925 001c B5F5887F 	 cmp r5,#272
+ 926 0020 32D2     	 bcs .L77
+ 927              	.L78:
+ 928 0022 207B     	 ldrb r0,[r4,#12]
+ 929 0024 40F04070 	 orr r0,r0,#50331648
+ 930 0028 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 931 002c A37D     	 ldrb r3,[r4,#22]
+ 932 002e 8BB1     	 cbz r3,.L81
+ 933 0030 012B     	 cmp r3,#1
+ 934 0032 22D1     	 bne .L80
+ 935 0034 6189     	 ldrh r1,[r4,#10]
+ 936 0036 0091     	 str r1,[sp]
+ 937 0038 A18A     	 ldrh r1,[r4,#20]
+ 938 003a 0191     	 str r1,[sp,#4]
+ 939 003c 2169     	 ldr r1,[r4,#16]
+ 940 003e 0291     	 str r1,[sp,#8]
+ 941 0040 B4F90000 	 ldrsh r0,[r4]
+ 942 0044 B4F90420 	 ldrsh r2,[r4,#4]
+ 943 0048 B4F90830 	 ldrsh r3,[r4,#8]
+ 944 004c 29B2     	 sxth r1,r5
+ 945 004e FFF7FEFF 	 bl EVE_cmd_toggle_burst
+ 946 0052 12E0     	 b .L80
+ 947              	.L81:
+ 948 0054 B4F90810 	 ldrsh r1,[r4,#8]
+ 949 0058 0091     	 str r1,[sp]
+ 950 005a A68A     	 ldrh r6,[r4,#20]
+ 951 005c 6189     	 ldrh r1,[r4,#10]
+ 952 005e B4F90000 	 ldrsh r0,[r4]
+ 953 0062 B4F90420 	 ldrsh r2,[r4,#4]
+ 954 0066 B4F90630 	 ldrsh r3,[r4,#6]
+ 955 006a 3143     	 orrs r1,r1,r6
+ 956 006c 89B2     	 uxth r1,r1
+ 957 006e 0191     	 str r1,[sp,#4]
+ 958 0070 2169     	 ldr r1,[r4,#16]
+ 959 0072 0291     	 str r1,[sp,#8]
+ 960 0074 29B2     	 sxth r1,r5
+ 961 0076 FFF7FEFF 	 bl EVE_cmd_button_burst
+ 962              	.L80:
+ 963 007a 4FF04070 	 mov r0,#50331648
+ 964 007e 04B0     	 add sp,sp,#16
+ 965              	 
+ 966 0080 BDE87040 	 pop {r4,r5,r6,lr}
+ 967 0084 FFF7FEBF 	 b EVE_cmd_dl_burst
+ 968              	.L77:
+ 969 0088 04B0     	 add sp,sp,#16
+ 970              	 
+ 971 008a 70BD     	 pop {r4,r5,r6,pc}
+ 972              	.L84:
+ 973              	 .align 2
+ 974              	.L83:
+ 975 008c 00000000 	 .word .LANCHOR9
+ 976 0090 00000000 	 .word .LANCHOR8
+ 978              	 .section .text.TFT_textbox_static,"ax",%progbits
+ 979              	 .align 1
+ 980              	 .global TFT_textbox_static
+ 981              	 .thumb
+ 982              	 .thumb_func
+ 984              	TFT_textbox_static:
+ 985              	 
+ 986              	 
+ 987 0000 394A     	 ldr r2,.L90
+ 988 0002 4B88     	 ldrh r3,[r1,#2]
+ 989 0004 2DE9F347 	 push {r0,r1,r4,r5,r6,r7,r8,r9,r10,lr}
+ 990 0008 1588     	 ldrh r5,[r2]
+ 991 000a 5D1B     	 subs r5,r3,r5
+ 992 000c 374B     	 ldr r3,.L90+4
+ 993 000e B3F90030 	 ldrsh r3,[r3]
+ 994 0012 ADB2     	 uxth r5,r5
+ 995 0014 9D42     	 cmp r5,r3
+ 996 0016 8146     	 mov r9,r0
+ 997 0018 0C46     	 mov r4,r1
+ 998 001a 61DD     	 ble .L85
+ 999 001c B5F5887F 	 cmp r5,#272
+ 1000 0020 5ED2     	 bcs .L85
+ 1001 0022 A368     	 ldr r3,[r4,#8]
+ 1002 0024 B1F90000 	 ldrsh r0,[r1]
+ 1003 0028 0093     	 str r3,[sp]
+ 1004 002a 314B     	 ldr r3,.L90+8
+ 1005 002c DFF8D0A0 	 ldr r10,.L90+24
+ 1006 0030 53F82960 	 ldr r6,[r3,r9,lsl#2]
+ 1007 0034 05F10801 	 add r1,r5,#8
+ 1008 0038 0023     	 movs r3,#0
+ 1009 003a 09B2     	 sxth r1,r1
+ 1010 003c 1A22     	 movs r2,#26
+ 1011 003e B047     	 blx r6
+ 1012 0040 E688     	 ldrh r6,[r4,#6]
+ 1013 0042 2388     	 ldrh r3,[r4]
+ 1014 0044 A788     	 ldrh r7,[r4,#4]
+ 1015 0046 207B     	 ldrb r0,[r4,#12]
+ 1016 0048 5AF82940 	 ldr r4,[r10,r9,lsl#2]
+ 1017 004c 1E44     	 add r6,r6,r3
+ 1018 004e B6B2     	 uxth r6,r6
+ 1019 0050 3744     	 add r7,r7,r6
+ 1020 0052 05F11F08 	 add r8,r5,#31
+ 1021 0056 BFB2     	 uxth r7,r7
+ 1022 0058 1FFA88F8 	 uxth r8,r8
+ 1023 005c 20B9     	 cbnz r0,.L87
+ 1024 005e 4FF04070 	 mov r0,#50331648
+ 1025 0062 A047     	 blx r4
+ 1026 0064 2348     	 ldr r0,.L90+12
+ 1027 0066 04E0     	 b .L89
+ 1028              	.L87:
+ 1029 0068 40F04070 	 orr r0,r0,#50331648
+ 1030 006c A047     	 blx r4
+ 1031 006e 6FF07B40 	 mvn r0,#-83886080
+ 1032              	.L89:
+ 1033 0072 C6F30E06 	 ubfx r6,r6,#0,#15
+ 1034 0076 F603     	 lsls r6,r6,#15
+ 1035 0078 45F08045 	 orr r5,r5,#1073741824
+ 1036 007c C7F30E07 	 ubfx r7,r7,#0,#15
+ 1037 0080 A047     	 blx r4
+ 1038 0082 FF03     	 lsls r7,r7,#15
+ 1039 0084 5AF82940 	 ldr r4,[r10,r9,lsl#2]
+ 1040 0088 1B48     	 ldr r0,.L90+16
+ 1041 008a 45EA060A 	 orr r10,r5,r6
+ 1042 008e 48F08049 	 orr r9,r8,#1073741824
+ 1043 0092 A047     	 blx r4
+ 1044 0094 49EA0709 	 orr r9,r9,r7
+ 1045 0098 5046     	 mov r0,r10
+ 1046 009a A047     	 blx r4
+ 1047 009c 4846     	 mov r0,r9
+ 1048 009e A047     	 blx r4
+ 1049 00a0 4FF00450 	 mov r0,#553648128
+ 1050 00a4 A047     	 blx r4
+ 1051 00a6 4FF08060 	 mov r0,#67108864
+ 1052 00aa A047     	 blx r4
+ 1053 00ac 1348     	 ldr r0,.L90+20
+ 1054 00ae A047     	 blx r4
+ 1055 00b0 5046     	 mov r0,r10
+ 1056 00b2 A047     	 blx r4
+ 1057 00b4 46EA0800 	 orr r0,r6,r8
+ 1058 00b8 40F08040 	 orr r0,r0,#1073741824
+ 1059 00bc A047     	 blx r4
+ 1060 00be 4846     	 mov r0,r9
+ 1061 00c0 A047     	 blx r4
+ 1062 00c2 47EA0500 	 orr r0,r7,r5
+ 1063 00c6 A047     	 blx r4
+ 1064 00c8 5046     	 mov r0,r10
+ 1065 00ca A047     	 blx r4
+ 1066 00cc 4FF00450 	 mov r0,#553648128
+ 1067 00d0 A047     	 blx r4
+ 1068 00d2 4FF04070 	 mov r0,#50331648
+ 1069 00d6 2346     	 mov r3,r4
+ 1070 00d8 02B0     	 add sp,sp,#8
+ 1071              	 
+ 1072 00da BDE8F047 	 pop {r4,r5,r6,r7,r8,r9,r10,lr}
+ 1073 00de 1847     	 bx r3
+ 1074              	.L85:
+ 1075 00e0 02B0     	 add sp,sp,#8
+ 1076              	 
+ 1077 00e2 BDE8F087 	 pop {r4,r5,r6,r7,r8,r9,r10,pc}
+ 1078              	.L91:
+ 1079 00e6 00BF     	 .align 2
+ 1080              	.L90:
+ 1081 00e8 00000000 	 .word .LANCHOR9
+ 1082 00ec 00000000 	 .word .LANCHOR8
+ 1083 00f0 00000000 	 .word .LANCHOR11
+ 1084 00f4 CCCCCC04 	 .word 80530636
+ 1085 00f8 0900001F 	 .word 520093705
+ 1086 00fc 0400001F 	 .word 520093700
+ 1087 0100 00000000 	 .word .LANCHOR10
+ 1089              	 .section .text.TFT_textbox_display,"ax",%progbits
+ 1090              	 .align 1
+ 1091              	 .global TFT_textbox_display
+ 1092              	 .thumb
+ 1093              	 .thumb_func
+ 1095              	TFT_textbox_display:
+ 1096              	 
+ 1097              	 
+ 1098 0000 2DE9F041 	 push {r4,r5,r6,r7,r8,lr}
+ 1099 0004 874B     	 ldr r3,.L122
+ 1100 0006 4588     	 ldrh r5,[r0,#2]
+ 1101 0008 1988     	 ldrh r1,[r3]
+ 1102 000a 874B     	 ldr r3,.L122+4
+ 1103 000c 0835     	 adds r5,r5,#8
+ 1104 000e 2DED028B 	 fstmfdd sp!,{d8}
+ 1105 0012 6D1A     	 subs r5,r5,r1
+ 1106 0014 B3F90030 	 ldrsh r3,[r3]
+ 1107 0018 ADB2     	 uxth r5,r5
+ 1108 001a 9D42     	 cmp r5,r3
+ 1109 001c 86B0     	 sub sp,sp,#24
+ 1110 001e 0446     	 mov r4,r0
+ 1111 0020 40F3FB80 	 ble .L92
+ 1112 0024 B5F5887F 	 cmp r5,#272
+ 1113 0028 80F0F780 	 bcs .L92
+ 1114 002c 007B     	 ldrb r0,[r0,#12]
+ 1115 002e 40F04070 	 orr r0,r0,#50331648
+ 1116 0032 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1117 0036 4FF08060 	 mov r0,#67108864
+ 1118 003a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1119 003e 7B4B     	 ldr r3,.L122+8
+ 1120 0040 1B78     	 ldrb r3,[r3]
+ 1121 0042 002B     	 cmp r3,#0
+ 1122 0044 37D0     	 beq .L94
+ 1123 0046 7A4B     	 ldr r3,.L122+12
+ 1124 0048 1A78     	 ldrb r2,[r3]
+ 1125 004a 94F90C30 	 ldrsb r3,[r4,#12]
+ 1126 004e 9A42     	 cmp r2,r3
+ 1127 0050 31D1     	 bne .L94
+ 1128 0052 784E     	 ldr r6,.L122+16
+ 1129 0054 DFF8EC81 	 ldr r8,.L122+32
+ 1130 0058 FFF7FEFF 	 bl SYSTIMER_GetTime
+ 1131 005c 3368     	 ldr r3,[r6]
+ 1132 005e 03F50623 	 add r3,r3,#548864
+ 1133 0062 03F58E63 	 add r3,r3,#1136
+ 1134 0066 9842     	 cmp r0,r3
+ 1135 0068 0AD9     	 bls .L95
+ 1136 006a FFF7FEFF 	 bl SYSTIMER_GetTime
+ 1137 006e 98F80030 	 ldrb r3,[r8]
+ 1138 0072 3060     	 str r0,[r6]
+ 1139 0074 7C2B     	 cmp r3,#124
+ 1140 0076 0CBF     	 ite eq
+ 1141 0078 2023     	 moveq r3,#32
+ 1142 007a 7C23     	 movne r3,#124
+ 1143 007c 88F80030 	 strb r3,[r8]
+ 1144              	.L95:
+ 1145 0080 6D4B     	 ldr r3,.L122+20
+ 1146 0082 6E4E     	 ldr r6,.L122+24
+ 1147 0084 1F78     	 ldrb r7,[r3]
+ 1148 0086 2169     	 ldr r1,[r4,#16]
+ 1149 0088 3A46     	 mov r2,r7
+ 1150 008a 3046     	 mov r0,r6
+ 1151 008c FFF7FEFF 	 bl strncpy
+ 1152 0090 98F80030 	 ldrb r3,[r8]
+ 1153 0094 F355     	 strb r3,[r6,r7]
+ 1154 0096 2169     	 ldr r1,[r4,#16]
+ 1155 0098 781C     	 adds r0,r7,#1
+ 1156 009a 3944     	 add r1,r1,r7
+ 1157 009c 3044     	 add r0,r0,r6
+ 1158 009e FFF7FEFF 	 bl strcpy
+ 1159 00a2 E388     	 ldrh r3,[r4,#6]
+ 1160 00a4 2088     	 ldrh r0,[r4]
+ 1161 00a6 0096     	 str r6,[sp]
+ 1162 00a8 1844     	 add r0,r0,r3
+ 1163 00aa 0730     	 adds r0,r0,#7
+ 1164 00ac 00B2     	 sxth r0,r0
+ 1165 00ae 29B2     	 sxth r1,r5
+ 1166 00b0 1A22     	 movs r2,#26
+ 1167 00b2 0023     	 movs r3,#0
+ 1168 00b4 A6E0     	 b .L121
+ 1169              	.L94:
+ 1170 00b6 94F82830 	 ldrb r3,[r4,#40]
+ 1171 00ba 002B     	 cmp r3,#0
+ 1172 00bc 00F09980 	 beq .L98
+ 1173 00c0 012B     	 cmp r3,#1
+ 1174 00c2 17D1     	 bne .L99
+ 1175 00c4 2088     	 ldrh r0,[r4]
+ 1176 00c6 E288     	 ldrh r2,[r4,#6]
+ 1177 00c8 266B     	 ldr r6,[r4,#48]
+ 1178 00ca 29B2     	 sxth r1,r5
+ 1179 00cc 1044     	 add r0,r0,r2
+ 1180 00ce 256A     	 ldr r5,[r4,#32]
+ 1181 00d0 E46A     	 ldr r4,[r4,#44]
+ 1182 00d2 0095     	 str r5,[sp]
+ 1183 00d4 0730     	 adds r0,r0,#7
+ 1184 00d6 0193     	 str r3,[sp,#4]
+ 1185 00d8 0EB9     	 cbnz r6,.L100
+ 1186 00da 2388     	 ldrh r3,[r4]
+ 1187 00dc 02E0     	 b .L120
+ 1188              	.L100:
+ 1189 00de 3388     	 ldrh r3,[r6]
+ 1190 00e0 34F81330 	 ldrh r3,[r4,r3,lsl#1]
+ 1191              	.L120:
+ 1192 00e4 0293     	 str r3,[sp,#8]
+ 1193 00e6 00B2     	 sxth r0,r0
+ 1194 00e8 1A22     	 movs r2,#26
+ 1195 00ea 4FF48053 	 mov r3,#4096
+ 1196 00ee FFF7FEFF 	 bl EVE_cmd_text_var_burst
+ 1197 00f2 89E0     	 b .L97
+ 1198              	.L99:
+ 1199 00f4 022B     	 cmp r3,#2
+ 1200 00f6 40F08780 	 bne .L97
+ 1201 00fa 226B     	 ldr r2,[r4,#48]
+ 1202 00fc E36A     	 ldr r3,[r4,#44]
+ 1203 00fe 12B1     	 cbz r2,.L117
+ 1204 0100 1288     	 ldrh r2,[r2]
+ 1205 0102 03EB8203 	 add r3,r3,r2,lsl#2
+ 1206              	.L117:
+ 1207 0106 1868     	 ldr r0,[r3]
+ 1208 0108 05A9     	 add r1,sp,#20
+ 1209 010a FFF7FEFF 	 bl modff
+ 1210 010e DDED057A 	 flds s15,[sp,#20]
+ 1211 0112 2688     	 ldrh r6,[r4]
+ 1212 0114 E388     	 ldrh r3,[r4,#6]
+ 1213 0116 D4F82080 	 ldr r8,[r4,#32]
+ 1214 011a 1E44     	 add r6,r6,r3
+ 1215 011c F5EEC07A 	 fcmpezs s15
+ 1216 0120 0736     	 adds r6,r6,#7
+ 1217 0122 F1EE10FA 	 fmstat
+ 1218 0126 08EE100A 	 fmsr s16,r0
+ 1219 012a B6B2     	 uxth r6,r6
+ 1220 012c ADB2     	 uxth r5,r5
+ 1221 012e 17EE900A 	 fmrs r0,s15
+ 1222 0132 06DB     	 blt .L114
+ 1223 0134 FFF7FEFF 	 bl __aeabi_f2d
+ 1224 0138 0022     	 movs r2,#0
+ 1225 013a 414B     	 ldr r3,.L122+28
+ 1226 013c FFF7FEFF 	 bl __aeabi_dadd
+ 1227 0140 05E0     	 b .L118
+ 1228              	.L114:
+ 1229 0142 FFF7FEFF 	 bl __aeabi_f2d
+ 1230 0146 0022     	 movs r2,#0
+ 1231 0148 3D4B     	 ldr r3,.L122+28
+ 1232 014a FFF7FEFF 	 bl __aeabi_dsub
+ 1233              	.L118:
+ 1234 014e FFF7FEFF 	 bl __aeabi_d2iz
+ 1235 0152 07B2     	 sxth r7,r0
+ 1236 0154 94F82400 	 ldrb r0,[r4,#36]
+ 1237 0158 07EE900A 	 fmsr s15,r0
+ 1238 015c F8EE677A 	 fuitos s15,s15
+ 1239 0160 17EE900A 	 fmrs r0,s15
+ 1240 0164 FFF7FEFF 	 bl pow10f
+ 1241 0168 07EE900A 	 fmsr s15,r0
+ 1242 016c 68EE277A 	 fmuls s15,s16,s15
+ 1243 0170 94F82430 	 ldrb r3,[r4,#36]
+ 1244 0174 F0EEE77A 	 fabss s15,s15
+ 1245 0178 F5EEC07A 	 fcmpezs s15
+ 1246 017c 07EE903A 	 fmsr s15,r3
+ 1247 0180 F8EE677A 	 fuitos s15,s15
+ 1248 0184 F1EE10FA 	 fmstat
+ 1249 0188 17EE900A 	 fmrs r0,s15
+ 1250 018c 10DB     	 blt .L115
+ 1251 018e FFF7FEFF 	 bl pow10f
+ 1252 0192 07EE900A 	 fmsr s15,r0
+ 1253 0196 28EE278A 	 fmuls s16,s16,s15
+ 1254 019a F0EEC87A 	 fabss s15,s16
+ 1255 019e 17EE900A 	 fmrs r0,s15
+ 1256 01a2 FFF7FEFF 	 bl __aeabi_f2d
+ 1257 01a6 0022     	 movs r2,#0
+ 1258 01a8 254B     	 ldr r3,.L122+28
+ 1259 01aa FFF7FEFF 	 bl __aeabi_dadd
+ 1260 01ae 0FE0     	 b .L119
+ 1261              	.L115:
+ 1262 01b0 FFF7FEFF 	 bl pow10f
+ 1263 01b4 07EE900A 	 fmsr s15,r0
+ 1264 01b8 28EE278A 	 fmuls s16,s16,s15
+ 1265 01bc F0EEC87A 	 fabss s15,s16
+ 1266 01c0 17EE900A 	 fmrs r0,s15
+ 1267 01c4 FFF7FEFF 	 bl __aeabi_f2d
+ 1268 01c8 0022     	 movs r2,#0
+ 1269 01ca 1D4B     	 ldr r3,.L122+28
+ 1270 01cc FFF7FEFF 	 bl __aeabi_dsub
+ 1271              	.L119:
+ 1272 01d0 FFF7FEFF 	 bl __aeabi_d2iz
+ 1273 01d4 0223     	 movs r3,#2
+ 1274 01d6 00B2     	 sxth r0,r0
+ 1275 01d8 0193     	 str r3,[sp,#4]
+ 1276 01da 0390     	 str r0,[sp,#12]
+ 1277 01dc CDF80080 	 str r8,[sp]
+ 1278 01e0 0297     	 str r7,[sp,#8]
+ 1279 01e2 30B2     	 sxth r0,r6
+ 1280 01e4 29B2     	 sxth r1,r5
+ 1281 01e6 1A22     	 movs r2,#26
+ 1282 01e8 4FF48053 	 mov r3,#4096
+ 1283 01ec FFF7FEFF 	 bl EVE_cmd_text_var_burst
+ 1284 01f0 0AE0     	 b .L97
+ 1285              	.L98:
+ 1286 01f2 E288     	 ldrh r2,[r4,#6]
+ 1287 01f4 2088     	 ldrh r0,[r4]
+ 1288 01f6 1044     	 add r0,r0,r2
+ 1289 01f8 0730     	 adds r0,r0,#7
+ 1290 01fa 2269     	 ldr r2,[r4,#16]
+ 1291 01fc 0092     	 str r2,[sp]
+ 1292 01fe 00B2     	 sxth r0,r0
+ 1293 0200 29B2     	 sxth r1,r5
+ 1294 0202 1A22     	 movs r2,#26
+ 1295              	.L121:
+ 1296 0204 FFF7FEFF 	 bl EVE_cmd_text_burst
+ 1297              	.L97:
+ 1298 0208 4FF04070 	 mov r0,#50331648
+ 1299 020c 06B0     	 add sp,sp,#24
+ 1300              	 
+ 1301 020e BDEC028B 	 fldmfdd sp!,{d8}
+ 1302 0212 BDE8F041 	 pop {r4,r5,r6,r7,r8,lr}
+ 1303 0216 FFF7FEBF 	 b EVE_cmd_dl_burst
+ 1304              	.L92:
+ 1305 021a 06B0     	 add sp,sp,#24
+ 1306              	 
+ 1307 021c BDEC028B 	 fldmfdd sp!,{d8}
+ 1308 0220 BDE8F081 	 pop {r4,r5,r6,r7,r8,pc}
+ 1309              	.L123:
+ 1310              	 .align 2
+ 1311              	.L122:
+ 1312 0224 00000000 	 .word .LANCHOR9
+ 1313 0228 00000000 	 .word .LANCHOR8
+ 1314 022c 00000000 	 .word .LANCHOR0
+ 1315 0230 00000000 	 .word .LANCHOR1
+ 1316 0234 00000000 	 .word .LANCHOR14
+ 1317 0238 00000000 	 .word .LANCHOR16
+ 1318 023c 00000000 	 .word .LANCHOR17
+ 1319 0240 0000E03F 	 .word 1071644672
+ 1320 0244 00000000 	 .word .LANCHOR15
+ 1322              	 .section .text.TFT_textbox_setStatus,"ax",%progbits
+ 1323              	 .align 1
+ 1324              	 .global TFT_textbox_setStatus
+ 1325              	 .thumb
+ 1326              	 .thumb_func
+ 1328              	TFT_textbox_setStatus:
+ 1329              	 
+ 1330              	 
+ 1331 0000 2DE9F041 	 push {r4,r5,r6,r7,r8,lr}
+ 1332 0004 2DED028B 	 fstmfdd sp!,{d8}
+ 1333 0008 0129     	 cmp r1,#1
+ 1334 000a 82B0     	 sub sp,sp,#8
+ 1335 000c 0446     	 mov r4,r0
+ 1336 000e 1546     	 mov r5,r2
+ 1337 0010 40F0A780 	 bne .L125
+ 1338 0014 90F91C30 	 ldrsb r3,[r0,#28]
+ 1339 0018 002B     	 cmp r3,#0
+ 1340 001a 40F09E80 	 bne .L141
+ 1341 001e 90F82830 	 ldrb r3,[r0,#40]
+ 1342 0022 012B     	 cmp r3,#1
+ 1343 0024 0ED1     	 bne .L127
+ 1344 0026 026B     	 ldr r2,[r0,#48]
+ 1345 0028 C36A     	 ldr r3,[r0,#44]
+ 1346 002a 1AB9     	 cbnz r2,.L128
+ 1347 002c 0069     	 ldr r0,[r0,#16]
+ 1348 002e 216A     	 ldr r1,[r4,#32]
+ 1349 0030 1A88     	 ldrh r2,[r3]
+ 1350 0032 04E0     	 b .L166
+ 1351              	.L128:
+ 1352 0034 1288     	 ldrh r2,[r2]
+ 1353 0036 0069     	 ldr r0,[r0,#16]
+ 1354 0038 216A     	 ldr r1,[r4,#32]
+ 1355 003a 33F81220 	 ldrh r2,[r3,r2,lsl#1]
+ 1356              	.L166:
+ 1357 003e FFF7FEFF 	 bl sprintf
+ 1358 0042 6FE0     	 b .L170
+ 1359              	.L127:
+ 1360 0044 022B     	 cmp r3,#2
+ 1361 0046 72D1     	 bne .L130
+ 1362 0048 026B     	 ldr r2,[r0,#48]
+ 1363 004a C36A     	 ldr r3,[r0,#44]
+ 1364 004c 12B1     	 cbz r2,.L167
+ 1365 004e 1288     	 ldrh r2,[r2]
+ 1366 0050 03EB8203 	 add r3,r3,r2,lsl#2
+ 1367              	.L167:
+ 1368 0054 1868     	 ldr r0,[r3]
+ 1369 0056 01A9     	 add r1,sp,#4
+ 1370 0058 FFF7FEFF 	 bl modff
+ 1371 005c DDED017A 	 flds s15,[sp,#4]
+ 1372 0060 D4F81080 	 ldr r8,[r4,#16]
+ 1373 0064 276A     	 ldr r7,[r4,#32]
+ 1374 0066 F5EEC07A 	 fcmpezs s15
+ 1375 006a F1EE10FA 	 fmstat
+ 1376 006e 08EE100A 	 fmsr s16,r0
+ 1377 0072 17EE900A 	 fmrs r0,s15
+ 1378 0076 06DB     	 blt .L160
+ 1379 0078 FFF7FEFF 	 bl __aeabi_f2d
+ 1380 007c 0022     	 movs r2,#0
+ 1381 007e 724B     	 ldr r3,.L175
+ 1382 0080 FFF7FEFF 	 bl __aeabi_dadd
+ 1383 0084 05E0     	 b .L168
+ 1384              	.L160:
+ 1385 0086 FFF7FEFF 	 bl __aeabi_f2d
+ 1386 008a 0022     	 movs r2,#0
+ 1387 008c 6E4B     	 ldr r3,.L175
+ 1388 008e FFF7FEFF 	 bl __aeabi_dsub
+ 1389              	.L168:
+ 1390 0092 FFF7FEFF 	 bl __aeabi_d2iz
+ 1391 0096 06B2     	 sxth r6,r0
+ 1392 0098 94F82400 	 ldrb r0,[r4,#36]
+ 1393 009c 07EE900A 	 fmsr s15,r0
+ 1394 00a0 F8EE677A 	 fuitos s15,s15
+ 1395 00a4 17EE900A 	 fmrs r0,s15
+ 1396 00a8 FFF7FEFF 	 bl pow10f
+ 1397 00ac 07EE900A 	 fmsr s15,r0
+ 1398 00b0 68EE277A 	 fmuls s15,s16,s15
+ 1399 00b4 94F82430 	 ldrb r3,[r4,#36]
+ 1400 00b8 F0EEE77A 	 fabss s15,s15
+ 1401 00bc F5EEC07A 	 fcmpezs s15
+ 1402 00c0 07EE903A 	 fmsr s15,r3
+ 1403 00c4 F8EE677A 	 fuitos s15,s15
+ 1404 00c8 F1EE10FA 	 fmstat
+ 1405 00cc 17EE900A 	 fmrs r0,s15
+ 1406 00d0 10DB     	 blt .L161
+ 1407 00d2 FFF7FEFF 	 bl pow10f
+ 1408 00d6 07EE900A 	 fmsr s15,r0
+ 1409 00da 28EE278A 	 fmuls s16,s16,s15
+ 1410 00de F0EEC87A 	 fabss s15,s16
+ 1411 00e2 17EE900A 	 fmrs r0,s15
+ 1412 00e6 FFF7FEFF 	 bl __aeabi_f2d
+ 1413 00ea 0022     	 movs r2,#0
+ 1414 00ec 564B     	 ldr r3,.L175
+ 1415 00ee FFF7FEFF 	 bl __aeabi_dadd
+ 1416 00f2 0FE0     	 b .L169
+ 1417              	.L161:
+ 1418 00f4 FFF7FEFF 	 bl pow10f
+ 1419 00f8 07EE900A 	 fmsr s15,r0
+ 1420 00fc 28EE278A 	 fmuls s16,s16,s15
+ 1421 0100 F0EEC87A 	 fabss s15,s16
+ 1422 0104 17EE900A 	 fmrs r0,s15
+ 1423 0108 FFF7FEFF 	 bl __aeabi_f2d
+ 1424 010c 0022     	 movs r2,#0
+ 1425 010e 4E4B     	 ldr r3,.L175
+ 1426 0110 FFF7FEFF 	 bl __aeabi_dsub
+ 1427              	.L169:
+ 1428 0114 FFF7FEFF 	 bl __aeabi_d2iz
+ 1429 0118 3946     	 mov r1,r7
+ 1430 011a 03B2     	 sxth r3,r0
+ 1431 011c 3246     	 mov r2,r6
+ 1432 011e 4046     	 mov r0,r8
+ 1433 0120 FFF7FEFF 	 bl sprintf
+ 1434              	.L170:
+ 1435 0124 2069     	 ldr r0,[r4,#16]
+ 1436 0126 A669     	 ldr r6,[r4,#24]
+ 1437 0128 FFF7FEFF 	 bl strlen
+ 1438 012c 3070     	 strb r0,[r6]
+ 1439              	.L130:
+ 1440 012e 6388     	 ldrh r3,[r4,#2]
+ 1441 0130 464A     	 ldr r2,.L175+4
+ 1442 0132 94F83410 	 ldrb r1,[r4,#52]
+ 1443 0136 207B     	 ldrb r0,[r4,#12]
+ 1444 0138 483B     	 subs r3,r3,#72
+ 1445 013a 1380     	 strh r3,[r2]
+ 1446 013c 0123     	 movs r3,#1
+ 1447 013e 2377     	 strb r3,[r4,#28]
+ 1448 0140 FFF7FEFF 	 bl TFT_keypad_open
+ 1449 0144 A369     	 ldr r3,[r4,#24]
+ 1450 0146 691C     	 adds r1,r5,#1
+ 1451 0148 1B78     	 ldrb r3,[r3]
+ 1452 014a 02D1     	 bne .L162
+ 1453 014c 404A     	 ldr r2,.L175+8
+ 1454 014e 1370     	 strb r3,[r2]
+ 1455 0150 03E0     	 b .L141
+ 1456              	.L162:
+ 1457 0152 9D42     	 cmp r5,r3
+ 1458 0154 01DC     	 bgt .L141
+ 1459 0156 3E4B     	 ldr r3,.L175+8
+ 1460 0158 1D70     	 strb r5,[r3]
+ 1461              	.L141:
+ 1462 015a 94F91C30 	 ldrsb r3,[r4,#28]
+ 1463 015e 012B     	 cmp r3,#1
+ 1464 0160 61D0     	 beq .L174
+ 1465              	.L125:
+ 1466 0162 94F82830 	 ldrb r3,[r4,#40]
+ 1467 0166 012B     	 cmp r3,#1
+ 1468 0168 46D1     	 bne .L145
+ 1469 016a 236B     	 ldr r3,[r4,#48]
+ 1470 016c E56A     	 ldr r5,[r4,#44]
+ 1471 016e 03BB     	 cbnz r3,.L146
+ 1472 0170 2069     	 ldr r0,[r4,#16]
+ 1473 0172 FFF7FEFF 	 bl atoff
+ 1474 0176 07EE900A 	 fmsr s15,r0
+ 1475 017a F5EEC07A 	 fcmpezs s15
+ 1476 017e F1EE10FA 	 fmstat
+ 1477 0182 2069     	 ldr r0,[r4,#16]
+ 1478 0184 08DB     	 blt .L164
+ 1479 0186 FFF7FEFF 	 bl atoff
+ 1480 018a FFF7FEFF 	 bl __aeabi_f2d
+ 1481 018e 0022     	 movs r2,#0
+ 1482 0190 2D4B     	 ldr r3,.L175
+ 1483 0192 FFF7FEFF 	 bl __aeabi_dadd
+ 1484 0196 07E0     	 b .L171
+ 1485              	.L164:
+ 1486 0198 FFF7FEFF 	 bl atoff
+ 1487 019c FFF7FEFF 	 bl __aeabi_f2d
+ 1488 01a0 0022     	 movs r2,#0
+ 1489 01a2 294B     	 ldr r3,.L175
+ 1490 01a4 FFF7FEFF 	 bl __aeabi_dsub
+ 1491              	.L171:
+ 1492 01a8 FFF7FEFF 	 bl __aeabi_d2iz
+ 1493 01ac 80B2     	 uxth r0,r0
+ 1494 01ae 2880     	 strh r0,[r5]
+ 1495 01b0 2EE0     	 b .L150
+ 1496              	.L146:
+ 1497 01b2 2069     	 ldr r0,[r4,#16]
+ 1498 01b4 1E88     	 ldrh r6,[r3]
+ 1499 01b6 FFF7FEFF 	 bl atoff
+ 1500 01ba 07EE900A 	 fmsr s15,r0
+ 1501 01be F5EEC07A 	 fcmpezs s15
+ 1502 01c2 F1EE10FA 	 fmstat
+ 1503 01c6 2069     	 ldr r0,[r4,#16]
+ 1504 01c8 08DB     	 blt .L165
+ 1505 01ca FFF7FEFF 	 bl atoff
+ 1506 01ce FFF7FEFF 	 bl __aeabi_f2d
+ 1507 01d2 0022     	 movs r2,#0
+ 1508 01d4 1C4B     	 ldr r3,.L175
+ 1509 01d6 FFF7FEFF 	 bl __aeabi_dadd
+ 1510 01da 07E0     	 b .L172
+ 1511              	.L165:
+ 1512 01dc FFF7FEFF 	 bl atoff
+ 1513 01e0 FFF7FEFF 	 bl __aeabi_f2d
+ 1514 01e4 0022     	 movs r2,#0
+ 1515 01e6 184B     	 ldr r3,.L175
+ 1516 01e8 FFF7FEFF 	 bl __aeabi_dsub
+ 1517              	.L172:
+ 1518 01ec FFF7FEFF 	 bl __aeabi_d2iz
+ 1519 01f0 80B2     	 uxth r0,r0
+ 1520 01f2 25F81600 	 strh r0,[r5,r6,lsl#1]
+ 1521 01f6 0BE0     	 b .L150
+ 1522              	.L145:
+ 1523 01f8 022B     	 cmp r3,#2
+ 1524 01fa 09D1     	 bne .L150
+ 1525 01fc 236B     	 ldr r3,[r4,#48]
+ 1526 01fe E56A     	 ldr r5,[r4,#44]
+ 1527 0200 13B1     	 cbz r3,.L173
+ 1528 0202 1B88     	 ldrh r3,[r3]
+ 1529 0204 05EB8305 	 add r5,r5,r3,lsl#2
+ 1530              	.L173:
+ 1531 0208 2069     	 ldr r0,[r4,#16]
+ 1532 020a FFF7FEFF 	 bl atoff
+ 1533 020e 2860     	 str r0,[r5]
+ 1534              	.L150:
+ 1535 0210 0E4A     	 ldr r2,.L175+4
+ 1536 0212 0023     	 movs r3,#0
+ 1537 0214 1380     	 strh r3,[r2]
+ 1538 0216 2377     	 strb r3,[r4,#28]
+ 1539 0218 02B0     	 add sp,sp,#8
+ 1540              	 
+ 1541 021a BDEC028B 	 fldmfdd sp!,{d8}
+ 1542 021e BDE8F041 	 pop {r4,r5,r6,r7,r8,lr}
+ 1543 0222 FFF7FEBF 	 b TFT_keypad_close
+ 1544              	.L174:
+ 1545 0226 A369     	 ldr r3,[r4,#24]
+ 1546 0228 6A1C     	 adds r2,r5,#1
+ 1547 022a 1B78     	 ldrb r3,[r3]
+ 1548 022c 02D1     	 bne .L163
+ 1549 022e 084A     	 ldr r2,.L175+8
+ 1550 0230 1370     	 strb r3,[r2]
+ 1551 0232 03E0     	 b .L124
+ 1552              	.L163:
+ 1553 0234 9D42     	 cmp r5,r3
+ 1554 0236 01DC     	 bgt .L124
+ 1555 0238 054B     	 ldr r3,.L175+8
+ 1556 023a 1D70     	 strb r5,[r3]
+ 1557              	.L124:
+ 1558 023c 02B0     	 add sp,sp,#8
+ 1559              	 
+ 1560 023e BDEC028B 	 fldmfdd sp!,{d8}
+ 1561 0242 BDE8F081 	 pop {r4,r5,r6,r7,r8,pc}
+ 1562              	.L176:
+ 1563 0246 00BF     	 .align 2
+ 1564              	.L175:
+ 1565 0248 0000E03F 	 .word 1071644672
+ 1566 024c 00000000 	 .word .LANCHOR9
+ 1567 0250 00000000 	 .word .LANCHOR16
+ 1569              	 .section .text.TFT_textbox_touch,"ax",%progbits
+ 1570              	 .align 1
+ 1571              	 .global TFT_textbox_touch
+ 1572              	 .thumb
+ 1573              	 .thumb_func
+ 1575              	TFT_textbox_touch:
+ 1576              	 
+ 1577              	 
+ 1578 0000 2DE9F84F 	 push {r3,r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 1579 0004 3C4B     	 ldr r3,.L199
+ 1580 0006 1B78     	 ldrb r3,[r3]
+ 1581 0008 0446     	 mov r4,r0
+ 1582 000a 002B     	 cmp r3,#0
+ 1583 000c 70D0     	 beq .L178
+ 1584 000e 3B4B     	 ldr r3,.L199+4
+ 1585 0010 1A78     	 ldrb r2,[r3]
+ 1586 0012 90F90C30 	 ldrsb r3,[r0,#12]
+ 1587 0016 9A42     	 cmp r2,r3
+ 1588 0018 69D1     	 bne .L185
+ 1589 001a 394F     	 ldr r7,.L199+8
+ 1590 001c 3B78     	 ldrb r3,[r7]
+ 1591 001e 002B     	 cmp r3,#0
+ 1592 0020 66D0     	 beq .L178
+ 1593 0022 384E     	 ldr r6,.L199+12
+ 1594 0024 3578     	 ldrb r5,[r6]
+ 1595 0026 A5F12003 	 sub r3,r5,#32
+ 1596 002a 602B     	 cmp r3,#96
+ 1597 002c B046     	 mov r8,r6
+ 1598 002e 5ED8     	 bhi .L185
+ 1599 0030 802D     	 cmp r5,#128
+ 1600 0032 08D1     	 bne .L179
+ 1601 0034 0021     	 movs r1,#0
+ 1602 0036 0A46     	 mov r2,r1
+ 1603 0038 FFF7FEFF 	 bl TFT_textbox_setStatus
+ 1604 003c 0023     	 movs r3,#0
+ 1605 003e 3B70     	 strb r3,[r7]
+ 1606 0040 3370     	 strb r3,[r6]
+ 1607 0042 0123     	 movs r3,#1
+ 1608 0044 54E0     	 b .L178
+ 1609              	.L179:
+ 1610 0046 7F2D     	 cmp r5,#127
+ 1611 0048 13D1     	 bne .L180
+ 1612 004a 2F4D     	 ldr r5,.L199+16
+ 1613 004c 2B78     	 ldrb r3,[r5]
+ 1614 004e 002B     	 cmp r3,#0
+ 1615 0050 47D0     	 beq .L181
+ 1616 0052 8269     	 ldr r2,[r0,#24]
+ 1617 0054 1278     	 ldrb r2,[r2]
+ 1618 0056 9A42     	 cmp r2,r3
+ 1619 0058 43D3     	 bcc .L181
+ 1620 005a 0169     	 ldr r1,[r0,#16]
+ 1621 005c 5E1E     	 subs r6,r3,#1
+ 1622 005e 8819     	 adds r0,r1,r6
+ 1623 0060 1944     	 add r1,r1,r3
+ 1624 0062 FFF7FEFF 	 bl strcpy
+ 1625 0066 A269     	 ldr r2,[r4,#24]
+ 1626 0068 2E70     	 strb r6,[r5]
+ 1627 006a 1378     	 ldrb r3,[r2]
+ 1628 006c 013B     	 subs r3,r3,#1
+ 1629 006e 1370     	 strb r3,[r2]
+ 1630 0070 37E0     	 b .L181
+ 1631              	.L180:
+ 1632 0072 3C2D     	 cmp r5,#60
+ 1633 0074 04D1     	 bne .L182
+ 1634 0076 244A     	 ldr r2,.L199+16
+ 1635 0078 1378     	 ldrb r3,[r2]
+ 1636 007a 93B3     	 cbz r3,.L181
+ 1637 007c 013B     	 subs r3,r3,#1
+ 1638 007e 08E0     	 b .L198
+ 1639              	.L182:
+ 1640 0080 3E2D     	 cmp r5,#62
+ 1641 0082 8669     	 ldr r6,[r0,#24]
+ 1642 0084 07D1     	 bne .L183
+ 1643 0086 204A     	 ldr r2,.L199+16
+ 1644 0088 3178     	 ldrb r1,[r6]
+ 1645 008a 1378     	 ldrb r3,[r2]
+ 1646 008c 9942     	 cmp r1,r3
+ 1647 008e 28D9     	 bls .L181
+ 1648 0090 0133     	 adds r3,r3,#1
+ 1649              	.L198:
+ 1650 0092 1370     	 strb r3,[r2]
+ 1651 0094 25E0     	 b .L181
+ 1652              	.L183:
+ 1653 0096 037D     	 ldrb r3,[r0,#20]
+ 1654 0098 3278     	 ldrb r2,[r6]
+ 1655 009a 013B     	 subs r3,r3,#1
+ 1656 009c 9A42     	 cmp r2,r3
+ 1657 009e 20DA     	 bge .L181
+ 1658 00a0 DFF864B0 	 ldr fp,.L199+16
+ 1659 00a4 0769     	 ldr r7,[r0,#16]
+ 1660 00a6 9BF80040 	 ldrb r4,[fp]
+ 1661 00aa DFF86090 	 ldr r9,.L199+20
+ 1662 00ae 4FFA84FA 	 sxtb r10,r4
+ 1663 00b2 5246     	 mov r2,r10
+ 1664 00b4 3946     	 mov r1,r7
+ 1665 00b6 4846     	 mov r0,r9
+ 1666 00b8 FFF7FEFF 	 bl strncpy
+ 1667 00bc 0AF10100 	 add r0,r10,#1
+ 1668 00c0 07EB0A01 	 add r1,r7,r10
+ 1669 00c4 4844     	 add r0,r0,r9
+ 1670 00c6 FFF7FEFF 	 bl strcpy
+ 1671 00ca 3846     	 mov r0,r7
+ 1672 00cc 4946     	 mov r1,r9
+ 1673 00ce 09F80A50 	 strb r5,[r9,r10]
+ 1674 00d2 FFF7FEFF 	 bl strcpy
+ 1675 00d6 3378     	 ldrb r3,[r6]
+ 1676 00d8 0134     	 adds r4,r4,#1
+ 1677 00da 0133     	 adds r3,r3,#1
+ 1678 00dc 3370     	 strb r3,[r6]
+ 1679 00de 8BF80040 	 strb r4,[fp]
+ 1680              	.L181:
+ 1681 00e2 074A     	 ldr r2,.L199+8
+ 1682 00e4 0023     	 movs r3,#0
+ 1683 00e6 1370     	 strb r3,[r2]
+ 1684 00e8 88F80030 	 strb r3,[r8]
+ 1685 00ec 00E0     	 b .L178
+ 1686              	.L185:
+ 1687 00ee 0023     	 movs r3,#0
+ 1688              	.L178:
+ 1689 00f0 1846     	 mov r0,r3
+ 1690 00f2 BDE8F88F 	 pop {r3,r4,r5,r6,r7,r8,r9,r10,fp,pc}
+ 1691              	.L200:
+ 1692 00f6 00BF     	 .align 2
+ 1693              	.L199:
+ 1694 00f8 00000000 	 .word .LANCHOR0
+ 1695 00fc 00000000 	 .word .LANCHOR1
+ 1696 0100 00000000 	 .word .LANCHOR4
+ 1697 0104 00000000 	 .word .LANCHOR18
+ 1698 0108 00000000 	 .word .LANCHOR16
+ 1699 010c 00000000 	 .word .LANCHOR17
+ 1701              	 .section .text.TFT_primitive,"ax",%progbits
+ 1702              	 .align 1
+ 1703              	 .global TFT_primitive
+ 1704              	 .thumb
+ 1705              	 .thumb_func
+ 1707              	TFT_primitive:
+ 1708              	 
+ 1709              	 
+ 1710 0000 2DE9F74F 	 push {r0,r1,r2,r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 1711 0004 1F46     	 mov r7,r3
+ 1712 0006 234B     	 ldr r3,.L217
+ 1713 0008 BDF83450 	 ldrh r5,[sp,#52]
+ 1714 000c B3F80080 	 ldrh r8,[r3]
+ 1715 0010 BDF83090 	 ldrh r9,[sp,#48]
+ 1716 0014 BDF83840 	 ldrh r4,[sp,#56]
+ 1717 0018 BDF83C60 	 ldrh r6,[sp,#60]
+ 1718 001c C8EB0505 	 rsb r5,r8,r5
+ 1719 0020 ABB2     	 uxth r3,r5
+ 1720 0022 8346     	 mov fp,r0
+ 1721 0024 8A46     	 mov r10,r1
+ 1722 0026 0193     	 str r3,[sp,#4]
+ 1723 0028 1B4D     	 ldr r5,.L217+4
+ 1724 002a 32B1     	 cbz r2,.L202
+ 1725 002c C2F30C00 	 ubfx r0,r2,#0,#13
+ 1726 0030 55F82B10 	 ldr r1,[r5,fp,lsl#2]
+ 1727 0034 40F05060 	 orr r0,r0,#218103808
+ 1728 0038 8847     	 blx r1
+ 1729              	.L202:
+ 1730 003a 37B1     	 cbz r7,.L203
+ 1731 003c C7F30B00 	 ubfx r0,r7,#0,#12
+ 1732 0040 55F82B20 	 ldr r2,[r5,fp,lsl#2]
+ 1733 0044 40F06060 	 orr r0,r0,#234881024
+ 1734 0048 9047     	 blx r2
+ 1735              	.L203:
+ 1736 004a 4AF0F850 	 orr r0,r10,#520093696
+ 1737 004e 55F82B70 	 ldr r7,[r5,fp,lsl#2]
+ 1738 0052 B847     	 blx r7
+ 1739 0054 C9F30E09 	 ubfx r9,r9,#0,#15
+ 1740 0058 019B     	 ldr r3,[sp,#4]
+ 1741 005a 4FEAC939 	 lsl r9,r9,#15
+ 1742 005e 49F08049 	 orr r9,r9,#1073741824
+ 1743 0062 C3F30E00 	 ubfx r0,r3,#0,#15
+ 1744 0066 49EA0000 	 orr r0,r9,r0
+ 1745 006a B847     	 blx r7
+ 1746 006c 5CB1     	 cbz r4,.L204
+ 1747 006e 56B1     	 cbz r6,.L204
+ 1748 0070 C4F30E04 	 ubfx r4,r4,#0,#15
+ 1749 0074 E403     	 lsls r4,r4,#15
+ 1750 0076 C8EB0606 	 rsb r6,r8,r6
+ 1751 007a 44F08044 	 orr r4,r4,#1073741824
+ 1752 007e C6F30E00 	 ubfx r0,r6,#0,#15
+ 1753 0082 2043     	 orrs r0,r0,r4
+ 1754 0084 B847     	 blx r7
+ 1755              	.L204:
+ 1756 0086 4FF00450 	 mov r0,#553648128
+ 1757 008a 3B46     	 mov r3,r7
+ 1758 008c 03B0     	 add sp,sp,#12
+ 1759              	 
+ 1760 008e BDE8F04F 	 pop {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 1761 0092 1847     	 bx r3
+ 1762              	.L218:
+ 1763              	 .align 2
+ 1764              	.L217:
+ 1765 0094 00000000 	 .word .LANCHOR9
+ 1766 0098 00000000 	 .word .LANCHOR10
+ 1768              	 .section .text.TFT_graph_pixeldata_i,"ax",%progbits
+ 1769              	 .align 1
+ 1770              	 .global TFT_graph_pixeldata_i
+ 1771              	 .thumb
+ 1772              	 .thumb_func
+ 1774              	TFT_graph_pixeldata_i:
+ 1775              	 
+ 1776              	 
+ 1777 0000 2DE9F047 	 push {r4,r5,r6,r7,r8,r9,r10,lr}
+ 1778 0004 9146     	 mov r9,r2
+ 1779 0006 5F4A     	 ldr r2,.L233
+ 1780 0008 0446     	 mov r4,r0
+ 1781 000a 1E46     	 mov r6,r3
+ 1782 000c 4388     	 ldrh r3,[r0,#2]
+ 1783 000e 0898     	 ldr r0,[sp,#32]
+ 1784 0010 1588     	 ldrh r5,[r2]
+ 1785 0012 40F08060 	 orr r0,r0,#67108864
+ 1786 0016 5D1B     	 subs r5,r3,r5
+ 1787 0018 0F46     	 mov r7,r1
+ 1788 001a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1789 001e 5A48     	 ldr r0,.L233+4
+ 1790 0020 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1791 0024 94F82C30 	 ldrb r3,[r4,#44]
+ 1792 0028 ADB2     	 uxth r5,r5
+ 1793 002a 002B     	 cmp r3,#0
+ 1794 002c 65D1     	 bne .L232
+ 1795 002e 9846     	 mov r8,r3
+ 1796              	.L220:
+ 1797 0030 C845     	 cmp r8,r9
+ 1798 0032 2ADA     	 bge .L228
+ 1799 0034 2289     	 ldrh r2,[r4,#8]
+ 1800 0036 2388     	 ldrh r3,[r4]
+ 1801 0038 D4ED057A 	 flds s15,[r4,#20]
+ 1802 003c B4F806E0 	 ldrh lr,[r4,#6]
+ 1803 0040 A818     	 adds r0,r5,r2
+ 1804 0042 1344     	 add r3,r3,r2
+ 1805 0044 37F81820 	 ldrh r2,[r7,r8,lsl#1]
+ 1806 0048 07EE102A 	 fmsr s14,r2
+ 1807 004c B8EE477A 	 fuitos s14,s14
+ 1808 0050 00EB0E01 	 add r1,r0,lr
+ 1809 0054 87EE277A 	 fdivs s14,s14,s15
+ 1810 0058 4344     	 add r3,r3,r8
+ 1811 005a C3F30E03 	 ubfx r3,r3,#0,#15
+ 1812 005e DB03     	 lsls r3,r3,#15
+ 1813 0060 43F08043 	 orr r3,r3,#1073741824
+ 1814 0064 08F10108 	 add r8,r8,#1
+ 1815 0068 07EE90EA 	 fmsr s15,lr
+ 1816 006c F8EE677A 	 fuitos s15,s15
+ 1817 0070 67EE277A 	 fmuls s15,s14,s15
+ 1818 0074 FCEEE77A 	 ftouizs s15,s15
+ 1819 0078 17EE900A 	 fmrs r0,s15
+ 1820 007c 081A     	 subs r0,r1,r0
+ 1821 007e C0F30E00 	 ubfx r0,r0,#0,#15
+ 1822 0082 1843     	 orrs r0,r0,r3
+ 1823 0084 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1824 0088 D2E7     	 b .L220
+ 1825              	.L228:
+ 1826 008a 4FF00450 	 mov r0,#553648128
+ 1827 008e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1828 0092 94F82C30 	 ldrb r3,[r4,#44]
+ 1829 0096 002B     	 cmp r3,#0
+ 1830 0098 71D1     	 bne .L231
+ 1831 009a 3C48     	 ldr r0,.L233+8
+ 1832 009c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1833 00a0 3948     	 ldr r0,.L233+4
+ 1834 00a2 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1835 00a6 2289     	 ldrh r2,[r4,#8]
+ 1836 00a8 2088     	 ldrh r0,[r4]
+ 1837 00aa AB18     	 adds r3,r5,r2
+ 1838 00ac 1044     	 add r0,r0,r2
+ 1839 00ae 3288     	 ldrh r2,[r6]
+ 1840 00b0 053B     	 subs r3,r3,#5
+ 1841 00b2 1044     	 add r0,r0,r2
+ 1842 00b4 C3F30E03 	 ubfx r3,r3,#0,#15
+ 1843 00b8 43F08043 	 orr r3,r3,#1073741824
+ 1844 00bc C0F30E00 	 ubfx r0,r0,#0,#15
+ 1845 00c0 43EAC030 	 orr r0,r3,r0,lsl#15
+ 1846 00c4 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1847 00c8 2289     	 ldrh r2,[r4,#8]
+ 1848 00ca 2088     	 ldrh r0,[r4]
+ 1849 00cc 3388     	 ldrh r3,[r6]
+ 1850 00ce 1044     	 add r0,r0,r2
+ 1851 00d0 1844     	 add r0,r0,r3
+ 1852 00d2 E388     	 ldrh r3,[r4,#6]
+ 1853 00d4 1544     	 add r5,r5,r2
+ 1854 00d6 1D44     	 add r5,r5,r3
+ 1855 00d8 0535     	 adds r5,r5,#5
+ 1856 00da C5F30E05 	 ubfx r5,r5,#0,#15
+ 1857 00de C0F30E00 	 ubfx r0,r0,#0,#15
+ 1858 00e2 45EAC030 	 orr r0,r5,r0,lsl#15
+ 1859 00e6 40F08040 	 orr r0,r0,#1073741824
+ 1860 00ea FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1861 00ee 4FF00450 	 mov r0,#553648128
+ 1862 00f2 BDE8F047 	 pop {r4,r5,r6,r7,r8,r9,r10,lr}
+ 1863 00f6 FFF7FEBF 	 b EVE_cmd_dl_burst
+ 1864              	.L232:
+ 1865 00fa 09F1FF39 	 add r9,r9,#-1
+ 1866 00fe 1FFA89F9 	 uxth r9,r9
+ 1867 0102 B6F80080 	 ldrh r8,[r6]
+ 1868 0106 CA46     	 mov r10,r9
+ 1869              	.L225:
+ 1870 0108 0FFA8AF2 	 sxth r2,r10
+ 1871 010c 002A     	 cmp r2,#0
+ 1872 010e BCDB     	 blt .L228
+ 1873 0110 2389     	 ldrh r3,[r4,#8]
+ 1874 0112 2088     	 ldrh r0,[r4]
+ 1875 0114 B4F806E0 	 ldrh lr,[r4,#6]
+ 1876 0118 D4ED057A 	 flds s15,[r4,#20]
+ 1877 011c 18F4004F 	 tst r8,#32768
+ 1878 0120 18BF     	 it ne
+ 1879 0122 C846     	 movne r8,r9
+ 1880 0124 1844     	 add r0,r0,r3
+ 1881 0126 2B44     	 add r3,r3,r5
+ 1882 0128 03EB0E01 	 add r1,r3,lr
+ 1883 012c 0FFA88F3 	 sxth r3,r8
+ 1884 0130 0244     	 add r2,r2,r0
+ 1885 0132 37F81330 	 ldrh r3,[r7,r3,lsl#1]
+ 1886 0136 07EE103A 	 fmsr s14,r3
+ 1887 013a B8EE477A 	 fuitos s14,s14
+ 1888 013e C2F30E02 	 ubfx r2,r2,#0,#15
+ 1889 0142 87EE277A 	 fdivs s14,s14,s15
+ 1890 0146 D203     	 lsls r2,r2,#15
+ 1891 0148 42F08042 	 orr r2,r2,#1073741824
+ 1892 014c 08F1FF38 	 add r8,r8,#-1
+ 1893 0150 0AF1FF3A 	 add r10,r10,#-1
+ 1894 0154 1FFA88F8 	 uxth r8,r8
+ 1895 0158 1FFA8AFA 	 uxth r10,r10
+ 1896 015c 07EE90EA 	 fmsr s15,lr
+ 1897 0160 F8EE677A 	 fuitos s15,s15
+ 1898 0164 67EE277A 	 fmuls s15,s14,s15
+ 1899 0168 FCEEE77A 	 ftouizs s15,s15
+ 1900 016c 17EE903A 	 fmrs r3,s15
+ 1901 0170 CB1A     	 subs r3,r1,r3
+ 1902 0172 C3F30E00 	 ubfx r0,r3,#0,#15
+ 1903 0176 1043     	 orrs r0,r0,r2
+ 1904 0178 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1905 017c C4E7     	 b .L225
+ 1906              	.L231:
+ 1907 017e BDE8F087 	 pop {r4,r5,r6,r7,r8,r9,r10,pc}
+ 1908              	.L234:
+ 1909 0182 00BF     	 .align 2
+ 1910              	.L233:
+ 1911 0184 00000000 	 .word .LANCHOR9
+ 1912 0188 0400001F 	 .word 520093700
+ 1913 018c 0000FF04 	 .word 83820544
+ 1915              	 .section .text.TFT_graph_pixeldata_f,"ax",%progbits
+ 1916              	 .align 1
+ 1917              	 .global TFT_graph_pixeldata_f
+ 1918              	 .thumb
+ 1919              	 .thumb_func
+ 1921              	TFT_graph_pixeldata_f:
+ 1922              	 
+ 1923              	 
+ 1924 0000 2DE9F047 	 push {r4,r5,r6,r7,r8,r9,r10,lr}
+ 1925 0004 1646     	 mov r6,r2
+ 1926 0006 5B4A     	 ldr r2,.L246
+ 1927 0008 0446     	 mov r4,r0
+ 1928 000a 1F46     	 mov r7,r3
+ 1929 000c 4388     	 ldrh r3,[r0,#2]
+ 1930 000e 0898     	 ldr r0,[sp,#32]
+ 1931 0010 1588     	 ldrh r5,[r2]
+ 1932 0012 40F08060 	 orr r0,r0,#67108864
+ 1933 0016 5D1B     	 subs r5,r3,r5
+ 1934 0018 8846     	 mov r8,r1
+ 1935 001a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1936 001e 5648     	 ldr r0,.L246+4
+ 1937 0020 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1938 0024 94F82C30 	 ldrb r3,[r4,#44]
+ 1939 0028 ADB2     	 uxth r5,r5
+ 1940 002a 002B     	 cmp r3,#0
+ 1941 002c 61D1     	 bne .L236
+ 1942 002e 9946     	 mov r9,r3
+ 1943              	.L237:
+ 1944 0030 B145     	 cmp r9,r6
+ 1945 0032 26DA     	 bge .L244
+ 1946 0034 D4ED057A 	 flds s15,[r4,#20]
+ 1947 0038 B8EC017A 	 fldmias r8!,{s14}
+ 1948 003c B4F806E0 	 ldrh lr,[r4,#6]
+ 1949 0040 2289     	 ldrh r2,[r4,#8]
+ 1950 0042 2388     	 ldrh r3,[r4]
+ 1951 0044 87EE277A 	 fdivs s14,s14,s15
+ 1952 0048 A818     	 adds r0,r5,r2
+ 1953 004a 1344     	 add r3,r3,r2
+ 1954 004c 00EB0E01 	 add r1,r0,lr
+ 1955 0050 4B44     	 add r3,r3,r9
+ 1956 0052 C3F30E03 	 ubfx r3,r3,#0,#15
+ 1957 0056 DB03     	 lsls r3,r3,#15
+ 1958 0058 43F08043 	 orr r3,r3,#1073741824
+ 1959 005c 09F10109 	 add r9,r9,#1
+ 1960 0060 07EE90EA 	 fmsr s15,lr
+ 1961 0064 F8EE677A 	 fuitos s15,s15
+ 1962 0068 67EE277A 	 fmuls s15,s14,s15
+ 1963 006c FCEEE77A 	 ftouizs s15,s15
+ 1964 0070 17EE900A 	 fmrs r0,s15
+ 1965 0074 081A     	 subs r0,r1,r0
+ 1966 0076 C0F30E00 	 ubfx r0,r0,#0,#15
+ 1967 007a 1843     	 orrs r0,r0,r3
+ 1968 007c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1969 0080 D6E7     	 b .L237
+ 1970              	.L244:
+ 1971 0082 4FF00450 	 mov r0,#553648128
+ 1972 0086 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1973 008a 94F82C30 	 ldrb r3,[r4,#44]
+ 1974 008e 002B     	 cmp r3,#0
+ 1975 0090 6DD1     	 bne .L245
+ 1976 0092 3A48     	 ldr r0,.L246+8
+ 1977 0094 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1978 0098 3748     	 ldr r0,.L246+4
+ 1979 009a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1980 009e 2289     	 ldrh r2,[r4,#8]
+ 1981 00a0 2088     	 ldrh r0,[r4]
+ 1982 00a2 AB18     	 adds r3,r5,r2
+ 1983 00a4 1044     	 add r0,r0,r2
+ 1984 00a6 3A88     	 ldrh r2,[r7]
+ 1985 00a8 053B     	 subs r3,r3,#5
+ 1986 00aa 1044     	 add r0,r0,r2
+ 1987 00ac C3F30E03 	 ubfx r3,r3,#0,#15
+ 1988 00b0 43F08043 	 orr r3,r3,#1073741824
+ 1989 00b4 C0F30E00 	 ubfx r0,r0,#0,#15
+ 1990 00b8 43EAC030 	 orr r0,r3,r0,lsl#15
+ 1991 00bc FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 1992 00c0 2289     	 ldrh r2,[r4,#8]
+ 1993 00c2 2088     	 ldrh r0,[r4]
+ 1994 00c4 3B88     	 ldrh r3,[r7]
+ 1995 00c6 1044     	 add r0,r0,r2
+ 1996 00c8 1844     	 add r0,r0,r3
+ 1997 00ca E388     	 ldrh r3,[r4,#6]
+ 1998 00cc 1544     	 add r5,r5,r2
+ 1999 00ce 1D44     	 add r5,r5,r3
+ 2000 00d0 0535     	 adds r5,r5,#5
+ 2001 00d2 C5F30E05 	 ubfx r5,r5,#0,#15
+ 2002 00d6 C0F30E00 	 ubfx r0,r0,#0,#15
+ 2003 00da 45EAC030 	 orr r0,r5,r0,lsl#15
+ 2004 00de 40F08040 	 orr r0,r0,#1073741824
+ 2005 00e2 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2006 00e6 4FF00450 	 mov r0,#553648128
+ 2007 00ea BDE8F047 	 pop {r4,r5,r6,r7,r8,r9,r10,lr}
+ 2008 00ee FFF7FEBF 	 b EVE_cmd_dl_burst
+ 2009              	.L236:
+ 2010 00f2 013E     	 subs r6,r6,#1
+ 2011 00f4 B6B2     	 uxth r6,r6
+ 2012 00f6 B7F80090 	 ldrh r9,[r7]
+ 2013 00fa B246     	 mov r10,r6
+ 2014              	.L241:
+ 2015 00fc 0FFA8AF2 	 sxth r2,r10
+ 2016 0100 002A     	 cmp r2,#0
+ 2017 0102 BEDB     	 blt .L244
+ 2018 0104 2389     	 ldrh r3,[r4,#8]
+ 2019 0106 2188     	 ldrh r1,[r4]
+ 2020 0108 B4F806E0 	 ldrh lr,[r4,#6]
+ 2021 010c D4ED057A 	 flds s15,[r4,#20]
+ 2022 0110 19F4004F 	 tst r9,#32768
+ 2023 0114 18BF     	 it ne
+ 2024 0116 B146     	 movne r9,r6
+ 2025 0118 1944     	 add r1,r1,r3
+ 2026 011a 2B44     	 add r3,r3,r5
+ 2027 011c 1144     	 add r1,r1,r2
+ 2028 011e 03EB0E02 	 add r2,r3,lr
+ 2029 0122 0FFA89F3 	 sxth r3,r9
+ 2030 0126 08EB8303 	 add r3,r8,r3,lsl#2
+ 2031 012a 93ED007A 	 flds s14,[r3]
+ 2032 012e 87EE277A 	 fdivs s14,s14,s15
+ 2033 0132 C1F30E01 	 ubfx r1,r1,#0,#15
+ 2034 0136 C903     	 lsls r1,r1,#15
+ 2035 0138 41F08041 	 orr r1,r1,#1073741824
+ 2036 013c 09F1FF39 	 add r9,r9,#-1
+ 2037 0140 0AF1FF3A 	 add r10,r10,#-1
+ 2038 0144 1FFA89F9 	 uxth r9,r9
+ 2039 0148 1FFA8AFA 	 uxth r10,r10
+ 2040 014c 07EE90EA 	 fmsr s15,lr
+ 2041 0150 F8EE677A 	 fuitos s15,s15
+ 2042 0154 67EE277A 	 fmuls s15,s14,s15
+ 2043 0158 FCEEE77A 	 ftouizs s15,s15
+ 2044 015c 17EE903A 	 fmrs r3,s15
+ 2045 0160 D31A     	 subs r3,r2,r3
+ 2046 0162 C3F30E00 	 ubfx r0,r3,#0,#15
+ 2047 0166 0843     	 orrs r0,r0,r1
+ 2048 0168 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2049 016c C6E7     	 b .L241
+ 2050              	.L245:
+ 2051 016e BDE8F087 	 pop {r4,r5,r6,r7,r8,r9,r10,pc}
+ 2052              	.L247:
+ 2053 0172 00BF     	 .align 2
+ 2054              	.L246:
+ 2055 0174 00000000 	 .word .LANCHOR9
+ 2056 0178 0400001F 	 .word 520093700
+ 2057 017c 0000FF04 	 .word 83820544
+ 2059              	 .section .text.TFT_graph_stepdata,"ax",%progbits
+ 2060              	 .align 1
+ 2061              	 .global TFT_graph_stepdata
+ 2062              	 .thumb
+ 2063              	 .thumb_func
+ 2065              	TFT_graph_stepdata:
+ 2066              	 
+ 2067              	 
+ 2068 0000 2DE9F347 	 push {r0,r1,r4,r5,r6,r7,r8,r9,r10,lr}
+ 2069 0004 0F46     	 mov r7,r1
+ 2070 0006 3149     	 ldr r1,.L252
+ 2071 0008 D0ED076A 	 flds s13,[r0,#28]
+ 2072 000c 0D88     	 ldrh r5,[r1]
+ 2073 000e 1646     	 mov r6,r2
+ 2074 0010 4288     	 ldrh r2,[r0,#2]
+ 2075 0012 551B     	 subs r5,r2,r5
+ 2076 0014 8288     	 ldrh r2,[r0,#4]
+ 2077 0016 07EE902A 	 fmsr s15,r2
+ 2078 001a B8EEE77A 	 fsitos s14,s15
+ 2079 001e D0ED087A 	 flds s15,[r0,#32]
+ 2080 0022 77EEE67A 	 fsubs s15,s15,s13
+ 2081 0026 8046     	 mov r8,r0
+ 2082 0028 C7EE277A 	 fdivs s15,s14,s15
+ 2083 002c 0A98     	 ldr r0,[sp,#40]
+ 2084 002e 40F08060 	 orr r0,r0,#67108864
+ 2085 0032 4FF00009 	 mov r9,#0
+ 2086 0036 ADB2     	 uxth r5,r5
+ 2087 0038 CA46     	 mov r10,r9
+ 2088 003a 07EE103A 	 fmsr s14,r3
+ 2089 003e 67EE877A 	 fmuls s15,s15,s14
+ 2090 0042 FCEEE77A 	 ftouizs s15,s15
+ 2091 0046 CDED017A 	 fsts s15,[sp,#4]
+ 2092 004a BDF80440 	 ldrh r4,[sp,#4]
+ 2093 004e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2094 0052 1F48     	 ldr r0,.L252+4
+ 2095 0054 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2096              	.L249:
+ 2097 0058 B145     	 cmp r9,r6
+ 2098 005a 2FDA     	 bge .L251
+ 2099 005c B8F80820 	 ldrh r2,[r8,#8]
+ 2100 0060 B8F80030 	 ldrh r3,[r8]
+ 2101 0064 D8ED057A 	 flds s15,[r8,#20]
+ 2102 0068 B8F806E0 	 ldrh lr,[r8,#6]
+ 2103 006c A818     	 adds r0,r5,r2
+ 2104 006e 1344     	 add r3,r3,r2
+ 2105 0070 37F81920 	 ldrh r2,[r7,r9,lsl#1]
+ 2106 0074 07EE102A 	 fmsr s14,r2
+ 2107 0078 B8EE477A 	 fuitos s14,s14
+ 2108 007c 00EB0E01 	 add r1,r0,lr
+ 2109 0080 87EE277A 	 fdivs s14,s14,s15
+ 2110 0084 5344     	 add r3,r3,r10
+ 2111 0086 C3F30E03 	 ubfx r3,r3,#0,#15
+ 2112 008a DB03     	 lsls r3,r3,#15
+ 2113 008c 43F08043 	 orr r3,r3,#1073741824
+ 2114 0090 A244     	 add r10,r10,r4
+ 2115 0092 1FFA8AFA 	 uxth r10,r10
+ 2116 0096 09F10109 	 add r9,r9,#1
+ 2117 009a 07EE90EA 	 fmsr s15,lr
+ 2118 009e F8EE677A 	 fuitos s15,s15
+ 2119 00a2 67EE277A 	 fmuls s15,s14,s15
+ 2120 00a6 FCEEE77A 	 ftouizs s15,s15
+ 2121 00aa 17EE900A 	 fmrs r0,s15
+ 2122 00ae 081A     	 subs r0,r1,r0
+ 2123 00b0 C0F30E00 	 ubfx r0,r0,#0,#15
+ 2124 00b4 1843     	 orrs r0,r0,r3
+ 2125 00b6 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2126 00ba CDE7     	 b .L249
+ 2127              	.L251:
+ 2128 00bc 4FF00450 	 mov r0,#553648128
+ 2129 00c0 02B0     	 add sp,sp,#8
+ 2130              	 
+ 2131 00c2 BDE8F047 	 pop {r4,r5,r6,r7,r8,r9,r10,lr}
+ 2132 00c6 FFF7FEBF 	 b EVE_cmd_dl_burst
+ 2133              	.L253:
+ 2134 00ca 00BF     	 .align 2
+ 2135              	.L252:
+ 2136 00cc 00000000 	 .word .LANCHOR9
+ 2137 00d0 0400001F 	 .word 520093700
+ 2139              	 .section .text.TFT_graph_XYdata,"ax",%progbits
+ 2140              	 .align 1
+ 2141              	 .global TFT_graph_XYdata
+ 2142              	 .thumb
+ 2143              	 .thumb_func
+ 2145              	TFT_graph_XYdata:
+ 2146              	 
+ 2147              	 
+ 2148 0000 2DE9F04F 	 push {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 2149 0004 2DED028B 	 fstmfdd sp!,{d8}
+ 2150 0008 85B0     	 sub sp,sp,#20
+ 2151 000a 1646     	 mov r6,r2
+ 2152 000c 824A     	 ldr r2,.L290
+ 2153 000e 0393     	 str r3,[sp,#12]
+ 2154 0010 109B     	 ldr r3,[sp,#64]
+ 2155 0012 0293     	 str r3,[sp,#8]
+ 2156 0014 0446     	 mov r4,r0
+ 2157 0016 4388     	 ldrh r3,[r0,#2]
+ 2158 0018 1088     	 ldrh r0,[r2]
+ 2159 001a 9DF84470 	 ldrb r7,[sp,#68]
+ 2160 001e 181A     	 subs r0,r3,r0
+ 2161 0020 83B2     	 uxth r3,r0
+ 2162 0022 1298     	 ldr r0,[sp,#72]
+ 2163 0024 0193     	 str r3,[sp,#4]
+ 2164 0026 40F08060 	 orr r0,r0,#67108864
+ 2165 002a 8946     	 mov r9,r1
+ 2166 002c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2167 0030 17B1     	 cbz r7,.L256
+ 2168 0032 012F     	 cmp r7,#1
+ 2169 0034 08D0     	 beq .L257
+ 2170 0036 02E0     	 b .L255
+ 2171              	.L256:
+ 2172 0038 7848     	 ldr r0,.L290+4
+ 2173              	.L284:
+ 2174 003a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2175              	.L255:
+ 2176 003e CB46     	 mov fp,r9
+ 2177 0040 B246     	 mov r10,r6
+ 2178 0042 4FF00008 	 mov r8,#0
+ 2179 0046 59E0     	 b .L258
+ 2180              	.L257:
+ 2181 0048 7548     	 ldr r0,.L290+8
+ 2182 004a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2183 004e 7548     	 ldr r0,.L290+12
+ 2184 0050 F3E7     	 b .L284
+ 2185              	.L265:
+ 2186 0052 A388     	 ldrh r3,[r4,#4]
+ 2187 0054 D4ED086A 	 flds s13,[r4,#32]
+ 2188 0058 BAEC016A 	 fldmias r10!,{s12}
+ 2189 005c 07EE903A 	 fmsr s15,r3
+ 2190 0060 B8EE677A 	 fuitos s14,s15
+ 2191 0064 D4ED077A 	 flds s15,[r4,#28]
+ 2192 0068 76EEE77A 	 fsubs s15,s13,s15
+ 2193 006c C7EE277A 	 fdivs s15,s14,s15
+ 2194 0070 67EE867A 	 fmuls s15,s15,s12
+ 2195 0074 F5EEC07A 	 fcmpezs s15
+ 2196 0078 F1EE10FA 	 fmstat
+ 2197 007c 17EE900A 	 fmrs r0,s15
+ 2198 0080 40DB     	 blt .L280
+ 2199 0082 FFF7FEFF 	 bl __aeabi_f2d
+ 2200 0086 0022     	 movs r2,#0
+ 2201 0088 674B     	 ldr r3,.L290+16
+ 2202 008a FFF7FEFF 	 bl __aeabi_dadd
+ 2203              	.L285:
+ 2204 008e FFF7FEFF 	 bl __aeabi_d2iz
+ 2205 0092 94ED057A 	 flds s14,[r4,#20]
+ 2206 0096 FBEC017A 	 fldmias fp!,{s15}
+ 2207 009a E388     	 ldrh r3,[r4,#6]
+ 2208 009c C7EE877A 	 fdivs s15,s15,s14
+ 2209 00a0 85B2     	 uxth r5,r0
+ 2210 00a2 08EE103A 	 fmsr s16,r3
+ 2211 00a6 B8EE487A 	 fuitos s14,s16
+ 2212 00aa 67EE877A 	 fmuls s15,s15,s14
+ 2213 00ae F5EEC07A 	 fcmpezs s15
+ 2214 00b2 F1EE10FA 	 fmstat
+ 2215 00b6 17EE900A 	 fmrs r0,s15
+ 2216 00ba 2ADB     	 blt .L281
+ 2217 00bc FFF7FEFF 	 bl __aeabi_f2d
+ 2218 00c0 0022     	 movs r2,#0
+ 2219 00c2 594B     	 ldr r3,.L290+16
+ 2220 00c4 FFF7FEFF 	 bl __aeabi_dadd
+ 2221              	.L286:
+ 2222 00c8 FFF7FEFF 	 bl __aeabi_d2iz
+ 2223 00cc 2389     	 ldrh r3,[r4,#8]
+ 2224 00ce 2288     	 ldrh r2,[r4]
+ 2225 00d0 1A44     	 add r2,r2,r3
+ 2226 00d2 1544     	 add r5,r5,r2
+ 2227 00d4 019A     	 ldr r2,[sp,#4]
+ 2228 00d6 1344     	 add r3,r3,r2
+ 2229 00d8 18EE102A 	 fmrs r2,s16
+ 2230 00dc 80B2     	 uxth r0,r0
+ 2231 00de 101A     	 subs r0,r2,r0
+ 2232 00e0 C5F30E05 	 ubfx r5,r5,#0,#15
+ 2233 00e4 13FA80F0 	 uxtah r0,r3,r0
+ 2234 00e8 ED03     	 lsls r5,r5,#15
+ 2235 00ea 45F08045 	 orr r5,r5,#1073741824
+ 2236 00ee C0F30E00 	 ubfx r0,r0,#0,#15
+ 2237 00f2 2843     	 orrs r0,r0,r5
+ 2238 00f4 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2239 00f8 08F10108 	 add r8,r8,#1
+ 2240              	.L258:
+ 2241 00fc 039B     	 ldr r3,[sp,#12]
+ 2242 00fe 9845     	 cmp r8,r3
+ 2243 0100 A7DB     	 blt .L265
+ 2244 0102 0DE0     	 b .L289
+ 2245              	.L280:
+ 2246 0104 FFF7FEFF 	 bl __aeabi_f2d
+ 2247 0108 0022     	 movs r2,#0
+ 2248 010a 474B     	 ldr r3,.L290+16
+ 2249 010c FFF7FEFF 	 bl __aeabi_dsub
+ 2250 0110 BDE7     	 b .L285
+ 2251              	.L281:
+ 2252 0112 FFF7FEFF 	 bl __aeabi_f2d
+ 2253 0116 0022     	 movs r2,#0
+ 2254 0118 434B     	 ldr r3,.L290+16
+ 2255 011a FFF7FEFF 	 bl __aeabi_dsub
+ 2256 011e D3E7     	 b .L286
+ 2257              	.L289:
+ 2258 0120 012F     	 cmp r7,#1
+ 2259 0122 6FD1     	 bne .L266
+ 2260 0124 029B     	 ldr r3,[sp,#8]
+ 2261 0126 B3F90030 	 ldrsh r3,[r3]
+ 2262 012a 0133     	 adds r3,r3,#1
+ 2263 012c 6AD0     	 beq .L266
+ 2264 012e 3F48     	 ldr r0,.L290+20
+ 2265 0130 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2266 0134 3E48     	 ldr r0,.L290+24
+ 2267 0136 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2268 013a 029B     	 ldr r3,[sp,#8]
+ 2269 013c D4ED076A 	 flds s13,[r4,#28]
+ 2270 0140 B3F90070 	 ldrsh r7,[r3]
+ 2271 0144 A388     	 ldrh r3,[r4,#4]
+ 2272 0146 07EE903A 	 fmsr s15,r3
+ 2273 014a B8EE677A 	 fuitos s14,s15
+ 2274 014e D4ED087A 	 flds s15,[r4,#32]
+ 2275 0152 77EEE67A 	 fsubs s15,s15,s13
+ 2276 0156 BF00     	 lsls r7,r7,#2
+ 2277 0158 C7EE277A 	 fdivs s15,s14,s15
+ 2278 015c 3E44     	 add r6,r6,r7
+ 2279 015e 96ED007A 	 flds s14,[r6]
+ 2280 0162 67EE877A 	 fmuls s15,s15,s14
+ 2281 0166 F5EEC07A 	 fcmpezs s15
+ 2282 016a F1EE10FA 	 fmstat
+ 2283 016e 17EE900A 	 fmrs r0,s15
+ 2284 0172 06DB     	 blt .L282
+ 2285 0174 FFF7FEFF 	 bl __aeabi_f2d
+ 2286 0178 0022     	 movs r2,#0
+ 2287 017a 2B4B     	 ldr r3,.L290+16
+ 2288 017c FFF7FEFF 	 bl __aeabi_dadd
+ 2289 0180 05E0     	 b .L287
+ 2290              	.L282:
+ 2291 0182 FFF7FEFF 	 bl __aeabi_f2d
+ 2292 0186 0022     	 movs r2,#0
+ 2293 0188 274B     	 ldr r3,.L290+16
+ 2294 018a FFF7FEFF 	 bl __aeabi_dsub
+ 2295              	.L287:
+ 2296 018e B944     	 add r9,r9,r7
+ 2297 0190 FFF7FEFF 	 bl __aeabi_d2iz
+ 2298 0194 94ED057A 	 flds s14,[r4,#20]
+ 2299 0198 D9ED007A 	 flds s15,[r9]
+ 2300 019c E688     	 ldrh r6,[r4,#6]
+ 2301 019e C7EE877A 	 fdivs s15,s15,s14
+ 2302 01a2 85B2     	 uxth r5,r0
+ 2303 01a4 07EE106A 	 fmsr s14,r6
+ 2304 01a8 B8EE477A 	 fuitos s14,s14
+ 2305 01ac 67EE877A 	 fmuls s15,s15,s14
+ 2306 01b0 F5EEC07A 	 fcmpezs s15
+ 2307 01b4 F1EE10FA 	 fmstat
+ 2308 01b8 17EE900A 	 fmrs r0,s15
+ 2309 01bc 06DB     	 blt .L283
+ 2310 01be FFF7FEFF 	 bl __aeabi_f2d
+ 2311 01c2 0022     	 movs r2,#0
+ 2312 01c4 184B     	 ldr r3,.L290+16
+ 2313 01c6 FFF7FEFF 	 bl __aeabi_dadd
+ 2314 01ca 05E0     	 b .L288
+ 2315              	.L283:
+ 2316 01cc FFF7FEFF 	 bl __aeabi_f2d
+ 2317 01d0 0022     	 movs r2,#0
+ 2318 01d2 154B     	 ldr r3,.L290+16
+ 2319 01d4 FFF7FEFF 	 bl __aeabi_dsub
+ 2320              	.L288:
+ 2321 01d8 FFF7FEFF 	 bl __aeabi_d2iz
+ 2322 01dc 2389     	 ldrh r3,[r4,#8]
+ 2323 01de 2288     	 ldrh r2,[r4]
+ 2324 01e0 1A44     	 add r2,r2,r3
+ 2325 01e2 1544     	 add r5,r5,r2
+ 2326 01e4 019A     	 ldr r2,[sp,#4]
+ 2327 01e6 80B2     	 uxth r0,r0
+ 2328 01e8 C5F30E05 	 ubfx r5,r5,#0,#15
+ 2329 01ec 1A44     	 add r2,r2,r3
+ 2330 01ee 361A     	 subs r6,r6,r0
+ 2331 01f0 ED03     	 lsls r5,r5,#15
+ 2332 01f2 12FA86F0 	 uxtah r0,r2,r6
+ 2333 01f6 45F08045 	 orr r5,r5,#1073741824
+ 2334 01fa C0F30E00 	 ubfx r0,r0,#0,#15
+ 2335 01fe 2843     	 orrs r0,r0,r5
+ 2336 0200 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2337              	.L266:
+ 2338 0204 4FF00450 	 mov r0,#553648128
+ 2339 0208 05B0     	 add sp,sp,#20
+ 2340              	 
+ 2341 020a BDEC028B 	 fldmfdd sp!,{d8}
+ 2342 020e BDE8F04F 	 pop {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 2343 0212 FFF7FEBF 	 b EVE_cmd_dl_burst
+ 2344              	.L291:
+ 2345 0216 00BF     	 .align 2
+ 2346              	.L290:
+ 2347 0218 00000000 	 .word .LANCHOR9
+ 2348 021c 0400001F 	 .word 520093700
+ 2349 0220 3000000D 	 .word 218103856
+ 2350 0224 0200001F 	 .word 520093698
+ 2351 0228 0000E03F 	 .word 1071644672
+ 2352 022c 0000FF04 	 .word 83820544
+ 2353 0230 4000000D 	 .word 218103872
+ 2355              	 .section .text.TFT_graph_function,"ax",%progbits
+ 2356              	 .align 1
+ 2357              	 .global TFT_graph_function
+ 2358              	 .thumb
+ 2359              	 .thumb_func
+ 2361              	TFT_graph_function:
+ 2362              	 
+ 2363              	 
+ 2364 0000 2DE9F04F 	 push {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 2365 0004 8946     	 mov r9,r1
+ 2366 0006 5E49     	 ldr r1,.L311
+ 2367 0008 9246     	 mov r10,r2
+ 2368 000a 0F88     	 ldrh r7,[r1]
+ 2369 000c 4288     	 ldrh r2,[r0,#2]
+ 2370 000e D71B     	 subs r7,r2,r7
+ 2371 0010 8288     	 ldrh r2,[r0,#4]
+ 2372 0012 B2FBF3F3 	 udiv r3,r2,r3
+ 2373 0016 07EE903A 	 fmsr s15,r3
+ 2374 001a 2DED048B 	 fstmfdd sp!,{d8,d9}
+ 2375 001e B8EEE79A 	 fsitos s18,s15
+ 2376 0022 D0ED079A 	 flds s19,[r0,#28]
+ 2377 0026 D0ED087A 	 flds s15,[r0,#32]
+ 2378 002a 77EEE99A 	 fsubs s19,s15,s19
+ 2379 002e 07EE902A 	 fmsr s15,r2
+ 2380 0032 F8EEE77A 	 fsitos s15,s15
+ 2381 0036 83B0     	 sub sp,sp,#12
+ 2382 0038 C7EE897A 	 fdivs s15,s15,s18
+ 2383 003c 0446     	 mov r4,r0
+ 2384 003e 1198     	 ldr r0,[sp,#68]
+ 2385 0040 9DF84060 	 ldrb r6,[sp,#64]
+ 2386 0044 40F08060 	 orr r0,r0,#67108864
+ 2387 0048 BFB2     	 uxth r7,r7
+ 2388 004a C9EE899A 	 fdivs s19,s19,s18
+ 2389 004e FCEEE77A 	 ftouizs s15,s15
+ 2390 0052 CDED017A 	 fsts s15,[sp,#4]
+ 2391 0056 BDF80450 	 ldrh r5,[sp,#4]
+ 2392 005a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2393 005e 16B1     	 cbz r6,.L294
+ 2394 0060 012E     	 cmp r6,#1
+ 2395 0062 06D0     	 beq .L295
+ 2396 0064 02E0     	 b .L293
+ 2397              	.L294:
+ 2398 0066 4748     	 ldr r0,.L311+4
+ 2399              	.L307:
+ 2400 0068 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2401              	.L293:
+ 2402 006c 0026     	 movs r6,#0
+ 2403 006e B046     	 mov r8,r6
+ 2404 0070 47E0     	 b .L296
+ 2405              	.L295:
+ 2406 0072 4548     	 ldr r0,.L311+8
+ 2407 0074 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2408 0078 4448     	 ldr r0,.L311+12
+ 2409 007a F5E7     	 b .L307
+ 2410              	.L301:
+ 2411 007c E388     	 ldrh r3,[r4,#6]
+ 2412 007e D4ED057A 	 flds s15,[r4,#20]
+ 2413 0082 08EE103A 	 fmsr s16,r3
+ 2414 0086 B8EEC88A 	 fsitos s16,s16
+ 2415 008a 69EEA88A 	 fmuls s17,s19,s17
+ 2416 008e 88EE278A 	 fdivs s16,s16,s15
+ 2417 0092 4946     	 mov r1,r9
+ 2418 0094 5246     	 mov r2,r10
+ 2419 0096 18EE900A 	 fmrs r0,s17
+ 2420 009a FFF7FEFF 	 bl poly_calc
+ 2421 009e B4F806B0 	 ldrh fp,[r4,#6]
+ 2422 00a2 07EE900A 	 fmsr s15,r0
+ 2423 00a6 28EE278A 	 fmuls s16,s16,s15
+ 2424 00aa 07EE90BA 	 fmsr s15,fp
+ 2425 00ae B5EEC08A 	 fcmpezs s16
+ 2426 00b2 F8EEE77A 	 fsitos s15,s15
+ 2427 00b6 94ED058A 	 flds s16,[r4,#20]
+ 2428 00ba F1EE10FA 	 fmstat
+ 2429 00be 87EE888A 	 fdivs s16,s15,s16
+ 2430 00c2 4946     	 mov r1,r9
+ 2431 00c4 5246     	 mov r2,r10
+ 2432 00c6 18EE900A 	 fmrs r0,s17
+ 2433 00ca 28DB     	 blt .L306
+ 2434 00cc FFF7FEFF 	 bl poly_calc
+ 2435 00d0 07EE900A 	 fmsr s15,r0
+ 2436 00d4 68EE277A 	 fmuls s15,s16,s15
+ 2437 00d8 17EE900A 	 fmrs r0,s15
+ 2438 00dc FFF7FEFF 	 bl __aeabi_f2d
+ 2439 00e0 0022     	 movs r2,#0
+ 2440 00e2 2B4B     	 ldr r3,.L311+16
+ 2441 00e4 FFF7FEFF 	 bl __aeabi_dadd
+ 2442              	.L308:
+ 2443 00e8 FFF7FEFF 	 bl __aeabi_d2iz
+ 2444 00ec 80B2     	 uxth r0,r0
+ 2445 00ee C0EB0B00 	 rsb r0,r0,fp
+ 2446 00f2 80B2     	 uxth r0,r0
+ 2447 00f4 2288     	 ldrh r2,[r4]
+ 2448 00f6 2189     	 ldrh r1,[r4,#8]
+ 2449 00f8 00BB     	 cbnz r0,.L309
+ 2450              	.L300:
+ 2451 00fa 2E44     	 add r6,r6,r5
+ 2452 00fc 08F10108 	 add r8,r8,#1
+ 2453 0100 B6B2     	 uxth r6,r6
+ 2454              	.L296:
+ 2455 0102 07EE908A 	 fmsr s15,r8
+ 2456 0106 F8EEE78A 	 fsitos s17,s15
+ 2457 010a F7EE007A 	 fconsts s15,#112
+ 2458 010e 79EE277A 	 fadds s15,s18,s15
+ 2459 0112 F4EEE78A 	 fcmpes s17,s15
+ 2460 0116 F1EE10FA 	 fmstat
+ 2461 011a AFD4     	 bmi .L301
+ 2462 011c 27E0     	 b .L310
+ 2463              	.L306:
+ 2464 011e FFF7FEFF 	 bl poly_calc
+ 2465 0122 07EE900A 	 fmsr s15,r0
+ 2466 0126 68EE277A 	 fmuls s15,s16,s15
+ 2467 012a 17EE900A 	 fmrs r0,s15
+ 2468 012e FFF7FEFF 	 bl __aeabi_f2d
+ 2469 0132 0022     	 movs r2,#0
+ 2470 0134 164B     	 ldr r3,.L311+16
+ 2471 0136 FFF7FEFF 	 bl __aeabi_dsub
+ 2472 013a D5E7     	 b .L308
+ 2473              	.L309:
+ 2474 013c E388     	 ldrh r3,[r4,#6]
+ 2475 013e 8342     	 cmp r3,r0
+ 2476 0140 DBD9     	 bls .L300
+ 2477 0142 7B18     	 adds r3,r7,r1
+ 2478 0144 0344     	 add r3,r3,r0
+ 2479 0146 1348     	 ldr r0,.L311+20
+ 2480 0148 B0F90000 	 ldrsh r0,[r0]
+ 2481 014c 9BB2     	 uxth r3,r3
+ 2482 014e 8342     	 cmp r3,r0
+ 2483 0150 D3DD     	 ble .L300
+ 2484 0152 B3F5887F 	 cmp r3,#272
+ 2485 0156 D0D2     	 bcs .L300
+ 2486 0158 8818     	 adds r0,r1,r2
+ 2487 015a 3044     	 add r0,r0,r6
+ 2488 015c C0F30E00 	 ubfx r0,r0,#0,#15
+ 2489 0160 43EAC030 	 orr r0,r3,r0,lsl#15
+ 2490 0164 40F08040 	 orr r0,r0,#1073741824
+ 2491 0168 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2492 016c C5E7     	 b .L300
+ 2493              	.L310:
+ 2494 016e 4FF00450 	 mov r0,#553648128
+ 2495 0172 03B0     	 add sp,sp,#12
+ 2496              	 
+ 2497 0174 BDEC048B 	 fldmfdd sp!,{d8-d9}
+ 2498 0178 BDE8F04F 	 pop {r4,r5,r6,r7,r8,r9,r10,fp,lr}
+ 2499 017c FFF7FEBF 	 b EVE_cmd_dl_burst
+ 2500              	.L312:
+ 2501              	 .align 2
+ 2502              	.L311:
+ 2503 0180 00000000 	 .word .LANCHOR9
+ 2504 0184 0400001F 	 .word 520093700
+ 2505 0188 5000000D 	 .word 218103888
+ 2506 018c 0200001F 	 .word 520093698
+ 2507 0190 0000E03F 	 .word 1071644672
+ 2508 0194 00000000 	 .word .LANCHOR8
+ 2510              	 .section .text.TFT_touch_calibrate,"ax",%progbits
+ 2511              	 .align 1
+ 2512              	 .global TFT_touch_calibrate
+ 2513              	 .thumb
+ 2514              	 .thumb_func
+ 2516              	TFT_touch_calibrate:
+ 2517              	 
+ 2518              	 
+ 2519 0000 2DE9F743 	 push {r0,r1,r2,r4,r5,r6,r7,r8,r9,lr}
+ 2520 0004 0446     	 mov r4,r0
+ 2521 0006 46F2C411 	 movw r1,#25028
+ 2522 000a 6D48     	 ldr r0,.L316
+ 2523 000c FFF7FEFF 	 bl EVE_memWrite32
+ 2524 0010 6C48     	 ldr r0,.L316+4
+ 2525 0012 40F25D21 	 movw r1,#605
+ 2526 0016 FFF7FEFF 	 bl EVE_memWrite32
+ 2527 001a 6B48     	 ldr r0,.L316+8
+ 2528 001c 6B49     	 ldr r1,.L316+12
+ 2529 001e FFF7FEFF 	 bl EVE_memWrite32
+ 2530 0022 6B48     	 ldr r0,.L316+16
+ 2531 0024 6FF06E01 	 mvn r1,#110
+ 2532 0028 FFF7FEFF 	 bl EVE_memWrite32
+ 2533 002c 6948     	 ldr r0,.L316+20
+ 2534 002e 45F66B31 	 movw r1,#23403
+ 2535 0032 FFF7FEFF 	 bl EVE_memWrite32
+ 2536 0036 6848     	 ldr r0,.L316+24
+ 2537 0038 6849     	 ldr r1,.L316+28
+ 2538 003a FFF7FEFF 	 bl EVE_memWrite32
+ 2539 003e 002C     	 cmp r4,#0
+ 2540 0040 00F0BB80 	 beq .L313
+ 2541 0044 6FF0FF00 	 mvn r0,#255
+ 2542 0048 FFF7FEFF 	 bl EVE_cmd_dl
+ 2543 004c 4FF00070 	 mov r0,#33554432
+ 2544 0050 FFF7FEFF 	 bl EVE_cmd_dl
+ 2545 0054 6248     	 ldr r0,.L316+32
+ 2546 0056 FFF7FEFF 	 bl EVE_cmd_dl
+ 2547 005a 624B     	 ldr r3,.L316+36
+ 2548 005c 0093     	 str r3,[sp]
+ 2549 005e 3221     	 movs r1,#50
+ 2550 0060 1A22     	 movs r2,#26
+ 2551 0062 4FF4C063 	 mov r3,#1536
+ 2552 0066 F020     	 movs r0,#240
+ 2553 0068 FFF7FEFF 	 bl EVE_cmd_text
+ 2554 006c FFF7FEFF 	 bl EVE_cmd_calibrate
+ 2555 0070 0020     	 movs r0,#0
+ 2556 0072 FFF7FEFF 	 bl EVE_cmd_dl
+ 2557 0076 6FF0FE00 	 mvn r0,#254
+ 2558 007a FFF7FEFF 	 bl EVE_cmd_dl
+ 2559 007e FFF7FEFF 	 bl EVE_cmd_execute
+ 2560 0082 4F48     	 ldr r0,.L316
+ 2561 0084 FFF7FEFF 	 bl EVE_memRead32
+ 2562 0088 8146     	 mov r9,r0
+ 2563 008a 4E48     	 ldr r0,.L316+4
+ 2564 008c FFF7FEFF 	 bl EVE_memRead32
+ 2565 0090 8046     	 mov r8,r0
+ 2566 0092 4D48     	 ldr r0,.L316+8
+ 2567 0094 FFF7FEFF 	 bl EVE_memRead32
+ 2568 0098 0746     	 mov r7,r0
+ 2569 009a 4D48     	 ldr r0,.L316+16
+ 2570 009c FFF7FEFF 	 bl EVE_memRead32
+ 2571 00a0 0646     	 mov r6,r0
+ 2572 00a2 4C48     	 ldr r0,.L316+20
+ 2573 00a4 FFF7FEFF 	 bl EVE_memRead32
+ 2574 00a8 0546     	 mov r5,r0
+ 2575 00aa 4B48     	 ldr r0,.L316+24
+ 2576 00ac FFF7FEFF 	 bl EVE_memRead32
+ 2577 00b0 0446     	 mov r4,r0
+ 2578 00b2 6FF0FF00 	 mvn r0,#255
+ 2579 00b6 FFF7FEFF 	 bl EVE_cmd_dl
+ 2580 00ba 4FF00070 	 mov r0,#33554432
+ 2581 00be FFF7FEFF 	 bl EVE_cmd_dl
+ 2582 00c2 4748     	 ldr r0,.L316+32
+ 2583 00c4 FFF7FEFF 	 bl EVE_cmd_dl
+ 2584 00c8 4FF04070 	 mov r0,#50331648
+ 2585 00cc FFF7FEFF 	 bl EVE_cmd_dl
+ 2586 00d0 454B     	 ldr r3,.L316+40
+ 2587 00d2 0093     	 str r3,[sp]
+ 2588 00d4 0520     	 movs r0,#5
+ 2589 00d6 0F21     	 movs r1,#15
+ 2590 00d8 1A22     	 movs r2,#26
+ 2591 00da 0023     	 movs r3,#0
+ 2592 00dc FFF7FEFF 	 bl EVE_cmd_text
+ 2593 00e0 424B     	 ldr r3,.L316+44
+ 2594 00e2 0093     	 str r3,[sp]
+ 2595 00e4 0520     	 movs r0,#5
+ 2596 00e6 1E21     	 movs r1,#30
+ 2597 00e8 1A22     	 movs r2,#26
+ 2598 00ea 0023     	 movs r3,#0
+ 2599 00ec FFF7FEFF 	 bl EVE_cmd_text
+ 2600 00f0 3F4B     	 ldr r3,.L316+48
+ 2601 00f2 0093     	 str r3,[sp]
+ 2602 00f4 0520     	 movs r0,#5
+ 2603 00f6 2D21     	 movs r1,#45
+ 2604 00f8 1A22     	 movs r2,#26
+ 2605 00fa 0023     	 movs r3,#0
+ 2606 00fc FFF7FEFF 	 bl EVE_cmd_text
+ 2607 0100 3C4B     	 ldr r3,.L316+52
+ 2608 0102 0093     	 str r3,[sp]
+ 2609 0104 0520     	 movs r0,#5
+ 2610 0106 3C21     	 movs r1,#60
+ 2611 0108 1A22     	 movs r2,#26
+ 2612 010a 0023     	 movs r3,#0
+ 2613 010c FFF7FEFF 	 bl EVE_cmd_text
+ 2614 0110 394B     	 ldr r3,.L316+56
+ 2615 0112 0093     	 str r3,[sp]
+ 2616 0114 0520     	 movs r0,#5
+ 2617 0116 4B21     	 movs r1,#75
+ 2618 0118 1A22     	 movs r2,#26
+ 2619 011a 0023     	 movs r3,#0
+ 2620 011c FFF7FEFF 	 bl EVE_cmd_text
+ 2621 0120 364B     	 ldr r3,.L316+60
+ 2622 0122 0093     	 str r3,[sp]
+ 2623 0124 5A21     	 movs r1,#90
+ 2624 0126 1A22     	 movs r2,#26
+ 2625 0128 0023     	 movs r3,#0
+ 2626 012a 0520     	 movs r0,#5
+ 2627 012c FFF7FEFF 	 bl EVE_cmd_text
+ 2628 0130 1020     	 movs r0,#16
+ 2629 0132 FFF7FEFF 	 bl EVE_cmd_setbase
+ 2630 0136 4FF49B70 	 mov r0,#310
+ 2631 013a 0F21     	 movs r1,#15
+ 2632 013c 1A22     	 movs r2,#26
+ 2633 013e 40F60803 	 movw r3,#2056
+ 2634 0142 CDF80090 	 str r9,[sp]
+ 2635 0146 FFF7FEFF 	 bl EVE_cmd_number
+ 2636 014a 4FF49B70 	 mov r0,#310
+ 2637 014e 1E21     	 movs r1,#30
+ 2638 0150 1A22     	 movs r2,#26
+ 2639 0152 40F60803 	 movw r3,#2056
+ 2640 0156 CDF80080 	 str r8,[sp]
+ 2641 015a FFF7FEFF 	 bl EVE_cmd_number
+ 2642 015e 4FF49B70 	 mov r0,#310
+ 2643 0162 2D21     	 movs r1,#45
+ 2644 0164 1A22     	 movs r2,#26
+ 2645 0166 40F60803 	 movw r3,#2056
+ 2646 016a 0097     	 str r7,[sp]
+ 2647 016c FFF7FEFF 	 bl EVE_cmd_number
+ 2648 0170 4FF49B70 	 mov r0,#310
+ 2649 0174 3C21     	 movs r1,#60
+ 2650 0176 1A22     	 movs r2,#26
+ 2651 0178 40F60803 	 movw r3,#2056
+ 2652 017c 0096     	 str r6,[sp]
+ 2653 017e FFF7FEFF 	 bl EVE_cmd_number
+ 2654 0182 4FF49B70 	 mov r0,#310
+ 2655 0186 4B21     	 movs r1,#75
+ 2656 0188 1A22     	 movs r2,#26
+ 2657 018a 40F60803 	 movw r3,#2056
+ 2658 018e 0095     	 str r5,[sp]
+ 2659 0190 FFF7FEFF 	 bl EVE_cmd_number
+ 2660 0194 5A21     	 movs r1,#90
+ 2661 0196 1A22     	 movs r2,#26
+ 2662 0198 40F60803 	 movw r3,#2056
+ 2663 019c 4FF49B70 	 mov r0,#310
+ 2664 01a0 0094     	 str r4,[sp]
+ 2665 01a2 FFF7FEFF 	 bl EVE_cmd_number
+ 2666 01a6 0020     	 movs r0,#0
+ 2667 01a8 FFF7FEFF 	 bl EVE_cmd_dl
+ 2668 01ac 6FF0FE00 	 mvn r0,#254
+ 2669 01b0 FFF7FEFF 	 bl EVE_cmd_dl
+ 2670 01b4 FFF7FEFF 	 bl EVE_cmd_execute
+ 2671              	.L315:
+ 2672 01b8 FEE7     	 b .L315
+ 2673              	.L313:
+ 2674 01ba 03B0     	 add sp,sp,#12
+ 2675              	 
+ 2676 01bc BDE8F083 	 pop {r4,r5,r6,r7,r8,r9,pc}
+ 2677              	.L317:
+ 2678              	 .align 2
+ 2679              	.L316:
+ 2680 01c0 50213000 	 .word 3154256
+ 2681 01c4 54213000 	 .word 3154260
+ 2682 01c8 58213000 	 .word 3154264
+ 2683 01cc B14AF1FF 	 .word -963919
+ 2684 01d0 5C213000 	 .word 3154268
+ 2685 01d4 60213000 	 .word 3154272
+ 2686 01d8 64213000 	 .word 3154276
+ 2687 01dc ABC7FAFF 	 .word -342101
+ 2688 01e0 07000026 	 .word 637534215
+ 2689 01e4 06000000 	 .word .LC1
+ 2690 01e8 1D000000 	 .word .LC2
+ 2691 01ec 30000000 	 .word .LC3
+ 2692 01f0 43000000 	 .word .LC4
+ 2693 01f4 56000000 	 .word .LC5
+ 2694 01f8 69000000 	 .word .LC6
+ 2695 01fc 7C000000 	 .word .LC7
+ 2697              	 .section .text.TFT_init,"ax",%progbits
+ 2698              	 .align 1
+ 2699              	 .global TFT_init
+ 2700              	 .thumb
+ 2701              	 .thumb_func
+ 2703              	TFT_init:
+ 2704              	 
+ 2705              	 
+ 2706 0000 10B5     	 push {r4,lr}
+ 2707 0002 FFF7FEFF 	 bl EVE_init
+ 2708 0006 58B3     	 cbz r0,.L319
+ 2709 0008 164B     	 ldr r3,.L323
+ 2710 000a 1748     	 ldr r0,.L323+4
+ 2711 000c 0021     	 movs r1,#0
+ 2712 000e 0124     	 movs r4,#1
+ 2713 0010 1C70     	 strb r4,[r3]
+ 2714 0012 FFF7FEFF 	 bl EVE_memWrite8
+ 2715 0016 0020     	 movs r0,#0
+ 2716 0018 FFF7FEFF 	 bl TFT_touch_calibrate
+ 2717 001c FFF7FEFF 	 bl EVE_start_cmd_burst
+ 2718 0020 6FF0FF00 	 mvn r0,#255
+ 2719 0024 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2720 0028 4FF04070 	 mov r0,#50331648
+ 2721 002c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2722 0030 0020     	 movs r0,#0
+ 2723 0032 FFF7FEFF 	 bl EVE_cmd_bgcolor_burst
+ 2724 0036 4FF01C50 	 mov r0,#654311424
+ 2725 003a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2726 003e 4FF00070 	 mov r0,#33554432
+ 2727 0042 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2728 0046 0948     	 ldr r0,.L323+8
+ 2729 0048 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2730 004c 0020     	 movs r0,#0
+ 2731 004e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2732 0052 6FF0FE00 	 mvn r0,#254
+ 2733 0056 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2734 005a FFF7FEFF 	 bl EVE_end_cmd_burst
+ 2735 005e 2046     	 mov r0,r4
+ 2736              	.L319:
+ 2737 0060 10BD     	 pop {r4,pc}
+ 2738              	.L324:
+ 2739 0062 00BF     	 .align 2
+ 2740              	.L323:
+ 2741 0064 00000000 	 .word .LANCHOR19
+ 2742 0068 D4203000 	 .word 3154132
+ 2743 006c 07000026 	 .word 637534215
+ 2745              	 .section .text.TFT_display_init_screen,"ax",%progbits
+ 2746              	 .align 1
+ 2747              	 .global TFT_display_init_screen
+ 2748              	 .thumb
+ 2749              	 .thumb_func
+ 2751              	TFT_display_init_screen:
+ 2752              	 
+ 2753              	 
+ 2754 0000 10B5     	 push {r4,lr}
+ 2755 0002 244B     	 ldr r3,.L330
+ 2756 0004 1B78     	 ldrb r3,[r3]
+ 2757 0006 002B     	 cmp r3,#0
+ 2758 0008 43D0     	 beq .L325
+ 2759 000a 2349     	 ldr r1,.L330+4
+ 2760 000c 41F60822 	 movw r2,#6664
+ 2761 0010 0020     	 movs r0,#0
+ 2762 0012 FFF7FEFF 	 bl EVE_cmd_inflate
+ 2763 0016 FFF7FEFF 	 bl EVE_start_cmd_burst
+ 2764 001a 6FF0FF00 	 mvn r0,#255
+ 2765 001e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2766 0022 4FF00070 	 mov r0,#33554432
+ 2767 0026 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2768 002a 1C48     	 ldr r0,.L330+8
+ 2769 002c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2770 0030 4FF04070 	 mov r0,#50331648
+ 2771 0034 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2772 0038 0020     	 movs r0,#0
+ 2773 003a 0146     	 mov r1,r0
+ 2774 003c 4FF49A72 	 mov r2,#308
+ 2775 0040 FA23     	 movs r3,#250
+ 2776 0042 FFF7FEFF 	 bl EVE_cmd_setbitmap_burst
+ 2777 0046 1648     	 ldr r0,.L330+12
+ 2778 0048 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2779 004c 1548     	 ldr r0,.L330+16
+ 2780 004e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2781 0052 4FF00450 	 mov r0,#553648128
+ 2782 0056 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2783 005a 0020     	 movs r0,#0
+ 2784 005c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2785 0060 6FF0FE00 	 mvn r0,#254
+ 2786 0064 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2787 0068 FFF7FEFF 	 bl EVE_end_cmd_burst
+ 2788 006c FFF7FEFF 	 bl SYSTIMER_GetTime
+ 2789 0070 0446     	 mov r4,r0
+ 2790              	.L327:
+ 2791 0072 FFF7FEFF 	 bl SYSTIMER_GetTime
+ 2792 0076 04F51233 	 add r3,r4,#149504
+ 2793 007a 03F5F873 	 add r3,r3,#496
+ 2794 007e 9842     	 cmp r0,r3
+ 2795 0080 01D2     	 bcs .L329
+ 2796              	
+ 2797 0082 00BF     	 nop
+ 2798              	
+ 2799              	 .thumb
+ 2800 0084 F5E7     	 b .L327
+ 2801              	.L329:
+ 2802 0086 0848     	 ldr r0,.L330+20
+ 2803 0088 4021     	 movs r1,#64
+ 2804 008a BDE81040 	 pop {r4,lr}
+ 2805 008e FFF7FEBF 	 b EVE_memWrite8
+ 2806              	.L325:
+ 2807 0092 10BD     	 pop {r4,pc}
+ 2808              	.L331:
+ 2809              	 .align 2
+ 2810              	.L330:
+ 2811 0094 00000000 	 .word .LANCHOR19
+ 2812 0098 00000000 	 .word logo_init
+ 2813 009c 07000026 	 .word 637534215
+ 2814 00a0 0100001F 	 .word 520093697
+ 2815 00a4 B000B042 	 .word 1118830768
+ 2816 00a8 D4203000 	 .word 3154132
+ 2818              	 .section .text.TFT_display_static,"ax",%progbits
+ 2819              	 .align 1
+ 2820              	 .global TFT_display_static
+ 2821              	 .thumb
+ 2822              	 .thumb_func
+ 2824              	TFT_display_static:
+ 2825              	 
+ 2826              	 
+ 2827 0000 10B5     	 push {r4,lr}
+ 2828 0002 FFF7FEFF 	 bl EVE_start_cmd_burst
+ 2829 0006 6FF0FF00 	 mvn r0,#255
+ 2830 000a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2831 000e 2148     	 ldr r0,.L337
+ 2832 0010 214C     	 ldr r4,.L337+4
+ 2833 0012 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2834 0016 2148     	 ldr r0,.L337+8
+ 2835 0018 FFF7FEFF 	 bl EVE_cmd_bgcolor_burst
+ 2836 001c 4FF01C50 	 mov r0,#654311424
+ 2837 0020 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2838 0024 1E48     	 ldr r0,.L337+12
+ 2839 0026 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2840 002a 1E48     	 ldr r0,.L337+16
+ 2841 002c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2842 0030 4FF08040 	 mov r0,#1073741824
+ 2843 0034 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2844 0038 1B48     	 ldr r0,.L337+20
+ 2845 003a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2846 003e 4FF00450 	 mov r0,#553648128
+ 2847 0042 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 2848 0046 94F90020 	 ldrsb r2,[r4]
+ 2849 004a 184B     	 ldr r3,.L337+24
+ 2850 004c 53F82230 	 ldr r3,[r3,r2,lsl#2]
+ 2851 0050 9847     	 blx r3
+ 2852 0052 FFF7FEFF 	 bl EVE_end_cmd_burst
+ 2853              	.L333:
+ 2854 0056 FFF7FEFF 	 bl EVE_busy
+ 2855 005a 0028     	 cmp r0,#0
+ 2856 005c FBD1     	 bne .L333
+ 2857 005e 1448     	 ldr r0,.L337+28
+ 2858 0060 FFF7FEFF 	 bl EVE_memRead16
+ 2859 0064 134B     	 ldr r3,.L337+32
+ 2860 0066 0246     	 mov r2,r0
+ 2861 0068 1860     	 str r0,[r3]
+ 2862 006a 4FF44011 	 mov r1,#3145728
+ 2863 006e 4FF47F20 	 mov r0,#1044480
+ 2864 0072 FFF7FEFF 	 bl EVE_cmd_memcpy
+ 2865              	.L334:
+ 2866 0076 FFF7FEFF 	 bl EVE_busy
+ 2867 007a 0028     	 cmp r0,#0
+ 2868 007c FBD1     	 bne .L334
+ 2869 007e 0E4B     	 ldr r3,.L337+36
+ 2870 0080 2278     	 ldrb r2,[r4]
+ 2871 0082 1A70     	 strb r2,[r3]
+ 2872 0084 0D4B     	 ldr r3,.L337+40
+ 2873 0086 1A88     	 ldrh r2,[r3]
+ 2874 0088 0D4B     	 ldr r3,.L337+44
+ 2875 008a 1A80     	 strh r2,[r3]
+ 2876 008c 0D4B     	 ldr r3,.L337+48
+ 2877 008e 1870     	 strb r0,[r3]
+ 2878 0090 10BD     	 pop {r4,pc}
+ 2879              	.L338:
+ 2880 0092 00BF     	 .align 2
+ 2881              	.L337:
+ 2882 0094 01000003 	 .word 50331649
+ 2883 0098 00000000 	 .word .LANCHOR6
+ 2884 009c FEFAFB00 	 .word 16513790
+ 2885 00a0 FEFAFB04 	 .word 83622654
+ 2886 00a4 0900001F 	 .word 520093705
+ 2887 00a8 1001F040 	 .word 1089470736
+ 2888 00ac 00000000 	 .word TFT_display_static_cur_Menu__fptr_arr
+ 2889 00b0 00213000 	 .word 3154176
+ 2890 00b4 00000000 	 .word .LANCHOR20
+ 2891 00b8 00000000 	 .word .LANCHOR7
+ 2892 00bc 00000000 	 .word .LANCHOR9
+ 2893 00c0 00000000 	 .word .LANCHOR21
+ 2894 00c4 00000000 	 .word .LANCHOR5
+ 2896              	 .section .text.TFT_touch,"ax",%progbits
+ 2897              	 .align 1
+ 2898              	 .global TFT_touch
+ 2899              	 .thumb
+ 2900              	 .thumb_func
+ 2902              	TFT_touch:
+ 2903              	 
+ 2904              	 
+ 2905 0000 73B5     	 push {r0,r1,r4,r5,r6,lr}
+ 2906 0002 FFF7FEFF 	 bl EVE_busy
+ 2907 0006 0028     	 cmp r0,#0
+ 2908 0008 40F0C380 	 bne .L339
+ 2909 000c 6248     	 ldr r0,.L385
+ 2910 000e 634D     	 ldr r5,.L385+4
+ 2911 0010 FFF7FEFF 	 bl EVE_memRead8
+ 2912 0014 0446     	 mov r4,r0
+ 2913 0016 6248     	 ldr r0,.L385+8
+ 2914 0018 FFF7FEFF 	 bl EVE_memRead32
+ 2915 001c 2B78     	 ldrb r3,[r5]
+ 2916 001e 002B     	 cmp r3,#0
+ 2917 0020 2ED0     	 beq .L342
+ 2918 0022 604B     	 ldr r3,.L385+12
+ 2919 0024 1A68     	 ldr r2,[r3]
+ 2920 0026 B2F5004F 	 cmp r2,#32768
+ 2921 002a 4FEA1041 	 lsr r1,r0,#16
+ 2922 002e 07D1     	 bne .L343
+ 2923 0030 5D4A     	 ldr r2,.L385+16
+ 2924 0032 1668     	 ldr r6,[r2]
+ 2925 0034 B6F5004F 	 cmp r6,#32768
+ 2926 0038 02BF     	 ittt eq
+ 2927 003a 86B2     	 uxtheq r6,r0
+ 2928 003c 1960     	 streq r1,[r3]
+ 2929 003e 1660     	 streq r6,[r2]
+ 2930              	.L343:
+ 2931 0040 0E04     	 lsls r6,r1,#16
+ 2932 0042 0BD4     	 bmi .L344
+ 2933 0044 0204     	 lsls r2,r0,#16
+ 2934 0046 09D4     	 bmi .L344
+ 2935 0048 1A68     	 ldr r2,[r3]
+ 2936 004a 521A     	 subs r2,r2,r1
+ 2937 004c 5749     	 ldr r1,.L385+20
+ 2938 004e 0A60     	 str r2,[r1]
+ 2939 0050 554A     	 ldr r2,.L385+16
+ 2940 0052 1268     	 ldr r2,[r2]
+ 2941 0054 80B2     	 uxth r0,r0
+ 2942 0056 101A     	 subs r0,r2,r0
+ 2943 0058 554A     	 ldr r2,.L385+24
+ 2944 005a 1060     	 str r0,[r2]
+ 2945              	.L344:
+ 2946 005c 84B9     	 cbnz r4,.L342
+ 2947 005e 5549     	 ldr r1,.L385+28
+ 2948 0060 0A78     	 ldrb r2,[r1]
+ 2949 0062 0132     	 adds r2,r2,#1
+ 2950 0064 D2B2     	 uxtb r2,r2
+ 2951 0066 042A     	 cmp r2,#4
+ 2952 0068 0A70     	 strb r2,[r1]
+ 2953 006a 09D9     	 bls .L342
+ 2954 006c 524A     	 ldr r2,.L385+32
+ 2955 006e 1478     	 ldrb r4,[r2]
+ 2956 0070 0022     	 movs r2,#0
+ 2957 0072 2A70     	 strb r2,[r5]
+ 2958 0074 0A70     	 strb r2,[r1]
+ 2959 0076 4FF40042 	 mov r2,#32768
+ 2960 007a 1A60     	 str r2,[r3]
+ 2961 007c 4A4B     	 ldr r3,.L385+16
+ 2962 007e 1A60     	 str r2,[r3]
+ 2963              	.L342:
+ 2964 0080 4E4B     	 ldr r3,.L385+36
+ 2965 0082 1B78     	 ldrb r3,[r3]
+ 2966 0084 43B3     	 cbz r3,.L345
+ 2967 0086 4E4B     	 ldr r3,.L385+40
+ 2968 0088 1B78     	 ldrb r3,[r3]
+ 2969 008a 2BBB     	 cbnz r3,.L345
+ 2970 008c CCB9     	 cbnz r4,.L346
+ 2971 008e 4D49     	 ldr r1,.L385+44
+ 2972 0090 0878     	 ldrb r0,[r1]
+ 2973 0092 B0B1     	 cbz r0,.L346
+ 2974 0094 4C4A     	 ldr r2,.L385+48
+ 2975 0096 1378     	 ldrb r3,[r2]
+ 2976 0098 0133     	 adds r3,r3,#1
+ 2977 009a DBB2     	 uxtb r3,r3
+ 2978 009c 042B     	 cmp r3,#4
+ 2979 009e 1370     	 strb r3,[r2]
+ 2980 00a0 1ED9     	 bls .L350
+ 2981 00a2 5E28     	 cmp r0,#94
+ 2982 00a4 09BF     	 itett eq
+ 2983 00a6 494A     	 ldreq r2,.L385+52
+ 2984 00a8 494B     	 ldrne r3,.L385+56
+ 2985 00aa 1378     	 ldrbeq r3,[r2]
+ 2986 00ac B3FA83F3 	 clzeq r3,r3
+ 2987 00b0 11BF     	 iteee ne
+ 2988 00b2 0121     	 movne r1,#1
+ 2989 00b4 5B09     	 lsreq r3,r3,#5
+ 2990 00b6 1370     	 strbeq r3,[r2]
+ 2991 00b8 0C70     	 strbeq r4,[r1]
+ 2992 00ba 1CBF     	 itt ne
+ 2993 00bc 1970     	 strbne r1,[r3]
+ 2994 00be 1470     	 strbne r4,[r2]
+ 2995 00c0 0EE0     	 b .L350
+ 2996              	.L346:
+ 2997 00c2 A4F12003 	 sub r3,r4,#32
+ 2998 00c6 DBB2     	 uxtb r3,r3
+ 2999 00c8 602B     	 cmp r3,#96
+ 3000 00ca 05D8     	 bhi .L345
+ 3001 00cc 3E4B     	 ldr r3,.L385+48
+ 3002 00ce 0022     	 movs r2,#0
+ 3003 00d0 1A70     	 strb r2,[r3]
+ 3004 00d2 3C4B     	 ldr r3,.L385+44
+ 3005 00d4 1C70     	 strb r4,[r3]
+ 3006 00d6 03E0     	 b .L350
+ 3007              	.L345:
+ 3008 00d8 14B1     	 cbz r4,.L350
+ 3009 00da 012C     	 cmp r4,#1
+ 3010 00dc 05D0     	 beq .L351
+ 3011 00de 45E0     	 b .L384
+ 3012              	.L350:
+ 3013 00e0 3C4B     	 ldr r3,.L385+60
+ 3014 00e2 0024     	 movs r4,#0
+ 3015 00e4 1C70     	 strb r4,[r3]
+ 3016 00e6 364B     	 ldr r3,.L385+40
+ 3017 00e8 0CE0     	 b .L382
+ 3018              	.L351:
+ 3019 00ea 3B4B     	 ldr r3,.L385+64
+ 3020 00ec 93F90000 	 ldrsb r0,[r3]
+ 3021 00f0 0328     	 cmp r0,#3
+ 3022 00f2 3CDC     	 bgt .L355
+ 3023 00f4 2B78     	 ldrb r3,[r5]
+ 3024 00f6 3BB9     	 cbnz r3,.L353
+ 3025 00f8 2F4B     	 ldr r3,.L385+32
+ 3026 00fa 1A78     	 ldrb r2,[r3]
+ 3027 00fc 1E46     	 mov r6,r3
+ 3028 00fe 0ABB     	 cbnz r2,.L354
+ 3029 0100 264A     	 ldr r2,.L385+4
+ 3030 0102 1470     	 strb r4,[r2]
+ 3031              	.L382:
+ 3032 0104 1C70     	 strb r4,[r3]
+ 3033 0106 32E0     	 b .L355
+ 3034              	.L353:
+ 3035 0108 012B     	 cmp r3,#1
+ 3036 010a 30D1     	 bne .L355
+ 3037 010c 2A4B     	 ldr r3,.L385+32
+ 3038 010e 1B78     	 ldrb r3,[r3]
+ 3039 0110 012B     	 cmp r3,#1
+ 3040 0112 2CD1     	 bne .L355
+ 3041 0114 254B     	 ldr r3,.L385+20
+ 3042 0116 1A68     	 ldr r2,[r3]
+ 3043 0118 254B     	 ldr r3,.L385+24
+ 3044 011a 1B68     	 ldr r3,[r3]
+ 3045 011c 82EAE271 	 eor r1,r2,r2,asr#31
+ 3046 0120 002B     	 cmp r3,#0
+ 3047 0122 A1EBE271 	 sub r1,r1,r2,asr#31
+ 3048 0126 B8BF     	 it lt
+ 3049 0128 5B42     	 rsblt r3,r3,#0
+ 3050 012a 9942     	 cmp r1,r3
+ 3051 012c 1FDD     	 ble .L355
+ 3052 012e 322A     	 cmp r2,#50
+ 3053 0130 2A4B     	 ldr r3,.L385+68
+ 3054 0132 01DD     	 ble .L356
+ 3055 0134 0322     	 movs r2,#3
+ 3056 0136 03E0     	 b .L383
+ 3057              	.L356:
+ 3058 0138 3232     	 adds r2,r2,#50
+ 3059 013a B4BF     	 ite lt
+ 3060 013c 0422     	 movlt r2,#4
+ 3061 013e 0022     	 movge r2,#0
+ 3062              	.L383:
+ 3063 0140 1A70     	 strb r2,[r3]
+ 3064 0142 14E0     	 b .L355
+ 3065              	.L354:
+ 3066 0144 012A     	 cmp r2,#1
+ 3067 0146 12D1     	 bne .L355
+ 3068 0148 244B     	 ldr r3,.L385+68
+ 3069 014a 1B78     	 ldrb r3,[r3]
+ 3070 014c 032B     	 cmp r3,#3
+ 3071 014e 03D1     	 bne .L358
+ 3072 0150 0328     	 cmp r0,#3
+ 3073 0152 08D0     	 beq .L359
+ 3074 0154 0130     	 adds r0,r0,#1
+ 3075 0156 04E0     	 b .L381
+ 3076              	.L358:
+ 3077 0158 042B     	 cmp r3,#4
+ 3078 015a 04D1     	 bne .L359
+ 3079 015c 0028     	 cmp r0,#0
+ 3080 015e 02DD     	 ble .L359
+ 3081 0160 0138     	 subs r0,r0,#1
+ 3082              	.L381:
+ 3083 0162 FFF7FEFF 	 bl TFT_setMenu
+ 3084              	.L359:
+ 3085 0166 0023     	 movs r3,#0
+ 3086 0168 3370     	 strb r3,[r6]
+ 3087 016a 00E0     	 b .L355
+ 3088              	.L384:
+ 3089 016c 02D8     	 bhi .L360
+ 3090              	.L355:
+ 3091 016e 184B     	 ldr r3,.L385+56
+ 3092 0170 1B78     	 ldrb r3,[r3]
+ 3093 0172 73B1     	 cbz r3,.L339
+ 3094              	.L360:
+ 3095 0174 184B     	 ldr r3,.L385+64
+ 3096 0176 2A78     	 ldrb r2,[r5]
+ 3097 0178 93F90010 	 ldrsb r1,[r3]
+ 3098 017c 0B4B     	 ldr r3,.L385+20
+ 3099 017e 0093     	 str r3,[sp]
+ 3100 0180 0B4B     	 ldr r3,.L385+24
+ 3101 0182 0193     	 str r3,[sp,#4]
+ 3102 0184 164B     	 ldr r3,.L385+72
+ 3103 0186 2046     	 mov r0,r4
+ 3104 0188 53F82150 	 ldr r5,[r3,r1,lsl#2]
+ 3105 018c 1149     	 ldr r1,.L385+60
+ 3106 018e 0A4B     	 ldr r3,.L385+32
+ 3107 0190 A847     	 blx r5
+ 3108              	.L339:
+ 3109 0192 02B0     	 add sp,sp,#8
+ 3110              	 
+ 3111 0194 70BD     	 pop {r4,r5,r6,pc}
+ 3112              	.L386:
+ 3113 0196 00BF     	 .align 2
+ 3114              	.L385:
+ 3115 0198 2C213000 	 .word 3154220
+ 3116 019c 00000000 	 .word .LANCHOR22
+ 3117 01a0 24213000 	 .word 3154212
+ 3118 01a4 00000000 	 .word .LANCHOR23
+ 3119 01a8 00000000 	 .word .LANCHOR24
+ 3120 01ac 00000000 	 .word .LANCHOR25
+ 3121 01b0 00000000 	 .word .LANCHOR26
+ 3122 01b4 00000000 	 .word .LANCHOR27
+ 3123 01b8 00000000 	 .word .LANCHOR28
+ 3124 01bc 00000000 	 .word .LANCHOR0
+ 3125 01c0 00000000 	 .word .LANCHOR3
+ 3126 01c4 00000000 	 .word .LANCHOR18
+ 3127 01c8 00000000 	 .word .LANCHOR29
+ 3128 01cc 00000000 	 .word .LANCHOR30
+ 3129 01d0 00000000 	 .word .LANCHOR4
+ 3130 01d4 00000000 	 .word .LANCHOR31
+ 3131 01d8 00000000 	 .word .LANCHOR6
+ 3132 01dc 00000000 	 .word .LANCHOR32
+ 3133 01e0 00000000 	 .word TFT_touch_cur_Menu__fptr_arr
+ 3135              	 .section .text.TFT_display,"ax",%progbits
+ 3136              	 .align 1
+ 3137              	 .global TFT_display
+ 3138              	 .thumb
+ 3139              	 .thumb_func
+ 3141              	TFT_display:
+ 3142              	 
+ 3143              	 
+ 3144 0000 F0B5     	 push {r4,r5,r6,r7,lr}
+ 3145 0002 794B     	 ldr r3,.L410
+ 3146 0004 1B78     	 ldrb r3,[r3]
+ 3147 0006 85B0     	 sub sp,sp,#20
+ 3148 0008 002B     	 cmp r3,#0
+ 3149 000a 00F0BD81 	 beq .L387
+ 3150 000e FFF7FEFF 	 bl TFT_display_get_values
+ 3151 0012 764B     	 ldr r3,.L410+4
+ 3152 0014 764C     	 ldr r4,.L410+8
+ 3153 0016 93F90030 	 ldrsb r3,[r3]
+ 3154 001a 73B9     	 cbnz r3,.L389
+ 3155 001c 754B     	 ldr r3,.L410+12
+ 3156 001e 93F90020 	 ldrsb r2,[r3]
+ 3157 0022 94F90030 	 ldrsb r3,[r4]
+ 3158 0026 9A42     	 cmp r2,r3
+ 3159 0028 07D1     	 bne .L389
+ 3160 002a 734B     	 ldr r3,.L410+16
+ 3161 002c B3F90020 	 ldrsh r2,[r3]
+ 3162 0030 724B     	 ldr r3,.L410+20
+ 3163 0032 B3F90030 	 ldrsh r3,[r3]
+ 3164 0036 9A42     	 cmp r2,r3
+ 3165 0038 01D0     	 beq .L390
+ 3166              	.L389:
+ 3167 003a FFF7FEFF 	 bl TFT_display_static
+ 3168              	.L390:
+ 3169 003e FFF7FEFF 	 bl EVE_start_cmd_burst
+ 3170 0042 6FF0FF00 	 mvn r0,#255
+ 3171 0046 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3172 004a 6FF07D40 	 mvn r0,#-50331648
+ 3173 004e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3174 0052 6B48     	 ldr r0,.L410+24
+ 3175 0054 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3176 0058 4FF04070 	 mov r0,#50331648
+ 3177 005c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3178 0060 684B     	 ldr r3,.L410+28
+ 3179 0062 4FF47F20 	 mov r0,#1044480
+ 3180 0066 1968     	 ldr r1,[r3]
+ 3181 0068 FFF7FEFF 	 bl EVE_cmd_append_burst
+ 3182 006c 94F90020 	 ldrsb r2,[r4]
+ 3183 0070 654B     	 ldr r3,.L410+32
+ 3184 0072 53F82230 	 ldr r3,[r3,r2,lsl#2]
+ 3185 0076 9847     	 blx r3
+ 3186 0078 644B     	 ldr r3,.L410+36
+ 3187 007a 1B78     	 ldrb r3,[r3]
+ 3188 007c 002B     	 cmp r3,#0
+ 3189 007e 00F07781 	 beq .L391
+ 3190 0082 6348     	 ldr r0,.L410+40
+ 3191 0084 634C     	 ldr r4,.L410+44
+ 3192 0086 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3193 008a 6348     	 ldr r0,.L410+48
+ 3194 008c FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3195 0090 6248     	 ldr r0,.L410+52
+ 3196 0092 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3197 0096 6248     	 ldr r0,.L410+56
+ 3198 0098 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3199 009c 4FF00450 	 mov r0,#553648128
+ 3200 00a0 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3201 00a4 4FF04070 	 mov r0,#50331648
+ 3202 00a8 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3203 00ac 5D4B     	 ldr r3,.L410+60
+ 3204 00ae 1D78     	 ldrb r5,[r3]
+ 3205 00b0 012D     	 cmp r5,#1
+ 3206 00b2 59D0     	 beq .L393
+ 3207 00b4 5C4B     	 ldr r3,.L410+64
+ 3208 00b6 022D     	 cmp r5,#2
+ 3209 00b8 1B78     	 ldrb r3,[r3]
+ 3210 00ba 40F0CF80 	 bne .L407
+ 3211 00be 4BBB     	 cbnz r3,.L395
+ 3212              	.L397:
+ 3213 00c0 1A25     	 movs r5,#26
+ 3214 00c2 0095     	 str r5,[sp]
+ 3215 00c4 2378     	 ldrb r3,[r4]
+ 3216 00c6 0193     	 str r3,[sp,#4]
+ 3217 00c8 584B     	 ldr r3,.L410+68
+ 3218 00ca 0293     	 str r3,[sp,#8]
+ 3219 00cc 0220     	 movs r0,#2
+ 3220 00ce 7121     	 movs r1,#113
+ 3221 00d0 4FF4D372 	 mov r2,#422
+ 3222 00d4 1D23     	 movs r3,#29
+ 3223 00d6 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3224 00da 0095     	 str r5,[sp]
+ 3225 00dc 2378     	 ldrb r3,[r4]
+ 3226 00de 0193     	 str r3,[sp,#4]
+ 3227 00e0 534B     	 ldr r3,.L410+72
+ 3228 00e2 0293     	 str r3,[sp,#8]
+ 3229 00e4 0220     	 movs r0,#2
+ 3230 00e6 9121     	 movs r1,#145
+ 3231 00e8 4FF4EE72 	 mov r2,#476
+ 3232 00ec 1D23     	 movs r3,#29
+ 3233 00ee FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3234 00f2 0095     	 str r5,[sp]
+ 3235 00f4 2378     	 ldrb r3,[r4]
+ 3236 00f6 0193     	 str r3,[sp,#4]
+ 3237 00f8 4E4B     	 ldr r3,.L410+76
+ 3238 00fa 0293     	 str r3,[sp,#8]
+ 3239 00fc 0220     	 movs r0,#2
+ 3240 00fe 1D23     	 movs r3,#29
+ 3241 0100 B121     	 movs r1,#177
+ 3242 0102 4FF4EE72 	 mov r2,#476
+ 3243 0106 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3244 010a 0095     	 str r5,[sp]
+ 3245 010c 2378     	 ldrb r3,[r4]
+ 3246 010e 0193     	 str r3,[sp,#4]
+ 3247 0110 494B     	 ldr r3,.L410+80
+ 3248 0112 CFE0     	 b .L408
+ 3249              	.L395:
+ 3250 0114 1A26     	 movs r6,#26
+ 3251 0116 0096     	 str r6,[sp]
+ 3252 0118 2378     	 ldrb r3,[r4]
+ 3253 011a 0193     	 str r3,[sp,#4]
+ 3254 011c 434B     	 ldr r3,.L410+68
+ 3255 011e 0293     	 str r3,[sp,#8]
+ 3256 0120 2846     	 mov r0,r5
+ 3257 0122 7121     	 movs r1,#113
+ 3258 0124 4FF4D372 	 mov r2,#422
+ 3259 0128 1D23     	 movs r3,#29
+ 3260 012a FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3261 012e 0096     	 str r6,[sp]
+ 3262 0130 2378     	 ldrb r3,[r4]
+ 3263 0132 0193     	 str r3,[sp,#4]
+ 3264 0134 414B     	 ldr r3,.L410+84
+ 3265 0136 0293     	 str r3,[sp,#8]
+ 3266 0138 2846     	 mov r0,r5
+ 3267 013a 9121     	 movs r1,#145
+ 3268 013c 4FF4EE72 	 mov r2,#476
+ 3269 0140 1D23     	 movs r3,#29
+ 3270 0142 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3271 0146 0096     	 str r6,[sp]
+ 3272 0148 2378     	 ldrb r3,[r4]
+ 3273 014a 0193     	 str r3,[sp,#4]
+ 3274 014c 3C4B     	 ldr r3,.L410+88
+ 3275 014e 0293     	 str r3,[sp,#8]
+ 3276 0150 2846     	 mov r0,r5
+ 3277 0152 1D23     	 movs r3,#29
+ 3278 0154 B121     	 movs r1,#177
+ 3279 0156 4FF4EE72 	 mov r2,#476
+ 3280 015a FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3281 015e 0096     	 str r6,[sp]
+ 3282 0160 2378     	 ldrb r3,[r4]
+ 3283 0162 0193     	 str r3,[sp,#4]
+ 3284 0164 374B     	 ldr r3,.L410+92
+ 3285 0166 A5E0     	 b .L408
+ 3286              	.L393:
+ 3287 0168 1A25     	 movs r5,#26
+ 3288 016a 0095     	 str r5,[sp]
+ 3289 016c 2378     	 ldrb r3,[r4]
+ 3290 016e 0193     	 str r3,[sp,#4]
+ 3291 0170 354B     	 ldr r3,.L410+96
+ 3292 0172 0293     	 str r3,[sp,#8]
+ 3293 0174 0220     	 movs r0,#2
+ 3294 0176 7121     	 movs r1,#113
+ 3295 0178 4FF4D372 	 mov r2,#422
+ 3296 017c 1D23     	 movs r3,#29
+ 3297 017e FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3298 0182 0095     	 str r5,[sp]
+ 3299 0184 2378     	 ldrb r3,[r4]
+ 3300 0186 0193     	 str r3,[sp,#4]
+ 3301 0188 304B     	 ldr r3,.L410+100
+ 3302 018a 0293     	 str r3,[sp,#8]
+ 3303 018c 0220     	 movs r0,#2
+ 3304 018e 9121     	 movs r1,#145
+ 3305 0190 4FF4D372 	 mov r2,#422
+ 3306 0194 1D23     	 movs r3,#29
+ 3307 0196 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3308 019a 0095     	 str r5,[sp]
+ 3309 019c 2378     	 ldrb r3,[r4]
+ 3310 019e 0193     	 str r3,[sp,#4]
+ 3311 01a0 2B4B     	 ldr r3,.L410+104
+ 3312 01a2 0293     	 str r3,[sp,#8]
+ 3313 01a4 0220     	 movs r0,#2
+ 3314 01a6 B121     	 movs r1,#177
+ 3315 01a8 4FF4D372 	 mov r2,#422
+ 3316 01ac 1D23     	 movs r3,#29
+ 3317 01ae FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3318 01b2 0095     	 str r5,[sp]
+ 3319 01b4 2378     	 ldrb r3,[r4]
+ 3320 01b6 0193     	 str r3,[sp,#4]
+ 3321 01b8 264B     	 ldr r3,.L410+108
+ 3322 01ba 0293     	 str r3,[sp,#8]
+ 3323 01bc 0220     	 movs r0,#2
+ 3324 01be D121     	 movs r1,#209
+ 3325 01c0 4FF48C72 	 mov r2,#280
+ 3326 01c4 1D23     	 movs r3,#29
+ 3327 01c6 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3328 01ca 0095     	 str r5,[sp]
+ 3329 01cc 2378     	 ldrb r3,[r4]
+ 3330 01ce 0193     	 str r3,[sp,#4]
+ 3331 01d0 214B     	 ldr r3,.L410+112
+ 3332 01d2 0293     	 str r3,[sp,#8]
+ 3333 01d4 40F21D10 	 movw r0,#285
+ 3334 01d8 D121     	 movs r1,#209
+ 3335 01da 8B22     	 movs r2,#139
+ 3336 01dc 1D23     	 movs r3,#29
+ 3337 01de FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3338 01e2 0025     	 movs r5,#0
+ 3339 01e4 6FE0     	 b .L396
+ 3340              	.L411:
+ 3341 01e6 00BF     	 .align 2
+ 3342              	.L410:
+ 3343 01e8 00000000 	 .word .LANCHOR19
+ 3344 01ec 00000000 	 .word .LANCHOR5
+ 3345 01f0 00000000 	 .word .LANCHOR6
+ 3346 01f4 00000000 	 .word .LANCHOR7
+ 3347 01f8 00000000 	 .word .LANCHOR21
+ 3348 01fc 00000000 	 .word .LANCHOR9
+ 3349 0200 07000026 	 .word 637534215
+ 3350 0204 00000000 	 .word .LANCHOR20
+ 3351 0208 00000000 	 .word TFT_display_cur_Menu__fptr_arr
+ 3352 020c 00000000 	 .word .LANCHOR0
+ 3353 0210 22222204 	 .word 69345826
+ 3354 0214 00000000 	 .word .LANCHOR18
+ 3355 0218 0900001F 	 .word 520093705
+ 3356 021c 6F000040 	 .word 1073741935
+ 3357 0220 1001F040 	 .word 1089470736
+ 3358 0224 00000000 	 .word .LANCHOR2
+ 3359 0228 00000000 	 .word .LANCHOR30
+ 3360 022c 8F000000 	 .word .LC8
+ 3361 0230 9A000000 	 .word .LC9
+ 3362 0234 A5000000 	 .word .LC10
+ 3363 0238 AF000000 	 .word .LC11
+ 3364 023c B9000000 	 .word .LC12
+ 3365 0240 C4000000 	 .word .LC13
+ 3366 0244 CE000000 	 .word .LC14
+ 3367 0248 D8000000 	 .word .LC15
+ 3368 024c DC000000 	 .word .LC16
+ 3369 0250 E0000000 	 .word .LC17
+ 3370 0254 E4000000 	 .word .LC18
+ 3371 0258 E6000000 	 .word .LC19
+ 3372              	.L407:
+ 3373 025c 002B     	 cmp r3,#0
+ 3374 025e 3FF42FAF 	 beq .L397
+ 3375 0262 1A25     	 movs r5,#26
+ 3376 0264 0095     	 str r5,[sp]
+ 3377 0266 2378     	 ldrb r3,[r4]
+ 3378 0268 0193     	 str r3,[sp,#4]
+ 3379 026a 484B     	 ldr r3,.L412
+ 3380 026c 0293     	 str r3,[sp,#8]
+ 3381 026e 0220     	 movs r0,#2
+ 3382 0270 7121     	 movs r1,#113
+ 3383 0272 4FF4D372 	 mov r2,#422
+ 3384 0276 1D23     	 movs r3,#29
+ 3385 0278 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3386 027c 0095     	 str r5,[sp]
+ 3387 027e 2378     	 ldrb r3,[r4]
+ 3388 0280 0193     	 str r3,[sp,#4]
+ 3389 0282 434B     	 ldr r3,.L412+4
+ 3390 0284 0293     	 str r3,[sp,#8]
+ 3391 0286 0220     	 movs r0,#2
+ 3392 0288 9121     	 movs r1,#145
+ 3393 028a 4FF4EE72 	 mov r2,#476
+ 3394 028e 1D23     	 movs r3,#29
+ 3395 0290 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3396 0294 0095     	 str r5,[sp]
+ 3397 0296 2378     	 ldrb r3,[r4]
+ 3398 0298 0193     	 str r3,[sp,#4]
+ 3399 029a 3E4B     	 ldr r3,.L412+8
+ 3400 029c 0293     	 str r3,[sp,#8]
+ 3401 029e 0220     	 movs r0,#2
+ 3402 02a0 1D23     	 movs r3,#29
+ 3403 02a2 B121     	 movs r1,#177
+ 3404 02a4 4FF4EE72 	 mov r2,#476
+ 3405 02a8 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3406 02ac 0095     	 str r5,[sp]
+ 3407 02ae 2378     	 ldrb r3,[r4]
+ 3408 02b0 0193     	 str r3,[sp,#4]
+ 3409 02b2 394B     	 ldr r3,.L412+12
+ 3410              	.L408:
+ 3411 02b4 0293     	 str r3,[sp,#8]
+ 3412 02b6 3820     	 movs r0,#56
+ 3413 02b8 D121     	 movs r1,#209
+ 3414 02ba 4FF4D372 	 mov r2,#422
+ 3415 02be 1D23     	 movs r3,#29
+ 3416 02c0 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3417 02c4 0125     	 movs r5,#1
+ 3418              	.L396:
+ 3419 02c6 3548     	 ldr r0,.L412+16
+ 3420 02c8 354F     	 ldr r7,.L412+20
+ 3421 02ca FFF7FEFF 	 bl EVE_cmd_fgcolor_burst
+ 3422 02ce 1A26     	 movs r6,#26
+ 3423 02d0 3448     	 ldr r0,.L412+24
+ 3424 02d2 FFF7FEFF 	 bl EVE_cmd_bgcolor_burst
+ 3425 02d6 0096     	 str r6,[sp]
+ 3426 02d8 2378     	 ldrb r3,[r4]
+ 3427 02da 0193     	 str r3,[sp,#4]
+ 3428 02dc 324B     	 ldr r3,.L412+28
+ 3429 02de 0293     	 str r3,[sp,#8]
+ 3430 02e0 0220     	 movs r0,#2
+ 3431 02e2 F121     	 movs r1,#241
+ 3432 02e4 5A22     	 movs r2,#90
+ 3433 02e6 1D23     	 movs r3,#29
+ 3434 02e8 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3435 02ec B5B1     	 cbz r5,.L398
+ 3436 02ee 0096     	 str r6,[sp]
+ 3437 02f0 3B78     	 ldrb r3,[r7]
+ 3438 02f2 0193     	 str r3,[sp,#4]
+ 3439 02f4 2D4B     	 ldr r3,.L412+32
+ 3440 02f6 0293     	 str r3,[sp,#8]
+ 3441 02f8 6020     	 movs r0,#96
+ 3442 02fa F121     	 movs r1,#241
+ 3443 02fc 4FF49072 	 mov r2,#288
+ 3444 0300 1D23     	 movs r3,#29
+ 3445 0302 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3446 0306 0096     	 str r6,[sp]
+ 3447 0308 3B78     	 ldrb r3,[r7]
+ 3448 030a 0193     	 str r3,[sp,#4]
+ 3449 030c 284B     	 ldr r3,.L412+36
+ 3450 030e 0293     	 str r3,[sp,#8]
+ 3451 0310 0220     	 movs r0,#2
+ 3452 0312 D121     	 movs r1,#209
+ 3453 0314 3222     	 movs r2,#50
+ 3454 0316 1D23     	 movs r3,#29
+ 3455 0318 FFF7FEFF 	 bl EVE_cmd_keys_burst
+ 3456              	.L398:
+ 3457 031c 2548     	 ldr r0,.L412+40
+ 3458 031e FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3459 0322 2378     	 ldrb r3,[r4]
+ 3460 0324 1322     	 movs r2,#19
+ 3461 0326 7F2B     	 cmp r3,#127
+ 3462 0328 0092     	 str r2,[sp]
+ 3463 032a 234B     	 ldr r3,.L412+44
+ 3464 032c 05BF     	 ittet eq
+ 3465 032e 0293     	 streq r3,[sp,#8]
+ 3466 0330 4FF48072 	 moveq r2,#256
+ 3467 0334 0022     	 movne r2,#0
+ 3468 0336 0192     	 streq r2,[sp,#4]
+ 3469 0338 0FBF     	 iteee eq
+ 3470 033a 4FF4D770 	 moveq r0,#430
+ 3471 033e 0192     	 strne r2,[sp,#4]
+ 3472 0340 0293     	 strne r3,[sp,#8]
+ 3473 0342 4FF4D670 	 movne r0,#428
+ 3474 0346 7121     	 movs r1,#113
+ 3475 0348 3222     	 movs r2,#50
+ 3476 034a 1D23     	 movs r3,#29
+ 3477 034c FFF7FEFF 	 bl EVE_cmd_button_burst
+ 3478 0350 1A48     	 ldr r0,.L412+48
+ 3479 0352 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3480 0356 1422     	 movs r2,#20
+ 3481 0358 0023     	 movs r3,#0
+ 3482 035a 8DE80C00 	 stmia sp,{r2,r3}
+ 3483 035e 184B     	 ldr r3,.L412+52
+ 3484 0360 0293     	 str r3,[sp,#8]
+ 3485 0362 4FF4C270 	 mov r0,#388
+ 3486 0366 F121     	 movs r1,#241
+ 3487 0368 5A22     	 movs r2,#90
+ 3488 036a 1D23     	 movs r3,#29
+ 3489 036c FFF7FEFF 	 bl EVE_cmd_button_burst
+ 3490              	.L391:
+ 3491 0370 0020     	 movs r0,#0
+ 3492 0372 FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3493 0376 6FF0FE00 	 mvn r0,#254
+ 3494 037a FFF7FEFF 	 bl EVE_cmd_dl_burst
+ 3495 037e 05B0     	 add sp,sp,#20
+ 3496              	 
+ 3497 0380 BDE8F040 	 pop {r4,r5,r6,r7,lr}
+ 3498 0384 FFF7FEBF 	 b EVE_end_cmd_burst
+ 3499              	.L387:
+ 3500 0388 05B0     	 add sp,sp,#20
+ 3501              	 
+ 3502 038a F0BD     	 pop {r4,r5,r6,r7,pc}
+ 3503              	.L413:
+ 3504              	 .align 2
+ 3505              	.L412:
+ 3506 038c E8000000 	 .word .LC20
+ 3507 0390 B9000000 	 .word .LC12
+ 3508 0394 C4000000 	 .word .LC13
+ 3509 0398 F3000000 	 .word .LC21
+ 3510 039c 56869A00 	 .word 10126934
+ 3511 03a0 00000000 	 .word .LANCHOR18
+ 3512 03a4 0088F500 	 .word 16091136
+ 3513 03a8 FD000000 	 .word .LC22
+ 3514 03ac 00010000 	 .word .LC23
+ 3515 03b0 02010000 	 .word .LC24
+ 3516 03b4 7F000003 	 .word 50331775
+ 3517 03b8 00000000 	 .word .LANCHOR33
+ 3518 03bc 80000003 	 .word 50331776
+ 3519 03c0 04010000 	 .word .LC25
+ 3521              	 .comm TFT_touch_cur_Menu__fptr_arr,24,4
+ 3522              	 .comm TFT_display_cur_Menu__fptr_arr,24,4
+ 3523              	 .comm TFT_display_static_cur_Menu__fptr_arr,24,4
+ 3524              	 .comm frameover,1,1
+ 3525              	 .comm sdState,1,1
+ 3526              	 .comm measureMode,1,1
+ 3527              	 .comm fifo_recordBlock,1,1
+ 3528              	 .comm fifo_writeBlock,1,1
+ 3529              	 .comm fifo_writeBufIdx,2,2
+ 3530              	 .comm fifo_buf,4,4
+ 3531              	 .comm filename_rec_curLength,1,1
+ 3532              	 .comm sensor2,76,4
+ 3533              	 .comm s2_filename_cal,20,1
+ 3534              	 .comm sensor1,76,4
+ 3535              	 .comm s1_filename_cal,20,1
+ 3536              	 .comm measurementCurSensor,1,1
+ 3537              	 .comm measurementCounter,4,4
+ 3538              	 .comm main_trigger,1,1
+ 3539              	 .comm _msCounter,4,4
+ 3540              	 .comm ReadData,1,1
+ 3541              	 .section .bss.keypadEndOfKeypress_Debounce,"aw",%nobits
+ 3542              	 .set .LANCHOR29,.+0
+ 3545              	keypadEndOfKeypress_Debounce:
+ 3546 0000 00       	 .space 1
+ 3547              	 .section .bss.num_dl_static,"aw",%nobits
+ 3548              	 .align 2
+ 3549              	 .set .LANCHOR20,.+0
+ 3552              	num_dl_static:
+ 3553 0000 00000000 	 .space 4
+ 3554              	 .section .bss.swipeDistance_Y,"aw",%nobits
+ 3555              	 .align 2
+ 3556              	 .set .LANCHOR26,.+0
+ 3559              	swipeDistance_Y:
+ 3560 0000 00000000 	 .space 4
+ 3561              	 .section .bss.keypadKeypressFinished,"aw",%nobits
+ 3562              	 .set .LANCHOR4,.+0
+ 3565              	keypadKeypressFinished:
+ 3566 0000 00       	 .space 1
+ 3567              	 .section .rodata.EVE_cmd_text_var__fptr_arr,"a",%progbits
+ 3568              	 .align 2
+ 3569              	 .set .LANCHOR13,.+0
+ 3572              	EVE_cmd_text_var__fptr_arr:
+ 3573 0000 00000000 	 .word EVE_cmd_text_var
+ 3574 0004 00000000 	 .word EVE_cmd_text_var_burst
+ 3575              	 .section .bss.keypadCurrentKey,"aw",%nobits
+ 3576              	 .set .LANCHOR18,.+0
+ 3579              	keypadCurrentKey:
+ 3580 0000 00       	 .space 1
+ 3581              	 .section .rodata.EVE_cmd_text__fptr_arr,"a",%progbits
+ 3582              	 .align 2
+ 3583              	 .set .LANCHOR11,.+0
+ 3586              	EVE_cmd_text__fptr_arr:
+ 3587 0000 00000000 	 .word EVE_cmd_text
+ 3588 0004 00000000 	 .word EVE_cmd_text_burst
+ 3589              	 .section .bss.TFT_last_ScrollV,"aw",%nobits
+ 3590              	 .align 1
+ 3591              	 .set .LANCHOR21,.+0
+ 3594              	TFT_last_ScrollV:
+ 3595 0000 0000     	 .space 2
+ 3596              	 .section .data.swipeInitialTouch_X,"aw",%progbits
+ 3597              	 .align 2
+ 3598              	 .set .LANCHOR23,.+0
+ 3601              	swipeInitialTouch_X:
+ 3602 0000 00800000 	 .word 32768
+ 3603              	 .section .data.swipeInitialTouch_Y,"aw",%progbits
+ 3604              	 .align 2
+ 3605              	 .set .LANCHOR24,.+0
+ 3608              	swipeInitialTouch_Y:
+ 3609 0000 00800000 	 .word 32768
+ 3610              	 .section .bss.tft_active,"aw",%nobits
+ 3611              	 .set .LANCHOR19,.+0
+ 3614              	tft_active:
+ 3615 0000 00       	 .space 1
+ 3616              	 .section .bss.toggle_lock,"aw",%nobits
+ 3617              	 .set .LANCHOR31,.+0
+ 3620              	toggle_lock:
+ 3621 0000 00       	 .space 1
+ 3622              	 .section .bss.keypadActive,"aw",%nobits
+ 3623              	 .set .LANCHOR0,.+0
+ 3626              	keypadActive:
+ 3627 0000 00       	 .space 1
+ 3628              	 .section .bss.TFT_refresh_static,"aw",%nobits
+ 3629              	 .set .LANCHOR5,.+0
+ 3632              	TFT_refresh_static:
+ 3633 0000 00       	 .space 1
+ 3634              	 .section .bss.keypadInitialLock,"aw",%nobits
+ 3635              	 .set .LANCHOR3,.+0
+ 3638              	keypadInitialLock:
+ 3639 0000 00       	 .space 1
+ 3640              	 .section .bss.swipeDistance_X,"aw",%nobits
+ 3641              	 .align 2
+ 3642              	 .set .LANCHOR25,.+0
+ 3645              	swipeDistance_X:
+ 3646 0000 00000000 	 .space 4
+ 3647              	 .section .bss.keypadType,"aw",%nobits
+ 3648              	 .set .LANCHOR2,.+0
+ 3651              	keypadType:
+ 3652 0000 00       	 .space 1
+ 3653              	 .section .bss.TFT_cur_ScrollV,"aw",%nobits
+ 3654              	 .align 1
+ 3655              	 .set .LANCHOR9,.+0
+ 3658              	TFT_cur_ScrollV:
+ 3659 0000 0000     	 .space 2
+ 3660              	 .section .data.cursor.14447,"aw",%progbits
+ 3661              	 .set .LANCHOR15,.+0
+ 3664              	cursor.14447:
+ 3665 0000 7C       	 .byte 124
+ 3666              	 .section .bss.textbox_cursor_pos,"aw",%nobits
+ 3667              	 .set .LANCHOR16,.+0
+ 3670              	textbox_cursor_pos:
+ 3671 0000 00       	 .space 1
+ 3672              	 .section .data.TFT_last_MenuIdx,"aw",%progbits
+ 3673              	 .set .LANCHOR7,.+0
+ 3676              	TFT_last_MenuIdx:
+ 3677 0000 FF       	 .byte -1
+ 3678              	 .section .bss.lastBlink.14448,"aw",%nobits
+ 3679              	 .align 2
+ 3680              	 .set .LANCHOR14,.+0
+ 3683              	lastBlink.14448:
+ 3684 0000 00000000 	 .space 4
+ 3685              	 .section .bss.swipeDetect,"aw",%nobits
+ 3686              	 .set .LANCHOR32,.+0
+ 3689              	swipeDetect:
+ 3690 0000 00       	 .space 1
+ 3691              	 .section .bss.swipeInProgress,"aw",%nobits
+ 3692              	 .set .LANCHOR22,.+0
+ 3695              	swipeInProgress:
+ 3696 0000 00       	 .space 1
+ 3697              	 .section .rodata.backspace_char,"a",%progbits
+ 3698              	 .set .LANCHOR33,.+0
+ 3701              	backspace_char:
+ 3702 0000 2E       	 .byte 46
+ 3703              	 .section .bss.str_buf,"aw",%nobits
+ 3704              	 .set .LANCHOR17,.+0
+ 3707              	str_buf:
+ 3708 0000 00000000 	 .space 100
+ 3708      00000000 
+ 3708      00000000 
+ 3708      00000000 
+ 3708      00000000 
+ 3709              	 .section .bss.swipeEvokedBy,"aw",%nobits
+ 3710              	 .set .LANCHOR28,.+0
+ 3713              	swipeEvokedBy:
+ 3714 0000 00       	 .space 1
+ 3715              	 .section .bss.keypadEvokedBy,"aw",%nobits
+ 3716              	 .set .LANCHOR1,.+0
+ 3719              	keypadEvokedBy:
+ 3720 0000 00       	 .space 1
+ 3721              	 .section .rodata.EVE_cmd_dl__fptr_arr,"a",%progbits
+ 3722              	 .align 2
+ 3723              	 .set .LANCHOR10,.+0
+ 3726              	EVE_cmd_dl__fptr_arr:
+ 3727 0000 00000000 	 .word EVE_cmd_dl
+ 3728 0004 00000000 	 .word EVE_cmd_dl_burst
+ 3729              	 .section .bss.TFT_UpperBond,"aw",%nobits
+ 3730              	 .align 1
+ 3731              	 .set .LANCHOR8,.+0
+ 3734              	TFT_UpperBond:
+ 3735 0000 0000     	 .space 2
+ 3736              	 .section .bss.keypadShiftActive,"aw",%nobits
+ 3737              	 .set .LANCHOR30,.+0
+ 3740              	keypadShiftActive:
+ 3741 0000 00       	 .space 1
+ 3742              	 .section .rodata.str1.1,"aMS",%progbits,1
+ 3743              	.LC0:
+ 3744 0000 252E316C 	 .ascii "%.1lf\000"
+ 3744      6600
+ 3745              	.LC1:
+ 3746 0006 506C6561 	 .ascii "Please tap on the dot.\000"
+ 3746      73652074 
+ 3746      6170206F 
+ 3746      6E207468 
+ 3746      6520646F 
+ 3747              	.LC2:
+ 3748 001d 544F5543 	 .ascii "TOUCH_TRANSFORM_A:\000"
+ 3748      485F5452 
+ 3748      414E5346 
+ 3748      4F524D5F 
+ 3748      413A00
+ 3749              	.LC3:
+ 3750 0030 544F5543 	 .ascii "TOUCH_TRANSFORM_B:\000"
+ 3750      485F5452 
+ 3750      414E5346 
+ 3750      4F524D5F 
+ 3750      423A00
+ 3751              	.LC4:
+ 3752 0043 544F5543 	 .ascii "TOUCH_TRANSFORM_C:\000"
+ 3752      485F5452 
+ 3752      414E5346 
+ 3752      4F524D5F 
+ 3752      433A00
+ 3753              	.LC5:
+ 3754 0056 544F5543 	 .ascii "TOUCH_TRANSFORM_D:\000"
+ 3754      485F5452 
+ 3754      414E5346 
+ 3754      4F524D5F 
+ 3754      443A00
+ 3755              	.LC6:
+ 3756 0069 544F5543 	 .ascii "TOUCH_TRANSFORM_E:\000"
+ 3756      485F5452 
+ 3756      414E5346 
+ 3756      4F524D5F 
+ 3756      453A00
+ 3757              	.LC7:
+ 3758 007c 544F5543 	 .ascii "TOUCH_TRANSFORM_F:\000"
+ 3758      485F5452 
+ 3758      414E5346 
+ 3758      4F524D5F 
+ 3758      463A00
+ 3759              	.LC8:
+ 3760 008f 31323334 	 .ascii "1234567890\000"
+ 3760      35363738 
+ 3760      393000
+ 3761              	.LC9:
+ 3762 009a 71776572 	 .ascii "qwertyuiop\000"
+ 3762      74797569 
+ 3762      6F7000
+ 3763              	.LC10:
+ 3764 00a5 61736466 	 .ascii "asdfghjkl\000"
+ 3764      67686A6B 
+ 3764      6C00
+ 3765              	.LC11:
+ 3766 00af 7A786376 	 .ascii "zxcvbnm._\000"
+ 3766      626E6D2E 
+ 3766      5F00
+ 3767              	.LC12:
+ 3768 00b9 51574552 	 .ascii "QWERTYUIOP\000"
+ 3768      54595549 
+ 3768      4F5000
+ 3769              	.LC13:
+ 3770 00c4 41534446 	 .ascii "ASDFGHJKL\000"
+ 3770      47484A4B 
+ 3770      4C00
+ 3771              	.LC14:
+ 3772 00ce 5A584356 	 .ascii "ZXCVBNM#-\000"
+ 3772      424E4D23 
+ 3772      2D00
+ 3773              	.LC15:
+ 3774 00d8 37383900 	 .ascii "789\000"
+ 3775              	.LC16:
+ 3776 00dc 34353600 	 .ascii "456\000"
+ 3777              	.LC17:
+ 3778 00e0 31323300 	 .ascii "123\000"
+ 3779              	.LC18:
+ 3780 00e4 3000     	 .ascii "0\000"
+ 3781              	.LC19:
+ 3782 00e6 2E00     	 .ascii ".\000"
+ 3783              	.LC20:
+ 3784 00e8 21222526 	 .ascii "!\"%&/()=?\\\000"
+ 3784      2F28293D 
+ 3784      3F5C00
+ 3785              	.LC21:
+ 3786 00f3 5A584356 	 .ascii "ZXCVBNM:-\000"
+ 3786      424E4D3A 
+ 3786      2D00
+ 3787              	.LC22:
+ 3788 00fd 3C3E00   	 .ascii "<>\000"
+ 3789              	.LC23:
+ 3790 0100 2000     	 .ascii " \000"
+ 3791              	.LC24:
+ 3792 0102 5E00     	 .ascii "^\000"
+ 3793              	.LC25:
+ 3794 0104 4F4B00   	 .ascii "OK\000"
+ 3795              	 .section .rodata.EVE_cmd_number__fptr_arr,"a",%progbits
+ 3796              	 .align 2
+ 3797              	 .set .LANCHOR12,.+0
+ 3800              	EVE_cmd_number__fptr_arr:
+ 3801 0000 00000000 	 .word EVE_cmd_number
+ 3802 0004 00000000 	 .word EVE_cmd_number_burst
+ 3803              	 .section .data.TFT_cur_menuIdx,"aw",%progbits
+ 3804              	 .set .LANCHOR6,.+0
+ 3807              	TFT_cur_menuIdx:
+ 3808 0000 01       	 .byte 1
+ 3809              	 .section .bss.swipeEndOfTouch_Debounce,"aw",%nobits
+ 3810              	 .set .LANCHOR27,.+0
+ 3813              	swipeEndOfTouch_Debounce:
+ 3814 0000 00       	 .space 1
+ 3815              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 tft.c
+    {standard input}:17     .text.TFT_keypad_open:00000000 $t
+    {standard input}:22     .text.TFT_keypad_open:00000000 TFT_keypad_open
+    {standard input}:42     .text.TFT_keypad_open:00000018 $d
+    {standard input}:48     .text.TFT_keypad_close:00000000 $t
+    {standard input}:53     .text.TFT_keypad_close:00000000 TFT_keypad_close
+    {standard input}:70     .text.TFT_keypad_close:00000014 $d
+    {standard input}:76     .text.TFT_setMenu:00000000 $t
+    {standard input}:81     .text.TFT_setMenu:00000000 TFT_setMenu
+    {standard input}:111    .text.TFT_setMenu:00000038 $d
+    {standard input}:119    .text.TFT_setColor:00000000 $t
+    {standard input}:124    .text.TFT_setColor:00000000 TFT_setColor
+    {standard input}:179    .text.TFT_graph_static:00000000 $t
+    {standard input}:184    .text.TFT_graph_static:00000000 TFT_graph_static
+    {standard input}:461    .text.TFT_graph_static:00000330 $d
+    {standard input}:469    .text.TFT_graph_static:0000034c $t
+    {standard input}:616    .text.TFT_graph_static:00000508 $d
+    {standard input}:621    .text.TFT_header_static:00000000 $t
+    {standard input}:626    .text.TFT_header_static:00000000 TFT_header_static
+    {standard input}:719    .text.TFT_header_static:000000f4 $d
+    {standard input}:729    .text.TFT_label_display:00000000 $t
+    {standard input}:734    .text.TFT_label_display:00000000 TFT_label_display
+    {standard input}:896    .text.TFT_label_display:000001b4 $d
+    {standard input}:904    .text.TFT_control_display:00000000 $t
+    {standard input}:909    .text.TFT_control_display:00000000 TFT_control_display
+    {standard input}:975    .text.TFT_control_display:0000008c $d
+    {standard input}:979    .text.TFT_textbox_static:00000000 $t
+    {standard input}:984    .text.TFT_textbox_static:00000000 TFT_textbox_static
+    {standard input}:1081   .text.TFT_textbox_static:000000e8 $d
+    {standard input}:1090   .text.TFT_textbox_display:00000000 $t
+    {standard input}:1095   .text.TFT_textbox_display:00000000 TFT_textbox_display
+    {standard input}:1312   .text.TFT_textbox_display:00000224 $d
+    {standard input}:1323   .text.TFT_textbox_setStatus:00000000 $t
+    {standard input}:1328   .text.TFT_textbox_setStatus:00000000 TFT_textbox_setStatus
+    {standard input}:1565   .text.TFT_textbox_setStatus:00000248 $d
+    {standard input}:1570   .text.TFT_textbox_touch:00000000 $t
+    {standard input}:1575   .text.TFT_textbox_touch:00000000 TFT_textbox_touch
+    {standard input}:1694   .text.TFT_textbox_touch:000000f8 $d
+    {standard input}:1702   .text.TFT_primitive:00000000 $t
+    {standard input}:1707   .text.TFT_primitive:00000000 TFT_primitive
+    {standard input}:1765   .text.TFT_primitive:00000094 $d
+    {standard input}:1769   .text.TFT_graph_pixeldata_i:00000000 $t
+    {standard input}:1774   .text.TFT_graph_pixeldata_i:00000000 TFT_graph_pixeldata_i
+    {standard input}:1911   .text.TFT_graph_pixeldata_i:00000184 $d
+    {standard input}:1916   .text.TFT_graph_pixeldata_f:00000000 $t
+    {standard input}:1921   .text.TFT_graph_pixeldata_f:00000000 TFT_graph_pixeldata_f
+    {standard input}:2055   .text.TFT_graph_pixeldata_f:00000174 $d
+    {standard input}:2060   .text.TFT_graph_stepdata:00000000 $t
+    {standard input}:2065   .text.TFT_graph_stepdata:00000000 TFT_graph_stepdata
+    {standard input}:2136   .text.TFT_graph_stepdata:000000cc $d
+    {standard input}:2140   .text.TFT_graph_XYdata:00000000 $t
+    {standard input}:2145   .text.TFT_graph_XYdata:00000000 TFT_graph_XYdata
+    {standard input}:2347   .text.TFT_graph_XYdata:00000218 $d
+    {standard input}:2356   .text.TFT_graph_function:00000000 $t
+    {standard input}:2361   .text.TFT_graph_function:00000000 TFT_graph_function
+    {standard input}:2503   .text.TFT_graph_function:00000180 $d
+    {standard input}:2511   .text.TFT_touch_calibrate:00000000 $t
+    {standard input}:2516   .text.TFT_touch_calibrate:00000000 TFT_touch_calibrate
+    {standard input}:2680   .text.TFT_touch_calibrate:000001c0 $d
+    {standard input}:2698   .text.TFT_init:00000000 $t
+    {standard input}:2703   .text.TFT_init:00000000 TFT_init
+    {standard input}:2741   .text.TFT_init:00000064 $d
+    {standard input}:2746   .text.TFT_display_init_screen:00000000 $t
+    {standard input}:2751   .text.TFT_display_init_screen:00000000 TFT_display_init_screen
+    {standard input}:2811   .text.TFT_display_init_screen:00000094 $d
+    {standard input}:2819   .text.TFT_display_static:00000000 $t
+    {standard input}:2824   .text.TFT_display_static:00000000 TFT_display_static
+    {standard input}:2882   .text.TFT_display_static:00000094 $d
+                            *COM*:00000018 TFT_display_static_cur_Menu__fptr_arr
+    {standard input}:2897   .text.TFT_touch:00000000 $t
+    {standard input}:2902   .text.TFT_touch:00000000 TFT_touch
+    {standard input}:3115   .text.TFT_touch:00000198 $d
+                            *COM*:00000018 TFT_touch_cur_Menu__fptr_arr
+    {standard input}:3136   .text.TFT_display:00000000 $t
+    {standard input}:3141   .text.TFT_display:00000000 TFT_display
+    {standard input}:3343   .text.TFT_display:000001e8 $d
+                            *COM*:00000018 TFT_display_cur_Menu__fptr_arr
+    {standard input}:3373   .text.TFT_display:0000025c $t
+    {standard input}:3506   .text.TFT_display:0000038c $d
+                            *COM*:00000001 frameover
+                            *COM*:00000001 sdState
+                            *COM*:00000001 measureMode
+                            *COM*:00000001 fifo_recordBlock
+                            *COM*:00000001 fifo_writeBlock
+                            *COM*:00000002 fifo_writeBufIdx
+                            *COM*:00000004 fifo_buf
+                            *COM*:00000001 filename_rec_curLength
+                            *COM*:0000004c sensor2
+                            *COM*:00000014 s2_filename_cal
+                            *COM*:0000004c sensor1
+                            *COM*:00000014 s1_filename_cal
+                            *COM*:00000001 measurementCurSensor
+                            *COM*:00000004 measurementCounter
+                            *COM*:00000001 main_trigger
+                            *COM*:00000004 _msCounter
+                            *COM*:00000001 ReadData
+    {standard input}:3545   .bss.keypadEndOfKeypress_Debounce:00000000 keypadEndOfKeypress_Debounce
+    {standard input}:3546   .bss.keypadEndOfKeypress_Debounce:00000000 $d
+    {standard input}:3548   .bss.num_dl_static:00000000 $d
+    {standard input}:3552   .bss.num_dl_static:00000000 num_dl_static
+    {standard input}:3555   .bss.swipeDistance_Y:00000000 $d
+    {standard input}:3559   .bss.swipeDistance_Y:00000000 swipeDistance_Y
+    {standard input}:3565   .bss.keypadKeypressFinished:00000000 keypadKeypressFinished
+    {standard input}:3566   .bss.keypadKeypressFinished:00000000 $d
+    {standard input}:3568   .rodata.EVE_cmd_text_var__fptr_arr:00000000 $d
+    {standard input}:3572   .rodata.EVE_cmd_text_var__fptr_arr:00000000 EVE_cmd_text_var__fptr_arr
+    {standard input}:3579   .bss.keypadCurrentKey:00000000 keypadCurrentKey
+    {standard input}:3580   .bss.keypadCurrentKey:00000000 $d
+    {standard input}:3582   .rodata.EVE_cmd_text__fptr_arr:00000000 $d
+    {standard input}:3586   .rodata.EVE_cmd_text__fptr_arr:00000000 EVE_cmd_text__fptr_arr
+    {standard input}:3590   .bss.TFT_last_ScrollV:00000000 $d
+    {standard input}:3594   .bss.TFT_last_ScrollV:00000000 TFT_last_ScrollV
+    {standard input}:3597   .data.swipeInitialTouch_X:00000000 $d
+    {standard input}:3601   .data.swipeInitialTouch_X:00000000 swipeInitialTouch_X
+    {standard input}:3604   .data.swipeInitialTouch_Y:00000000 $d
+    {standard input}:3608   .data.swipeInitialTouch_Y:00000000 swipeInitialTouch_Y
+    {standard input}:3614   .bss.tft_active:00000000 tft_active
+    {standard input}:3615   .bss.tft_active:00000000 $d
+    {standard input}:3620   .bss.toggle_lock:00000000 toggle_lock
+    {standard input}:3621   .bss.toggle_lock:00000000 $d
+    {standard input}:3626   .bss.keypadActive:00000000 keypadActive
+    {standard input}:3627   .bss.keypadActive:00000000 $d
+    {standard input}:3632   .bss.TFT_refresh_static:00000000 TFT_refresh_static
+    {standard input}:3633   .bss.TFT_refresh_static:00000000 $d
+    {standard input}:3638   .bss.keypadInitialLock:00000000 keypadInitialLock
+    {standard input}:3639   .bss.keypadInitialLock:00000000 $d
+    {standard input}:3641   .bss.swipeDistance_X:00000000 $d
+    {standard input}:3645   .bss.swipeDistance_X:00000000 swipeDistance_X
+    {standard input}:3651   .bss.keypadType:00000000 keypadType
+    {standard input}:3652   .bss.keypadType:00000000 $d
+    {standard input}:3654   .bss.TFT_cur_ScrollV:00000000 $d
+    {standard input}:3658   .bss.TFT_cur_ScrollV:00000000 TFT_cur_ScrollV
+    {standard input}:3664   .data.cursor.14447:00000000 cursor.14447
+    {standard input}:3670   .bss.textbox_cursor_pos:00000000 textbox_cursor_pos
+    {standard input}:3671   .bss.textbox_cursor_pos:00000000 $d
+    {standard input}:3676   .data.TFT_last_MenuIdx:00000000 TFT_last_MenuIdx
+    {standard input}:3679   .bss.lastBlink.14448:00000000 $d
+    {standard input}:3683   .bss.lastBlink.14448:00000000 lastBlink.14448
+    {standard input}:3689   .bss.swipeDetect:00000000 swipeDetect
+    {standard input}:3690   .bss.swipeDetect:00000000 $d
+    {standard input}:3695   .bss.swipeInProgress:00000000 swipeInProgress
+    {standard input}:3696   .bss.swipeInProgress:00000000 $d
+    {standard input}:3701   .rodata.backspace_char:00000000 backspace_char
+    {standard input}:3707   .bss.str_buf:00000000 str_buf
+    {standard input}:3708   .bss.str_buf:00000000 $d
+    {standard input}:3713   .bss.swipeEvokedBy:00000000 swipeEvokedBy
+    {standard input}:3714   .bss.swipeEvokedBy:00000000 $d
+    {standard input}:3719   .bss.keypadEvokedBy:00000000 keypadEvokedBy
+    {standard input}:3720   .bss.keypadEvokedBy:00000000 $d
+    {standard input}:3722   .rodata.EVE_cmd_dl__fptr_arr:00000000 $d
+    {standard input}:3726   .rodata.EVE_cmd_dl__fptr_arr:00000000 EVE_cmd_dl__fptr_arr
+    {standard input}:3730   .bss.TFT_UpperBond:00000000 $d
+    {standard input}:3734   .bss.TFT_UpperBond:00000000 TFT_UpperBond
+    {standard input}:3740   .bss.keypadShiftActive:00000000 keypadShiftActive
+    {standard input}:3741   .bss.keypadShiftActive:00000000 $d
+    {standard input}:3796   .rodata.EVE_cmd_number__fptr_arr:00000000 $d
+    {standard input}:3800   .rodata.EVE_cmd_number__fptr_arr:00000000 EVE_cmd_number__fptr_arr
+    {standard input}:3807   .data.TFT_cur_menuIdx:00000000 TFT_cur_menuIdx
+    {standard input}:3813   .bss.swipeEndOfTouch_Debounce:00000000 swipeEndOfTouch_Debounce
+    {standard input}:3814   .bss.swipeEndOfTouch_Debounce:00000000 $d
+
+UNDEFINED SYMBOLS
+menu_objects
+EVE_cmd_dl_burst
+EVE_cmd_fgcolor_burst
+EVE_cmd_bgcolor_burst
+EVE_cmd_gradcolor_burst
+EVE_cmd_dl
+EVE_cmd_fgcolor
+EVE_cmd_bgcolor
+EVE_cmd_gradcolor
+__aeabi_f2d
+__aeabi_d2iz
+floor
+ceil
+sprintf
+__aeabi_dadd
+__aeabi_dsub
+modff
+pow10f
+EVE_cmd_toggle_burst
+EVE_cmd_button_burst
+SYSTIMER_GetTime
+strncpy
+strcpy
+EVE_cmd_text_var_burst
+EVE_cmd_text_burst
+strlen
+atoff
+poly_calc
+EVE_memWrite32
+EVE_cmd_text
+EVE_cmd_calibrate
+EVE_cmd_execute
+EVE_memRead32
+EVE_cmd_setbase
+EVE_cmd_number
+EVE_init
+EVE_memWrite8
+EVE_start_cmd_burst
+EVE_end_cmd_burst
+EVE_cmd_inflate
+EVE_cmd_setbitmap_burst
+logo_init
+EVE_busy
+EVE_memRead16
+EVE_cmd_memcpy
+EVE_memRead8
+TFT_display_get_values
+EVE_cmd_append_burst
+EVE_cmd_keys_burst
+EVE_cmd_text_var
+EVE_cmd_number_burst

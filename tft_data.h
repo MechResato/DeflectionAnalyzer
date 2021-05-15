@@ -11,7 +11,7 @@
 	#define PROGMEM
 #endif
 
-extern const uint8_t logo_init[20228] PROGMEM;
+extern const uint8_t logo_init[6664] PROGMEM;
 
 // Original data removed by RS 03.01.2021
 //extern const uint8_t logo[239] PROGMEM;

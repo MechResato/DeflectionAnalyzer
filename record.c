@@ -24,7 +24,7 @@
 // type's:	  int_buffer_t (e.g. uint16_t), float_buffer_t (e.g. float),
 // #define's: FIFO_LINE_SIZE_PAD, FIFO_BLOCKS, SENSOR_RAW_SIZE, SENSORS_SIZE and
 //			  FILENAME_BUFFER_LENGTH
-extern sdStates sdState;				  // state of sd-card (purpose: none, mounted, open or error)
+extern sdStates sdState;				  // state of sd-card (purpose: none=0, mounted, open or error)
 extern volatile measureModes measureMode; // state of the measurement (purpose: none, monitoring or recording)
 // FIFO-variables
 extern volatile uint8_t volatile * volatile fifo_buf;	// FIFO buffer
@@ -69,8 +69,8 @@ void record_mountDisk(uint8_t mount){
 		sdState = sdNone;
 
 		// Initialize SD
-		DSTATUS resDinit = disk_initialize(0);
-		printf("Reinit sd = %d\n", resDinit);
+		DSTATUS resDiskInit = disk_initialize(0);
+		printf("Reinit sd = %d\n", resDiskInit);
 	}
 
 
@@ -119,7 +119,7 @@ static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t access
 	/// Todo
 
 	// FATFS result code
-	FRESULT res;
+	FRESULT res = FR_OK;
 
 	// If SD is not mounted or a file is still open mount/close it
 	if(sdState == sdNone)
@@ -184,7 +184,7 @@ static FRESULT record_closeFile(objFIL objFILrw){
 	/// Used to close the file of the write or read FIL struct.
 
 	// FATFS result code
-	FRESULT res;
+	FRESULT res = FR_OK;
 
 	// If SD is mounted and the corresponding file is still open close it
 	if(sdState != sdError && sdState != sdNone){
@@ -199,7 +199,10 @@ static FRESULT record_closeFile(objFIL objFILrw){
 		// Check result
 		if (res == FR_OK) {
 			printf("\tClose File OK\n");
-			sdState = sdMounted;
+
+			// Check if one of the files is still open, if not mark sd state to "no file open" = "sd mounted"
+			if(fil_r.obj.fs != NULL && fil_w.obj.fs != NULL)
+				sdState = sdMounted;
 		}
 		else if(res == FR_INVALID_OBJECT){ // Note: Unsure if needed - check this again
 			printf("\tFile close warning: %d\n", res);
@@ -418,7 +421,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 			// Single loop do-while slope to handle errors clean with break; (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 			do{
 				// Write header
-				f_printf(&fil_w, "Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", (sens->index+1), sens->name);
+				f_printf(&fil_w, "# Specification of sensor %d '%s'. Odd lines are comments, even lines are values. Float values are converted to 32bit integer hex (memory content). ", (sens->index+1), sens->name);
 				printf("Write header\n");
 
 				// Write fit order comment and value in separate lines
@@ -426,24 +429,34 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 				if( record_writeCalFile_pair("Curve fit function order:\n", &buff[0]) ) break;
 
 				// Write coefficients comment and value in separate lines. Note: Floating point precision is taken from FLT_DIG (=here 6). See https://www.h-schmidt.net/FloatConverter/IEEE754.html for an online converter.
-				sprintf(c_buff,"Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->fitCoefficients[0], sens->fitCoefficients[1], sens->fitCoefficients[2], sens->fitCoefficients[3]);
+				sprintf(c_buff,"# Coefficients (%.8f, %.8f, %.8f, %.8f):\n", sens->fitCoefficients[0], sens->fitCoefficients[1], sens->fitCoefficients[2], sens->fitCoefficients[3]);
 				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->fitCoefficients[0], *(unsigned long*)&sens->fitCoefficients[1], *(unsigned long*)&sens->fitCoefficients[2], *(unsigned long*)&sens->fitCoefficients[3]);
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
 				// Write avg filter order comment and value in separate lines
 				sprintf(buff,"%d\n", sens->avgFilterOrder);
-				if( record_writeCalFile_pair("Average filter order:\n", &buff[0]) ) break;
+				if( record_writeCalFile_pair("# Average filter order:\n", &buff[0]) ) break;
 
 				// Write avg filter order comment and value in separate lines
 				sprintf(buff,"%d\n", sens->errorThreshold);
-				if( record_writeCalFile_pair("Error threshold:\n", &buff[0]) ) break;
+				if( record_writeCalFile_pair("# Error threshold:\n", &buff[0]) ) break;
+
+				//// Write converted origin point (unloaded) comment and value in separate lines
+				//sprintf(c_buff,"# Sensor origin point/unloaded (%.8f):\n", sens->originPoint);
+				//sprintf(buff,"%08lX\n", *(unsigned long*)&sens->originPoint);
+				//if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
+				//
+				//// Write converted operating point (offset/sag) comment and value in separate lines
+				//sprintf(c_buff,"# Sensor operating point offset/sag (%.8f):\n", sens->operatingPoint);
+				//sprintf(buff,"%08lX\n", *(unsigned long*)&sens->operatingPoint);
+				//if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
 				// Write numDataPoints comment and value in separate lines
 				sprintf(buff,"%d\n", dp_size);
-				if( record_writeCalFile_pair("Number of data points:\n", &buff[0]) ) break;
+				if( record_writeCalFile_pair("# Number of data points:\n", &buff[0]) ) break;
 
 				// DataPoints x-value comment
-				sprintf(c_buff,"Data Points x (%.8f", dp_x[0]);
+				sprintf(c_buff,"# Datapoints x (%.8f", dp_x[0]);
 				for (uint8_t i = 1; i < dp_size; i++)
 					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", dp_x[i]);
 				sprintf(&c_buff[0] + (strlen(c_buff)),"):\n");
@@ -456,7 +469,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
 				// DataPoints y-value comment
-				sprintf(c_buff,"Data points y (%.8f", dp_y[0]);
+				sprintf(c_buff,"# Datapoints y (%.8f", dp_y[0]);
 				for (uint8_t i = 1; i < dp_size; i++)
 					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", dp_y[i]);
 				sprintf(&c_buff[0] + (strlen(c_buff)),"):\n");
@@ -680,7 +693,7 @@ uint8_t record_openBMP(const char* path){
 	// FATFS result code and two string buffers for comment and values
 	FRESULT res = 0;
 	UINT bw;
-	char buff[400];
+	//char buff[400];
 	// The Header of an 480x272 pixel sized 32bit bitmap
 	#define BMP_HEADER_ARGB8_32BIT_SIZE 54
 	const uint8_t bmp_header_argb8_32bit[BMP_HEADER_ARGB8_32BIT_SIZE] =
@@ -702,30 +715,40 @@ uint8_t record_openBMP(const char* path){
 
 		/// Check if file already exists - if so rename it
 		// Get file-info to check if it exists
-		res = f_stat(path, NULL); // Use &fno if actual file-info is needed
-		if(res == FR_OK){
-			sprintf(buff, "BACKUP.BMP");
-			res = f_rename(path, buff);
-			printf("Backup BMP file to %s: %d\n", buff, res);
+		//res = f_stat(path, NULL); // Use &fno if actual file-info is needed
+		//if(res == FR_OK){
+		//	sprintf(buff, "BACKUP.BMP");
+		//	res = f_rename(path, buff);
+		//	printf("Backup BMP file to %s: %d\n", buff, res);
+		//}
+		//else{
+		//	printf("File not found: %d\n", res);
+		//}
+
+		// Check filename for uniqueness and rename existing file if needed
+		int8_t fil_OK = record_backupFile(path);
+
+		// If everything is OK open file
+		if(fil_OK){
+			// Open/Create File
+			record_openFile(path, objFILwrite, 0);
+
+			// If file is ready to be written to ...
+			if(sdState == sdFileOpen){
+				// Write Header
+				res = f_write(&fil_w, bmp_header_argb8_32bit, BMP_HEADER_ARGB8_32BIT_SIZE, &bw);
+				if (res != FR_OK || bw <= 0)
+					printf("\t BMP write failed %d (bw=%d)\n", res, bw);
+				printf("Write BMP File open\n");
+				return 1;
+			}
+			else{
+				printf("Write BMP File not open\n");
+				return 0;
+			}
 		}
 		else{
-			printf("File not found: %d\n", res);
-		}
-
-		// Open/Create File
-		record_openFile(path, objFILwrite, 0);
-
-		// If file is ready to be written to ...
-		if(sdState == sdFileOpen){
-			// Write Header
-			res = f_write(&fil_w, bmp_header_argb8_32bit, BMP_HEADER_ARGB8_32BIT_SIZE, &bw);
-			if (res != FR_OK || bw <= 0)
-				printf("\t BMP write failed %d (bw=%d)\n", res, bw);
-			printf("Write BMP File open\n");
-			return 1;
-		}
-		else{
-			printf("Write BMP File not open\n");
+			printf("File Backup failed\n");
 			return 0;
 		}
 	}
@@ -927,7 +950,7 @@ int8_t record_stop(uint8_t flushData){
 		record_closeFile(objFILwrite);
 
 		// If everything is OK
-		if(sdState == sdMounted){
+		if(sdState != sdError){
 			// Return 1 - Stop successful!
 			printf("recording stopped\n");
 			return 1;

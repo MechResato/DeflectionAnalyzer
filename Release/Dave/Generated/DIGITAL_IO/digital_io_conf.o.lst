@@ -1,0 +1,104 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "digital_io_conf.c"
+  16              	 .global IO_3_3_SC
+  17              	 .global IO_6_6
+  18              	 .global IO_6_4
+  19              	 .global IO_6_2_TIMING
+  20              	 .global IO_DIO_DIGOUT_CS_TFT
+  21              	 .global IO_DIO_DIGOUT_PD_TFT
+  22              	 .section .rodata.IO_DIO_DIGOUT_PD_TFT,"a",%progbits
+  23              	 .align 2
+  26              	IO_DIO_DIGOUT_PD_TFT:
+  27 0000 00800248 	 .word 1208123392
+  28 0004 80       	 .byte -128
+  29 0005 000000   	 .space 3
+  30 0008 00000100 	 .word 65536
+  31 000c 00000000 	 .space 4
+  32 0010 0C       	 .byte 12
+  33 0011 00       	 .byte 0
+  34 0012 0000     	 .space 2
+  35              	 .section .rodata.IO_6_2_TIMING,"a",%progbits
+  36              	 .align 2
+  39              	IO_6_2_TIMING:
+  40 0000 00860248 	 .word 1208124928
+  41 0004 80       	 .byte -128
+  42 0005 000000   	 .space 3
+  43 0008 00000100 	 .word 65536
+  44 000c 00000000 	 .space 4
+  45 0010 02       	 .byte 2
+  46 0011 00       	 .byte 0
+  47 0012 0000     	 .space 2
+  48              	 .section .rodata.IO_3_3_SC,"a",%progbits
+  49              	 .align 2
+  52              	IO_3_3_SC:
+  53 0000 00830248 	 .word 1208124160
+  54 0004 08       	 .byte 8
+  55 0005 00000000 	 .space 11
+  55      00000000 
+  55      000000
+  56 0010 03       	 .byte 3
+  57 0011 00       	 .byte 0
+  58 0012 0000     	 .space 2
+  59              	 .section .rodata.IO_DIO_DIGOUT_CS_TFT,"a",%progbits
+  60              	 .align 2
+  63              	IO_DIO_DIGOUT_CS_TFT:
+  64 0000 00850248 	 .word 1208124672
+  65 0004 80       	 .byte -128
+  66 0005 000000   	 .space 3
+  67 0008 00000100 	 .word 65536
+  68 000c 00000000 	 .space 4
+  69 0010 04       	 .byte 4
+  70 0011 00       	 .byte 0
+  71 0012 0000     	 .space 2
+  72              	 .section .rodata.IO_6_4,"a",%progbits
+  73              	 .align 2
+  76              	IO_6_4:
+  77 0000 00860248 	 .word 1208124928
+  78 0004 80       	 .byte -128
+  79 0005 000000   	 .space 3
+  80 0008 00000100 	 .word 65536
+  81 000c 00000000 	 .space 4
+  82 0010 04       	 .byte 4
+  83 0011 00       	 .byte 0
+  84 0012 0000     	 .space 2
+  85              	 .section .rodata.IO_6_6,"a",%progbits
+  86              	 .align 2
+  89              	IO_6_6:
+  90 0000 00860248 	 .word 1208124928
+  91 0004 80       	 .byte -128
+  92 0005 000000   	 .space 3
+  93 0008 00000100 	 .word 65536
+  94 000c 00000000 	 .space 4
+  95 0010 06       	 .byte 6
+  96 0011 00       	 .byte 0
+  97 0012 0000     	 .space 2
+  98              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 digital_io_conf.c
+    {standard input}:52     .rodata.IO_3_3_SC:00000000 IO_3_3_SC
+    {standard input}:89     .rodata.IO_6_6:00000000 IO_6_6
+    {standard input}:76     .rodata.IO_6_4:00000000 IO_6_4
+    {standard input}:39     .rodata.IO_6_2_TIMING:00000000 IO_6_2_TIMING
+    {standard input}:63     .rodata.IO_DIO_DIGOUT_CS_TFT:00000000 IO_DIO_DIGOUT_CS_TFT
+    {standard input}:26     .rodata.IO_DIO_DIGOUT_PD_TFT:00000000 IO_DIO_DIGOUT_PD_TFT
+    {standard input}:23     .rodata.IO_DIO_DIGOUT_PD_TFT:00000000 $d
+    {standard input}:36     .rodata.IO_6_2_TIMING:00000000 $d
+    {standard input}:49     .rodata.IO_3_3_SC:00000000 $d
+    {standard input}:60     .rodata.IO_DIO_DIGOUT_CS_TFT:00000000 $d
+    {standard input}:73     .rodata.IO_6_4:00000000 $d
+    {standard input}:86     .rodata.IO_6_6:00000000 $d
+
+NO UNDEFINED SYMBOLS

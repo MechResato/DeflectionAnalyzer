@@ -10,7 +10,7 @@
 #define GLOBALS_H_
 
 /*  MACROS - DEFINEs */
-#define DEBUG_ENABLE   // self implemented Debug flag
+//#define DEBUG_ENABLE   // self implemented Debug flag
 #define INPUT_STANDARD // Defines what signal shall be retrieved in ADC_measurement_handler. INPUT_STANDARD = current adc value, INPUT_TESTIMPULSE = generated impulse signal, INPUT_TESTSAWTOOTH = generated saw signal, INPUT_TESTSINE = generated sine signal
 
 #define MEASUREMENT_INTERVAL (5.0) // Time between measurements in ms. Must be same as is set in TIMER_0 DAVE App!
@@ -30,7 +30,7 @@ typedef float float_buffer_t;
 
 /*  SYSTEM VARIABLEs */
 volatile uint32_t _msCounter;
-volatile uint8_t main_tick;
+volatile uint8_t main_trigger;
 volatile uint32_t measurementCounter;
 volatile uint8_t measurementCurSensor;
 
@@ -60,6 +60,8 @@ typedef struct {
 	int_buffer_t*   bufRaw;
 	float_buffer_t* bufFilter;
 	float_buffer_t* bufConv;
+	float_buffer_t  originPoint;
+	float_buffer_t  operatingPoint;
 	uint8_t	 	  errorOccured;	  		// Number of error-measurements that occurred since last valid value. If this is 0 the current value is valid.
 	int_buffer_t  errorThreshold; 		// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	int32_t		  errorLastValid;
@@ -102,9 +104,9 @@ uint8_t filename_rec_curLength;
 // Note: FIFO_BLOCK_SIZE times FIFO_BLOCKS must always be a power of 2! Otherwise the overleap check with &= doesn't work anymore
 #define FIFO_BLOCK_SIZE 1024			// Number of bytes in one block
 #define FIFO_BLOCKS 	4				// Number of blocks that are used (total RAM usage = FIFO_BLOCK_SIZE*FIFO_BLOCKS)
-#define FIFO_BITS_ONE_BLOCK (FIFO_BLOCK_SIZE-1)		         // = 0b000 0111 1111 111 for 1024BS. Represents the used bits of the uint16_t which represents the index in one block. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
-#define FIFO_BITS_ALL_BLOCK	((FIFO_BLOCK_SIZE*FIFO_BLOCKS)-1)// = 0b000 0011 1111 1111 for 1024BS and 4B. Represents the used bits of the uint16_t which represents the index in whole buffer. Use '&' to ignore higher bits
-#define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE, and must be adapted if more or less sensors are recorded.
+#define FIFO_BITS_ONE_BLOCK (FIFO_BLOCK_SIZE-1)		         // = 0b000 0111 1111 1111 for 1024BS. Represents the used bits of the uint16_t which represents the index in one block. Use '&' to check if a number is a multiple of the block size or to ignore higher bits
+#define FIFO_BITS_ALL_BLOCK	((FIFO_BLOCK_SIZE*FIFO_BLOCKS)-1)// = 0b000 0011 1111 1111 for 1024BS and 4Blocks. Represents the used bits of the uint16_t which represents the index in whole buffer. Use '&' to ignore higher bits
+#define FIFO_LINE_SIZE 		4				// Number of bytes that represent one measurement line. This MUST be a clean divider of the FIFO_BLOCK_SIZE and must be adapted if more or less sensors are recorded.
 #define FIFO_LINE_SIZE_PAD 	0				// Number of bytes that are added after the content of each measurement line. Might or might not be needed to fill a line to FIFO_LINE_SIZE. This MUST be adapted if more or less sensors are recorded or the size changes.
 volatile uint8_t volatile * volatile fifo_buf;
 volatile uint16_t fifo_writeBufIdx;
@@ -114,7 +116,7 @@ extern volatile uint8_t fifo_finBlock[];
 
 /// BIN to CSV conversion
 // The header text to be written once at first line of CSV file. Must include all columns of all sensors! Do not add the "Time" column or the line break at the end (will be automatically added).
-#define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;EO;S2_RAW;S2_FILTERED;S2_CONVERTED;EO"
+#define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;S1_EO;S2_RAW;S2_FILTERED;S2_CONVERTED;S2_EO"
 // ... used for every sensor ... TODO
 #define RECORD_CSV_ARGUMENTS	sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured
 // ... used for every sensor ... TODO

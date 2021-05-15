@@ -56,10 +56,10 @@ int main(void)
 	if( TFT_init() ){ printf("TFT init done 1\n"); }
 	else{ printf("TFT init failed 0\n"); }
 
-	// Show initial logo
+	// Show initial menu/logo
 	TFT_display_init_screen();
 	uint32_t now = SYSTIMER_GetTime();
-	while (SYSTIMER_GetTime() < now + (100*1000)) __NOP();
+	while (SYSTIMER_GetTime() < now + (1500*1000)) __NOP();
 
 	// Load Values from SD-Card if possible
 	for (uint8_t i = 0; i < SENSORS_SIZE; i++)
@@ -71,10 +71,10 @@ int main(void)
 	// Main loop
 	printf("Start Main Loop -------------------------------------\n");
 	while(1U) {
-		if(main_tick) {
+		if(main_trigger) {
 			/// Main tick is set by Adc_Measurement_Handler at every interrupt of it and triggers this
 			// Reset tick
-			main_tick = 0;
+			main_trigger = 0;
 
 			// Check if screenshot is requested
 			#ifdef DEBUG_ENABLE
@@ -86,7 +86,7 @@ int main(void)
 			// If recording mode is active and there is something to record (current block is finished) write block to SD-Card
 			if(measureMode == measureModeRecording && fifo_finBlock[fifo_recordBlock] == 1){
 				// Timing measurement pin high
-				//DIGITAL_IO_SetOutputHigh(&IO_6_2_TIMING);
+				DIGITAL_IO_SetOutputHigh(&IO_6_4);
 
 				// Record current block
 				record_block();
@@ -101,7 +101,7 @@ int main(void)
 					fifo_recordBlock = 0;
 
 				// Timing measurement pin low
-				//DIGITAL_IO_SetOutputLow(&IO_6_2_TIMING);
+				DIGITAL_IO_SetOutputLow(&IO_6_4);
 			}
 			// If an error was detected during the measurement handler (usually block crash)
 			else if(measureMode == measureModeRecordError)
@@ -109,17 +109,22 @@ int main(void)
 				record_stop(1);
 
 
-			/// TFT HANDLING
+			/// Menu and HMI HANDLING
+			// Timing measurement pin high
+			DIGITAL_IO_SetOutputHigh(&IO_6_6);
+
 			// Evaluate touches
 			TFT_touch(); // ~100us with no touch
 
-			// Evaluate and rewrite display list
+			// Evaluate and rewrite display content
 			display_ticker++;
 			if(measurementCounter % 4 == 0) { // 4*5ms=20ms,  1/20ms=50Hz refresh rate
 				display_ticker = 0;
 				TFT_display(); // ~9000us at Monitoring, 800us at Dashboard(empty), 1440us at Setup
 			}
 
+			// Timing measurement pin low
+			DIGITAL_IO_SetOutputLow(&IO_6_6);
 		} // End of main_tick
 	} // End of mail loop
 

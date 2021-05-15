@@ -1,0 +1,393 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "globals.c"
+  16              	 .section .text.delay_ms,"ax",%progbits
+  17              	 .align 1
+  18              	 .global delay_ms
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	delay_ms:
+  23              	 
+  24              	 
+  25 0000 10B5     	 push {r4,lr}
+  26 0002 0446     	 mov r4,r0
+  27 0004 FFF7FEFF 	 bl SYSTIMER_GetTime
+  28 0008 4FF47A73 	 mov r3,#1000
+  29 000c 03FB0404 	 mla r4,r3,r4,r0
+  30              	.L2:
+  31 0010 FFF7FEFF 	 bl SYSTIMER_GetTime
+  32 0014 8442     	 cmp r4,r0
+  33 0016 01D9     	 bls .L5
+  34              	
+  35 0018 00BF     	 nop
+  36              	
+  37              	 .thumb
+  38 001a F9E7     	 b .L2
+  39              	.L5:
+  40 001c 10BD     	 pop {r4,pc}
+  42              	 .section .text.poly_calc,"ax",%progbits
+  43              	 .align 1
+  44              	 .global poly_calc
+  45              	 .thumb
+  46              	 .thumb_func
+  48              	poly_calc:
+  49              	 
+  50              	 
+  51 0000 F8B5     	 push {r3,r4,r5,r6,r7,lr}
+  52 0002 2DED028B 	 fstmfdd sp!,{d8}
+  53 0006 91ED008A 	 flds s16,[r1]
+  54 000a 0746     	 mov r7,r0
+  55 000c 0D46     	 mov r5,r1
+  56 000e 1646     	 mov r6,r2
+  57 0010 0124     	 movs r4,#1
+  58              	.L7:
+  59 0012 A642     	 cmp r6,r4
+  60 0014 13DB     	 blt .L9
+  61 0016 07EE904A 	 fmsr s15,r4
+  62 001a F8EE677A 	 fuitos s15,s15
+  63 001e 05EB8403 	 add r3,r5,r4,lsl#2
+  64 0022 17EE901A 	 fmrs r1,s15
+  65 0026 3846     	 mov r0,r7
+  66 0028 D3ED008A 	 flds s17,[r3]
+  67 002c FFF7FEFF 	 bl powf
+  68 0030 07EE900A 	 fmsr s15,r0
+  69 0034 0134     	 adds r4,r4,#1
+  70 0036 A8EEA78A 	 vfma.f32 s16,s17,s15
+  71 003a E4B2     	 uxtb r4,r4
+  72 003c E9E7     	 b .L7
+  73              	.L9:
+  74 003e 18EE100A 	 fmrs r0,s16
+  75 0042 BDEC028B 	 fldmfdd sp!,{d8}
+  76 0046 F8BD     	 pop {r3,r4,r5,r6,r7,pc}
+  78              	 .section .text.measure_movAvgFilter_clean,"ax",%progbits
+  79              	 .align 1
+  80              	 .global measure_movAvgFilter_clean
+  81              	 .thumb
+  82              	 .thumb_func
+  84              	measure_movAvgFilter_clean:
+  85              	 
+  86              	 
+  87 0000 F0B5     	 push {r4,r5,r6,r7,lr}
+  88 0002 8389     	 ldrh r3,[r0,#12]
+  89 0004 058E     	 ldrh r5,[r0,#48]
+  90 0006 5D1B     	 subs r5,r3,r5
+  91 0008 44BF     	 itt mi
+  92 000a C689     	 ldrhmi r6,[r0,#14]
+  93 000c AD19     	 addmi r5,r5,r6
+  94 000e 0026     	 movs r6,#0
+  95 0010 1C46     	 mov r4,r3
+  96 0012 C662     	 str r6,[r0,#44]
+  97              	.L12:
+  98 0014 AC42     	 cmp r4,r5
+  99 0016 14D0     	 beq .L19
+ 100 0018 002C     	 cmp r4,#0
+ 101 001a B8BF     	 it lt
+ 102 001c C789     	 ldrhlt r7,[r0,#14]
+ 103 001e 90ED0B7A 	 flds s14,[r0,#44]
+ 104 0022 BCBF     	 itt lt
+ 105 0024 0137     	 addlt r7,r7,#1
+ 106 0026 E419     	 addlt r4,r4,r7
+ 107 0028 0769     	 ldr r7,[r0,#16]
+ 108 002a 37F81470 	 ldrh r7,[r7,r4,lsl#1]
+ 109 002e 07EE907A 	 fmsr s15,r7
+ 110 0032 F8EEE77A 	 fsitos s15,s15
+ 111 0036 013C     	 subs r4,r4,#1
+ 112 0038 77EE277A 	 fadds s15,s14,s15
+ 113 003c C0ED0B7A 	 fsts s15,[r0,#44]
+ 114 0040 E8E7     	 b .L12
+ 115              	.L19:
+ 116 0042 4469     	 ldr r4,[r0,#20]
+ 117 0044 9B00     	 lsls r3,r3,#2
+ 118 0046 2344     	 add r3,r3,r4
+ 119 0048 12B1     	 cbz r2,.L15
+ 120 004a 07EE902A 	 fmsr s15,r2
+ 121 004e 02E0     	 b .L18
+ 122              	.L15:
+ 123 0050 51B1     	 cbz r1,.L17
+ 124 0052 07EE901A 	 fmsr s15,r1
+ 125              	.L18:
+ 126 0056 90ED0B7A 	 flds s14,[r0,#44]
+ 127 005a F8EEE77A 	 fsitos s15,s15
+ 128 005e C7EE277A 	 fdivs s15,s14,s15
+ 129 0062 C3ED007A 	 fsts s15,[r3]
+ 130 0066 F0BD     	 pop {r4,r5,r6,r7,pc}
+ 131              	.L17:
+ 132 0068 1E60     	 str r6,[r3]
+ 133 006a F0BD     	 pop {r4,r5,r6,r7,pc}
+ 135              	 .global fifo_finBlock
+ 136              	 .global filename_rec
+ 137              	 .global sensors
+ 138              	 .global s2_buf_2conv
+ 139              	 .global s2_buf_1filter
+ 140              	 .global s2_buf_0raw
+ 141              	 .global s1_buf_2conv
+ 142              	 .global s1_buf_1filter
+ 143              	 .global s1_buf_0raw
+ 144              	 .global frameover
+ 145              	 .global sdState
+ 146              	 .global measureMode
+ 147              	 .global fifo_recordBlock
+ 148              	 .global fifo_writeBlock
+ 149              	 .global fifo_writeBufIdx
+ 150              	 .global fifo_buf
+ 151              	 .global filename_rec_curLength
+ 152              	 .global sensor2
+ 153              	 .global s2_filename_cal
+ 154              	 .global sensor1
+ 155              	 .global s1_filename_cal
+ 156              	 .global measurementCurSensor
+ 157              	 .global measurementCounter
+ 158              	 .global main_trigger
+ 159              	 .comm _msCounter,4,4
+ 160              	 .section .bss.main_trigger,"aw",%nobits
+ 163              	main_trigger:
+ 164 0000 00       	 .space 1
+ 165              	 .section .data.filename_rec_curLength,"aw",%progbits
+ 168              	filename_rec_curLength:
+ 169 0000 08       	 .byte 8
+ 170              	 .section .data.s2_filename_cal,"aw",%progbits
+ 173              	s2_filename_cal:
+ 174 0000 53322E43 	 .ascii "S2.CAL\000"
+ 174      414C00
+ 175 0007 00000000 	 .space 13
+ 175      00000000 
+ 175      00000000 
+ 175      00
+ 176              	 .section .bss.s2_buf_0raw,"aw",%nobits
+ 177              	 .align 1
+ 180              	s2_buf_0raw:
+ 181 0000 00000000 	 .space 880
+ 181      00000000 
+ 181      00000000 
+ 181      00000000 
+ 181      00000000 
+ 182              	 .section .bss.frameover,"aw",%nobits
+ 185              	frameover:
+ 186 0000 00       	 .space 1
+ 187              	 .section .bss.s2_buf_2conv,"aw",%nobits
+ 188              	 .align 2
+ 191              	s2_buf_2conv:
+ 192 0000 00000000 	 .space 1760
+ 192      00000000 
+ 192      00000000 
+ 192      00000000 
+ 192      00000000 
+ 193              	 .section .bss.fifo_writeBufIdx,"aw",%nobits
+ 194              	 .align 1
+ 197              	fifo_writeBufIdx:
+ 198 0000 0000     	 .space 2
+ 199              	 .section .bss.s1_buf_0raw,"aw",%nobits
+ 200              	 .align 1
+ 203              	s1_buf_0raw:
+ 204 0000 00000000 	 .space 880
+ 204      00000000 
+ 204      00000000 
+ 204      00000000 
+ 204      00000000 
+ 205              	 .section .data.sensor1,"aw",%progbits
+ 206              	 .align 2
+ 209              	sensor1:
+ 210 0000 00       	 .byte 0
+ 211 0001 000000   	 .space 3
+ 212 0004 05000000 	 .word .LC1
+ 213 0008 00000000 	 .word ADC_MEASUREMENT_Channel_A_handle
+ 214 000c 0000     	 .short 0
+ 215 000e B701     	 .short 439
+ 216 0010 00000000 	 .word s1_buf_0raw
+ 217 0014 00000000 	 .word s1_buf_1filter
+ 218 0018 00000000 	 .word s1_buf_2conv
+ 219 001c 00000000 	 .word 0
+ 220 0020 00000000 	 .word 0
+ 221 0024 00       	 .byte 0
+ 222 0025 00       	 .space 1
+ 223 0026 3C0F     	 .short 3900
+ 224 0028 00000000 	 .space 4
+ 225 002c 00000000 	 .word 0
+ 226 0030 0500     	 .short 5
+ 227 0032 0000     	 .space 2
+ 228 0034 00000000 	 .word s1_filename_cal
+ 229 0038 06       	 .byte 6
+ 230 0039 02       	 .byte 2
+ 231 003a 0000     	 .space 2
+ 232 003c 00000000 	 .word 0
+ 233 0040 00000000 	 .word 0
+ 234 0044 00000000 	 .word 0
+ 235 0048 00000000 	 .word 0
+ 236              	 .section .data.measureMode,"aw",%progbits
+ 239              	measureMode:
+ 240 0000 01       	 .byte 1
+ 241              	 .section .bss.s2_buf_1filter,"aw",%nobits
+ 242              	 .align 2
+ 245              	s2_buf_1filter:
+ 246 0000 00000000 	 .space 1760
+ 246      00000000 
+ 246      00000000 
+ 246      00000000 
+ 246      00000000 
+ 247              	 .section .rodata.str1.1,"aMS",%progbits,1
+ 248              	.LC0:
+ 249 0000 52656172 	 .ascii "Rear\000"
+ 249      00
+ 250              	.LC1:
+ 251 0005 46726F6E 	 .ascii "Front\000"
+ 251      7400
+ 252              	 .section .bss.fifo_recordBlock,"aw",%nobits
+ 255              	fifo_recordBlock:
+ 256 0000 00       	 .space 1
+ 257              	 .section .bss.fifo_writeBlock,"aw",%nobits
+ 260              	fifo_writeBlock:
+ 261 0000 00       	 .space 1
+ 262              	 .section .data.filename_rec,"aw",%progbits
+ 265              	filename_rec:
+ 266 0000 6C6F672E 	 .ascii "log.csv\000"
+ 266      63737600 
+ 267 0008 0000     	 .space 2
+ 268              	 .section .data.sensors,"aw",%progbits
+ 269              	 .align 2
+ 272              	sensors:
+ 273 0000 00000000 	 .word sensor1
+ 274 0004 00000000 	 .word sensor2
+ 275              	 .section .bss.s1_buf_2conv,"aw",%nobits
+ 276              	 .align 2
+ 279              	s1_buf_2conv:
+ 280 0000 00000000 	 .space 1760
+ 280      00000000 
+ 280      00000000 
+ 280      00000000 
+ 280      00000000 
+ 281              	 .section .bss.s1_buf_1filter,"aw",%nobits
+ 282              	 .align 2
+ 285              	s1_buf_1filter:
+ 286 0000 00000000 	 .space 1760
+ 286      00000000 
+ 286      00000000 
+ 286      00000000 
+ 286      00000000 
+ 287              	 .section .bss.sdState,"aw",%nobits
+ 290              	sdState:
+ 291 0000 00       	 .space 1
+ 292              	 .section .data.s1_filename_cal,"aw",%progbits
+ 295              	s1_filename_cal:
+ 296 0000 53312E43 	 .ascii "S1.CAL\000"
+ 296      414C00
+ 297 0007 00000000 	 .space 13
+ 297      00000000 
+ 297      00000000 
+ 297      00
+ 298              	 .section .bss.fifo_buf,"aw",%nobits
+ 299              	 .align 2
+ 302              	fifo_buf:
+ 303 0000 00000000 	 .space 4
+ 304              	 .section .bss.measurementCounter,"aw",%nobits
+ 305              	 .align 2
+ 308              	measurementCounter:
+ 309 0000 00000000 	 .space 4
+ 310              	 .section .data.sensor2,"aw",%progbits
+ 311              	 .align 2
+ 314              	sensor2:
+ 315 0000 01       	 .byte 1
+ 316 0001 000000   	 .space 3
+ 317 0004 00000000 	 .word .LC0
+ 318 0008 00000000 	 .word ADC_MEASUREMENT_Channel_B_handle
+ 319 000c 0000     	 .short 0
+ 320 000e B701     	 .short 439
+ 321 0010 00000000 	 .word s2_buf_0raw
+ 322 0014 00000000 	 .word s2_buf_1filter
+ 323 0018 00000000 	 .word s2_buf_2conv
+ 324 001c 00000000 	 .word 0
+ 325 0020 00000000 	 .word 0
+ 326 0024 00       	 .byte 0
+ 327 0025 00       	 .space 1
+ 328 0026 3C0F     	 .short 3900
+ 329 0028 00000000 	 .space 4
+ 330 002c 00000000 	 .word 0
+ 331 0030 0500     	 .short 5
+ 332 0032 0000     	 .space 2
+ 333 0034 00000000 	 .word s2_filename_cal
+ 334 0038 06       	 .byte 6
+ 335 0039 02       	 .byte 2
+ 336 003a 0000     	 .space 2
+ 337 003c 00000000 	 .word 0
+ 338 0040 00000000 	 .word 0
+ 339 0044 00000000 	 .word 0
+ 340 0048 00000000 	 .word 0
+ 341              	 .section .bss.fifo_finBlock,"aw",%nobits
+ 344              	fifo_finBlock:
+ 345 0000 00000000 	 .space 4
+ 346              	 .section .bss.measurementCurSensor,"aw",%nobits
+ 349              	measurementCurSensor:
+ 350 0000 00       	 .space 1
+ 351              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 globals.c
+    {standard input}:17     .text.delay_ms:00000000 $t
+    {standard input}:22     .text.delay_ms:00000000 delay_ms
+    {standard input}:43     .text.poly_calc:00000000 $t
+    {standard input}:48     .text.poly_calc:00000000 poly_calc
+    {standard input}:79     .text.measure_movAvgFilter_clean:00000000 $t
+    {standard input}:84     .text.measure_movAvgFilter_clean:00000000 measure_movAvgFilter_clean
+    {standard input}:344    .bss.fifo_finBlock:00000000 fifo_finBlock
+    {standard input}:265    .data.filename_rec:00000000 filename_rec
+    {standard input}:272    .data.sensors:00000000 sensors
+    {standard input}:191    .bss.s2_buf_2conv:00000000 s2_buf_2conv
+    {standard input}:245    .bss.s2_buf_1filter:00000000 s2_buf_1filter
+    {standard input}:180    .bss.s2_buf_0raw:00000000 s2_buf_0raw
+    {standard input}:279    .bss.s1_buf_2conv:00000000 s1_buf_2conv
+    {standard input}:285    .bss.s1_buf_1filter:00000000 s1_buf_1filter
+    {standard input}:203    .bss.s1_buf_0raw:00000000 s1_buf_0raw
+    {standard input}:185    .bss.frameover:00000000 frameover
+    {standard input}:290    .bss.sdState:00000000 sdState
+    {standard input}:239    .data.measureMode:00000000 measureMode
+    {standard input}:255    .bss.fifo_recordBlock:00000000 fifo_recordBlock
+    {standard input}:260    .bss.fifo_writeBlock:00000000 fifo_writeBlock
+    {standard input}:197    .bss.fifo_writeBufIdx:00000000 fifo_writeBufIdx
+    {standard input}:302    .bss.fifo_buf:00000000 fifo_buf
+    {standard input}:168    .data.filename_rec_curLength:00000000 filename_rec_curLength
+    {standard input}:314    .data.sensor2:00000000 sensor2
+    {standard input}:173    .data.s2_filename_cal:00000000 s2_filename_cal
+    {standard input}:209    .data.sensor1:00000000 sensor1
+    {standard input}:295    .data.s1_filename_cal:00000000 s1_filename_cal
+    {standard input}:349    .bss.measurementCurSensor:00000000 measurementCurSensor
+    {standard input}:308    .bss.measurementCounter:00000000 measurementCounter
+    {standard input}:163    .bss.main_trigger:00000000 main_trigger
+                            *COM*:00000004 _msCounter
+    {standard input}:164    .bss.main_trigger:00000000 $d
+    {standard input}:175    .data.s2_filename_cal:00000007 $d
+    {standard input}:177    .bss.s2_buf_0raw:00000000 $d
+    {standard input}:186    .bss.frameover:00000000 $d
+    {standard input}:188    .bss.s2_buf_2conv:00000000 $d
+    {standard input}:194    .bss.fifo_writeBufIdx:00000000 $d
+    {standard input}:200    .bss.s1_buf_0raw:00000000 $d
+    {standard input}:206    .data.sensor1:00000000 $d
+    {standard input}:242    .bss.s2_buf_1filter:00000000 $d
+    {standard input}:256    .bss.fifo_recordBlock:00000000 $d
+    {standard input}:261    .bss.fifo_writeBlock:00000000 $d
+    {standard input}:267    .data.filename_rec:00000008 $d
+    {standard input}:269    .data.sensors:00000000 $d
+    {standard input}:276    .bss.s1_buf_2conv:00000000 $d
+    {standard input}:282    .bss.s1_buf_1filter:00000000 $d
+    {standard input}:291    .bss.sdState:00000000 $d
+    {standard input}:297    .data.s1_filename_cal:00000007 $d
+    {standard input}:299    .bss.fifo_buf:00000000 $d
+    {standard input}:305    .bss.measurementCounter:00000000 $d
+    {standard input}:311    .data.sensor2:00000000 $d
+    {standard input}:345    .bss.fifo_finBlock:00000000 $d
+    {standard input}:350    .bss.measurementCurSensor:00000000 $d
+
+UNDEFINED SYMBOLS
+SYSTIMER_GetTime
+powf
+ADC_MEASUREMENT_Channel_A_handle
+ADC_MEASUREMENT_Channel_B_handle

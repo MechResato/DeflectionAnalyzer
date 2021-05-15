@@ -102,7 +102,7 @@
 
 #define ADC_MEASUREMENT_MAXCHANNELS (2U)
 
-#define Adc_Measurement_Handler IRQ_Hdlr_16
+#define measure_IRQ_handler IRQ_Hdlr_16
 #define ADC_MEASUREMENT_Channel_A (ADC_MEASUREMENT_Channel_A_handle)
 #define ADC_MEASUREMENT_Channel_A_RES (VADC_G2->RES[0])
 

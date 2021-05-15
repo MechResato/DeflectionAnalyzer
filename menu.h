@@ -12,14 +12,14 @@
 
 
 /////////// COLOR SCHEME
-#define MAIN_BGCOLOR       0xfdf9f6 // background
+#define MAIN_BGCOLOR       0xfbfafe // background
 #define MAIN_TEXTCOLOR     0xF3CD29 // main text
-#define MAIN_BANNERCOLOR   0x64584B // banner
-#define MAIN_DIVIDERCOLOR  0xF3CD29 // divider
-#define MAIN_BTNCOLOR  	   0xEAA92B // button
-#define MAIN_BTNCTSCOLOR   0xAD9666 // button contrast
-#define MAIN_BTNTXTCOLOR   0xFFF8EE // button text
-#define MAIN_BTNGRDCOLOR   0x8C4B12 // 3D gradient color
+#define MAIN_BANNERCOLOR   0x54483B // banner 0x64584B
+#define MAIN_DIVIDERCOLOR  0xF58800 // divider 0xF3CD29
+#define MAIN_BTNCOLOR  	   0xF58800 // button 0xEAA92B
+#define MAIN_BTNCTSCOLOR   0x9A8656 // button contrast
+#define MAIN_BTNTXTCOLOR   0xFFF8F1 // button text 0xFFF8EE
+#define MAIN_BTNGRDCOLOR   0xF8BC24 // 3D gradient color 0x8C4B12
 #define GRAPH_AXISCOLOR   		0x3B1E0B // graph axis
 #define GRAPH_GRIDCOLOR			0xC5DAE2 // graph grid
 #define GRAPH_DATA1COLOR   		0x003F9E // graph data 1

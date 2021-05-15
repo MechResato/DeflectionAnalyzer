@@ -11,7 +11,7 @@
 extern volatile uint8_t* volatile fifo_buf;
 
 
-void Adc_Measurement_Handler(void);
+void measure_IRQ_handler(void);
 
 void measure_postProcessing(volatile sensor* sens);
 

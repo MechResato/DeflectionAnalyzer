@@ -19,7 +19,7 @@
 #endif
 
 ///*  SYSTEM VARIABLEs */
-volatile uint8_t main_tick = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
+volatile uint8_t main_trigger = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
 
 
 ///*  MEASUREMENTs */
@@ -42,6 +42,8 @@ volatile sensor sensor1 = {
 	.bufRaw    = (int_buffer_t*)&s1_buf_0raw,
 	.bufFilter = (float_buffer_t*)&s1_buf_1filter,
 	.bufConv   = (float_buffer_t*)&s1_buf_2conv,
+	.originPoint = 0,
+	.operatingPoint = 0,
 	.errorOccured = 0,
 	.errorThreshold = 3900, // Raw value above this threshold will be considered invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	.avgFilterOrder = 5,
@@ -70,6 +72,8 @@ volatile sensor sensor2 = {
 	.bufRaw    = (int_buffer_t*)&s2_buf_0raw,
 	.bufFilter = (float_buffer_t*)&s2_buf_1filter,
 	.bufConv   = (float_buffer_t*)&s2_buf_2conv,
+	.originPoint = 0,
+	.operatingPoint = 0,
 	.errorOccured = 0,
 	.errorThreshold = 3900, // Raw value above this threshold will be considered invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	.avgFilterOrder = 5,

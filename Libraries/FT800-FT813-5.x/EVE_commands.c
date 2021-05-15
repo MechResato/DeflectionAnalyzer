@@ -1341,9 +1341,9 @@ uint8_t EVE_init(void)
 	EVE_memWrite8(REG_PCLK, EVE_PCLK); /* now start clocking data to the LCD panel */
 
 	#if defined (EVE_ADAM101)
-	EVE_memWrite8(REG_PWM_DUTY, 0x60); /* turn on backlight to 25% for Glyn ADAM101 module, it uses inverted values */
+	//EVE_memWrite8(REG_PWM_DUTY, 0x60); /* turn on backlight to 25% for Glyn ADAM101 module, it uses inverted values */
 	#else
-	EVE_memWrite8(REG_PWM_DUTY, 0x20); /* turn on backlight to 25% for any other module */
+	//EVE_memWrite8(REG_PWM_DUTY, 0x20); /* turn on backlight to 25% for any other module */
 	#endif
 
 	timeout = 0;

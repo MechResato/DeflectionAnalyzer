@@ -1,0 +1,97 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,4
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "clock_xmc4_conf.c"
+  16              	 .section .text.SystemCoreClockSetup,"ax",%progbits
+  17              	 .align 1
+  18              	 .global SystemCoreClockSetup
+  19              	 .thumb
+  20              	 .thumb_func
+  22              	SystemCoreClockSetup:
+  23              	 
+  24              	 
+  25 0000 30B5     	 push {r4,r5,lr}
+  26 0002 114D     	 ldr r5,.L2
+  27 0004 0FCD     	 ldmia r5!,{r0,r1,r2,r3}
+  28 0006 87B0     	 sub sp,sp,#28
+  29 0008 01AC     	 add r4,sp,#4
+  30 000a 0FC4     	 stmia r4!,{r0,r1,r2,r3}
+  31 000c 2B68     	 ldr r3,[r5]
+  32 000e 2360     	 str r3,[r4]
+  33 0010 01A8     	 add r0,sp,#4
+  34 0012 FFF7FEFF 	 bl XMC_SCU_CLOCK_Init
+  35 0016 0020     	 movs r0,#0
+  36 0018 FFF7FEFF 	 bl XMC_SCU_HIB_SetRtcClockSource
+  37 001c 0020     	 movs r0,#0
+  38 001e FFF7FEFF 	 bl XMC_SCU_CLOCK_SetUsbClockSource
+  39 0022 0420     	 movs r0,#4
+  40 0024 FFF7FEFF 	 bl XMC_SCU_CLOCK_SetUsbClockDivider
+  41 0028 2021     	 movs r1,#32
+  42 002a 0120     	 movs r0,#1
+  43 002c FFF7FEFF 	 bl XMC_SCU_CLOCK_StartUsbPll
+  44 0030 0020     	 movs r0,#0
+  45 0032 FFF7FEFF 	 bl XMC_SCU_CLOCK_SetWdtClockSource
+  46 0036 0120     	 movs r0,#1
+  47 0038 FFF7FEFF 	 bl XMC_SCU_CLOCK_SetWdtClockDivider
+  48 003c 0120     	 movs r0,#1
+  49 003e FFF7FEFF 	 bl XMC_SCU_CLOCK_SetEbuClockDivider
+  50 0042 07B0     	 add sp,sp,#28
+  51              	 
+  52 0044 30BD     	 pop {r4,r5,pc}
+  53              	.L3:
+  54 0046 00BF     	 .align 2
+  55              	.L2:
+  56 0048 00000000 	 .word .LANCHOR0
+  58              	 .global CLOCK_XMC4_0
+  59              	 .section .rodata
+  60              	 .align 2
+  61              	 .set .LANCHOR0,.+0
+  62              	.LC0:
+  63 0000 30       	 .byte 48
+  64 0001 02       	 .byte 2
+  65 0002 01       	 .byte 1
+  66 0003 01       	 .byte 1
+  67 0004 0000     	 .short 0
+  68 0006 01       	 .byte 1
+  69 0007 00       	 .byte 0
+  70 0008 00       	 .byte 0
+  71 0009 00       	 .byte 0
+  72 000a 0000     	 .space 2
+  73 000c 00000100 	 .word 65536
+  74 0010 02       	 .byte 2
+  75 0011 01       	 .byte 1
+  76 0012 01       	 .byte 1
+  77 0013 01       	 .byte 1
+  78              	 .section .bss.CLOCK_XMC4_0,"aw",%nobits
+  81              	CLOCK_XMC4_0:
+  82 0000 00       	 .space 1
+  83              	 .ident "GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20141119 (release) [ARM/embedded-4_9-branch revision 218278]"
+DEFINED SYMBOLS
+                            *ABS*:00000000 clock_xmc4_conf.c
+    {standard input}:17     .text.SystemCoreClockSetup:00000000 $t
+    {standard input}:22     .text.SystemCoreClockSetup:00000000 SystemCoreClockSetup
+    {standard input}:56     .text.SystemCoreClockSetup:00000048 $d
+    {standard input}:81     .bss.CLOCK_XMC4_0:00000000 CLOCK_XMC4_0
+    {standard input}:60     .rodata:00000000 $d
+    {standard input}:82     .bss.CLOCK_XMC4_0:00000000 $d
+
+UNDEFINED SYMBOLS
+XMC_SCU_CLOCK_Init
+XMC_SCU_HIB_SetRtcClockSource
+XMC_SCU_CLOCK_SetUsbClockSource
+XMC_SCU_CLOCK_SetUsbClockDivider
+XMC_SCU_CLOCK_StartUsbPll
+XMC_SCU_CLOCK_SetWdtClockSource
+XMC_SCU_CLOCK_SetWdtClockDivider
+XMC_SCU_CLOCK_SetEbuClockDivider

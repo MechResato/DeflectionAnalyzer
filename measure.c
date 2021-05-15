@@ -18,7 +18,7 @@
 // #define's: FIFO_LINE_SIZE_PAD, FIFO_BITS_ALL_BLOCK, FIFO_BITS_ONE_BLOCK, FIFO_BLOCKS, SENSOR_RAW_SIZE, SENSORS_SIZE and
 //            POSTPROCESS_INTERPOLATE_ERRORS or POSTPROCESS_CHANGEORDER_AT_ERRORS,
 //            INPUT_STANDARD or other STANDARD_...
-extern volatile uint8_t main_tick;			// triggers main slope execution
+extern volatile uint8_t main_trigger;			// triggers main slope execution
 extern volatile sensor* sensors[];			// array of all sensors that need to be evaluated
 extern volatile measureModes measureMode;	// state of the measurement (purpose: none, monitoring or recording)
 /// FIFO-variables
@@ -42,84 +42,93 @@ extern volatile uint8_t fifo_finBlock[];				// array of which block is finished 
 	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / divider;
 
 /// Compute filtered raw value to converted value and save it
-#define MEASURE_POLYCONVERSION(sens, sensBufIdx)		\
-	/* Sum and result value, stored in register to
+#define MEASURE_POLYCONVERSION(sens, sensBufIdx)			\
+	/* Value of sum and result are stored in register to
 	 *  enhance speed (multiple successive access). Use
-	 *  first coefficient (constant) as init value.*/	\
-	register float result = sens->fitCoefficients[0];	\
-	register float pow_x = 1;							\
-	/* Calculate every term and add it to the result*/	\
-	for(register uint8_t i = 1; i < sens->fitOrder+1; i++){		\
-		pow_x *= sens->bufFilter[sensBufIdx];			\
-		result += sens->fitCoefficients[i] * pow_x; 	\
-	}													\
-	/* Save result*/									\
+	 *  first coefficient (constant) as init value.*/		\
+	register float result = sens->fitCoefficients[0];		\
+	register float pow_x = 1;								\
+	/* Calculate every term and add it to the result*/		\
+	for(register uint8_t i = 1; i < sens->fitOrder+1; i++){	\
+		pow_x *= sens->bufFilter[sensBufIdx];				\
+		result += sens->fitCoefficients[i] * pow_x; 		\
+	}														\
+	/* Save result*/										\
 	sens->bufConv[sensBufIdx] = result;
 
 
 
 
-void Adc_Measurement_Handler(void){
+void measure_IRQ_handler(void){
 	/// Interrupt handler - Do measurements, filter/convert them and store result in buffers. Allows to 'measure' self produced test signal based on value in global variable InputType
 	/// Start Timer after init and make sure initial conversion in ADC_MEASUREMENT APP is deactivated
 	/// Uses global/extern variables: InputType, tft_tick, sensor[...], ...
 
 	// Timing measurement pin high
-	//DIGITAL_IO_SetOutputHigh(&IO_6_2);
+	DIGITAL_IO_SetOutputHigh(&IO_6_2_TIMING);
 
 
 	// Check
 	uint8_t sensIdx = 0;
 	volatile sensor* sens;
 	uint16_t sensBufIdx;
+
 	do{
 		// Store current sensor pointer (looks cleaner and may be faster without the additional indexing every time)
 		sens = sensors[sensIdx];
 
 		// Increment buffer index and store current ADC value if a measuring mode is active
 		if(measureMode != measureModeNone){
-			// Increment current Buffer index and set back to 0 if greater than size of array
-			sensBufIdx = sens->bufIdx = sens->bufIdx + 1;
-			if(sensBufIdx > sens->bufMaxIdx){
-				sensBufIdx = sens->bufIdx = 0;
-			}
-
+			// Note: Use bufRaw as buffer in order to not have execution-time varying commands before the measurement (index overleap when using "sens->bufRaw[sensBufIdx]" directly)
+			int_buffer_t bufRaw;
 
 			// Read value from sensor (or generated test if defined)
 			#if defined(INPUT_STANDARD)
 				// Get raw input from ADC
-				sens->bufRaw[sensBufIdx] = ADC_MEASUREMENT_GetResult(sens->adcChannel);//(&ADC_MEASUREMENT_Channel_A);
+				bufRaw = ADC_MEASUREMENT_GetResult(sens->adcChannel);//(&ADC_MEASUREMENT_Channel_A);
 			#elif defined(INPUT_TESTIMPULSE)
 			// 1 TestImpulse
-				if(sensBufIdx % (S1_BUF_SIZE/5)) sens->bufRaw[sensBufIdx] = 0;
-				else sens->bufRaw[sensBufIdx] = 4095;
+				if(sensBufIdx % (S1_BUF_SIZE/5)) bufRaw[sensBufIdx] = 0;
+				else bufRaw[sensBufIdx] = 4095;
 			#elif defined(INPUT_TESTSAWTOOTH)
 				// 2 TestSawtooth
 				static uint32_t lastval; // just for TestTriangle signal
-				if(lastval < 4095) sens->bufRaw[sensBufIdx] = lastval+7;
-				else sens->bufRaw[sensBufIdx] = 0;
-				lastval = sens->bufRaw[sensBufIdx];
+				if(lastval < 4095) bufRaw[sensBufIdx] = lastval+7;
+				else bufRaw[sensBufIdx] = 0;
+				lastval = bufRaw[sensBufIdx];
 			#elif defined(INPUT_TESTSINE)
 				// 3 TestSine (Note: The used time variable is not perfect for this purpose - just for test)
-				sens->bufRaw[sensBufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
+				bufRaw[sensBufIdx] = (uint32_t)((0.5*(1.0+sin(2.0 * M_PI * 11.725 * ((double)measurementCounter/3000))))*4095.0);
 			#endif
-		}
-		// TODO: (Consideration) Everything past here could be moved to the main slope. It would require a "last processed value" index and had to process every missed value between. The interrupt here would get much shorter though...
+
+			// Increment current Buffer index and set back to 0 if greater than size of array
+			// Note: This is designed to take about the same amount of time either case but it still has potential to make the sampling time a bit async when overleaping. If even higher accuracy is needed move this to a second slope after all sensor values are retrieved.
+			sensBufIdx = sens->bufIdx + 1;
+			if(sensBufIdx > sens->bufMaxIdx)
+				sens->bufIdx = sensBufIdx = 0;
+			else
+				sens->bufIdx = sensBufIdx;
+
+			// Store raw value
+			sens->bufRaw[sensBufIdx] = bufRaw;
 
 
-		// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
-		if(measureMode == measureModeMonitoring){
-			// Error handling and calculation of raw/filtered/converted value
-			measure_postProcessing(sens);
-		}
+			// (Consideration) Everything past here could be moved to the main slope. It would require a "last processed value" index and had to process every missed value between. The interrupt here would get much shorter though...
 
-		// If system is in recording mode store current raw value in FIFO
-		if(measureMode == measureModeRecording){
-			// Copy current value to FIFO
-			memcpy((void*)(fifo_buf + fifo_writeBufIdx), &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
 
-			// Increase index
-			fifo_writeBufIdx += SENSOR_RAW_SIZE;
+			// If system is in monitoring mode, filter/convert row values and fill corresponding buffers (+ error recognition)
+			if(measureMode == measureModeMonitoring){
+				// Error handling and calculation of raw/filtered/converted value
+				measure_postProcessing(sens);
+			}
+			// If system is in recording mode store current raw value in FIFO
+			else if(measureMode == measureModeRecording){
+				// Copy current value to FIFO
+				memcpy((void*)(fifo_buf + fifo_writeBufIdx), &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
+
+				// Increase index (this is OK without overleap check because buffer is designed to fill up perfectly!)
+				fifo_writeBufIdx += SENSOR_RAW_SIZE;
+			}
 		}
 
 		// Check next sensor
@@ -154,14 +163,14 @@ void Adc_Measurement_Handler(void){
 		}
 	}
 
-	// Trigger next main loop (with this it is running in sync with the measurement -> change if needed!)
-	main_tick = 42;
+	// Trigger next main loop (with this it is running in sync with the measurement)
+	main_trigger = 42;
 
 	// Increase count of executed measurements
 	measurementCounter++;
 
 	// Timing measurement pin low
-	//DIGITAL_IO_SetOutputLow(&IO_6_2);
+	DIGITAL_IO_SetOutputLow(&IO_6_2_TIMING);
 }
 
 
