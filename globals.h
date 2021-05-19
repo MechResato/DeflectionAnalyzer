@@ -1,8 +1,9 @@
 /*
- * globals.h
- *	This file keeps all variables that are used between the file -saying that are needed for collaboration between modules
- *  Created on: 20 Feb 2021
- *      Author: RS
+@file    		globals.h
+@brief   		This file keeps all variables that are used between the file -saying that are needed for collaboration between modules
+@version 		1.0
+@date    		2020-02-20
+@author 		Rene Santeler @ MCI 2020/21
  */
 #include <DAVE.h>
 
@@ -10,21 +11,12 @@
 #define GLOBALS_H_
 
 /*  MACROS - DEFINEs */
-//#define DEBUG_ENABLE   // self implemented Debug flag
-#define INPUT_STANDARD // Defines what signal shall be retrieved in ADC_measurement_handler. INPUT_STANDARD = current adc value, INPUT_TESTIMPULSE = generated impulse signal, INPUT_TESTSAWTOOTH = generated saw signal, INPUT_TESTSINE = generated sine signal
-
+#define DEBUG_ENABLE   // self implemented Debug flag
+#define INPUT_STANDARD // Defines which signal shall be retrieved in ADC_measurement_handler. INPUT_STANDARD = current adc value, INPUT_TESTIMPULSE = generated impulse signal, INPUT_TESTSAWTOOTH = generated saw signal, INPUT_TESTSINE = generated sine signal
 #define MEASUREMENT_INTERVAL (5.0) // Time between measurements in ms. Must be same as is set in TIMER_0 DAVE App!
-#define S1_BUF_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage          //sizeof(InputBuffer1)/sizeof(InputBuffer1[0])
+#define S_BUF_SIZE (480-20-20) // =440 values stored, next every 5ms -> 2.2sec storage
 
-// Function to convert a float to int16 with rounding // https://stackoverflow.com/questions/24723180/c-convert-floating-point-to-int
-#ifndef FLOAT_TO_INT16
-#define FLOAT_TO_INT16(x) ((x)>=0?(int16_t)((x)+0.5):(int16_t)((x)-0.5))
-#endif
-
-/*  MACROS - DEFINEs */
-// These types are used to store measurement results and values throughout the program. If they need to be changed, this can be done here.
-//#define INT_BUFFER_SIZE 2		// Size of int buffer in byte - needed to compare it
-//#define FLOAT_BUFFER_SIZE 4		// Size of float buffer in byte - needed to compare it
+// Types used to store measurement results and values throughout the program. If they need to be changed, this can be done here.
 typedef uint16_t int_buffer_t;
 typedef float float_buffer_t;
 
@@ -32,20 +24,16 @@ typedef float float_buffer_t;
 volatile uint32_t _msCounter;
 volatile uint8_t main_trigger;
 volatile uint32_t measurementCounter;
-volatile uint8_t measurementCurSensor;
-
-// Record screenshot marker, can only be used in debug mode
-#ifdef DEBUG_ENABLE
-	uint8_t menu_doScreenshot;
-#endif
+volatile uint8_t monitorSensorIdx;
 
 /*  MEASUREMENTs */
-
-// Setting to decide which error handling strategy is used. ONLY ONE OF THE FOLLOWING MUST BE ACTIVATED AT A TIME! the
-// See measure.c measure_postProcessing() for more details. When changing this you will also need to change the way the BIN->CSV conversion is done!
+// Set which error handling strategy is used. ONLY ONE OF THE FOLLOWING MUST BE ACTIVATED AT A TIME!
+// See measure.c measure_postProcessing() for more details.
+// When changing this, BIN->CSV conversion needs to be changed too!
 #define POSTPROCESS_CHANGEORDER_AT_ERRORS 1
 #define POSTPROCESS_INTERPOLATE_ERRORS 0
-// If POSTPROCESS_CHANGEORDER_AT_ERRORS is activated this decides if a filtered/converted value for measurements considered errors shall be calculated (if filter order is greater than occurred errors)
+// If POSTPROCESS_CHANGEORDER_AT_ERRORS is activated this decides if a filtered/converted value that
+// are errors shall be calculated (if filter order is greater than occurred errors)
 #define POSTPROCESS_BUGGED_VALUES 1
 
 // Sensor data definition
@@ -66,12 +54,14 @@ typedef struct {
 	int_buffer_t  errorThreshold; 		// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
 	int32_t		  errorLastValid;
 	float     avgFilterSum;
-	uint16_t  avgFilterOrder;
+	uint16_t  avgFilterInterval;
 	char*   fitFilename;
 	uint8_t  fitFilename_curLen;
 	uint8_t fitOrder;
 	float   fitCoefficients[4];
-
+	float* dp_x;
+	float* dp_y;
+	uint16_t dp_size;
 } sensor;
 
 // Sensor 1 Front
@@ -117,9 +107,9 @@ extern volatile uint8_t fifo_finBlock[];
 /// BIN to CSV conversion
 // The header text to be written once at first line of CSV file. Must include all columns of all sensors! Do not add the "Time" column or the line break at the end (will be automatically added).
 #define RECORD_CSV_HEADER		"S1_RAW;S1_FILTERED;S1_CONVERTED;S1_EO;S2_RAW;S2_FILTERED;S2_CONVERTED;S2_EO"
-// ... used for every sensor ... TODO
+// The 'sprintf' arguments that are used to generate the output string. Used repetitive for every sensor! Must match Header!
 #define RECORD_CSV_ARGUMENTS	sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured
-// ... used for every sensor ... TODO
+// The 'sprintf' format that is used to generate the output string. Used repetitive for every sensor! Must match Header!
 #define RECORD_CSV_FORMAT		"%d;%.1f;%.2f;%d"
 
 /*  MENU AND USER INTERFACE */
@@ -136,12 +126,10 @@ sdStates sdState;
 /* DEBUG */
 #if defined (DEBUG_ENABLE)
 	extern void initialise_monitor_handles(void);
+	uint8_t menu_doScreenshot; // Record screenshot marker
 #else
 	#define printf(...) { ; }
 #endif
-volatile uint8_t frameover;
-
-
 
 
 

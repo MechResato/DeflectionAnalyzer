@@ -1,8 +1,9 @@
 /*
- * measure.c
- *
- *  Created on: 20 Feb 2021
- *      Author: RS
+@file    		measure.c
+@brief   		Implementation of an efficient measurement interrupt-routine with simple filtering and conversion of values (implemented for XMC4700 and DAVE)
+@version 		1.0
+@date    		2020-02-20
+@author 		Rene Santeler @ MCI 2020/21
  */
 
 #include <DAVE.h>
@@ -34,7 +35,7 @@ extern volatile uint8_t fifo_finBlock[];				// array of which block is finished 
 #define MEASURE_MOVAVGFILTER(sens, divider)                       				\
 	/* Get index of oldest element, which shall be removed
 	 * (current index - filter order with roll-over check) */					\
-	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;						\
+	int32_t oldIdx = sens->bufIdx - sens->avgFilterInterval;					\
 	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;									\
 	/* Subtract oldest element and add newest to sum */							\
 	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];	\
@@ -62,7 +63,8 @@ extern volatile uint8_t fifo_finBlock[];				// array of which block is finished 
 void measure_IRQ_handler(void){
 	/// Interrupt handler - Do measurements, filter/convert them and store result in buffers. Allows to 'measure' self produced test signal based on value in global variable InputType
 	/// Start Timer after init and make sure initial conversion in ADC_MEASUREMENT APP is deactivated
-	/// Uses global/extern variables: InputType, tft_tick, sensor[...], ...
+	///
+	/// Uses global/externs: ADC_MEASUREMENT APP, INPUT_[...], InputType, tft_tick, measureMode, sensor[...], measurementCounter, fifo_[...]
 
 	// Timing measurement pin high
 	DIGITAL_IO_SetOutputHigh(&IO_6_2_TIMING);
@@ -190,7 +192,13 @@ void measure_postProcessing(volatile sensor* sens){
 	/// and can be controlled by global defined macros. In this context this is only necessary because the filter would
 	/// otherwise get confused by faulty values. This also allows "clear" lines to be printed to on the monitoring graph.
 	///
-	/// TODO
+	/// Input: Takes the array of sensors to be processed. Make sure the newest raw is already in buffer.
+	///
+	///	 Uses measure-global macros:
+	///		MEASURE_MOVAVGFILTER, MEASURE_POLYCONVERSION
+	///
+	///	 Uses global variables macros:
+	///		POSTPROCESS_CHANGEORDER_AT_ERRORS, POSTPROCESS_INTERPOLATE_ERRORS, POSTPROCESS_BUGGED_VALUES
 
 
 #if POSTPROCESS_CHANGEORDER_AT_ERRORS == 1
@@ -205,7 +213,7 @@ void measure_postProcessing(volatile sensor* sens){
 	/// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
 	if(sens->errorOccured != 0){
 		// Get oldest index
-		int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
+		int32_t oldIdx = sens->bufIdx - sens->avgFilterInterval;
 		if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;
 		// Decrease error counter
 		if(sens->bufRaw[oldIdx] == 0)
@@ -222,16 +230,16 @@ void measure_postProcessing(volatile sensor* sens){
 		sens->bufRaw[sens->bufIdx] = 0;
 
 		// If more errors occurred than can be compensated by the avg filter, limit it to stay in interval
-		if(sens->errorOccured > sens->avgFilterOrder)
-			sens->errorOccured = sens->avgFilterOrder;
+		if(sens->errorOccured > sens->avgFilterInterval)
+			sens->errorOccured = sens->avgFilterInterval;
 	}
 
 	// If no errors in filter interval - use avgFilterOrder as average divider
 	// Else if errors in filter interval - use filter order compensated by number of errors occurred (number of actual values in interval, used) as divider
 	if(sens->errorOccured == 0)
-		compFilterOrder = sens->avgFilterOrder;
+		compFilterOrder = sens->avgFilterInterval;
 	else
-		compFilterOrder = sens->avgFilterOrder - sens->errorOccured;
+		compFilterOrder = sens->avgFilterInterval - sens->errorOccured;
 
 #elif POSTPROCESS_INTERPOLATE_ERRORS == 1
 	/// Check for sensor errors and try to interpolate a raw value. This should be OK as long as the frequency of the,
@@ -242,7 +250,7 @@ void measure_postProcessing(volatile sensor* sens){
 	/// struct must be recorded as well!
 
 	// Filter order is never changed with this approach
-	static int16_t compFilterOrder = sens->avgFilterOrder;
+	static int16_t compFilterOrder = sens->avgFilterInterval;
 
 	/// Check if newest value in filter interval (to be added) is an error
 	if(sens->bufRaw[sensBufIdx] > sens->errorThreshold){
@@ -297,201 +305,3 @@ void measure_postProcessing(volatile sensor* sens){
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//if(sensBufIdx % 150 == 0)
-	//printf("%d %d %d\n", fifo_buf + fifo_writeBufIdx, &(sens->bufRaw[sensBufIdx]), SENSOR_RAW_SIZE);
-
-
-
-// Check for error and set raw to 0 if detected
-//if(sensArray[i]->bufRaw[sensArray[i]->bufIdx] > sensArray[i]->errorThreshold){
-//	sensArray[i]->errorOccured++;
-//	sensArray[i]->bufRaw[sensArray[i]->bufIdx] = 0;
-//
-//	if(sensArray[i]->errorOccured > sensArray[i]->avgFilterOrder){
-//
-//	}
-//}
-//else if(sensArray[i]->errorOccured != 0){
-//	sensArray[i]->errorOccured--;
-//}
-
-
-
-// Measurements at non leap-over cycle!
-// poly_calc_sensor_i 5.80us max
-// poly_calc_sensor   5.58us max
-// no function, with struct and powf 5.36us max
-// no function, with struct and ipow 3.80us max
-// no function, with struct and improved ipow 3.68us max
-// no function, with struct and recursive pow_x 3.6us max
-// TODO: First measurements imply that functions as inline, the sensor struct only when needed and integer (ipow) usage are the fastest here. To be continued! (Note: signs that inline in combination with struct's might be slower than with actual variables were found!)
-
-
-
-
-// movin avg filter full loop -> 3.54us (@leap over 4.14us)
-// movin avg filter function  -> 2.96us (@leap over 3.12us)
-// movin avg filter inline function  -> 2.76us (@leap over 2.88us)
-
-//static inline void measure_movAvgFilter(volatile sensor* sens){
-//	/// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
-//	/// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
-//	/// Note: This only subtracts the oldest and adds the newest entry to the stored sum before dividing.
-//
-//
-//	// Get index of oldest element, which shall be removed (current index minus filter order with roll-over check)
-//	int32_t oldIdx = sens->bufIdx - sens->avgFilterOrder;
-//	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;
-//
-//	// Subtract oldest element and add newest to sum
-//	sens->avgFilterSum += sens->bufRaw[sens->bufIdx] - sens->bufRaw[oldIdx];
-//
-//	// Calculate average and return it
-//	sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / sens->avgFilterOrder;
-//}
-
-
-
-
-
-
-
-//static inline uint32_t ipow(register int_buffer_t base, register uint8_t exp) {
-//	/// Efficient integer power function by John Zwinck on Apr 4 '18 at 7:26 at "https://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int"
-//	/// Adapted by Rene Santeler: Marked both parameters and result as register (all are used often) made function inline and changed int to uint32_t. Performance increases significant with this
-//
-//	register uint32_t result = 1;
-//    for (;;) {
-//        if (exp & 1)
-//            result *= base;
-//        exp >>= 1;
-//        if (!exp)
-//            break;
-//        base *= base;
-//    }
-//
-//    return result;
-//}
-
-//static inline uint32_t ipow(int_buffer_t base, uint8_t exp) {
-//	/// Efficient integer power function by Rene Santeler (slightly slower than the one from John Zwinck)
-//	///
-//	register uint32_t result = 1;
-//
-//	if(exp!=0)
-//		do{
-//			result *= base;
-//			exp--;
-//		}while(exp!=0);
-//
-//	return result;
-//}
-
-//static inline float poly_calc_r (float c_x, float* f_Coefficients, uint8_t order){
-//	/// Calculate the result of an polynomial based on the x value, the coefficients and the order (1=linear(2 coefficients used), 2=square(3 coefficients used)...)
-//	/// NOTE: A specialized version (inline and only for sensor struct's) of this code is implemented in measure.c because inline functions must be static to avoid compiler error (https://stackoverflow.com/questions/28606847/global-inline-function-between-two-c-files)
-//	/// UNTESTED!
-//
-//	// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
-//	register float result = f_Coefficients[0];
-//	register float pow_x = 1;
-//	// Calculate every term and add it to the result
-//	for(uint8_t i = 1; i < order+1; i++){
-//		pow_x *= c_x;
-//		result += f_Coefficients[i] * pow_x;
-//	}
-//	// return result
-//	return result;
-//}
-
-//static inline float poly_calc_sensor_f (sensor* sens, float_buffer_t* x_buf){
-//	/// Calculate the result of an polynomial based on a FLOAT x-value, the coefficients and the order (1=linear(2 coefficients used), 2=square(3 coefficients used)...)
-//	/// NOTE: This is a specialized version (inline and only for sensor struct's) of the common implementation in globals.c because inline functions must be static to avoid compiler error (https://stackoverflow.com/questions/28606847/global-inline-function-between-two-c-files)
-//
-//
-//	// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
-//	register float result = sens->fitCoefficients[0];
-//	// Calculate every term and add it to the result
-//	for(uint8_t i = 1; i < sens->fitOrder+1; i++)
-//		result += sens->fitCoefficients[i] * powf(x_buf[sens->bufIdx], i);
-//	// return result
-//	return result;
-//}
-//
-//static inline float poly_calc_sensor_i (sensor* sens, int_buffer_t* x_buf){
-//	/// Calculate the result of an polynomial based on a INTEGER x-value, the coefficients and the order (1=linear(2 coefficients used), 2=square(3 coefficients used)...)
-//	/// NOTE: This is a specialized version (inline and only for sensor struct's) of the common implementation in globals.c because inline functions must be static to avoid compiler error (https://stackoverflow.com/questions/28606847/global-inline-function-between-two-c-files)
-//
-//
-//	// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
-//	register float result = sens->fitCoefficients[0];
-//	// Calculate every term and add it to the result
-//	for(uint8_t i = 1; i < sens->fitOrder+1; i++)
-//		result += sens->fitCoefficients[i] * powf(x_buf[sens->bufIdx], i); //(float)
-//	// return result
-//	return result;
-//}
-//
-//static inline float poly_calc_m (float c_x, float* f_Coefficients, uint8_t order){
-//	/// Calculate the result of an polynomial based on the x value, the coefficients and the order (1=linear(2 coefficients used), 2=square(3 coefficients used)...)
-//	/// NOTE: A specialized version (inline and only for sensor struct's) of this code is implemented in measure.c because inline functions must be static to avoid compiler error (https://stackoverflow.com/questions/28606847/global-inline-function-between-two-c-files)
-//
-//	// Temporary sum and result value, marked to be stored in a register to enhance speed (multiple successive access!). Use first coefficient (constant) as init value.
-//	register float result = f_Coefficients[0];
-//	// Calculate every term and add it to the result
-//	for(uint8_t i = 1; i < order+1; i++)
-//		result += f_Coefficients[i] * powf(c_x, i);
-//	// return result
-//	return result;
-//}
-
-
-//float s1_avgSum = 0;
-//float fil2 = measure_movAvgFilter(&s1_avgSum, &InputBuffer1[0], INPUTBUFFER1_SIZE, sensBufIdx, sens->avgFilterOrder);
-//static inline float measure_movAvgFilter(float* sum, int_buffer_t* rbuf, uint16_t maxIdx, uint16_t newIdx, uint16_t order);
-//static inline float measure_movAvgFilter(float* sum, int_buffer_t* rbuf, uint16_t maxIdx, uint16_t newIdx, uint16_t order){
-//	/// Implementation of an moving average filter on an ring-buffer
-//
-//
-//	// Get index of oldest element, which shall be removed (current index minus order with roll-over check)
-//	int32_t oldIdx = newIdx - order;
-//	if(oldIdx < 0) oldIdx += maxIdx;
-//
-//	// Subtract oldest element and add newest to sum
-//	*sum += rbuf[newIdx] - rbuf[oldIdx];
-//
-//	// Calculate average and return it
-//	return *sum / order;
-//}
-
-
-
-
-//float fil1 = 0;
-//float sum1 = 0;
-//int32_t oldIdx = sensBufIdx - 5;
-//if(oldIdx < 0) oldIdx += INPUTBUFFER1_SIZE;
-//for(int i = sensBufIdx; i != oldIdx; i--){
-//	if(i<0) i += INPUTBUFFER1_SIZE+1;
-//	sum1 += InputBuffer1[i];
-//}
-//fil1 = sum1/5;
-//printf("-%d n%d %.2f %d\n", (int)oldIdx, (int)sensBufIdx, fil1, InputBuffer1[sensBufIdx]);

@@ -1,7 +1,7 @@
 /*
 @file    		tft.c
 @brief   		Implementation of an menu framework the EVE Library of Rudolph Riedel. Meant to display and manage menus, their elements and dynamic graphs (implemented for XMC4700 and DAVE)
-@version 		2.0 (base lib version was 1.13)
+@version 		3.0 (base lib version was 1.13)
 @date    		2020-09-05
 @initialauthor  Rudolph Riedel
 @author 		Rene Santeler (V2.0 together with Stefan Reinmüller) @ MCI 2020/21 (initially created by Rudolph Riedel, completely reworked by RS )
@@ -11,8 +11,9 @@
 - Added color scheme, adaptable banner, dynamic graph implementation (TFT_graph_static & TFT_graph_stepdata), a display init which adds the static part of a graph to static DL (TFT_graph_static), a display init to show a bitmap (TFT_display_init_screen), ...
 - Adapted TFT_init to only do the most necessary thins for init (no static DL creation! you need to call one afterwards before using TFT_display!)
 - by Rene Santeler & Stefan Reinmüller
-2.1
-- Added menu structure (ToDo: explain changes)
+3.0
+- Adapted everything to be a abstracted menu-framework
+- Added menu structure
 - Added keypad and swipe feature
 - Added TFT elements (TFT_label, TFT_header, TFT_textbox, TFT_control, TFT_graph_...)
 - by Rene Santeler
@@ -976,7 +977,6 @@ void TFT_graph_pixeldata_i(graph* gph, int_buffer_t buf[], uint16_t buf_size, ui
 
 void TFT_graph_pixeldata_f(graph* gph, float_buffer_t buf[], uint16_t buf_size, uint16_t *buf_curidx, uint32_t datacolor){
 	/// This is a copy of the above function! It taken a float buffer and will later be merged to its origin.
-	/// TODO: Make this a "generic" function (C equivalent)
 
 
 	// Determine current position (with scroll value)
@@ -1430,7 +1430,7 @@ void TFT_display_static(void) {
 
 void TFT_touch(void)
 {
-	/// Check for touch events and evaluate them. Manages swipe/keyboard feature and control vars for TFT_display() (therefore it must initially run before it).
+	/// Check for touch events and evaluate them. Manages swipe/keyboard feature and control variables for TFT_display() (therefore it must initially run before it).
 	/// Meant to be called more often that TFT_display() from main. Divided into 5 parts:
 	/// 	Read from TFT, evaluate swipe feature, evaluate keypad feature, evaluate global tags and run menu specific code.
 	///
@@ -1445,7 +1445,7 @@ void TFT_touch(void)
 
 
 
-	// Init vars
+	// Init variables
 	uint8_t tag; // temporary store of received touched tag
 	
 	// If Display is still busy, skip this evaluation to prevent hanging, glitches and flickers

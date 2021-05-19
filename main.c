@@ -2,9 +2,11 @@
  * main.c
  *  Created on: 2021 Feb 19 20:41:21
  *  Author: Rene Santeler @ MCI 2020/21
- *  Version: V0.2
- *  Comment:
- *  Parts are taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done by Stefan Reinmüller and Rene Santeler
+ *  Version: V0.3
+ *  Comment: This project aims to design an extensible microcontroller system to support the user in calibrating, monitoring and
+ *  recording of sensor data by using the example of a motorcycle suspension. To do so, a highly modular menu-framework for
+ *  touchscreens as well as multiple concepts for efficient sensor data management and SD-Card retention are implemented.
+ *  The port of the EVE Library is taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done by Stefan Reinmüller and Rene Santeler.
  */
 
 #include <DAVE.h> // Declarations from DAVE Code Generation (includes SFR declaration)

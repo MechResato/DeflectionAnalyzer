@@ -1,8 +1,9 @@
 /*
- * menu.c
- *
- *  Created on: 25 Feb 2021
- *      Author: Rene Santeler
+@file    		menu.c
+@brief   		Implementation of menu content build upon module tft.h (implemented for XMC4700 and DAVE)
+@version 		1.0
+@date    		2020-02-25
+@author 		Rene Santeler @ MCI 2020/21
  */
 
 #include <stdint.h>
@@ -648,8 +649,8 @@ uint16_t DP_size = 3;
 uint16_t DP_cur = 0;
 // Pointer to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function or storing of the fit values
 sensor*  curveset_sens;
-// The avgFilterOrder of the sensor is temporarily changed while curveset menu is active. This variable stores the original value it will be reset to when coming back from the submenu.
-uint16_t curveset_previousAvgFilterOrder;
+// The avgFilterInterval of the sensor is temporarily changed while curveset menu is active. This variable stores the original value it will be reset to when coming back from the submenu.
+uint16_t curveset_previousAvgFilterInterval;
 // Array to store the coefficients for the fitted polynomial and the state of the fit (0=OK everything else is error)
 uint8_t fit_order = 1;
 float coefficients[4] = {0,0,0,0}; //{25.0, -0.0235162665374, 0.00001617208884, 0, 0};
@@ -749,7 +750,7 @@ textbox tbx_dp = {
 	.width = 36,
 	.labelOffsetX = 75,
 	.labelText = "Data Point:",
-	.mytag = 0, //TBX_DP_TAG, // Todo: Made read-only because there needs to be an border check before this is useful
+	.mytag = 0, //TBX_DP_TAG, // Made read-only because there needs to be an border check before this is useful
 	.text = str_dp,
 	.text_maxlen = STR_DP_MAXLEN,
 	.text_curlen = &str_dp_curLength,
@@ -850,7 +851,7 @@ graph gph_filterset = {
 	.height = (0 + EVE_VSIZE - 15 - (2*G_PADDING) - 10 - (M_ROW_DIST*2)), 	// actual height of the data area, therefore y and the paddings top and bottom must me accommodated to "fill" the whole main area. Additional 10 px from bottom to leave some room (for 480x272: 272-66+15-20-10=161)
 	.padding = G_PADDING,
 	.x_label = "time",
-	.y_label = "raw",
+	.y_label = "ADC values",
 	.y_max = 4096.0, 		// maximum allowed amplitude y (here for 12bit sensor value);
 	.amp_max = 4096.0, 		// in given unit - used at print of vertical grid value labels
 	.cx_initial = 0,
@@ -862,7 +863,7 @@ graph gph_filterset = {
 
 #define BTN_FILTER_DOWN_TAG 11
 control btn_filter_down = {
-	.x = M_COL_1 + 80 + 40 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.x = M_COL_1 + 90 + 40 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.w0 = 30				  ,	.h0 = 30,
 	.mytag = BTN_DP_LAST_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "-",
@@ -871,7 +872,7 @@ control btn_filter_down = {
 };
 #define BTN_FILTER_UP_TAG 12
 control btn_filter_up = {
-	.x = M_COL_1 + 80 + 40 + 1 + 30 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
+	.x = M_COL_1 + 90 + 40 + 1 + 30 + 1,	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.w0 = 30						   , 	.h0 = 30,
 	.mytag = BTN_DP_NEXT_TAG,	.font = 27, .options = 0, .state = 0,
 	.text = "+",
@@ -906,7 +907,7 @@ textbox tbx_filter_interval = {
 	.x = M_COL_1,
 	.y = EVE_VSIZE - M_UPPER_PAD - M_ROW_DIST,
 	.width = 40,
-	.labelOffsetX = 80,
+	.labelOffsetX = 90,
 	.labelText = "Filter Interval:",
 	.mytag = 0,
 	.text = str_filter_interval,
@@ -1055,15 +1056,14 @@ void menu_display_0monitor(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	// TODO: This could me more automated
 	if(inputType == 0)
-		TFT_graph_pixeldata_i(&gph_monitor, sensors[measurementCurSensor]->bufRaw, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+		TFT_graph_pixeldata_i(&gph_monitor, sensors[monitorSensorIdx]->bufRaw, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 	else if(inputType == 1)
-		TFT_graph_pixeldata_f(&gph_monitor, sensors[measurementCurSensor]->bufConv, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+		TFT_graph_pixeldata_f(&gph_monitor, sensors[monitorSensorIdx]->bufConv, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 	else if(inputType == 2)
-		TFT_graph_pixeldata_i(&gph_monitor, sensors[measurementCurSensor]->bufRaw, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+		TFT_graph_pixeldata_i(&gph_monitor, sensors[monitorSensorIdx]->bufRaw, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 	else if(inputType == 3)
-		TFT_graph_pixeldata_f(&gph_monitor, sensors[measurementCurSensor]->bufConv, S1_BUF_SIZE, (uint16_t*)&sensors[measurementCurSensor]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
+		TFT_graph_pixeldata_f(&gph_monitor, sensors[monitorSensorIdx]->bufConv, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 
 }
 void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress, uint8_t *swipeEvokedBy, int32_t *swipeDistance_X, int32_t *swipeDistance_Y){
@@ -1102,7 +1102,7 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 
 				// Switch label of button to new input type
 				if(inputType == 0){
-					measurementCurSensor = sensor1.index;
+					monitorSensorIdx = sensor1.index;
 					btn_input.text = "S1 Raw";
 					lbl_sensor_val.text = "%d";
 					lbl_sensor_val.numSrc.srcType = srcTypeInt;
@@ -1115,7 +1115,7 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 					gph_monitor.y_label = "V";
 				}
 				else if(inputType == 1){
-					measurementCurSensor = sensor1.index;
+					monitorSensorIdx = sensor1.index;
 					btn_input.text = "S1 Front";
 					lbl_sensor_val.text = "%d.%.2d mm";
 					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
@@ -1128,7 +1128,7 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 					gph_monitor.y_label = "mm";
 				}
 				else if(inputType == 2){
-					measurementCurSensor = sensor2.index;
+					monitorSensorIdx = sensor2.index;
 					btn_input.text = "S2 Raw";
 					lbl_sensor_val.text = "%d";
 					lbl_sensor_val.numSrc.srcType = srcTypeInt;
@@ -1141,7 +1141,7 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 					gph_monitor.y_label = "V";
 				}
 				else if(inputType == 3){
-					measurementCurSensor = sensor2.index;
+					monitorSensorIdx = sensor2.index;
 					btn_input.text = "S2 Rear";
 					lbl_sensor_val.text = "%d.%.2d mm";
 					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
@@ -1567,6 +1567,9 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				// Set current filtered raw value as origin value
 				sensor1.originPoint = sensor1.bufConv[sensor1.bufIdx];
 
+				// Store setup in CAL file
+				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
 			}
@@ -1579,6 +1582,9 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 
 				// Set current filtered raw value as origin value
 				sensor2.originPoint = sensor2.bufConv[sensor2.bufIdx];
+
+				// Store setup in CAL file
+				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
@@ -1594,6 +1600,9 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				sensor1.operatingPoint = sensor1.bufConv[sensor1.bufIdx] - sensor1.originPoint;
 				printf("curfil %.2f, orig %.2f \n", sensor1.bufConv[sensor1.bufIdx], sensor1.originPoint);
 
+				// Store setup in CAL file
+				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
 			}
@@ -1606,6 +1615,9 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 
 				// Set operating point as offset from origin to current position
 				sensor2.operatingPoint = sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint;
+
+				// Store setup in CAL file
+				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
@@ -1671,17 +1683,17 @@ void curveset_prepare(volatile sensor* sens){
 
 
 	// Store current value of average filter order
-	curveset_previousAvgFilterOrder = sens->avgFilterOrder;
+	curveset_previousAvgFilterInterval = sens->avgFilterInterval;
 
 	// Set avg filter order higher. This way its easier to get precise measurements. The user should be able to keep the distance for minimum 1 second, therefore filter over 1 second
-	uint16_t newFilOrder = (uint16_t)ceil(1000.0 / MEASUREMENT_INTERVAL);
-	if(newFilOrder < sens->bufMaxIdx)
-		curveset_sens->avgFilterOrder = newFilOrder;
+	uint16_t newFilInt = (uint16_t)ceil(1000.0 / MEASUREMENT_INTERVAL);
+	if(newFilInt < sens->bufMaxIdx)
+		curveset_sens->avgFilterInterval = newFilInt;
 	else
-		curveset_sens->avgFilterOrder = sens->bufMaxIdx-1;
-	printf("Using Avg filter order %d during curveset!\n", sens->avgFilterOrder);
+		curveset_sens->avgFilterInterval = sens->bufMaxIdx-1;
+	printf("Using Avg filter interval %d during curveset!\n", sens->avgFilterInterval);
 	// Do a clean filter value calculation to sync it to the new filter order
-	measure_movAvgFilter_clean(curveset_sens, curveset_sens->avgFilterOrder, 0);
+	measure_movAvgFilter_clean(curveset_sens, curveset_sens->avgFilterInterval, 0);
 
 
 	// Link actual value array to corresponding textbox
@@ -1893,10 +1905,10 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				*toggle_lock = 42;
 
 				// Reset filter order
-				curveset_sens->avgFilterOrder = curveset_previousAvgFilterOrder;
-				printf("Reseting avg filter order back to %d!\n", curveset_sens->avgFilterOrder);
+				curveset_sens->avgFilterInterval = curveset_previousAvgFilterInterval;
+				printf("Reseting avg filter order back to %d!\n", curveset_sens->avgFilterInterval);
 				// Do a clean filter value calculation to sync it to the new filter order
-				measure_movAvgFilter_clean(curveset_sens, curveset_sens->avgFilterOrder, 0);
+				measure_movAvgFilter_clean(curveset_sens, curveset_sens->avgFilterInterval, 0);
 
 				// Store current polynomial fit to be used
 				for (uint8_t i = 0; i < 4; i++) {
@@ -1905,7 +1917,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				}
 				curveset_sens->fitOrder = fit_order;
 
-				// Write Spec file
+				// Write CAL file
 				record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
@@ -2073,7 +2085,6 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 			break;
 		default:
 			TFT_textbox_touch(&tbx_act);
-			//TFT_textbox_touch(&tbx_dp); // TODO: Commented out because there needs to be an border check before this is useful. Meanwhile it's read only this way
 			break;
 	}
 }
@@ -2091,7 +2102,7 @@ void filterset_prepare(volatile sensor* sens){
 	// Store pointer to referenced Sensor buffer (ignore volatile here)
 	filterset_sens = (sensor*)sens;
 
-	// Check if spec file exists and load current settings if possible
+	// Check if CAL file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
 	DP_size = 0;
 	record_readCalFile(sens, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
@@ -2116,7 +2127,7 @@ void filterset_prepare(volatile sensor* sens){
 		printf("Memory malloc failed!\n");
 
 	// Link filter order textbox source to current sensor filter order
-	tbx_filter_interval.numSrc.intSrc = &filterset_sens->avgFilterOrder;
+	tbx_filter_interval.numSrc.intSrc = &filterset_sens->avgFilterInterval;
 
 	// Set current error threshold to retrieved value (we use a separate value in order to modify it dynamically)
 	filter_errorThreshold = filterset_sens->errorThreshold;
@@ -2268,15 +2279,15 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// Reset filter order
-				//filterset_sens->avgFilterOrder = filterset_previousAvgFilterOrder;
-				printf("Reseting avg filter order back to %d!\n", filterset_sens->avgFilterOrder);
+				//filterset_sens->avgFilterInterval = filterset_previousAvgFilterInterval;
+				printf("Reseting avg filter order back to %d!\n", filterset_sens->avgFilterInterval);
 				// Do a clean filter value calculation to sync it to the new filter order
-				measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
+				measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterInterval, 0);
 
 				// Store current error threshold to be used (filter order is changed direct)
 				filterset_sens->errorThreshold = *tbx_error_threshold.numSrc.intSrc;
 
-				// Write Spec file
+				// Write CAL file
 				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
 
 				// Free allocated memory
@@ -2293,12 +2304,12 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// If the filter isn't at the limits...
-				if(filterset_sens->avgFilterOrder > 0){
+				if(filterset_sens->avgFilterInterval > 0){
 					// Decrease current order
-					filterset_sens->avgFilterOrder--;
+					filterset_sens->avgFilterInterval--;
 
 					// Do a clean filter value calculation to sync it
-					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
+					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterInterval, 0);
 				}
 			}
 			break;
@@ -2308,12 +2319,12 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				*toggle_lock = 42;
 
 				// If the filter isn't at the limits...
-				if(filterset_sens->avgFilterOrder < 254){
+				if(filterset_sens->avgFilterInterval < 254){
 					// Increase current order
-					filterset_sens->avgFilterOrder++;
+					filterset_sens->avgFilterInterval++;
 
 					// Do a clean filter value calculation to sync it
-					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterOrder, 0);
+					measure_movAvgFilter_clean(filterset_sens, filterset_sens->avgFilterInterval, 0);
 				}
 			}
 			break;

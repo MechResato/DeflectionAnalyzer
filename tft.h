@@ -159,7 +159,7 @@ typedef struct {
 	char* y_label;	  // Text that will be written at the top of y Axis (like "y" or "V")
 	float y_max; 	  // Maximum expected value of input (e.g. for 12bit ADC 4095), will represent 100% of y-Axis
 	float amp_max;    // Maximum represented value of amplitude (e.g. 10 Volts), will be used at 100% of y-Axis
-	float cx_initial; // NOT USED YET! (works for TFT_graph_stepdata but not TFT_graph_static) ToDo
+	float cx_initial; // NOT FULLY USED YET! (works for TFT_graph_stepdata but not TFT_graph_static)
 	float cx_max; 	  // Maximum represented value of x-Axis (e.g. time 2.2 Seconds), will be used at 100% of x-Axis
 	float h_grid_lines; 	// Number of horizontal grid lines
 	float v_grid_lines; 	// Number of vertical grid lines

@@ -1,11 +1,10 @@
 /*
- * record.c
- *
- *  Created on: 25 Feb 2021
- *      Author: RS
+@file    		record.c
+@brief   		Implementation of SD-Card management, calibration file read/write, screenshot write, write of data with a FIFO to BIN and conversion to CSV files (implemented for XMC4700 and DAVE)
+@version 		1.0
+@date    		2020-02-25
+@author 		Rene Santeler @ MCI 2020/21
  */
-
-
 // NOTE: Inside the fatfs DAVE App "LFN - Long File Names" are disabled per default and can only be enabled manually (must be redone after every "Generate code") at "ffconf.h" line 114 value "#define FF_USE_LFN		1"
 
 #include <stdint.h>
@@ -37,12 +36,13 @@ extern void measure_postProcessing(volatile sensor* sens);
 
 
 //// Internal variables
+
 /// FATFS variables
 DSTATUS diskStatus;
 static FATFS fs; 	// File system object (volume work area)
 static FIL fil_r; 	// File object used for read only
 static FIL fil_w; 	// File object used for write only
-//static FILINFO fno; // File information object
+
 //// Internal functions
 static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode);
 static FRESULT record_closeFile(objFIL objFILrw);
@@ -54,6 +54,12 @@ static int8_t record_backupFile(const char* path);
 
 void record_mountDisk(uint8_t mount){
 	/// Used to mount and unmount a disk.
+	///
+	/// mount ... 1 = mount, 0 = unmount SD-Card
+	///
+	/// Uses multiple ff.h defines (FATFS Lib)
+	///	Uses record-global variables: fil_w, fil_r
+	///	Uses globals variables: sdState
 
 
 	// FATFS result code
@@ -116,7 +122,14 @@ void record_mountDisk(uint8_t mount){
 static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t accessMode){
 	/// Used to open a file on the read or write FIL struct for read/write access. If another file is still open it will be closed automatically!
 	/// Note: This implementation allows only one read and one write file to be open at the same time!
-	/// Todo
+	///
+	/// path	   ... Path to the file to be opened
+	/// objFILrw   ... Choose between read or write file
+	/// accessMode ... File access mode and open method (see ff.h)
+	///
+	/// Uses multiple ff.h defines (FATFS Lib)
+	///	Uses record-global variables: fil_w, fil_r
+	///	Uses globals variables: sdState
 
 	// FATFS result code
 	FRESULT res = FR_OK;
@@ -182,6 +195,11 @@ static FRESULT record_openFile(const char* path, objFIL objFILrw, uint8_t access
 
 static FRESULT record_closeFile(objFIL objFILrw){
 	/// Used to close the file of the write or read FIL struct.
+	///
+	/// Uses multiple ff.h defines (FATFS Lib)
+	///	Uses record-global variables: fil_w, fil_r
+	///	Uses globals variables: sdState
+
 
 	// FATFS result code
 	FRESULT res = FR_OK;
@@ -220,7 +238,7 @@ static FRESULT record_closeFile(objFIL objFILrw){
 
 static int8_t record_checkEndOfFile(objFIL objFILrw){
 	/// Check and return end of file status of given file
-	/// Return 1 if if EOF is reached, 0 if its not reached and -1 if the requested file is wrong or not open
+	/// Returns 1 if EOF is reached, 0 if its not reached and -1 if the requested file is wrong or not open
 	///
 	/// objFILrw	...	Requested file (see objFIL, write or read file)
 
@@ -242,7 +260,7 @@ static int8_t record_backupFile(const char* path){
 	///
 	/// path	...	The path/filename to be checked with extension
 	///
-	///	Uses globals variables: ToDo
+	///	Uses globals variables: FF_USE_LFN, FILENAME_BUFFER_LENGTH
 	///
 
 
@@ -354,6 +372,8 @@ static int8_t record_backupFile(const char* path){
 static uint8_t record_writeCalFile_pair (char* comment, char* val_buff){
 	/// Writes a comment and an actual value as two separate lines to the file
 	/// Returns 1 if there was an error, 0 means success.
+	///
+	///	Uses record-global variables: fil_w
 
 
 	// FATFS result code and bytes written
@@ -377,13 +397,16 @@ static uint8_t record_writeCalFile_pair (char* comment, char* val_buff){
 
 void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size){
 	/// Write the calibration/specification data of the given sensor to the file stated in the sensor struct.
-	// If the File already exists, the current version will be backed up (means: only 2 version are saved current and last file!)
+	/// If the File already exists, the current version will be backed up (means: only 2 version are saved current and last file!)
 	/// Returns nothing.
 	///
 	///	sens	...	A struct of type sensor which holds all sensor data
 	/// dp_x	... A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
 	/// dp_y	... A float array holding all y-values (actual value in units e.g mm) used to do the curve fit (corresponding to x-values!)
 	/// dp_size	... Number of data points (elements in dp_x and dp_y)
+	///
+	///	Uses record-global variables: fil_w
+	///	Uses globals variables: sdState
 
 
 	// FATFS result code and two string buffers for comment and values
@@ -399,10 +422,9 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 
 	// If the SD card is ready, backup existing file, try to open the new one and write specifications
 	if(sdState == sdMounted || sdState == sdFileOpen){
-
 		/// Check if file already exists - if so rename it
 		// Get file-info to check if it exists
-		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
+		res = f_stat((char*)&sens->fitFilename[0], NULL);
 		if(res == FR_OK){
 			sprintf(buff, "S%dBAK.CAL", (sens->index+1));
 			res = f_rename((char*)&sens->fitFilename[0], buff);
@@ -433,23 +455,23 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 				sprintf(buff,"%08lX,%08lX,%08lX,%08lX\n", *(unsigned long*)&sens->fitCoefficients[0], *(unsigned long*)&sens->fitCoefficients[1], *(unsigned long*)&sens->fitCoefficients[2], *(unsigned long*)&sens->fitCoefficients[3]);
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
-				// Write avg filter order comment and value in separate lines
-				sprintf(buff,"%d\n", sens->avgFilterOrder);
-				if( record_writeCalFile_pair("# Average filter order:\n", &buff[0]) ) break;
+				// Write avg filter interval comment and value in separate lines
+				sprintf(buff,"%d\n", sens->avgFilterInterval);
+				if( record_writeCalFile_pair("# Average filter interval:\n", &buff[0]) ) break;
 
-				// Write avg filter order comment and value in separate lines
+				// Write error threshold comment and value in separate lines
 				sprintf(buff,"%d\n", sens->errorThreshold);
 				if( record_writeCalFile_pair("# Error threshold:\n", &buff[0]) ) break;
 
-				//// Write converted origin point (unloaded) comment and value in separate lines
-				//sprintf(c_buff,"# Sensor origin point/unloaded (%.8f):\n", sens->originPoint);
-				//sprintf(buff,"%08lX\n", *(unsigned long*)&sens->originPoint);
-				//if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
-				//
-				//// Write converted operating point (offset/sag) comment and value in separate lines
-				//sprintf(c_buff,"# Sensor operating point offset/sag (%.8f):\n", sens->operatingPoint);
-				//sprintf(buff,"%08lX\n", *(unsigned long*)&sens->operatingPoint);
-				//if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
+				// Write converted origin point (unloaded) comment and value in separate lines
+				sprintf(c_buff,"# Sensor origin point/unloaded (%.8f):\n", sens->originPoint);
+				sprintf(buff,"%08lX\n", *(unsigned long*)&sens->originPoint);
+				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
+
+				// Write converted operating point (offset/sag) comment and value in separate lines
+				sprintf(c_buff,"# Sensor operating point offset/sag (%.8f):\n", sens->operatingPoint);
+				sprintf(buff,"%08lX\n", *(unsigned long*)&sens->operatingPoint);
+				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
 				// Write numDataPoints comment and value in separate lines
 				sprintf(buff,"%d\n", dp_size);
@@ -499,14 +521,15 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
 	/// Read the calibration/specification data of the given sensor from the file stated in the sensor struct.
 	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (setup before actual start of record, not during).
-	/// On 03.04.2021 this function measured to take about 266ms to complete...
-	/// Returns nothing.
+	/// On 03.04.2021 this function measured to take about 266ms to complete.
 	///
 	///	sens	...	A struct of type sensor which will get all sensor data
 	/// dp_x	... Optional. A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
 	/// dp_y	... Optional. A float array holding all y-values (actual value in units e.g mm) used to do the curve fit (corresponding to x-values!)
 	/// dp_size	... Optional. Number of data points (elements in dp_x and dp_y)
-
+	///
+	///	Uses record-global variables: fil_r
+	///	Uses globals variables: sdState
 
 	// FATFS result code and two string buffers for comment and values
 	FRESULT res = 0; /* API result code */
@@ -524,7 +547,7 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 		/// Check if file exists - if so, open it
 		printf("Check if file exists\n");
-		res = f_stat((char*)&sens->fitFilename[0], NULL); // Use &fno if actual file-info is needed
+		res = f_stat((char*)&sens->fitFilename[0], NULL);
 		if(res == FR_OK){
 			// Open/Create File
 			printf("Open file\n");
@@ -535,7 +558,6 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 				/// ... read every second line and write it to its corresponding value
 				// Single loop do-while slope to handle errors clean with break (inspired by Infineon "FATFS_EXAMPLE_XMC47": https://www.infineon.com/cms/en/product/promopages/aim-mc/dave_downloads.html)
 				do{
-					//printf("do while\n");
 					res = f_lseek(&fil_r, 0);
 					if (res != FR_OK) break;
 
@@ -569,23 +591,45 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 							ptr++;
 					}
 
-					/// Read filter order
+					/// Read filter interval
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
 					res_buf = f_gets(buff, 400, &fil_r);
 					res_buf = f_gets(buff, 400, &fil_r);
 					if (res_buf == 0) break;
-					// Convert read string to unsigned long and write back to sensor struct
-					sens->avgFilterOrder = strtoul(buff, NULL, 10);
-					printf("filterOrder %d: %s", sens->avgFilterOrder, buff);
+					// Convert read string and write back to sensor struct
+					sens->avgFilterInterval = strtoul(buff, NULL, 10);
+					printf("filterInterval %d: %s", sens->avgFilterInterval, buff);
 
 					/// Read error threshold
 					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
 					res_buf = f_gets(buff, 400, &fil_r);
 					res_buf = f_gets(buff, 400, &fil_r);
 					if (res_buf == 0) break;
-					// Convert read string to unsigned long and write back to sensor struct
+					// Convert read string and write back to sensor struct
 					sens->errorThreshold = strtoul(buff, NULL, 10);
 					printf("errorThreshold %d: %s", sens->errorThreshold, buff);
+
+					/// Read origin point
+					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
+					res_buf = f_gets(buff, 400, &fil_r);
+					res_buf = f_gets(buff, 400, &fil_r);
+					if (res_buf == 0) break;
+					// Read as hex long
+					unsigned long hexToFloatTmp1 = strtoul(buff, NULL, 16);
+					// Convert to float and write to sensor struct
+					sens->originPoint = *(float*)&hexToFloatTmp1;
+					printf("originPoint %.8f: %s", sens->originPoint, buff);
+
+					/// Read operating point
+					// Read comment line (ignore it) then read actual data line into buffer and stop process if the result isn't OK
+					res_buf = f_gets(buff, 400, &fil_r);
+					res_buf = f_gets(buff, 400, &fil_r);
+					if (res_buf == 0) break;
+					// Read as hex long
+					unsigned long hexToFloatTmp2 = strtoul(buff, NULL, 16);
+					// Convert to float and write to sensor struct
+					sens->operatingPoint = *(float*)&hexToFloatTmp2;
+					printf("operatingPoint %.8f: %s", sens->operatingPoint, buff);
 
 					// Read numDataPoints
 					res_buf = f_gets(buff, 400, &fil_r);
@@ -621,7 +665,7 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 								// Read as hex long
 								unsigned long tmp = strtoul(ptr, &ptr, 16);
 								// Convert to float and write to sensor struct
-								(*dp_y)[i] = *(float*)&tmp; // TODO
+								(*dp_y)[i] = *(float*)&tmp;
 								printf("= %.8f\n", (*dp_y)[i]);
 								// Ignore separator between values
 								if( (ptr - &buff[0]) < strlen(&buff[0]) )
@@ -676,8 +720,8 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 		printf("SD-Card not ready: %d", res);
 	}
 
-	// Clean update of filter (the order might be changed)
-	measure_movAvgFilter_clean((sensor*)sens, sens->avgFilterOrder, 0);
+	// Clean update of filter (Interval might be changed)
+	measure_movAvgFilter_clean((sensor*)sens, sens->avgFilterInterval, 0);
 
 	// Add a line break to console
 	printf("\n");
@@ -686,14 +730,17 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 
 
 uint8_t record_openBMP(const char* path){
+	/// Creates a bitmap file at given path and adds an 480x272 pixel, 32bit header.
+	/// Returns 1 if OK, 0 = error
 	///
+	/// path ... Path to the bmp-file to be created (with extension)
 	///
+	///	Uses globals variables: sdState, fil_w
 
 
 	// FATFS result code and two string buffers for comment and values
 	FRESULT res = 0;
 	UINT bw;
-	//char buff[400];
 	// The Header of an 480x272 pixel sized 32bit bitmap
 	#define BMP_HEADER_ARGB8_32BIT_SIZE 54
 	const uint8_t bmp_header_argb8_32bit[BMP_HEADER_ARGB8_32BIT_SIZE] =
@@ -703,7 +750,6 @@ uint8_t record_openBMP(const char* path){
 		0x02, 0xF8,	0x07, 0x00, 0x12, 0x0B,	0x00, 0x00,	0x12, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
 
-
 	// Initial log line
 	printf("\nrecord_openBMP:\n");
 
@@ -712,19 +758,6 @@ uint8_t record_openBMP(const char* path){
 
 	// If the SD card is ready, backup existing file, try to open the new one and write specifications
 	if(sdState == sdMounted || sdState == sdFileOpen){
-
-		/// Check if file already exists - if so rename it
-		// Get file-info to check if it exists
-		//res = f_stat(path, NULL); // Use &fno if actual file-info is needed
-		//if(res == FR_OK){
-		//	sprintf(buff, "BACKUP.BMP");
-		//	res = f_rename(path, buff);
-		//	printf("Backup BMP file to %s: %d\n", buff, res);
-		//}
-		//else{
-		//	printf("File not found: %d\n", res);
-		//}
-
 		// Check filename for uniqueness and rename existing file if needed
 		int8_t fil_OK = record_backupFile(path);
 
@@ -760,8 +793,13 @@ uint8_t record_openBMP(const char* path){
 }
 
 void record_writeBMP(uint32_t* data, uint16_t size){
+	/// Fills a bitmap file with 32bit pixels (EVE ARGB8 Format of EVE_cmd_snapshot2).
 	///
+	/// data ... Array of pixels
+	/// size ... Size of the array in byte
 	///
+	///	Uses globals variables: fil_w
+
 
 	// FATFS result code and two string buffers for comment and values
 	FRESULT res = 0;
@@ -774,8 +812,11 @@ void record_writeBMP(uint32_t* data, uint16_t size){
 }
 
 void record_closeBMP(){
+	/// Closes the bitmap file.
 	///
+	/// No input
 	///
+	///	Uses globals variables: sdState
 
 
 	// Initial log line
@@ -801,7 +842,7 @@ int8_t record_start(){
 	///
 	/// No Inputs.
 	///
-	///	Uses globals variables: filename_rec, ToDo
+	///	Uses globals variables: filename_rec, FILENAME_BUFFER_LENGTH, sdState, measureMode, fifo_buf, FIFO_BLOCK_SIZE, FIFO_BLOCKS, fifo_finBlock, fifo_recordBlock, fifo_writeBufIdx, fifo_writeBlock, fifo_recordBlock
 	///
 
 
@@ -875,7 +916,7 @@ void record_block(){
 	/// Record the current block (fifo_recordBlock) of the FIFO to the SD-card
 	/// No inputs or output (performance)
 	///
-	///	Uses record-global variables: fil
+	///	Uses record-global variables: fil_w
 	///	Uses globals variables: fifo_buf, fifo_recordBlock, FIFO_BLOCK_SIZE
 
 
@@ -903,9 +944,9 @@ int8_t record_stop(uint8_t flushData){
 	/// This needs to be executed ONCE after the last record_block() execution!
 	/// Returns 1 if OK, 0 = error
 	///
-	/// flushData	...	If this is 1 the function will try to write the not yet written blocks to SD-card
+	/// flushData	...	If 1 the remaining finished blocks will be written to the SD-card
 	///
-	///	Uses globals variables: sdState, measureMode, fifo_buf, ToDo
+	///	Uses globals variables: sdState, measureMode, fifo_buf, fifo_finBlock, fifo_recordBlock, FIFO_BLOCKS
 	///
 
 
@@ -921,6 +962,7 @@ int8_t record_stop(uint8_t flushData){
 		if(flushData){
 			// Write blocks till an unfinished block is found
 			while(1){
+				// No finished block left - stop
 				if(fifo_finBlock[fifo_recordBlock] == 1){
 					printf("Write finished block %d\n", fifo_recordBlock);
 
@@ -936,8 +978,8 @@ int8_t record_stop(uint8_t flushData){
 					if(fifo_recordBlock == FIFO_BLOCKS)
 						fifo_recordBlock = 0;
 				}
+				// No finished block left - stop
 				else
-					// No finish block left - stop
 					break;
 			}
 
@@ -964,23 +1006,21 @@ int8_t record_stop(uint8_t flushData){
 }
 
 void record_convertBinFile(const char* filename, sensor** sensArray){
-	/// Read the .BIN file (path) and write a corresponding .CSV file. The base name of both file will be same (error if not possible).
+	/// Read the .BIN file (path) and write a corresponding .CSV file. The base name of both files will be same (error if not possible).
 	/// Therefore only the base name of 'filename' is used, extensions are changed as needed (a parameter "test.csv" or "test.bin" will lead to the same result!).
 	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (after end of record, not during).
-	/// Returns nothing.
+	/// Returns nothing. Note: This would be much faster if used with the FIFO, but for current situation there is no need.
 	///
 	///	filename	...	Path to the .BIN file.
 	/// dp_x		... Optional. A float array holding all x-values (nominal/ ADC output) used to do the curve fit (sorted!)
 	///
-	/// globals TODO
-
-	/// Note: This would be much faster with the FIFO implemented. But for current situation there is no need.
+	///	Uses record-global variables: objFILread, objFILwrite
+	///	Uses globals variables: sdState, measureMode, CSVLINE_BUFFER_LENGTH, FILENAME_BUFFER_LENGTH, MEASUREMENT_INTERVAL, SENSORS_SIZE, SENSOR_RAW_SIZE, RECORD_CSV_HEADER, RECORD_CSV_FORMAT, RECORD_CSV_ARGUMENTS, FIFO_LINE_SIZE_PAD
 
 
 	// FATFS result code, Bytes written and a string buffer
 	FRESULT res = 0;
 	UINT bw,br;
-	//char bin_line_buff[FIFO_LINE_SIZE+1];
 	char csv_line_buff[CSVLINE_BUFFER_LENGTH]; // Consideration: dynamic allocation based on line length?
 
 	// Initial log line
@@ -1001,8 +1041,8 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 		sensArray[i]->errorLastValid = 0;
 		sensArray[i]->avgFilterSum = 0;
 
-		// Set the current error count to the filter order. This lets the filter ignore that the entry's before the first one are still empty
-		sensArray[i]->errorOccured = sensArray[i]->avgFilterOrder;
+		// Set the current error count to the filter interval. This lets the filter ignore that the entry's before the first one are still empty
+		sensArray[i]->errorOccured = sensArray[i]->avgFilterInterval;
 
 		// Memset all elements of all buffers to 0
 		memset((int_buffer_t*)sensArray[i]->bufRaw     , 0, (sensArray[i]->bufMaxIdx+1)*sizeof(int_buffer_t));
@@ -1039,8 +1079,7 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 		res = f_stat(filename_BIN, NULL);
 		printf("Checked if file exists: %d\n", res);
 		if(fil_OK == 1 && res == FR_OK){
-			// Get line size, line padding size, block size and size of every value to be used while reading binary
-			// Todo list variables
+			// Get dynamic line size, line padding size, block size and size of every value to be used while reading binary
 			// Note: This will not be done because we assume that this will run straight after the recording, and therefore the global variables must be equal
 
 			// Open/Create Files
@@ -1062,7 +1101,7 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 				res = f_write(&fil_w, csv_line_buff, strlen(csv_line_buff), &bw);
 				csv_line_buff[0] = '\0';
 
-				// Read line by line and convert to csv, as long as end of file isn't reached
+				// Read line by line and convert to CSV, as long as end of file isn't reached
 				uint16_t linCount = 0;
 				float curTimeO = 0;
 				while(record_checkEndOfFile(objFILread) == 0  ){ //linCount < 10
@@ -1071,7 +1110,7 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 					int_buffer_t raw = 0;
 
 					// Add current time to buffer
-					sprintf( csv_line_buff, "%.3f;",	curTimeO);
+					sprintf( csv_line_buff, "%.3f;", curTimeO);
 
 					// For each sensor - read corresponding bits to sensor buffer, apply filter, convert value and write to CSV file
 					for (uint8_t i = 0; i < SENSORS_SIZE; i++){
@@ -1097,23 +1136,18 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 							seperator = '\n';
 
 						// Write current value to the buffer
-						//sprintf(csv_line_buff+strlen(csv_line_buff), "%.3f;%d;%.1f;%.2f;%d%c", curTimeO, sensArray[i]->bufRaw[sensArray[i]->bufIdx], sensArray[i]->bufFilter[sensArray[i]->bufIdx], sensArray[i]->bufConv[sensArray[i]->bufIdx], sensArray[i]->errorOccured, seperator);
 						sprintf(
-							csv_line_buff+strlen(csv_line_buff),		// Add sensor data to end of buffer
-							RECORD_CSV_FORMAT     "%c",		// Concatenate format ([values from sensor] separator[; or \n])
-							RECORD_CSV_ARGUMENTS, seperator	// Arguments	->	  ([values from sensor] separator[; or \n])
+							csv_line_buff+strlen(csv_line_buff), // Add sensor data to end of buffer
+							RECORD_CSV_FORMAT     "%c",		// Concatenate format ([values]separator[; or \n])
+							RECORD_CSV_ARGUMENTS, seperator	// Arguments	->	  ([values]separator[; or \n])
 						);
-
-						//printf("\n\tWriting sensor %d: (raw%d) %s",i ,raw, csv_line_buff);
 					}
 
 					// Write Line
 					res = f_write(&fil_w, csv_line_buff, strlen(csv_line_buff), &bw);
-					//printf("Writing line: (res=%d) %s", res, csv_line_buff);
 
 					// Read padding bytes to move cursor
 					f_read(&fil_r, &raw, FIFO_LINE_SIZE_PAD, &br);
-					//printf("\tPad is '%d'\n", raw);
 
 					// Reset Buffer
 					csv_line_buff[0] = '\0';
