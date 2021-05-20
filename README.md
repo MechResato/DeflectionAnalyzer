@@ -76,7 +76,7 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://github.com/MechResato/DeflectionAnalyzer/images)
+[![Product Name Screen Shot][product-screenshot]](https://github.com/MechResato/DeflectionAnalyzer/tree/master/images)
 
 ### Motivation
 
@@ -103,7 +103,7 @@ Preview Video: [https://www.youtube.com/watch?v=uU-0lam_NbY](https://www.youtube
 
 The firmware is written using [Infineon DAVE 4.4.2](https://infineoncommunity.com/dave-download_ID645). It is meant to be used with an Infineon XMC4700 Relax Kit (Version with assembled SD-Card mount, CAN transceiver and RTC) as microcontroller and a RiTFT-43-CAP-UX (4.3″ 480x272px TFT with capacitive touchscreen and BT81x Embedded Video Engine (EVE) coprocessor from Riverdi). The used (custom) mainboard is not necessary, but in this case the connections must be done according to following figure:
 
-[![Main schematics of the main board][pinout]](https://github.com/MechResato/DeflectionAnalyzer/images)
+[![Main schematics of the main board][pinout]](https://github.com/MechResato/DeflectionAnalyzer/tree/master/images)
 
 Note that the pinout of the TFT connector was designed to use an inverted flat cable (type B). If you use an Breakout board (like this [ZIF-20 Adapter](https://www.robotshop.com/de/de/riverdi-breakout-board-zif-20-zu-idc-20.html)) the pinout might be inverted (20 ->1 instead of 1->20).
 
