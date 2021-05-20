@@ -395,7 +395,7 @@ static uint8_t record_writeCalFile_pair (char* comment, char* val_buff){
 		return 0;
 }
 
-void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_size){
+void record_writeCalFile(sensor* sens){
 	/// Write the calibration/specification data of the given sensor to the file stated in the sensor struct.
 	/// If the File already exists, the current version will be backed up (means: only 2 version are saved current and last file!)
 	/// Returns nothing.
@@ -474,31 +474,31 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
 				// Write numDataPoints comment and value in separate lines
-				sprintf(buff,"%d\n", dp_size);
+				sprintf(buff,"%d\n", sens->dp_size);
 				if( record_writeCalFile_pair("# Number of data points:\n", &buff[0]) ) break;
 
 				// DataPoints x-value comment
-				sprintf(c_buff,"# Datapoints x (%.8f", dp_x[0]);
-				for (uint8_t i = 1; i < dp_size; i++)
-					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", dp_x[i]);
+				sprintf(c_buff,"# Datapoints x (%.8f", sens->dp_x[0]);
+				for (uint8_t i = 1; i < sens->dp_size; i++)
+					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", sens->dp_x[i]);
 				sprintf(&c_buff[0] + (strlen(c_buff)),"):\n");
 				// DataPoints x-values
-				sprintf(buff,"%08lX", *(unsigned long*)&dp_x[0]);
-				for (uint8_t i = 1; i < dp_size; i++)
-					sprintf(&buff[0] + (strlen(buff)),",%08lX", *(unsigned long*)&dp_x[i]);
+				sprintf(buff,"%08lX", *(unsigned long*)&sens->dp_x[0]);
+				for (uint8_t i = 1; i < sens->dp_size; i++)
+					sprintf(&buff[0] + (strlen(buff)),",%08lX", *(unsigned long*)&sens->dp_x[i]);
 				sprintf(&buff[0] + (strlen(buff)),"\n%c", '\0');
 				// Write comment and value
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
 
 				// DataPoints y-value comment
-				sprintf(c_buff,"# Datapoints y (%.8f", dp_y[0]);
-				for (uint8_t i = 1; i < dp_size; i++)
-					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", dp_y[i]);
+				sprintf(c_buff,"# Datapoints y (%.8f", sens->dp_y[0]);
+				for (uint8_t i = 1; i < sens->dp_size; i++)
+					sprintf(&c_buff[0] + (strlen(c_buff)),",%.8f", sens->dp_y[i]);
 				sprintf(&c_buff[0] + (strlen(c_buff)),"):\n");
 				// DataPoints y-values
-				sprintf(buff,"%08lX", *(unsigned long*)&dp_y[0]);
-				for (uint8_t i = 1; i < dp_size; i++)
-					sprintf(&buff[0] + (strlen(buff)),",%08lX", *(unsigned long*)&dp_y[i]);
+				sprintf(buff,"%08lX", *(unsigned long*)&sens->dp_y[0]);
+				for (uint8_t i = 1; i < sens->dp_size; i++)
+					sprintf(&buff[0] + (strlen(buff)),",%08lX", *(unsigned long*)&sens->dp_y[i]);
 				sprintf(&buff[0] + (strlen(buff)),"\n%c", '\0');
 				// Write comment and value
 				if( record_writeCalFile_pair(&c_buff[0], &buff[0]) ) break;
@@ -518,7 +518,7 @@ void record_writeCalFile(sensor* sens, float dp_x[], float dp_y[], uint8_t dp_si
 	printf("\n");
 }
 
-void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint16_t* dp_size){
+void record_readCalFile(volatile sensor* sens){
 	/// Read the calibration/specification data of the given sensor from the file stated in the sensor struct.
 	/// Note: This function is not optimized for high speed. It should only be used when performance is not top priority (setup before actual start of record, not during).
 	/// On 03.04.2021 this function measured to take about 266ms to complete.
@@ -634,43 +634,18 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 					// Read numDataPoints
 					res_buf = f_gets(buff, 400, &fil_r);
 					res_buf = f_gets(buff, 400, &fil_r);
-					printf("numDataPoints: %s", buff);
-					if (res_buf != 0 && dp_size != NULL){
-						printf("Reading DPs:\n");
-						*dp_size = (uint8_t)strtoul(buff, NULL, 10);
-						printf("dp_size %d\n", *dp_size);
-
-
+					sens->dp_size = (uint8_t)strtoul(buff, NULL, 10);
+					printf("numDataPoints %d: %s\n", sens->dp_size, buff);
+					if (res_buf != 0 && sens->dp_size >= 1){
 						// Allocate Memory for data points
-						if(*dp_size >= 1){
-							*dp_y = (float*)malloc((*dp_size+1)*sizeof(float));
-							*dp_x = (float*)malloc((*dp_size+1)*sizeof(float));
+						if(sens->dp_size >= 1){
+							sens->dp_y = (float*)realloc(sens->dp_y, (sens->dp_size+1)*sizeof(float));
+							sens->dp_x = (float*)realloc(sens->dp_x, (sens->dp_size+1)*sizeof(float));
 							char *ptr = &buff[0];
 
 							// Check for allocation errors
-							if(*dp_y == NULL || *dp_x == NULL)
-								printf("Read CAL: Memory malloc failed!\n");
-
-							// Read DataPoints y-value
-							res_buf = f_gets(buff, 100, &fil_r);
-							res_buf = f_gets(buff, 100, &fil_r);
-							if (res_buf == 0){
-								buff[0] = '-';
-								buff[1] = '1';
-								buff[2] = '\0';
-							}
-							ptr = &buff[0];
-							for (uint8_t i = 0; i < (*dp_size); i++) {
-								printf("y %d: ",i );
-								// Read as hex long
-								unsigned long tmp = strtoul(ptr, &ptr, 16);
-								// Convert to float and write to sensor struct
-								(*dp_y)[i] = *(float*)&tmp;
-								printf("= %.8f\n", (*dp_y)[i]);
-								// Ignore separator between values
-								if( (ptr - &buff[0]) < strlen(&buff[0]) )
-									ptr++;
-							}
+							if(sens->dp_y == NULL || sens->dp_x == NULL)
+								printf("Read CAL: Memory realloc failed!\n");
 
 							// Read DataPoints x-value
 							res_buf = f_gets(buff, 100, &fil_r);
@@ -681,17 +656,39 @@ void record_readCalFile(volatile sensor* sens, float** dp_x, float** dp_y, uint1
 								buff[2] = '\0';
 							}
 							ptr = &buff[0];
-							for (uint8_t i = 0; i < (*dp_size); i++) {
+							for (uint8_t i = 0; i < (sens->dp_size); i++) {
 								printf("x %d: ",i );
 								// Read as hex long
 								unsigned long tmp = strtoul(ptr, &ptr, 16);
 								// Convert to float and write to sensor struct
-								(*dp_x)[i] = *(float*)&tmp;
-								printf("= %.8f\n", (*dp_x)[i]);
+								(sens->dp_x)[i] = *(float*)&tmp;
+								printf("= %.8f\n", (sens->dp_x)[i]);
 								// Ignore separator between values
 								if( (ptr - &buff[0]) < strlen(&buff[0]) )
 									ptr++;
 							}
+
+							// Read DataPoints y-value
+							res_buf = f_gets(buff, 100, &fil_r);
+							res_buf = f_gets(buff, 100, &fil_r);
+							if (res_buf == 0){
+								buff[0] = '-';
+								buff[1] = '1';
+								buff[2] = '\0';
+							}
+							ptr = &buff[0];
+							for (uint8_t i = 0; i < (sens->dp_size); i++) {
+								printf("y %d: ",i );
+								// Read as hex long
+								unsigned long tmp = strtoul(ptr, &ptr, 16);
+								// Convert to float and write to sensor struct
+								(sens->dp_y)[i] = *(float*)&tmp;
+								printf("= %.8f\n", (sens->dp_y)[i]);
+								// Ignore separator between values
+								if( (ptr - &buff[0]) < strlen(&buff[0]) )
+									ptr++;
+							}
+
 						}
 					}
 					else{

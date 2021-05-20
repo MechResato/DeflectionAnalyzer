@@ -64,8 +64,13 @@ int main(void)
 	while (SYSTIMER_GetTime() < now + (1500*1000)) __NOP();
 
 	// Load Values from SD-Card if possible
-	for (uint8_t i = 0; i < SENSORS_SIZE; i++)
-		record_readCalFile(sensors[i], NULL, NULL, NULL);
+	for (uint8_t i = 0; i < SENSORS_SIZE; i++){
+		// Allocate memory for data points (curveset) - will only be realloc'ed after this!
+		sensors[i]->dp_y = (float*)malloc(1*sizeof(float));
+		sensors[i]->dp_x = (float*)malloc(1*sizeof(float));
+		// Load sensor calibration
+		record_readCalFile(sensors[i]);
+	}
 
 	// Start ADC measurement interrupt routine
 	TIMER_Start(&TIMER_0);
@@ -131,5 +136,10 @@ int main(void)
 	} // End of mail loop
 
 
+	// Free allocated memory (never needed - just to be clean)
+	free(sensor1.dp_x);
+	free(sensor1.dp_y);
+	free(sensor2.dp_x);
+	free(sensor2.dp_y);
 }
 

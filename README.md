@@ -60,6 +60,7 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#motivation">Motivation</a></li>
+        <li><a href="#description">Description</a></li>
 		<li><a href="#hardware">Hardware</a></li>
       </ul>
     </li>
@@ -70,6 +71,7 @@
   </ol>
 </details>
 
+
 <!-- ABOUT THE PROJECT -->
 
 ## About The Project
@@ -79,9 +81,15 @@
 ### Motivation
 
 The currently here growing project acts as a storage for a theses and is still under construction (estimated finalization May 2021). The main goals of the project are:
-* [Design of an detachable Platform used to analyze motorcycle suspensions]
-* [Highly modular code structure to be reused in various situations]
-* [Creation of an reusable embedded system platform with sensor/bus input (CAN, I2C, SPI, 0-5V, ...) as well as output via TFT and logging on an SD-Card]
+* Design of an detachable Platform used to analyze motorcycle suspensions
+* Highly modular code structure to be reused in various situations
+* Creation of an reusable embedded system platform with sensor/bus input (0-5V, 4-20mA, I2C, SPI, CAN, ...) as well as output via TFT and logging on an SD-Card
+
+### Description
+
+This project aims to design an extensible microcontroller system to support the user in calibrating, monitoring and recording of sensor data. The highly modular System implements a menu-framework for touchscreens as well as multiple concepts for efficient sensor data management and SD-Card retention. For Use in other projects the Hardware and Software is kept highly expandable.
+
+Based on this motorcycle suspension tracing is realized. Here the system allows the acquisition of spring deflections with position sensors at the axes, while keeping the possibility for vast extensions. The designed menu guides the user during the process of calibration, reference level setup and file-administration. In the end the values can be shown if form of graphs and indicators. With the press of a button the values are efficiently recorded and converted to readable format, to be processed externally.
 
 Preview Video: [https://www.youtube.com/watch?v=uU-0lam_NbY](https://www.youtube.com/watch?v=uU-0lam_NbY)
 

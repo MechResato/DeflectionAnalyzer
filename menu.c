@@ -645,7 +645,7 @@ void curveset_prepare(volatile sensor* sens);
 void curveset_setEditMode(uint8_t editMode);
 
 // Size and current index of all data point related arrays
-uint16_t DP_size = 3;
+//uint16_t DP_size = 3;
 uint16_t DP_cur = 0;
 // Pointer to the currently being recorded sensor - set at prepare and e.g. used when getting the nominal value at display function or storing of the fit values
 sensor*  curveset_sens;
@@ -762,7 +762,7 @@ textbox tbx_dp = {
 	.numSrcFormat = "%d"
 };
 
-// The pointers the the x and y value arrays to be allocated by malloc and resized by realloc and used by the textboxes and graph are inside tbx_nom and tbx_act.
+// The pointers the the x and y value arrays to be used with realloc and used by the textboxes and graph are inside tbx_nom and tbx_act.
 #define STR_NOM_MAXLEN 10
 char str_nom[STR_NOM_MAXLEN] = "4095";
 uint8_t str_nom_curLength = 4;
@@ -1568,7 +1568,7 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				sensor1.originPoint = sensor1.bufConv[sensor1.bufIdx];
 
 				// Store setup in CAL file
-				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile((sensor*)&sensor1);
 
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
@@ -1584,7 +1584,7 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				sensor2.originPoint = sensor2.bufConv[sensor2.bufIdx];
 
 				// Store setup in CAL file
-				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile((sensor*)&sensor2);
 
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
@@ -1601,7 +1601,7 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				printf("curfil %.2f, orig %.2f \n", sensor1.bufConv[sensor1.bufIdx], sensor1.originPoint);
 
 				// Store setup in CAL file
-				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile((sensor*)&sensor1);
 
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
@@ -1617,7 +1617,7 @@ void menu_touch_3setup2(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgre
 				sensor2.operatingPoint = sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint;
 
 				// Store setup in CAL file
-				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
+				record_writeCalFile((sensor*)&sensor2);
 
 				// Refresh display (rest will be done in menu specific static_display code)
 				TFT_setMenu(-1);
@@ -1644,22 +1644,23 @@ void curveset_prepare(volatile sensor* sens){
 
 	// Check if CAL file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
-	DP_size = 0;
-	record_readCalFile(sens, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	curveset_sens->dp_size = 0;
+	record_readCalFile(sens);
+
 	// If there are still no data points - use default ones
-	if(DP_size == 0){
+	if(curveset_sens->dp_size == 0){
 		// Allocate and set the y-value array
-		DP_size = 3;
-		tbx_act.numSrc.floatSrc = (float*)malloc((DP_size+1)*sizeof(float));
-		tbx_act.numSrc.floatSrc[0] = 0.0;
-		tbx_act.numSrc.floatSrc[1] = 100.0;
-		tbx_act.numSrc.floatSrc[2] = 200.0;
+		curveset_sens->dp_size = 3;
+		curveset_sens->dp_y = (float*)realloc(curveset_sens->dp_y, (curveset_sens->dp_size+1)*sizeof(float));
+		curveset_sens->dp_y[0] = 0.0;
+		curveset_sens->dp_y[1] = 100.0;
+		curveset_sens->dp_y[2] = 200.0;
 
 		// Allocate and set the x-value array
-		tbx_nom.numSrc.floatSrc = (float*)malloc((DP_size+1)*sizeof(float));
-		tbx_nom.numSrc.floatSrc[0] = 0.0;
-		tbx_nom.numSrc.floatSrc[1] = 2048.0;
-		tbx_nom.numSrc.floatSrc[2] = 4096.0;
+		curveset_sens->dp_x = (float*)realloc(curveset_sens->dp_x, (curveset_sens->dp_size+1)*sizeof(float));
+		curveset_sens->dp_x[0] = 0.0;
+		curveset_sens->dp_x[1] = 2048.0;
+		curveset_sens->dp_x[2] = 4096.0;
 
 	}
 	else{
@@ -1678,9 +1679,12 @@ void curveset_prepare(volatile sensor* sens){
 	}
 
 	// Check for allocation errors
-	if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
-		printf("Memory malloc failed!\n");
+	if(curveset_sens->dp_x == NULL || curveset_sens->dp_y == NULL)
+		printf("Memory realloc failed!\n");
 
+	// Link textbox to x and y points
+	tbx_nom.numSrc.floatSrc = curveset_sens->dp_x;
+	tbx_act.numSrc.floatSrc = curveset_sens->dp_y;
 
 	// Store current value of average filter order
 	curveset_previousAvgFilterInterval = sens->avgFilterInterval;
@@ -1705,7 +1709,7 @@ void curveset_prepare(volatile sensor* sens){
 	tbx_nom.numSrc.srcOffset = &DP_cur;
 
 	// Determine fitted polynomial for the first time
-	fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+	fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, curveset_sens->dp_size, fit_order, coefficients);
 
 	// Change sensor number in header
 	sprintf(lbl_curveset.text, "Curve set - Sensor %d", (curveset_sens->index+1));
@@ -1739,7 +1743,7 @@ void curveset_setEditMode(uint8_t editMode){
 		/// Set graph boundaries
 		// Get biggest y-value
 		float cur_y_max = 0;
-		for(uint8_t i = 0; i < DP_size; i++)
+		for(uint8_t i = 0; i < curveset_sens->dp_size; i++)
 			if(tbx_act.numSrc.floatSrc[i] > cur_y_max)
 				cur_y_max = tbx_act.numSrc.floatSrc[i];
 
@@ -1843,14 +1847,14 @@ void menu_display_curveset(void){
 		//printf("write %f\n", curveset_sens->bufFilter[curveset_sens->bufIdx]);
 
 		// Sort tbx_act.numSrc.floatSrc & tbx_nom.numSrc.floatSrc based on nomx and change current datapoint if necessary
-		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
+		DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, curveset_sens->dp_size, DP_cur);
 
 		// Determine fitted polynomial
-		fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+		fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, curveset_sens->dp_size, fit_order, coefficients);
 	}
 
 	// Change "right" button to "new" if on the edge of points
-	if(DP_cur >= DP_size-1)
+	if(DP_cur >= curveset_sens->dp_size-1)
 		btn_db_next.text = "+";
 	else
 		btn_db_next.text = ">";
@@ -1859,8 +1863,8 @@ void menu_display_curveset(void){
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
 	// Current data points and trace
-	TFT_graph_XYdata(&gph_curveset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size, (int16_t*)&DP_cur, graphLine, GRAPH_DATA2COLORLIGHT);
-	TFT_graph_XYdata(&gph_curveset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size, (int16_t*)&DP_cur, graphPoint, GRAPH_DATA2COLOR);
+	TFT_graph_XYdata(&gph_curveset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, curveset_sens->dp_size, (int16_t*)&DP_cur, graphLine, GRAPH_DATA2COLORLIGHT);
+	TFT_graph_XYdata(&gph_curveset, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, curveset_sens->dp_size, (int16_t*)&DP_cur, graphPoint, GRAPH_DATA2COLOR);
 	// Fitted curve
 	TFT_graph_function(&gph_curveset, &coefficients[0], fit_order, 2, graphLine, GRAPH_DATA1COLOR);
 
@@ -1918,11 +1922,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				curveset_sens->fitOrder = fit_order;
 
 				// Write CAL file
-				record_writeCalFile(curveset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
-
-				// Free allocated memory
-				free(tbx_act.numSrc.floatSrc);
-				free(tbx_nom.numSrc.floatSrc);
+				record_writeCalFile(curveset_sens);
 
 				// Change menu
 				TFT_setMenu(menu_2setup1.index);
@@ -1957,7 +1957,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				// ...
 
 				// Determine fitted polynomial after order change
-				fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, fit_order, coefficients);
+				fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, curveset_sens->dp_size, fit_order, coefficients);
 			}
 			break;
 		case TBX_DP_TAG:
@@ -2001,11 +2001,15 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 					DP_cur++;
 
 					// Add a new data-point if the border of the array is reached
-					if(DP_cur > (DP_size-1)){
+					if(DP_cur > (curveset_sens->dp_size-1)){
 						// Increase size of array
-						DP_size++;
-						tbx_act.numSrc.floatSrc = (float*)realloc(tbx_act.numSrc.floatSrc, DP_size*sizeof(float));
-						tbx_nom.numSrc.floatSrc = (float*)realloc(tbx_nom.numSrc.floatSrc, DP_size*sizeof(float));
+						curveset_sens->dp_size++;
+						curveset_sens->dp_y = (float*)realloc(curveset_sens->dp_y, curveset_sens->dp_size*sizeof(float));
+						curveset_sens->dp_x = (float*)realloc(curveset_sens->dp_x, curveset_sens->dp_size*sizeof(float));
+
+						// Link textbox to x and y points
+						tbx_nom.numSrc.floatSrc = curveset_sens->dp_x;
+						tbx_act.numSrc.floatSrc = curveset_sens->dp_y;
 
 						// Check for allocation errors
 						if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
@@ -2039,24 +2043,28 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				*toggle_lock = 42;
 
 				// if the data point isn't at the limits - change current index, set text of DP-textbox and set text of Actual-textbox
-				if(DP_size > 1){
+				if(curveset_sens->dp_size > 1){
 					// Set current point to highest value possible
 					tbx_nom.numSrc.floatSrc[DP_cur] = FLT_MAX;
 
 					// Leave edit mode
 					curveset_setEditMode(0);
 
-					// Shelf point to make it the last in the array (DP_cur will also change to DP_size-1)
-					DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, DP_size, DP_cur);
+					// Shelf point to make it the last in the array (DP_cur will also change to curveset_sens->dp_size-1)
+					DP_cur = menu_shelf_datapoint(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, curveset_sens->dp_size, DP_cur);
 
 					// Decrease currently selected data point (always selects the last point)
 					if(DP_cur != 0)
 						DP_cur--;
 
 					// Decrease size of array
-					DP_size--;
-					tbx_act.numSrc.floatSrc = (float*)realloc(tbx_act.numSrc.floatSrc, DP_size*sizeof(float));
-					tbx_nom.numSrc.floatSrc = (float*)realloc(tbx_nom.numSrc.floatSrc, DP_size*sizeof(float));
+					curveset_sens->dp_size--;
+					curveset_sens->dp_y = (float*)realloc(curveset_sens->dp_y, curveset_sens->dp_size*sizeof(float));
+					curveset_sens->dp_x = (float*)realloc(curveset_sens->dp_x, curveset_sens->dp_size*sizeof(float));
+
+					// Link textbox to x and y points
+					tbx_nom.numSrc.floatSrc = curveset_sens->dp_x;
+					tbx_act.numSrc.floatSrc = curveset_sens->dp_y;
 
 					// Check for allocation errors
 					if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
@@ -2104,27 +2112,33 @@ void filterset_prepare(volatile sensor* sens){
 
 	// Check if CAL file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
-	DP_size = 0;
-	record_readCalFile(sens, &tbx_nom.numSrc.floatSrc, &tbx_act.numSrc.floatSrc, &DP_size);
+	curveset_sens->dp_size = 0;
+	record_readCalFile(sens);
+
 	// If there are still no data points - use default ones
-	if(DP_size == 0){
+	if(curveset_sens->dp_size == 0){
 		// Allocate and set the y-value array
-		DP_size = 3;
-		tbx_act.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
-		tbx_act.numSrc.floatSrc[0] = 0.0;
-		tbx_act.numSrc.floatSrc[1] = 100.0;
-		tbx_act.numSrc.floatSrc[2] = 200.0;
+		curveset_sens->dp_size = 3;
+		curveset_sens->dp_y = (float*)realloc(curveset_sens->dp_y, (curveset_sens->dp_size+1)*sizeof(float));
+		curveset_sens->dp_y[0] = 0.0;
+		curveset_sens->dp_y[1] = 100.0;
+		curveset_sens->dp_y[2] = 200.0;
 
 		// Allocate and set the x-value array
-		tbx_nom.numSrc.floatSrc = (float*)malloc(DP_size*sizeof(float));
-		tbx_nom.numSrc.floatSrc[0] = 0.0;
-		tbx_nom.numSrc.floatSrc[1] = 2048.0;
-		tbx_nom.numSrc.floatSrc[2] = 4096.0;
+		curveset_sens->dp_x = (float*)realloc(curveset_sens->dp_x, (curveset_sens->dp_size+1)*sizeof(float));
+		curveset_sens->dp_x[0] = 0.0;
+		curveset_sens->dp_x[1] = 2048.0;
+		curveset_sens->dp_x[2] = 4096.0;
+
 	}
 
 	// Check for allocation errors
-	if(tbx_act.numSrc.floatSrc == NULL || tbx_nom.numSrc.floatSrc == NULL)
-		printf("Memory malloc failed!\n");
+	if(curveset_sens->dp_x == NULL || curveset_sens->dp_y == NULL)
+		printf("Memory realloc failed!\n");
+
+	// Link textbox to x and y points
+	tbx_nom.numSrc.floatSrc = curveset_sens->dp_x;
+	tbx_act.numSrc.floatSrc = curveset_sens->dp_y;
 
 	// Link filter order textbox source to current sensor filter order
 	tbx_filter_interval.numSrc.intSrc = &filterset_sens->avgFilterInterval;
@@ -2288,11 +2302,7 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 				filterset_sens->errorThreshold = *tbx_error_threshold.numSrc.intSrc;
 
 				// Write CAL file
-				record_writeCalFile(filterset_sens, tbx_act.numSrc.floatSrc, tbx_nom.numSrc.floatSrc, DP_size);
-
-				// Free allocated memory
-				free(tbx_act.numSrc.floatSrc);
-				free(tbx_nom.numSrc.floatSrc);
+				record_writeCalFile(filterset_sens);
 
 				// Change menu
 				TFT_setMenu(menu_2setup1.index);
