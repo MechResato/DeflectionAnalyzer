@@ -178,5 +178,5 @@ Project Link: [https://github.com/MechResato/DeflectionAnalyzer](https://github.
 [issues-url]: https://github.com/MechResato/DeflectionAnalyzer/issues
 [license-shield]: https://img.shields.io/github/license/MechResato/DeflectionAnalyzer.svg?style=for-the-badge
 [license-url]: https://github.com/MechResato/DeflectionAnalyzer/blob/master/LICENSE.txt
-[product-screenshot]: images/overview.jpg
+[product-screenshot]: images/overview.png
 [pinout]: images/pinout.png
