@@ -2,9 +2,9 @@
  * main.c
  *  Created on: 2021 Feb 19 20:41:21
  *  Author: Rene Santeler @ MCI 2020/21
- *  Version: V0.3
+ *  Version: V1.0
  *  Comment: This project aims to design an extensible microcontroller system to support the user in calibrating, monitoring and
- *  recording of sensor data by using the example of a motorcycle suspension. To do so, a highly modular menu-framework for
+ *  recording of sensor data at the example of a motorcycle suspension. To do so, a highly modular menu-framework for
  *  touchscreens as well as multiple concepts for efficient sensor data management and SD-Card retention are implemented.
  *  The port of the EVE Library is taken from DataAcquisitionAnalyzerPlatform_XMC4700_V1.6 MCI Project done by Stefan Reinmüller and Rene Santeler.
  */
@@ -44,9 +44,6 @@ int main(void)
 		while(1U){ }
 	}
 	else{ printf("DAVE APPs initialization successful\n"); }
-
-	// Arm-M internal interrupt init
-	//SysTick_Config(SystemCoreClock / 144);
 
 	// Counter for TFT_display init
 	uint8_t display_ticker = 0;
@@ -89,7 +86,7 @@ int main(void)
 					menu_doScreenshot = 1;
 			#endif
 
-			/// RECORDING HANDLING
+			/// RECORD HANDLING
 			// If recording mode is active and there is something to record (current block is finished) write block to SD-Card
 			if(measureMode == measureModeRecording && fifo_finBlock[fifo_recordBlock] == 1){
 				// Timing measurement pin high

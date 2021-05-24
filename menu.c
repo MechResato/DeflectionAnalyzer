@@ -154,7 +154,7 @@ uint32_t tracker = 0; // Value of tracker register (1.byte=tag, 2.byte=value). U
 float_buffer_t f_deflection = 0.0;
 float_buffer_t r_deflection = 0.0;
 
-int_buffer_t record_time = 0;
+int16_t record_time = 0;
 
 
 
@@ -294,22 +294,22 @@ label lbl_dash_r = { //deflection rear
 };
 
 label lbl_dash_f_d = { //deflection front value
-		.x = M_COL_1,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),//.x = 130,		.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*3),
-		.font = 30,		.options = 0,		.text = "%d.%.1d mm",
+		.x = M_COL_1 + 115,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),//.x = 130,		.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*3),
+		.font = 30,		.options = EVE_OPT_RIGHTX,		.text = "%d mm",
 		.ignoreScroll = 0,
 		.numSrc.srcType = srcTypeFloat,
 		.numSrc.floatSrc = (float_buffer_t*)&f_deflection,
 		.numSrc.srcOffset = NULL,
-		.fracExp = 1
+		.fracExp = 0
 };
 label lbl_dash_r_d = { //deflection rear value
-		.x = 200,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),//.x = 130,		.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*2),
-		.font = 30,		.options = 0,		.text = "%d.%.1d mm",
+		.x = 200 + 100,				.y = M_UPPER_PAD + M_SETUP_UPPERBOND + (M_ROW_DIST*1),//.x = 130,		.y = M_UPPER_PAD + M_1_UPPERBOND + (M_ROW_DIST*2),
+		.font = 30,		.options = EVE_OPT_RIGHTX,		.text = "%d mm",
 		.ignoreScroll = 0,
 		.numSrc.srcType = srcTypeFloat,
 		.numSrc.floatSrc = (float_buffer_t*)&r_deflection,
 		.numSrc.srcOffset = NULL,
-		.fracExp = 1
+		.fracExp = 0
 };
 
 
@@ -1019,6 +1019,69 @@ void TFT_display_get_values(void){
 //		Monitoring          --------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+enum menuMonitorInput{menuMonitorInputS1Raw=0, menuMonitorInputS1, menuMonitorInputS2Raw, menuMonitorInputS2};
+typedef enum menuMonitorInput menuMonitorInput;
+void menu_monitor_setInput(uint8_t inputTyp){
+	/// Set the main graph settings and link to the specific input
+	/// inputTyp ... Is the index of the wanted input (see inputType in globals)
+
+	// Set global input type mark
+	inputType = inputTyp;
+
+	// Change graph settings
+	if(inputTyp == menuMonitorInputS1Raw){
+		monitorSensorIdx = sensor1.index;
+		btn_input.text = "S1 Raw";
+		lbl_sensor_val.text = "%d";
+		lbl_sensor_val.numSrc.srcType = srcTypeInt;
+		lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)sensor1.bufRaw;
+		lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
+		lbl_sensor_val.fracExp = 1;
+
+		gph_monitor.amp_max = 5.2;
+		gph_monitor.y_max = 4095.0;
+		gph_monitor.y_label = "V";
+	}
+	else if(inputTyp == menuMonitorInputS1){
+		monitorSensorIdx = sensor1.index;
+		btn_input.text = "S1 Front";
+		lbl_sensor_val.text = "%d.%.2d mm";
+		lbl_sensor_val.numSrc.srcType = srcTypeFloat;
+		lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor1.bufConv;
+		lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
+		lbl_sensor_val.fracExp = 2;
+
+		gph_monitor.amp_max = 160;
+		gph_monitor.y_max = 160;
+		gph_monitor.y_label = "mm";
+	}
+	else if(inputTyp == menuMonitorInputS2Raw){
+		monitorSensorIdx = sensor2.index;
+		btn_input.text = "S2 Raw";
+		lbl_sensor_val.text = "%d";
+		lbl_sensor_val.numSrc.srcType = srcTypeInt;
+		lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)sensor2.bufRaw;
+		lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
+		lbl_sensor_val.fracExp = 1;
+
+		gph_monitor.amp_max = 5.2;
+		gph_monitor.y_max = 4095.0;
+		gph_monitor.y_label = "V";
+	}
+	else if(inputTyp == menuMonitorInputS2){
+		monitorSensorIdx = sensor2.index;
+		btn_input.text = "S2 Rear";
+		lbl_sensor_val.text = "%d.%.2d mm";
+		lbl_sensor_val.numSrc.srcType = srcTypeFloat;
+		lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor2.bufConv;
+		lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
+		lbl_sensor_val.fracExp = 2;
+
+		gph_monitor.amp_max = 160;
+		gph_monitor.y_max = 160;
+		gph_monitor.y_label = "mm";
+	}
+}
 void menu_display_static_0monitor(void){
 	// Set configuration for current menu
 	TFT_setMenu(menu_0monitor.index);
@@ -1056,13 +1119,13 @@ void menu_display_0monitor(void){
 
 	/////////////// GRAPH
 	///// Print dynamic part of the Graph (data & marker)
-	if(inputType == 0)
+	if(inputType == menuMonitorInputS1Raw)
 		TFT_graph_pixeldata_i(&gph_monitor, sensors[monitorSensorIdx]->bufRaw, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
-	else if(inputType == 1)
+	else if(inputType == menuMonitorInputS1)
 		TFT_graph_pixeldata_f(&gph_monitor, sensors[monitorSensorIdx]->bufConv, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
-	else if(inputType == 2)
+	else if(inputType == menuMonitorInputS2Raw)
 		TFT_graph_pixeldata_i(&gph_monitor, sensors[monitorSensorIdx]->bufRaw, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
-	else if(inputType == 3)
+	else if(inputType == menuMonitorInputS2)
 		TFT_graph_pixeldata_f(&gph_monitor, sensors[monitorSensorIdx]->bufConv, S_BUF_SIZE, (uint16_t*)&sensors[monitorSensorIdx]->bufIdx, GRAPH_DATA1COLOR); // ignore volatile sensor
 
 }
@@ -1098,61 +1161,14 @@ void menu_touch_0monitor(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 
 				// Switch signal type
 				inputType++;
+				// Do not allow view of converted values in recording mode (they are not captured!)
+				if(measureMode == measureModeRecording && inputType % 2 != 0)
+					inputType++;
+				// Overleap correction
 				if(inputType > 3){ inputType = 0; }
 
 				// Switch label of button to new input type
-				if(inputType == 0){
-					monitorSensorIdx = sensor1.index;
-					btn_input.text = "S1 Raw";
-					lbl_sensor_val.text = "%d";
-					lbl_sensor_val.numSrc.srcType = srcTypeInt;
-					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)sensor1.bufRaw;
-					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
-					lbl_sensor_val.fracExp = 1;
-
-					gph_monitor.amp_max = 5.2;
-					gph_monitor.y_max = 4095.0;
-					gph_monitor.y_label = "V";
-				}
-				else if(inputType == 1){
-					monitorSensorIdx = sensor1.index;
-					btn_input.text = "S1 Front";
-					lbl_sensor_val.text = "%d.%.2d mm";
-					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
-					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor1.bufConv;
-					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor1.bufIdx; // (ignore volatile here)
-					lbl_sensor_val.fracExp = 2;
-
-					gph_monitor.amp_max = 160;
-					gph_monitor.y_max = 160;
-					gph_monitor.y_label = "mm";
-				}
-				else if(inputType == 2){
-					monitorSensorIdx = sensor2.index;
-					btn_input.text = "S2 Raw";
-					lbl_sensor_val.text = "%d";
-					lbl_sensor_val.numSrc.srcType = srcTypeInt;
-					lbl_sensor_val.numSrc.intSrc = (int_buffer_t*)sensor2.bufRaw;
-					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
-					lbl_sensor_val.fracExp = 1;
-
-					gph_monitor.amp_max = 5.2;
-					gph_monitor.y_max = 4095.0;
-					gph_monitor.y_label = "V";
-				}
-				else if(inputType == 3){
-					monitorSensorIdx = sensor2.index;
-					btn_input.text = "S2 Rear";
-					lbl_sensor_val.text = "%d.%.2d mm";
-					lbl_sensor_val.numSrc.srcType = srcTypeFloat;
-					lbl_sensor_val.numSrc.floatSrc = (float_buffer_t*)sensor2.bufConv;
-					lbl_sensor_val.numSrc.srcOffset = (uint16_t*)&sensor2.bufIdx; // (ignore volatile here)
-					lbl_sensor_val.fracExp = 2;
-
-					gph_monitor.amp_max = 160;
-					gph_monitor.y_max = 160;
-					gph_monitor.y_label = "mm";
-				}
+				menu_monitor_setInput(inputType);
 
 				// Refresh menu (needed to reprint static part of graph)
 				TFT_setMenu(-1);
@@ -1187,10 +1203,30 @@ void menu_display_1dash(void){
 	/// Menu specific display code. This will run if the corresponding menu is active and the main tft_display() is called.
 	/// This menu ...
 
+	// Refresh deflection only every 10th measurement
+	if(measurementCounter % 13 == 0){
+		if(measureMode == measureModeRecording){
+			// Calculate current filter value clean (it is not moving during record!)
+			float_buffer_t s1_fil_tmp = measure_movAvgFilter_clean((sensor*)&sensor1, sensor1.avgFilterInterval, 0);
+			float_buffer_t s2_fil_tmp = measure_movAvgFilter_clean((sensor*)&sensor2, sensor1.avgFilterInterval, 0);
 
-	// Calculate current deflection
-	f_deflection = (float)sensor1.bufConv[sensor1.bufIdx] - sensor1.originPoint - sensor1.operatingPoint;
-	r_deflection = (float)sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint - sensor2.operatingPoint;
+			// Calculate current deflection from temp filtered value
+			f_deflection = poly_calc(s1_fil_tmp, (float*)sensor1.fitCoefficients, sensor1.fitOrder) - sensor1.originPoint - sensor1.operatingPoint;
+			r_deflection = poly_calc(s2_fil_tmp, (float*)sensor2.fitCoefficients, sensor2.fitOrder) - sensor2.originPoint - sensor2.operatingPoint;
+
+			// Refresh time
+			record_time = measurementCounter * (MEASUREMENT_INTERVAL/1000);
+		}
+		else if(measureMode == measureModeMonitoring){
+			// Calculate current deflection from current value in buffer
+			f_deflection = (float)sensor1.bufConv[sensor1.bufIdx] - sensor1.originPoint - sensor1.operatingPoint;
+			r_deflection = (float)sensor2.bufConv[sensor2.bufIdx] - sensor2.originPoint - sensor2.operatingPoint;
+		}
+		else{
+			// Produce a NAN
+			f_deflection = r_deflection = 0.0 / 0.0;
+		}
+	}
 
 	// Change record button name if needed
 	static measureModes lastMeasMode;
@@ -1267,6 +1303,9 @@ void menu_touch_1dash(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgress
 
 				// Start/Stop recording
 				if(measureMode == measureModeMonitoring){
+					// Set monitoring graph to raw Sensor1
+					menu_monitor_setInput(menuMonitorInputS1Raw);
+
 					// Start recording
 					measurementCounter = 0;
 					int8_t res = record_start();
@@ -1338,7 +1377,7 @@ void menu_display_static_2setup1(void){
 	/// Draw Banner and divider line on top
 	TFT_header_static(1, &menu_2setup1);
 
-	// Set Color
+	// Set color
 	TFT_setColor(1, BLACK, MAIN_BTNCOLOR, MAIN_BTNCTSCOLOR, MAIN_BTNGRDCOLOR);
 
 	/// Recording section
@@ -1701,11 +1740,9 @@ void curveset_prepare(volatile sensor* sens){
 
 
 	// Link actual value array to corresponding textbox
-	//tbx_act.numSrc.floatSrc = &tbx_act.numSrc.floatSrc[0];
 	tbx_act.numSrc.srcOffset = &DP_cur;
 
 	// Link actual value array to corresponding textbox
-	//tbx_nom.numSrc.floatSrc = &tbx_nom.numSrc.floatSrc[0];
 	tbx_nom.numSrc.srcOffset = &DP_cur;
 
 	// Determine fitted polynomial for the first time
@@ -1953,8 +1990,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 						break;
 				}
 
-				// TODO: Warn user if there are to less points for selected function
-				// ...
+				// Consideration: Warn user if there are to less points for selected function
 
 				// Determine fitted polynomial after order change
 				fit_result = polyfit(tbx_nom.numSrc.floatSrc, tbx_act.numSrc.floatSrc, curveset_sens->dp_size, fit_order, coefficients);
@@ -2087,7 +2123,7 @@ void menu_touch_curveset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProgr
 				else
 					curveset_setEditMode(1);
 
-				// Refresh static part of display (e.g. to show new textboxbackground when one changes from read-only to read-write)
+				// Refresh static part of display (e.g. to show new textbox background when one changes from read-only to read-write)
 				TFT_setMenu(-1);
 			}
 			break;
@@ -2112,33 +2148,33 @@ void filterset_prepare(volatile sensor* sens){
 
 	// Check if CAL file exists and load current settings if possible
 	// Load Values from SD-Card if possible, or use standard values
-	curveset_sens->dp_size = 0;
+	filterset_sens->dp_size = 0;
 	record_readCalFile(sens);
 
 	// If there are still no data points - use default ones
-	if(curveset_sens->dp_size == 0){
+	if(filterset_sens->dp_size == 0){
 		// Allocate and set the y-value array
-		curveset_sens->dp_size = 3;
-		curveset_sens->dp_y = (float*)realloc(curveset_sens->dp_y, (curveset_sens->dp_size+1)*sizeof(float));
-		curveset_sens->dp_y[0] = 0.0;
-		curveset_sens->dp_y[1] = 100.0;
-		curveset_sens->dp_y[2] = 200.0;
+		filterset_sens->dp_size = 3;
+		filterset_sens->dp_y = (float*)realloc(filterset_sens->dp_y, (filterset_sens->dp_size+1)*sizeof(float));
+		filterset_sens->dp_y[0] = 0.0;
+		filterset_sens->dp_y[1] = 100.0;
+		filterset_sens->dp_y[2] = 200.0;
 
 		// Allocate and set the x-value array
-		curveset_sens->dp_x = (float*)realloc(curveset_sens->dp_x, (curveset_sens->dp_size+1)*sizeof(float));
-		curveset_sens->dp_x[0] = 0.0;
-		curveset_sens->dp_x[1] = 2048.0;
-		curveset_sens->dp_x[2] = 4096.0;
+		filterset_sens->dp_x = (float*)realloc(filterset_sens->dp_x, (filterset_sens->dp_size+1)*sizeof(float));
+		filterset_sens->dp_x[0] = 0.0;
+		filterset_sens->dp_x[1] = 2048.0;
+		filterset_sens->dp_x[2] = 4096.0;
 
 	}
 
 	// Check for allocation errors
-	if(curveset_sens->dp_x == NULL || curveset_sens->dp_y == NULL)
+	if(filterset_sens->dp_x == NULL || filterset_sens->dp_y == NULL)
 		printf("Memory realloc failed!\n");
 
 	// Link textbox to x and y points
-	tbx_nom.numSrc.floatSrc = curveset_sens->dp_x;
-	tbx_act.numSrc.floatSrc = curveset_sens->dp_y;
+	tbx_nom.numSrc.floatSrc = filterset_sens->dp_x;
+	tbx_act.numSrc.floatSrc = filterset_sens->dp_y;
 
 	// Link filter order textbox source to current sensor filter order
 	tbx_filter_interval.numSrc.intSrc = &filterset_sens->avgFilterInterval;
@@ -2375,7 +2411,6 @@ void menu_touch_filterset(uint8_t tag, uint8_t* toggle_lock, uint8_t swipeInProg
 			// Handle textbox and if an OK was pressed an the active keypad stop cell from being updated
 			if(TFT_textbox_touch(&tbx_error_threshold))
 				filterset_setEditMode(0);
-
 			break;
 	}
 }

@@ -1035,7 +1035,6 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 
 		// Reset index counter
 		sensArray[i]->bufIdx = sensArray[i]->bufMaxIdx;
-		sensArray[i]->errorLastValid = 0;
 		sensArray[i]->avgFilterSum = 0;
 
 		// Set the current error count to the filter interval. This lets the filter ignore that the entry's before the first one are still empty
@@ -1171,6 +1170,4 @@ void record_convertBinFile(const char* filename, sensor** sensArray){
 
 	// Restart measuring
 	measureMode = measureModeMonitoring;
-
-
 }
