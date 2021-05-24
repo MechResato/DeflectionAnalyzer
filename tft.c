@@ -466,7 +466,10 @@ void TFT_label_display(uint8_t burst, label* lbl){
 				else
 					fracPart = modff(lbl->numSrc.floatSrc[*lbl->numSrc.srcOffset], &intPart);
 				// Print the string while using text as format and raising the fraction to the power of 10 given by fracExp
-				(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, lbl->font, EVE_OPT_FORMAT | lbl->options, lbl->text, 2 ,FLOAT_TO_INT16(intPart), FLOAT_TO_INT16(fabsf( fracPart*(pow10f((float)lbl->fracExp)))) ); //"%d.%.2d"
+				if(lbl->fracExp == 0)
+					(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, lbl->font, EVE_OPT_FORMAT | lbl->options, lbl->text, 2 ,FLOAT_TO_INT16(intPart) ); //"%d"
+				else
+					(*EVE_cmd_text_var__fptr_arr[burst])(lbl->x, curY, lbl->font, EVE_OPT_FORMAT | lbl->options, lbl->text, 2 ,FLOAT_TO_INT16(intPart), FLOAT_TO_INT16(fabsf( fracPart*(pow10f((float)lbl->fracExp)))) ); //"%d.%.2d"
 			}
 		}
 		// No source given -> print pure text
@@ -504,7 +507,7 @@ void TFT_control_display(control* ctrl){
 		curY -= TFT_cur_ScrollV;
 	}
 
-	// Only show textbox if it is inside display
+	// Only show control if it is inside display
 	if(ctrl->ignoreScroll || (curY > TFT_UpperBond && curY < EVE_VSIZE)){
 		// Set assigned Tag
 		EVE_cmd_dl_burst(TAG(ctrl->mytag)); /* do not use the following objects for touch-detection */

@@ -29,12 +29,12 @@ extern volatile uint8_t fifo_writeBlock;				// current block to write
 extern volatile uint8_t fifo_finBlock[];				// array of which block is finished an can be recorded
 
 
-/// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter order sum must not be changed outside of this!!!
+/// Implementation of an moving average filter on an ring-buffer. This version is very fast but it needs to be started on an 0'd out buffer and the filter interval sum must not be changed outside of this!!!
 /// If this gets out of sync, use the slow version measure_movAvgFilter_clean before using this again (globals.h).
 /// Note: This only subtracts the oldest and adds the newest entry to the stored sum before dividing.
 #define MEASURE_MOVAVGFILTER(sens, divider)                       				\
 	/* Get index of oldest element, which shall be removed
-	 * (current index - filter order with roll-over check) */					\
+	 * (current index - filter interval with roll-over check) */					\
 	int32_t oldIdx = sens->bufIdx - sens->avgFilterInterval;					\
 	if(oldIdx < 0) oldIdx += sens->bufMaxIdx+1;									\
 	/* Subtract oldest element and add newest to sum */							\
@@ -202,13 +202,13 @@ void measure_postProcessing(volatile sensor* sens){
 
 
 #if POSTPROCESS_CHANGEORDER_AT_ERRORS == 1
-	/// Check for sensor errors and try to reduce filter order on every encounter. Detects errors that are entering or
-	/// leaving the filter interval and changes the filter order accordingly. Set sens.errorOccured to sens.avgFilterOrder
+	/// Check for sensor errors and try to reduce filter interval on every encounter. Detects errors that are entering or
+	/// leaving the filter interval and changes the filter interval accordingly. Set sens.errorOccured to sens.avgFilterOrder
 	/// at the beginning of the measurement to ignore not yet written values and allow correct values to be written (no
 	/// ramp up). Errors are represented by a 0 value in the raw buffer. Make sure this can never be an actual value.
 
-	// The filter order compensated by the errors
-	int16_t compFilterOrder;
+	// The compensated filter interval
+	int16_t compFilterInterval;
 
 	/// Check if oldest value in filter interval (to be removed) was an error, if so decrease error counter
 	if(sens->errorOccured != 0){
@@ -235,22 +235,22 @@ void measure_postProcessing(volatile sensor* sens){
 	}
 
 	// If no errors in filter interval - use avgFilterOrder as average divider
-	// Else if errors in filter interval - use filter order compensated by number of errors occurred (number of actual values in interval, used) as divider
+	// Else if errors in filter interval - use filter interval compensated by number of errors occurred (number of actual values in interval, used) as divider
 	if(sens->errorOccured == 0)
-		compFilterOrder = sens->avgFilterInterval;
+		compFilterInterval = sens->avgFilterInterval;
 	else
-		compFilterOrder = sens->avgFilterInterval - sens->errorOccured;
+		compFilterInterval = sens->avgFilterInterval - sens->errorOccured;
 
 #elif POSTPROCESS_INTERPOLATE_ERRORS == 1
 	/// Check for sensor errors and try to interpolate a raw value. This should be OK as long as the frequency of the,
-	/// to be measured, event is much lower than the frequency time, the average filter order adjusted to the application
+	/// to be measured, event is much lower than the frequency time, the average filter interval adjusted to the application
 	/// and only few errors occur at a time. Square interpolation was ruled out due to performance issues (on first tests
 	/// the linear approach made the slope only ~400ns slower when errors occur). However with this method the raw value
 	/// can't be used to detect errors (it might be interpolated!) therefore the errorOccured property of the sensor
 	/// struct must be recorded as well!
 
-	// Filter order is never changed with this approach
-	static int16_t compFilterOrder = sens->avgFilterInterval;
+	// Filter interval is never changed with this approach
+	static int16_t compFilterInterval = sens->avgFilterInterval;
 
 	/// Check if newest value in filter interval (to be added) is an error
 	if(sens->bufRaw[sensBufIdx] > sens->errorThreshold){
@@ -283,13 +283,13 @@ void measure_postProcessing(volatile sensor* sens){
 	/// Post processing: Calculate filtered/converted value and fill corresponding buffers
 #if POSTPROCESS_BUGGED_VALUES == 1
 	// Always calculate filtered and converted value if possible (even if current value was an error)
-	if(compFilterOrder){
+	if(compFilterInterval){
 #else
 	// Only calculate filtered and converted value if no error are in filter interval
-	if(compFilterOrder && sens->bufRaw[sens->bufIdx] != 0){
+	if(compFilterInterval && sens->bufRaw[sens->bufIdx] != 0){
 #endif
 		// Set current filter value
-		MEASURE_MOVAVGFILTER(sens, compFilterOrder);
+		MEASURE_MOVAVGFILTER(sens, compFilterInterval);
 
 		// Set current converted value
 		MEASURE_POLYCONVERSION(sens, sens->bufIdx);

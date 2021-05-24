@@ -40,28 +40,27 @@ volatile uint8_t monitorSensorIdx;
 #define SENSOR_RAW_SIZE sizeof(int_buffer_t) // Bytes. Size of the a variable that represents the raw value. FIFO_BLOCK_SIZE MUST BE DIVISIBLE BY THIS!
 #define STR_SPEC_MAXLEN 20
 typedef struct {
-	uint8_t index;
-	char*   name;
-	ADC_MEASUREMENT_CHANNEL_t* adcChannel;
-	uint16_t        bufIdx;
-	uint16_t        bufMaxIdx;
-	int_buffer_t*   bufRaw;
-	float_buffer_t* bufFilter;
-	float_buffer_t* bufConv;
-	float_buffer_t  originPoint;
-	float_buffer_t  operatingPoint;
-	uint8_t	 	  errorOccured;	  		// Number of error-measurements that occurred since last valid value. If this is 0 the current value is valid.
-	int_buffer_t  errorThreshold; 		// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
-	int32_t		  errorLastValid;
-	float     avgFilterSum;
-	uint16_t  avgFilterInterval;
-	char*   fitFilename;
-	uint8_t  fitFilename_curLen;
-	uint8_t fitOrder;
-	float   fitCoefficients[4];
-	float* dp_x;
-	float* dp_y;
-	uint16_t dp_size;
+	uint8_t index; // Index of the sensor
+	char*   name; // Name of the sensor (like "S1_Front")
+	ADC_MEASUREMENT_CHANNEL_t* adcChannel; // DAVE APP ADC channel
+	uint16_t        bufIdx; 		// Index of current value in buffers
+	uint16_t        bufMaxIdx; 		// Maximum index of all buffers
+	int_buffer_t*   bufRaw; 		// The raw value buffer
+	float_buffer_t* bufFilter; 		// The filtered value buffer
+	float_buffer_t* bufConv; 		// The converted value buffer
+	float_buffer_t  originPoint; 	// Offset to actual zero point
+	float_buffer_t  operatingPoint; // Offset from origin to operating point
+	uint8_t	 	  errorOccured;	  	// Number of error-measurements that occurred since last valid value. If this is 0 the current value is valid.
+	int_buffer_t  errorThreshold; 	// Raw value above this threshold will be considered as invalid ( errorOccured=1 ). The stored value will be linear interpolated on the last Filter values.
+	float     avgFilterSum; 		// Sum of all values in filter interval (moving)
+	uint16_t  avgFilterInterval; 	// Size of the filter interval
+	char*   fitFilename; 			// Filename of the CAL file
+	uint8_t fitFilename_curLen; 	// Length of the CAL filename
+	uint8_t fitOrder; 				// Function order for curve fit
+	float   fitCoefficients[4]; 	// Estimated coefficients of the polynomial
+	float*  dp_x; 					// X-value of data points used for fit
+	float*  dp_y; 					// Y-value of data points used for fit
+	uint16_t dp_size; 				// Number of data points used for fit
 } sensor;
 
 // Sensor 1 Front
@@ -138,6 +137,6 @@ void SysTick_Handler(); // Interrupt Routine - used for delay_ms
 void delay_ms(uint32_t ms); // Delay execution by given milliseconds - used in tft.h->EVE.h->EVE_target.h
 
 float poly_calc (float c_x, float* f_coefficients, uint8_t order);
-void measure_movAvgFilter_clean(sensor* sens, uint16_t filterOrder, uint8_t compFilterOrder);
+float_buffer_t measure_movAvgFilter_clean(sensor* sens, uint16_t filterInterval, uint8_t compFilterOrder);
 
 #endif /* GLOBALS_H_ */

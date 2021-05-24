@@ -11,7 +11,7 @@
 #include <globals.h>
 
 /*  SYSTEM VARIABLEs */
-volatile uint8_t main_trigger = 0; // Trigger tft display function. Is set every time by Adc_Measurement_Handler (used in main and measure)
+volatile uint8_t main_trigger = 0; // Trigger for main loop. Is set every time by Adc_Measurement_Handler (used in main and measure)
 
 
 /*  MEASUREMENTs */
@@ -115,14 +115,15 @@ float poly_calc (float c_x, float* f_Coefficients, uint8_t order){
 	// Calculate every term and add it to the result
 	for(uint8_t i = 1; i < order+1; i++)
 		result += f_Coefficients[i] * powf(c_x, i);
-	// return result
+	// Return result
 	return result;
 }
 
-void measure_movAvgFilter_clean(sensor* sens, uint16_t filterOrder, uint8_t compFilterOrder){
+float_buffer_t measure_movAvgFilter_clean(sensor* sens, uint16_t filterInterval, uint8_t compFilterOrder){
 	/// Implementation of an moving average filter on an ring-buffer. This version is used to reevaluate the sum variable if the filter order is changed or the buffer is not 0'd when the filter starts.
 	/// It can also be used to calculate the sum over the filter while ignoring zeroed out values (decrease order/divider with every 0 found during sum).
 	/// Note: This resets the sum and adds all elements between the oldest and newest entry to it before dividing.
+	/// Return the filtered value (only needed if the value is processes async of buffers - see dashboard display code)
 
 
 	// Get index of oldest element, which shall be removed (current index minus filter order with roll-over check)
@@ -139,8 +140,11 @@ void measure_movAvgFilter_clean(sensor* sens, uint16_t filterOrder, uint8_t comp
 	// Calculate average and return it
 	if(compFilterOrder != 0)
 		sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / compFilterOrder;
-	else if(filterOrder != 0)
-		sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / filterOrder;
+	else if(filterInterval != 0)
+		sens->bufFilter[sens->bufIdx] = sens->avgFilterSum / filterInterval;
 	else
 		sens->bufFilter[sens->bufIdx] = 0;
+
+	// Return result
+	return sens->bufFilter[sens->bufIdx];
 }

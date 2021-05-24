@@ -46,6 +46,7 @@ void menu_display_static_3setup2(void);
 void menu_display_static_curveset(void);
 void menu_display_static_filterset(void);
 
+//void menuMonitor_setInput_(uint8_t);
 void menu_display_0monitor(void);
 void menu_display_1dash(void);
 void menu_display_2setup1(void);
