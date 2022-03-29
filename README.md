@@ -80,7 +80,7 @@
 
 ### Motivation
 
-The currently here growing project acts as a storage for a theses and is still under construction (estimated finalization May 2021). The main goals of the project are:
+The main goals of this project are:
 * Design of an detachable Platform used to analyze motorcycle suspensions
 * Highly modular code structure to be reused in various situations
 * Creation of an reusable embedded system platform with sensor/bus input (0-5V, 4-20mA, I2C, SPI, CAN, ...) as well as output via TFT and logging on an SD-Card
@@ -100,8 +100,9 @@ Preview Video: [https://www.youtube.com/watch?v=uU-0lam_NbY](https://www.youtube
 
 <!-- GETTING STARTED -->
 ## Getting Started
+The application is developed with Infineon [DAVE 4.4.2](https://softwaretools.infineon.com/tools/com.ifx.tb.tool.daveide). You need to download the project and import it into the DAVE workspace. Make sure it is imported correctly and set as active project. Next use the "Rebuild Active Project" button to compile it and click the "Debug" button. In the pop up window double click "GDB SEGGER J-Link Debugging" and it should configure it self automatically. In the tab "Startup" the checkbox "Enable semihosting" MUST be activated to use this (enables debug message transport without uart).
 
-The firmware is written using [Infineon DAVE 4.4.2](https://infineoncommunity.com/dave-download_ID645). It is meant to be used with an Infineon XMC4700 Relax Kit (Version with assembled SD-Card mount, CAN transceiver and RTC) as microcontroller and a RiTFT-43-CAP-UX (4.3″ 480x272px TFT with capacitive touchscreen and BT81x Embedded Video Engine (EVE) coprocessor from Riverdi). The used (custom) mainboard is not necessary, but in this case the connections must be done according to following figure:
+This is meant to be used with an Infineon XMC4700 Relax Kit (Version with assembled SD-Card mount, CAN transceiver and RTC) as microcontroller and a RiTFT-43-CAP-UX (4.3″ 480x272px TFT with capacitive touchscreen and BT81x Embedded Video Engine (EVE) coprocessor from Riverdi). The used (custom) mainboard is not necessary, but in this case the connections must be done according to following figure:
 
 [![Main schematics of the main board][pinout]](https://github.com/MechResato/DeflectionAnalyzer/tree/master/images)
 
